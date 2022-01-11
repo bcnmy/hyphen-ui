@@ -335,10 +335,6 @@ const TransactionProvider: React.FC = (props) => {
     }
   }, [errors, fetchTransactionFee]);
 
-  useEffect(() => {
-    if (transactionFee) console.log(transactionFee);
-  }, [transactionFee]);
-
   const preDepositCheck = useCallback(async () => {
     if (!transferAmount || errors.length > 0) {
       throw new Error("Invalid transfer amount");

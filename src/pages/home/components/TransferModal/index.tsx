@@ -79,11 +79,11 @@ const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
   }, [executed, executePreDepositCheckError, onError, active]);
 
   useEffect(() => {
-    if (executed && executePreDepositCheckStatus === Status.SUCCESS) {
+    if (executed && executePreDepositCheckStatus === Status.SUCCESS && active) {
       onNextStep();
       setExecuted(false);
     }
-  }, [executed, executePreDepositCheckStatus, onNextStep]);
+  }, [executed, executePreDepositCheckStatus, onNextStep, active]);
 
   return (
     <div className={!active && !completed ? "opacity-30" : ""}>

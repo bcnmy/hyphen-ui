@@ -1,8 +1,10 @@
 import { ChainConfig } from "..";
 import { NATIVE_ADDRESS } from "../../constants";
+import ethLogo from "../../../assets/images/chains/eth-logo.svg"
 
 export const ETHEREUM: ChainConfig = {
   name: "Ethereum",
+  image: ethLogo,
   subText: "Ethereum Mainnet",
   chainId: 1,
   rpcUrl: "https://mainnet.infura.io/v3/d126f392798444609246423b06116c77",

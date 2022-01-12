@@ -5,6 +5,7 @@ import { twMerge } from "tailwind-merge";
 
 export interface Option {
   name: string;
+  image?: string;
   id: any;
   disabled?: boolean;
   tooltip?: string;
@@ -13,7 +14,6 @@ export interface ISelectProps {
   options: Option[];
   selected?: Option;
   setSelected: (option: Option) => void;
-  narrow?: boolean;
   label: string;
 }
 
@@ -21,7 +21,6 @@ export const Select: React.FunctionComponent<ISelectProps> = ({
   selected,
   setSelected,
   options,
-  narrow,
   label,
 }) => {
   return (
@@ -30,7 +29,7 @@ export const Select: React.FunctionComponent<ISelectProps> = ({
         {label}
       </Listbox.Label>
       <div className="relative mt-1">
-        <Listbox.Button className="relative w-full py-2 pl-3 pr-10 text-left bg-white rounded-lg shadow-md border border-hyphen-purple border-opacity-20 cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
+        <Listbox.Button className="relative w-full py-2 pl-4 pr-10 text-left bg-white rounded-lg shadow-md border border-hyphen-purple border-opacity-20 cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
           <span className="block truncate">
             {selected ? selected.name : ""}
           </span>
@@ -50,9 +49,7 @@ export const Select: React.FunctionComponent<ISelectProps> = ({
                 key={option.id}
                 className={({ active }) =>
                   `${active ? "text-amber-900 bg-amber-100" : "text-gray-900"}
-                    cursor-default select-none relative py-2 ${
-                      narrow ? "pl-4" : "pl-10"
-                    } pr-4`
+                      cursor-default select-none relative py-2 pr-10 pl-4`
                 }
                 value={option}
                 disabled={!!option.disabled}
@@ -64,13 +61,14 @@ export const Select: React.FunctionComponent<ISelectProps> = ({
                         selected ? "font-medium" : "font-normal"
                       } block truncate`}
                     >
+                      {/* <img src={option.image} alt={option.name} /> */}
                       {option.name}
                     </span>
                     {selected ? (
                       <span
                         className={twMerge(
                           active ? "text-amber-600" : "text-amber-600",
-                          "absolute inset-y-0 left-0 flex items-center pl-3",
+                          "absolute inset-y-0 right-0 flex items-center pr-3",
                           option.disabled && "text-opacity-60"
                         )}
                       >

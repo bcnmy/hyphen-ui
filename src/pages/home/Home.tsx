@@ -112,7 +112,7 @@ const Home: React.FC<HomeProps> = (props) => {
           <div className="max-w-xl mx-auto flex flex-col flex-grow">
             <div className="relative z-10 flex-grow">
               <div className="absolute opacity-80 inset-2 rounded-3xl bg-hyphen-purple/75 blur-lg -z-10"></div>
-              <div className="mx-4 mt-4 min-w-0 bg-white px-4 py-6 rounded-3xl flex-grow flex flex-col gap-2 shadow-lg">
+              <div className="mx-4 mt-4 min-w-0 bg-white p-6 rounded-3xl flex-grow flex flex-col gap-2 shadow-lg">
                 <div className="flex justify-between items-center">
                   <img
                     src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}

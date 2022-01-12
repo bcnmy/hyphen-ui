@@ -50,7 +50,11 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     return (
       <div className="flex justify-center gap-8 mt-4">
         <PrimaryButtonLight
-          onClick={() => switchNetwork(walletProvider!, fromChain)}
+          onClick={() => {
+            if (!walletProvider || !fromChain)
+              throw new Error("Prerequisites missing");
+            switchNetwork(walletProvider, fromChain);
+          }}
         >
           Switch to {fromChain?.name}
         </PrimaryButtonLight>

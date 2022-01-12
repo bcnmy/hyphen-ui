@@ -75,19 +75,19 @@ const ChainsProvider: React.FC = (props) => {
   // whenever from chain changes, if a to chain is not selected,
   // or if the selected to chain is not valid, then default to the first
   // suitable to chain
-  useEffect(() => {
-    if (!fromChain) return;
-    if (
-      !toChain ||
-      config.chainMap[fromChain.chainId].indexOf(toChain.chainId) === -1
-    ) {
-      setToChain(
-        chainsList.find(
-          (chain) => chain.chainId === config.chainMap[fromChain.chainId][0]
-        )
-      );
-    }
-  }, [fromChain, toChain]);
+  // useEffect(() => {
+  //   if (!fromChain) return;
+  //   if (
+  //     !toChain ||
+  //     config.chainMap[fromChain.chainId].indexOf(toChain.chainId) === -1
+  //   ) {
+  //     setToChain(
+  //       chainsList.find(
+  //         (chain) => chain.chainId === config.chainMap[fromChain.chainId][0]
+  //       )
+  //     );
+  //   }
+  // }, [fromChain, toChain]);
 
   useEffect(() => {
     (async () => {
@@ -121,7 +121,7 @@ const ChainsProvider: React.FC = (props) => {
     (chain: ChainConfig) => {
       if (
         fromChain &&
-        config.chainMap[fromChain.chainId].indexOf(chain.chainId) !== -1
+        config.chainMap[fromChain.chainId].includes(chain.chainId)
       ) {
         setToChain(chain);
       } else {

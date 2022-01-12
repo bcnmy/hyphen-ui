@@ -6,7 +6,7 @@ export const RINKEBY: ChainConfig = {
   subText: "Ethereum testnet",
   chainId: 4,
   rpcUrl: "https://rinkeby.infura.io/v3/d126f392798444609246423b06116c77",
-  currency: "Rinkeby ETH",
+  currency: "RETH",
   nativeToken: NATIVE_ADDRESS,
   nativeDecimal: 18,
   nativeFaucetURL: "https://rinkeby-faucet.com/",

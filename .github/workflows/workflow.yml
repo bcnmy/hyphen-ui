@@ -26,6 +26,9 @@ jobs:
         run: |
           yarn install
           yarn run build
+        env:
+          CI: false
+          NODE_OPTIONS: --max_old_space_size=4096
       - if: github.ref == 'refs/heads/master'
         name: Generate build
         run: |

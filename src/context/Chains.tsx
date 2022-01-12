@@ -132,9 +132,13 @@ const ChainsProvider: React.FC = (props) => {
   );
 
   const switchChains = useCallback(() => {
-    setToChain(fromChain);
-    setFromChain(toChain);
+    if (fromChain && toChain) {
+      setFromChain(toChain);
+      setToChain(fromChain);
+    }
   }, [toChain, fromChain]);
+
+  console.log(toChain);
 
   return (
     <ChainsContext.Provider

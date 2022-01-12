@@ -8,11 +8,16 @@ import { useTransactionInfoModal } from "context/TransactionInfoModal";
 import { Status } from "hooks/useLoading";
 import React, { useMemo } from "react";
 import Skeleton from "react-loading-skeleton";
+import ReactTooltip from "react-tooltip";
 import { twMerge } from "tailwind-merge";
 
-interface ITokenSelectorProps {}
+interface ITokenSelectorProps {
+  disabled?: boolean;
+}
 
-const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
+const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
+  disabled,
+}) => {
   const {
     tokensList,
     compatibleTokensForCurrentChains,
@@ -42,7 +47,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
 
   return (
     <div className="flex flex-col justify-between">
-      <div>
+      <div data-tip data-for="tokenSelect">
         <Select
           options={tokenOptions}
           selected={
@@ -57,8 +62,15 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
               );
           }}
           label={"Token"}
+          disabled={disabled}
         />
+        {disabled && (
+          <ReactTooltip id="tokenSelect" type="dark" effect="solid">
+            <span>Select the source and the destination chains</span>
+          </ReactTooltip>
+        )}
       </div>
+
       <div className="flex p-2 text-xs font-bold gap-4 text-opacity-80 text-hyphen-purple-dark font-mono justify-between">
         <span className="flex flex-grow items-baseline">
           <span

@@ -68,7 +68,7 @@ const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
       </div>
       <div className="mx-2 mb-0.5 flex items-end">
         <button
-          className="p-2 rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 border text-hyphen-purple shadow-md shadow-hyphen-purple/30 hover:shadow transition-all"
+          className="p-2 rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 border text-hyphen-purple transition-all"
           onClick={switchChains}
         >
           <HiArrowRight />

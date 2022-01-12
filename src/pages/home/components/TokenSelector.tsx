@@ -8,8 +8,8 @@ import { useTransactionInfoModal } from "context/TransactionInfoModal";
 import { Status } from "hooks/useLoading";
 import React, { useMemo } from "react";
 import Skeleton from "react-loading-skeleton";
-import ReactTooltip from "react-tooltip";
 import { twMerge } from "tailwind-merge";
+import CustomTooltip from "./CustomTooltip";
 
 interface ITokenSelectorProps {
   disabled?: boolean;
@@ -65,9 +65,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           disabled={disabled}
         />
         {disabled && (
-          <ReactTooltip id="tokenSelect" type="dark" effect="solid">
-            <span>Select the source and the destination chains</span>
-          </ReactTooltip>
+          <CustomTooltip id="tokenSelect" text="Select from & to chains" />
         )}
       </div>
 

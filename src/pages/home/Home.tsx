@@ -32,7 +32,7 @@ import TransferInfoModal from "./components/TransferInfoModal";
 import { useTransaction } from "context/Transaction";
 import { useBiconomy } from "context/Biconomy";
 import { twMerge } from "tailwind-merge";
-import ReactTooltip from "react-tooltip";
+import CustomTooltip from "./components/CustomTooltip";
 
 interface HomeProps {}
 
@@ -139,15 +139,10 @@ const Home: React.FC<HomeProps> = (props) => {
                     />
                   </div>
                   {!isBiconomyAllowed && (
-                    <ReactTooltip
+                    <CustomTooltip
                       id="whyGaslessDisabled"
-                      type="dark"
-                      effect="solid"
-                    >
-                      <span>
-                        Gasless is disabled for currently selected chain
-                      </span>
-                    </ReactTooltip>
+                      text="Disabled for selected chain"
+                    />
                   )}
                 </div>
                 <div

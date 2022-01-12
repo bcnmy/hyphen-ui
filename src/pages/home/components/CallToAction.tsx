@@ -8,8 +8,8 @@ import { useTransaction } from "context/Transaction";
 import { useWalletProvider } from "context/WalletProvider";
 import { Status } from "hooks/useLoading";
 import * as React from "react";
-import ReactTooltip from "react-tooltip";
 import switchNetwork from "utils/switchNetwork";
+import CustomTooltip from "./CustomTooltip";
 
 export interface ICallToActionProps {
   onApproveButtonClick: () => void;
@@ -71,14 +71,15 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
           <span data-tip data-for="whyTransferDisabled">
             <PrimaryButtonLight disabled>Transfer</PrimaryButtonLight>
           </span>
-          <ReactTooltip id="whyTransferDisabled" type="dark" effect="solid">
-            <span>
-              {fetchSelectedTokenApprovalError &&
+          <CustomTooltip
+            id="whyTransferDisabled"
+            text={
+              fetchSelectedTokenApprovalError &&
               transactionAmountValidationErrors.length === 0
                 ? "Error trying to fetch token approval"
-                : "Enter a valid transfer amount"}
-            </span>
-          </ReactTooltip>
+                : "Enter a valid transfer amount"
+            }
+          />
         </>
       ) : (
         <>
@@ -92,9 +93,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
                   </span>
                 </PrimaryButtonLight>
               </span>
-              <ReactTooltip id="whyTransferDisabled" type="dark" effect="solid">
-                <span>Approval loading</span>
-              </ReactTooltip>
+              <CustomTooltip id="whyTransferDisabled" text="Approval loading" />
             </>
           )}
           {fetchSelectedTokenApprovalStatus === Status.SUCCESS &&
@@ -115,13 +114,10 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
                 <span data-tip data-for="whyTransferDisabled">
                   <PrimaryButtonLight disabled>Transfer</PrimaryButtonLight>
                 </span>
-                <ReactTooltip
+                <CustomTooltip
                   id="whyTransferDisabled"
-                  type="dark"
-                  effect="solid"
-                >
-                  <span>Approve token to enable token transfers</span>
-                </ReactTooltip>
+                  text="Approve token to enable token transfers"
+                />
               </>
             )}
 

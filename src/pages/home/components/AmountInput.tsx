@@ -6,7 +6,7 @@ import React from "react";
 import { useTransaction, ValidationErrors } from "context/Transaction";
 import { twMerge } from "tailwind-merge";
 import { useChains } from "context/Chains";
-import ReactTooltip from "react-tooltip";
+import CustomTooltip from "./CustomTooltip";
 
 interface IAmountInputProps {
   disabled?: boolean;
@@ -24,7 +24,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
   } = useTransaction()!;
 
   return (
-    <div className="text-hyphen-purple-dark flex flex-col font-mono justify-between">
+    <div className="text-hyphen-purple-dark flex flex-col font-mono justify-end">
       <div className="block" data-tip data-for="transferAmount">
         <input
           type="string"
@@ -33,16 +33,14 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           value={transferAmountInputValue}
           onChange={(e) => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(
-            "inline-block w-64 text-3xl font-mono font-medium bg-opacity-0 bg-white px-4 py-3 my-1 tracking-tight focus:outline-none focus-visible:ring-2 rounded-lg focus-visible:ring-opacity-10 focus-visible:ring-white focus-visible:ring-offset-hyphen-purple/30 focus-visible:ring-offset-2 focus-visible:border-indigo-500",
-            disabled && "cursor-not-allowed"
+            "inline-block h-16 w-64 text-2xl font-mono font-medium bg-white px-4 py-2 my-0 tracking-tight border border-hyphen-purple border-opacity-20 focus:outline-none focus-visible:ring-2 rounded-lg focus-visible:ring-opacity-10 focus-visible:ring-white focus-visible:ring-offset-hyphen-purple/30 focus-visible:ring-offset-2 focus-visible:border-hyphen-purple",
+            disabled && "cursor-not-allowed text-gray-900/80 bg-gray-200"
           )}
           disabled={disabled}
         />
       </div>
       {disabled && (
-        <ReactTooltip id="transferAmount" type="dark" effect="solid">
-          <span>Select the source and the destination chains</span>
-        </ReactTooltip>
+        <CustomTooltip id="transferAmount" text="Select from & to chains" />
       )}
       <div className="flex px-4 py-2 text-xs gap-4 text-opacity-60 text-hyphen-purple-dark">
         <span

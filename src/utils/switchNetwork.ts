@@ -1,8 +1,9 @@
+import { ChainConfig } from "config/chains";
 import { ethers } from "ethers";
 
 export async function switchNetwork(
   walletProvider: ethers.providers.Web3Provider,
-  chain: any
+  chain: ChainConfig
 ) {
   const params = {
     chainId: `0x${chain.chainId.toString(16)}`, // A 0x-prefixed hexadecimal string
@@ -12,7 +13,7 @@ export async function switchNetwork(
       symbol: chain.currency, // 2-6 characters long
       decimals: chain.nativeDecimal,
     },
-    rpcUrls: chain.rpc,
+    rpcUrls: [chain.rpcUrl],
     blockExplorerUrls: [chain.explorerUrl],
   };
 

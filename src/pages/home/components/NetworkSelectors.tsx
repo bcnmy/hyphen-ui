@@ -2,7 +2,7 @@ import Select from "components/Select";
 import { ChainConfig } from "config/chains";
 import { useChains } from "context/Chains";
 import React, { useMemo } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { HiArrowRight } from "react-icons/hi";
 
 interface INetworkSelectorsProps {}
 
@@ -71,7 +71,7 @@ const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
           className="p-2 rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 border text-hyphen-purple shadow-md shadow-hyphen-purple/30 hover:shadow transition-all"
           onClick={switchChains}
         >
-          <FaArrowRight />
+          <HiArrowRight />
         </button>
       </div>
       <div>

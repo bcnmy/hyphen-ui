@@ -17,7 +17,7 @@ export interface ISelectProps {
   label: string;
 }
 
-export const Select: React.FunctionComponent<ISelectProps> = ({
+export const Select: React.FC<ISelectProps> = ({
   selected,
   setSelected,
   options,
@@ -28,10 +28,22 @@ export const Select: React.FunctionComponent<ISelectProps> = ({
       <Listbox.Label className="text-xs uppercase font-semibold text-hyphen-purple-dark text-opacity-70 pl-1">
         {label}
       </Listbox.Label>
-      <div className="relative mt-1">
+      <div className="h-10 relative mt-1">
         <Listbox.Button className="relative w-full py-2 pl-4 pr-10 text-left bg-white rounded-lg shadow-md border border-hyphen-purple border-opacity-20 cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm">
-          <span className="block truncate">
-            {selected ? selected.name : ""}
+          <span className="flex items-center truncate">
+            {selected ? (
+              <>
+                {/* Uncomment when better icons are available */}
+                {/* <img
+                  className="w-6 h-6"
+                  src={selected.image}
+                  alt={selected.name}
+                /> */}
+                {selected.name}
+              </>
+            ) : (
+              `Select ${label}`
+            )}
           </span>
           <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
             <HiSelector className="w-5 h-5 text-gray-400" aria-hidden="true" />
@@ -59,9 +71,14 @@ export const Select: React.FunctionComponent<ISelectProps> = ({
                     <span
                       className={`${
                         selected ? "font-medium" : "font-normal"
-                      } block truncate`}
+                      } flex items-center truncate`}
                     >
-                      {/* <img src={option.image} alt={option.name} /> */}
+                      {/* Uncomment when better icons are available */}
+                      {/* <img
+                        className="w-6 h-6"
+                        src={option.image}
+                        alt={option.name}
+                      /> */}
                       {option.name}
                     </span>
                     {selected ? (

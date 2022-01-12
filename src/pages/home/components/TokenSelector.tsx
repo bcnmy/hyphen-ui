@@ -36,6 +36,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
       .map((token) => ({
         id: token.symbol,
         name: token.symbol,
+        image: token.image,
       }));
   }, [fromChain, tokensList, compatibleTokensForCurrentChains]);
 

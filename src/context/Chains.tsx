@@ -71,7 +71,7 @@ const ChainsProvider: React.FC = (props) => {
   // but rather be a function that is called every time there is possibility of to Chain becoming invalid.
   // This needs to be synchronous to facilitate Hyphen not confusing status between renders.
   // What that means is, we should not have any instance between renders where toChain is invalid.
-  
+
   // whenever from chain changes, if a to chain is not selected,
   // or if the selected to chain is not valid, then default to the first
   // suitable to chain
@@ -119,7 +119,10 @@ const ChainsProvider: React.FC = (props) => {
 
   const changeToChain = useCallback(
     (chain: ChainConfig) => {
-      if (fromChain && config.chainMap[fromChain.chainId][chain.chainId]) {
+      if (
+        fromChain &&
+        config.chainMap[fromChain.chainId].indexOf(chain.chainId) !== -1
+      ) {
         setToChain(chain);
       } else {
         throw new Error("To Chain not supported for current from chain");

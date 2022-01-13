@@ -20,8 +20,8 @@ interface IChainsContext {
   fromChain: undefined | ChainConfig;
   toChain: undefined | ChainConfig;
   compatibleToChainsForCurrentFromChain: undefined | ChainConfig[];
+  changeFromChain: (chain: ChainConfig) => void;
   changeToChain: (chain: ChainConfig) => void;
-  setFromChain: (chain: ChainConfig) => void;
   switchChains: () => void;
   chainsList: ChainConfig[];
 }
@@ -67,28 +67,6 @@ const ChainsProvider: React.FC = (props) => {
     }
   }, [currentChainId]);
 
-  // TODO: This should happen synchronously together with from Chain change, so it should not be its own effect,
-  // but rather be a function that is called every time there is possibility of to Chain becoming invalid.
-  // This needs to be synchronous to facilitate Hyphen not confusing status between renders.
-  // What that means is, we should not have any instance between renders where toChain is invalid.
-
-  // whenever from chain changes, if a to chain is not selected,
-  // or if the selected to chain is not valid, then default to the first
-  // suitable to chain
-  // useEffect(() => {
-  //   if (!fromChain) return;
-  //   if (
-  //     !toChain ||
-  //     config.chainMap[fromChain.chainId].indexOf(toChain.chainId) === -1
-  //   ) {
-  //     setToChain(
-  //       chainsList.find(
-  //         (chain) => chain.chainId === config.chainMap[fromChain.chainId][0]
-  //       )
-  //     );
-  //   }
-  // }, [fromChain, toChain]);
-
   useEffect(() => {
     (async () => {
       if (
@@ -117,6 +95,11 @@ const ChainsProvider: React.FC = (props) => {
     );
   }, [fromChain]);
 
+  const changeFromChain = useCallback((chain: ChainConfig) => {
+    setToChain(undefined);
+    setFromChain(chain);
+  }, []);
+
   const changeToChain = useCallback(
     (chain: ChainConfig) => {
       if (
@@ -138,15 +121,13 @@ const ChainsProvider: React.FC = (props) => {
     }
   }, [toChain, fromChain]);
 
-  console.log(toChain);
-
   return (
     <ChainsContext.Provider
       value={{
         areChainsReady,
         switchChains,
+        changeFromChain,
         changeToChain,
-        setFromChain,
         fromChainRpcUrlProvider,
         toChainRpcUrlProvider,
         compatibleToChainsForCurrentFromChain,

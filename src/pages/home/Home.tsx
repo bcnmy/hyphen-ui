@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { chainMap } from "../../config/chains/chainMap";
 
 import { HiOutlineExternalLink } from "react-icons/hi";
@@ -36,9 +36,8 @@ import CustomTooltip from "./components/CustomTooltip";
 
 interface HomeProps {}
 
-const Home: React.FC<HomeProps> = (props) => {
-  const { fromChain, toChain } = useChains()!;
-  const areChainsSelected = Boolean(fromChain && toChain);
+const Home: React.FC<HomeProps> = () => {
+  const { areChainsReady } = useChains()!;
   const { changeTransferAmountInputValue } = useTransaction()!;
   const { selectedTokenBalance } = useToken()!;
 
@@ -145,18 +144,12 @@ const Home: React.FC<HomeProps> = (props) => {
                     />
                   )}
                 </div>
-                <div
-                  className="grid p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30"
-                  style={{ gridTemplateColumns: "1fr auto 1fr" }}
-                >
+                <div className="grid grid-cols-[1fr_34px_1fr] gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
                   <NetworkSelectors />
                 </div>
-                <div
-                  className="p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30 grid"
-                  style={{ gridTemplateColumns: "3fr 2fr" }}
-                >
-                  <AmountInput disabled={!areChainsSelected} />
-                  <TokenSelector disabled={!areChainsSelected} />
+                <div className="grid grid-cols-[244px_1fr] gap-3 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
+                  <AmountInput disabled={!areChainsReady} />
+                  <TokenSelector disabled={!areChainsReady} />
                 </div>
                 <CallToAction
                   onApproveButtonClick={showApprovalModal}

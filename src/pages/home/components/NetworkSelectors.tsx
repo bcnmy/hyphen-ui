@@ -6,15 +6,13 @@ import { HiArrowRight } from "react-icons/hi";
 
 interface INetworkSelectorsProps {}
 
-const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
-  props
-) => {
+const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
   const {
     chainsList,
     fromChain,
     toChain,
+    changeFromChain,
     changeToChain,
-    setFromChain,
     switchChains,
     compatibleToChainsForCurrentFromChain,
   } = useChains()!;
@@ -57,7 +55,7 @@ const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
           selected={selectedFromChain}
           setSelected={(opt) => {
             chainsList &&
-              setFromChain(
+              changeFromChain(
                 chainsList.find(
                   (chain) => chain.chainId === opt.id
                 ) as ChainConfig
@@ -66,7 +64,7 @@ const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
           label={"From"}
         />
       </div>
-      <div className="mx-2 mb-0.5 flex items-end">
+      <div className="flex items-end mb-0.5">
         <button
           className="p-2 rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 border text-hyphen-purple transition-all"
           onClick={switchChains}

@@ -6,9 +6,11 @@ import { GOERLI } from "../chains/constants/Goerli";
 import { MUMBAI } from "../chains/constants/Mumbai";
 import { POLYGON } from "../chains/constants/Polygon";
 import { RINKEBY } from "../chains/constants/Rinkeby";
+import usdtLogo from "../../assets/images/tokens/usdt-logo.svg";
 
 export const USDT: TokenConfig = {
   symbol: "USDT",
+  image: usdtLogo,
   [MUMBAI.chainId]: {
     address: "0xeaBc4b91d9375796AA4F69cC764A4aB509080A58",
     transferOverhead: 86147,

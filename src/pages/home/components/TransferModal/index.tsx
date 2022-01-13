@@ -29,11 +29,11 @@ import { useToken } from "context/Token";
 import { useHyphen } from "context/Hyphen";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import SpinnerDark from "components/Buttons/SpinnerDark";
-import ReactTooltip from "react-tooltip";
 import {
   ITransferRecord,
   useTransactionInfoModal,
 } from "context/TransactionInfoModal";
+import CustomTooltip from "../CustomTooltip";
 
 export interface ITransferModalProps {
   isVisible: boolean;
@@ -444,15 +444,10 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                   </button>
                 </span>
                 {!isExitAllowed && (
-                  <ReactTooltip
+                  <CustomTooltip
                     id="whyModalExitDisabled"
-                    type="dark"
-                    effect="solid"
-                  >
-                    <span>
-                      Exit is disabled because transfer is in progress
-                    </span>
-                  </ReactTooltip>
+                    text="Exit is disabled because transfer is in progress"
+                  />
                 )}
               </div>
             </div>

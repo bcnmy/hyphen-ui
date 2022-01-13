@@ -5,10 +5,16 @@ import Skeleton from "react-loading-skeleton";
 import React from "react";
 import { useTransaction, ValidationErrors } from "context/Transaction";
 import { twMerge } from "tailwind-merge";
+import { useChains } from "context/Chains";
+import CustomTooltip from "./CustomTooltip";
 
-interface IAmountInputProps {}
+interface IAmountInputProps {
+  disabled?: boolean;
+}
 
-const AmountInput: React.FunctionComponent<IAmountInputProps> = (props) => {
+const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
+  disabled,
+}) => {
   const { poolInfo, getPoolInfoStatus } = useHyphen()!;
   const {
     transferAmount,
@@ -18,18 +24,25 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = (props) => {
   } = useTransaction()!;
 
   return (
-    <div className="text-hyphen-purple-dark flex flex-col font-mono justify-between">
-      <div className="block">
+    <div className="text-hyphen-purple-dark flex flex-col font-mono justify-end">
+      <div className="block" data-tip data-for="transferAmount">
         <input
           type="string"
           inputMode="decimal"
           placeholder="0.00"
           value={transferAmountInputValue}
           onChange={(e) => changeTransferAmountInputValue(e.target.value)}
-          className="inline-block w-64 text-3xl font-mono font-medium bg-opacity-0 bg-white px-4 py-3 my-1 tracking-tight focus:outline-none focus-visible:ring-2 rounded-lg focus-visible:ring-opacity-10 focus-visible:ring-white focus-visible:ring-offset-hyphen-purple/30 focus-visible:ring-offset-2 focus-visible:border-indigo-500"
+          className={twMerge(
+            "inline-block w-full h-16 text-2xl font-mono font-medium bg-white px-4 py-2 my-0 tracking-tight border border-hyphen-purple border-opacity-20 focus:outline-none focus-visible:ring-2 rounded-lg focus-visible:ring-opacity-10 focus-visible:ring-white focus-visible:ring-offset-hyphen-purple/30 focus-visible:ring-offset-2 focus-visible:border-hyphen-purple",
+            disabled && "cursor-not-allowed text-gray-900/80 bg-gray-200"
+          )}
+          disabled={disabled}
         />
       </div>
-      <div className="flex px-4 py-2 text-xs gap-4 text-opacity-60 text-hyphen-purple-dark">
+      {disabled && (
+        <CustomTooltip id="transferAmount" text="Select from & to chains" />
+      )}
+      <div className="flex my-2 pl-2 text-xs gap-4 text-opacity-60 text-hyphen-purple-dark">
         <span
           className={twMerge(
             "flex items-center gap-2 transition-colors",
@@ -45,7 +58,11 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = (props) => {
               <>{poolInfo.minDepositAmount}</>
             ) : (
               <>
-                <Skeleton baseColor="#615ccd20" highlightColor="#615ccd05" />
+                <Skeleton
+                  baseColor="#615ccd20"
+                  enableAnimation={!disabled}
+                  highlightColor="#615ccd05"
+                />
               </>
             )}
           </span>
@@ -65,7 +82,11 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = (props) => {
               <>{poolInfo.maxDepositAmount}</>
             ) : (
               <>
-                <Skeleton baseColor="#615ccd20" highlightColor="#615ccd05" />
+                <Skeleton
+                  baseColor="#615ccd20"
+                  enableAnimation={!disabled}
+                  highlightColor="#615ccd05"
+                />
               </>
             )}
           </span>

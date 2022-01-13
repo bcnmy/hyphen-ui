@@ -103,3 +103,10 @@ code {
 * {
   box-sizing: border-box;
 }
+
+.custom-tooltip {
+  font-size: 10px !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  background-color: #374151 !important;
+}

@@ -7,9 +7,11 @@ import { MUMBAI } from "../chains/constants/Mumbai";
 import { POLYGON } from "../chains/constants/Polygon";
 import { RINKEBY } from "../chains/constants/Rinkeby";
 import { NATIVE_ADDRESS } from "../constants";
+import ethLogo from "../../assets/images/chains/eth-logo.svg";
 
 export const ETH: TokenConfig = {
   symbol: "ETH",
+  image: ethLogo,
   [MUMBAI.chainId]: {
     address: "0xa6fa4fb5f76172d178d61b04b0ecd319c5d1c0aa",
     transferOverhead: 29766,

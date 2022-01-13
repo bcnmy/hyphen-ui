@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { chainMap } from "../../config/chains/chainMap";
 
 import { HiOutlineExternalLink } from "react-icons/hi";
@@ -32,12 +32,12 @@ import TransferInfoModal from "./components/TransferInfoModal";
 import { useTransaction } from "context/Transaction";
 import { useBiconomy } from "context/Biconomy";
 import { twMerge } from "tailwind-merge";
-import ReactTooltip from "react-tooltip";
+import CustomTooltip from "./components/CustomTooltip";
 
 interface HomeProps {}
 
-const Home: React.FC<HomeProps> = (props) => {
-  const { fromChain, toChain } = useChains()!;
+const Home: React.FC<HomeProps> = () => {
+  const { areChainsReady } = useChains()!;
   const { changeTransferAmountInputValue } = useTransaction()!;
   const { selectedTokenBalance } = useToken()!;
 
@@ -111,7 +111,7 @@ const Home: React.FC<HomeProps> = (props) => {
           <div className="max-w-xl mx-auto flex flex-col flex-grow">
             <div className="relative z-10 flex-grow">
               <div className="absolute opacity-80 inset-2 rounded-3xl bg-hyphen-purple/75 blur-lg -z-10"></div>
-              <div className="mx-4 mt-4 min-w-0 bg-white px-4 py-6 rounded-3xl flex-grow flex flex-col gap-2 shadow-lg">
+              <div className="mx-4 mt-4 min-w-0 bg-white p-6 rounded-3xl flex-grow flex flex-col gap-2 shadow-lg">
                 <div className="flex justify-between items-center">
                   <img
                     src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
@@ -138,29 +138,18 @@ const Home: React.FC<HomeProps> = (props) => {
                     />
                   </div>
                   {!isBiconomyAllowed && (
-                    <ReactTooltip
+                    <CustomTooltip
                       id="whyGaslessDisabled"
-                      type="dark"
-                      effect="solid"
-                    >
-                      <span>
-                        Gasless is disabled for currently selected chain
-                      </span>
-                    </ReactTooltip>
+                      text="Disabled for selected chain"
+                    />
                   )}
                 </div>
-                <div
-                  className="grid p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30"
-                  style={{ gridTemplateColumns: "1fr auto 1fr" }}
-                >
+                <div className="grid grid-cols-[1fr_34px_1fr] gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
                   <NetworkSelectors />
                 </div>
-                <div
-                  className="p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30 grid"
-                  style={{ gridTemplateColumns: "3fr 2fr" }}
-                >
-                  <AmountInput />
-                  <TokenSelector />
+                <div className="grid grid-cols-[244px_1fr] gap-3 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
+                  <AmountInput disabled={!areChainsReady} />
+                  <TokenSelector disabled={!areChainsReady} />
                 </div>
                 <CallToAction
                   onApproveButtonClick={showApprovalModal}

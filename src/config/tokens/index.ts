@@ -5,6 +5,7 @@ import { USDT } from "./USDT";
 
 export type TokenConfig = {
   symbol: string;
+  image?: string;
   // root level symbol is the common name to be used
   [chainId: number]: {
     address: string;

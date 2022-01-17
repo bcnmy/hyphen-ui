@@ -7,7 +7,7 @@ interface INavbarProps {
 }
 
 function Navbar({ showUserInfoModal }: INavbarProps) {
-  const { accounts } = useWalletProvider()!;
+  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const userAddress = accounts?.[0];
 
   return (
@@ -19,9 +19,11 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
           </span>
           <button
             className="px-4 py-2 bg-white bg-opacity-10 shadow-md rounded-full font-mono text-white text-opacity-75 border border-opacity-10 border-white ml-auto font-normal relative backdrop-blur-md cursor-pointer hover:bg-opacity-[0.15] hover:text-opacity-90 hover:border-opacity-20 hover:shadow-lg transition"
-            onClick={showUserInfoModal}
+            onClick={isLoggedIn ? showUserInfoModal : connect}
           >
-            {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
+            {isLoggedIn
+              ? `${userAddress?.slice(0, 6)}...${userAddress?.slice(-6)}`
+              : "Connect Wallet"}
           </button>
         </div>
       </div>

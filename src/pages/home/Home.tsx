@@ -72,22 +72,8 @@ const Home: React.FC<HomeProps> = () => {
 
   const { executeApproveTokenError } = useTokenApproval()!;
 
-  // useEffect(() => {
-  //   if (!isLoggedIn) {
-  //     navigate("/login");
-  //   }
-  // }, [isLoggedIn, navigate]);
-
-  useEffect(() => {
-    (async () => {
-      await connect().catch((e) => {
-        console.error(e);
-      });
-    })();
-  }, [isLoggedIn, navigate, connect]);
-
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="flex flex-col w-full h-full">
       <Navbar showUserInfoModal={showUserInfoModal} />
       <ApprovalModal
         isVisible={isApprovalModalVisible}
@@ -107,8 +93,8 @@ const Home: React.FC<HomeProps> = () => {
       {/* <TransferInfoModal isVisible={true} onClose={() => null} /> */}
       <ErrorModal error={executeApproveTokenError} title={"Approval Error"} />
       <div className="flex flex-col items-stretch gap-4">
-        <span className="flex items-center mt-8 gap-2 mx-auto">
-          <span className="flex-shrink-0 text-white font-bold text-xs">
+        <span className="flex items-center gap-2 mx-auto mt-8">
+          <span className="flex-shrink-0 text-xs font-bold text-white">
             Powered By
           </span>
           <img
@@ -119,11 +105,11 @@ const Home: React.FC<HomeProps> = () => {
         </span>
 
         <div className="flex flex-grow">
-          <div className="max-w-xl mx-auto flex flex-col flex-grow">
+          <div className="flex flex-col flex-grow max-w-xl mx-auto">
             <div className="relative z-10 flex-grow">
               <div className="absolute opacity-80 inset-2 rounded-3xl bg-hyphen-purple/75 blur-lg -z-10"></div>
-              <div className="mx-4 mt-4 min-w-0 bg-white p-6 rounded-3xl flex-grow flex flex-col gap-2 shadow-lg">
-                <div className="flex justify-between items-center">
+              <div className="flex flex-col flex-grow min-w-0 gap-2 p-6 mx-4 mt-4 bg-white shadow-lg rounded-3xl">
+                <div className="flex items-center justify-between">
                   <img
                     src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
                     className="h-8 m-2 opacity-100"
@@ -138,7 +124,7 @@ const Home: React.FC<HomeProps> = () => {
                       !isBiconomyAllowed && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <span className="text-hyphen-purple-dark/80 font-semibold text-sm uppercase flex items-center gap-2">
+                    <span className="flex items-center gap-2 text-sm font-semibold uppercase text-hyphen-purple-dark/80">
                       <FaInfoCircle />
                       <span className="mt-0.5">Go Gasless</span>
                     </span>

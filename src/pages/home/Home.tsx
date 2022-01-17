@@ -72,6 +72,14 @@ const Home: React.FC<HomeProps> = () => {
 
   const { executeApproveTokenError } = useTokenApproval()!;
 
+  useEffect(() => {
+    (async () => {
+      await connect().catch((e) => {
+        console.error(e);
+      });
+    })();
+  }, [isLoggedIn, navigate, connect]);
+
   return (
     <div className="flex flex-col w-full h-full">
       <Navbar showUserInfoModal={showUserInfoModal} />

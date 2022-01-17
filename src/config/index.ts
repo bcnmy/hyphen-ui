@@ -8,13 +8,9 @@ if (process.env.REACT_APP_ENV === ENV.production) {
   hyphenBaseUrl = "https://hyphen-api.biconomy.io";
 } else if (process.env.REACT_APP_ENV === ENV.test) {
   hyphenBaseUrl = "https://hyphen-test-api.biconomy.io";
-} else if (process.env.REACT_APP_ENV === ENV.staging) {
-  hyphenBaseUrl = "https://hyphen-staging-api.biconomy.io";
 } else {
-  hyphenBaseUrl = "http://localhost:3000";
+  hyphenBaseUrl = "https://hyphen-staging-api.biconomy.io";
 }
-
-// hyphenBaseUrl = "https://hyphen-staging-api.biconomy.io";
 
 const hyphen = {
   baseURL: hyphenBaseUrl,

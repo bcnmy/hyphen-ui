@@ -2,25 +2,28 @@ import Select from "components/Select";
 import { ChainConfig } from "config/chains";
 import { useChains } from "context/Chains";
 import React, { useMemo } from "react";
-import { FaArrowRight } from "react-icons/fa";
+import { HiArrowRight } from "react-icons/hi";
 
 interface INetworkSelectorsProps {}
 
-const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
-  props
-) => {
+const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
   const {
     chainsList,
     fromChain,
     toChain,
+    changeFromChain,
     changeToChain,
-    setFromChain,
     switchChains,
     compatibleToChainsForCurrentFromChain,
   } = useChains()!;
 
   const fromChainOptions = useMemo(
-    () => chainsList.map((chain) => ({ id: chain.chainId, name: chain.name })),
+    () =>
+      chainsList.map((chain) => ({
+        id: chain.chainId,
+        name: chain.name,
+        image: chain.image,
+      })),
     [chainsList]
   );
 
@@ -30,6 +33,7 @@ const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
       return compatibleToChainsForCurrentFromChain.map((chain) => ({
         id: chain.chainId,
         name: chain.name,
+        image: chain.image,
       }));
   }, [compatibleToChainsForCurrentFromChain]);
 
@@ -51,7 +55,7 @@ const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
           selected={selectedFromChain}
           setSelected={(opt) => {
             chainsList &&
-              setFromChain(
+              changeFromChain(
                 chainsList.find(
                   (chain) => chain.chainId === opt.id
                 ) as ChainConfig
@@ -60,9 +64,12 @@ const NetworkSelectors: React.FunctionComponent<INetworkSelectorsProps> = (
           label={"From"}
         />
       </div>
-      <div className="mx-2 mb-0.5 flex items-end">
-        <button className="p-2 rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 border text-hyphen-purple shadow-md shadow-hyphen-purple/30 hover:shadow transition-all" onClick={switchChains}>
-          <FaArrowRight />
+      <div className="flex items-end mb-0.5">
+        <button
+          className="p-2 rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 border text-hyphen-purple transition-all"
+          onClick={switchChains}
+        >
+          <HiArrowRight />
         </button>
       </div>
       <div>

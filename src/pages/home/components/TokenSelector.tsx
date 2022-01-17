@@ -9,10 +9,15 @@ import { Status } from "hooks/useLoading";
 import React, { useMemo } from "react";
 import Skeleton from "react-loading-skeleton";
 import { twMerge } from "tailwind-merge";
+import CustomTooltip from "./CustomTooltip";
 
-interface ITokenSelectorProps {}
+interface ITokenSelectorProps {
+  disabled?: boolean;
+}
 
-const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
+const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
+  disabled,
+}) => {
   const {
     tokensList,
     compatibleTokensForCurrentChains,
@@ -36,12 +41,13 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
       .map((token) => ({
         id: token.symbol,
         name: token.symbol,
+        image: token.image,
       }));
   }, [fromChain, tokensList, compatibleTokensForCurrentChains]);
 
   return (
     <div className="flex flex-col justify-between">
-      <div>
+      <div data-tip data-for="tokenSelect">
         <Select
           options={tokenOptions}
           selected={
@@ -56,13 +62,18 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
               );
           }}
           label={"Token"}
+          disabled={disabled}
         />
+        {disabled && (
+          <CustomTooltip id="tokenSelect" text="Select from & to chains" />
+        )}
       </div>
-      <div className="flex p-2 text-xs font-bold gap-4 text-opacity-80 text-hyphen-purple-dark font-mono justify-between">
+
+      <div className="flex items-center my-2 pl-2 text-xs font-bold gap-4 text-opacity-80 text-hyphen-purple-dark font-mono justify-between">
         <span className="flex flex-grow items-baseline">
           <span
             className={twMerge(
-              "text-opacity-40 text-hyphen-purple-dark font-sans font-medium pr-2",
+              "text-opacity-40 text-hyphen-purple-dark font-sans font-medium mr-2",
               transactionAmountValidationErrors.includes(
                 ValidationErrors.INADEQUATE_BALANCE
               ) && "text-red-600",
@@ -86,7 +97,11 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = (props) => {
                 {selectedTokenBalance?.displayBalance || ""}
               </span>
             ) : (
-              <Skeleton baseColor="#615ccd20" highlightColor="#615ccd05" />
+              <Skeleton
+                baseColor="#615ccd20"
+                enableAnimation={!!selectedToken}
+                highlightColor="#615ccd05"
+              />
             )}
           </span>
         </span>

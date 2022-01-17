@@ -11,6 +11,7 @@ import { POLYGON } from "./constants/Polygon";
 
 export type ChainConfig = {
   name: string;
+  image?: string;
   subText: string;
   chainId: number;
   rpcUrl: string;

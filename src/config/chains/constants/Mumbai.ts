@@ -1,8 +1,10 @@
 import { ChainConfig } from "..";
 import { NATIVE_ADDRESS } from "../../constants";
+import maticLogo from "../../../assets/images/chains/matic-logo.svg"
 
 export const MUMBAI: ChainConfig = {
   name: "Mumbai",
+  image: maticLogo,
   subText: "Polygon testnet",
   chainId: 80001,
   rpcUrl: "https://rpc-mumbai.maticvigil.com",

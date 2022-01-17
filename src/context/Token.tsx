@@ -75,12 +75,14 @@ const TokenProvider: React.FC = (props) => {
   // set the selected token to first compatible token for current chains on startup
   // or, upon chain change, if the currently selected token is not compatible, then do the same
   useEffect(() => {
-    if (!fromChain || !toChain || !compatibleTokensForCurrentChains) return;
+    if (!fromChain || !toChain || !compatibleTokensForCurrentChains) {
+      setSelectedToken(undefined);
+      return;
+    }
     if (
       !selectedToken ||
       !isTokenValidForChains(selectedToken, fromChain, toChain)
     ) {
-      // console.log({compatibleTokensForCurrentChains, selectedToken, fromChain})
       setSelectedToken(compatibleTokensForCurrentChains[0]);
     }
   }, [fromChain, toChain, selectedToken, compatibleTokensForCurrentChains]);
@@ -105,16 +107,10 @@ const TokenProvider: React.FC = (props) => {
       !tokenContract ||
       !selectedToken ||
       !fromChain ||
+      !toChain ||
       !accounts ||
       !accounts[0]
     ) {
-      // console.error("not getting balance", {
-      //   fromChainRpcUrlProvider,
-      //   tokenContract,
-      //   selectedToken,
-      //   fromChain,
-      //   accounts,
-      // });
       throw new Error("Prerequisites not met");
     }
     let formattedBalance: string;
@@ -140,22 +136,14 @@ const TokenProvider: React.FC = (props) => {
       selectedToken[fromChain.chainId].fixedDecimalPoint || 4
     );
 
-    // console.log({
-    //   formattedBalance,
-    //   displayBalance,
-    //   userRawBalance,
-    //   fromChain,
-    //   fromChainRpcUrlProvider,
-    //   selectedToken,
-    // });
-
     return { formattedBalance, displayBalance, userRawBalance };
   }, [
     fromChainRpcUrlProvider,
-    selectedToken,
-    accounts,
-    fromChain,
     tokenContract,
+    selectedToken,
+    fromChain,
+    toChain,
+    accounts,
   ]);
 
   const {

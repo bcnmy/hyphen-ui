@@ -28,6 +28,7 @@ import { useTokenApproval } from "context/TokenApproval";
 import useErrorModal from "hooks/useErrorModal";
 import ErrorModal from "./components/ErrorModal";
 import TransferModal from "./components/TransferModal";
+import UserInfoModal from "./components/UserInfoModal";
 import TransferInfoModal from "./components/TransferInfoModal";
 import { useTransaction } from "context/Transaction";
 import { useBiconomy } from "context/Biconomy";
@@ -63,6 +64,12 @@ const Home: React.FC<HomeProps> = () => {
     showModal: showTransferModal,
   } = useModal();
 
+  const {
+    isVisible: isUserInfoModalVisible,
+    hideModal: hideUserInfoModal,
+    showModal: showUserInfoModal,
+  } = useModal();
+
   const { executeApproveTokenError } = useTokenApproval()!;
 
   // useEffect(() => {
@@ -81,7 +88,7 @@ const Home: React.FC<HomeProps> = () => {
 
   return (
     <div className="h-full w-full flex flex-col">
-      <Navbar />
+      <Navbar showUserInfoModal={showUserInfoModal} />
       <ApprovalModal
         isVisible={isApprovalModalVisible}
         onClose={hideApprovalModal}
@@ -92,6 +99,10 @@ const Home: React.FC<HomeProps> = () => {
           changeTransferAmountInputValue("");
           hideTransferlModal();
         }}
+      />
+      <UserInfoModal
+        isVisible={isUserInfoModalVisible}
+        onClose={hideUserInfoModal}
       />
       {/* <TransferInfoModal isVisible={true} onClose={() => null} /> */}
       <ErrorModal error={executeApproveTokenError} title={"Approval Error"} />

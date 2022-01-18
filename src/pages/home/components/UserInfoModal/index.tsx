@@ -7,6 +7,7 @@ import {
   HiOutlineClipboardCheck,
 } from "react-icons/hi";
 import Modal from "../../../../components/Modal";
+import { getProviderInfo } from "web3modal";
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
@@ -15,8 +16,9 @@ export interface IUserInfoModalProps {
 
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const [addressCopied, setAddressCopied] = useState(false);
-  const { accounts } = useWalletProvider()!;
+  const { accounts, rawEthereumProvider } = useWalletProvider()!;
   const userAddress = accounts?.[0];
+  const { name: providerName } = getProviderInfo(rawEthereumProvider);
 
   function handleUserAddressCopy() {
     navigator.clipboard.writeText(userAddress || "");
@@ -28,8 +30,8 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className="relative z-20 p-6 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
-        <div className="flex items-center justify-between mb-6">
+      <div className="relative z-20 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
+        <div className="flex items-center justify-between p-6">
           <Dialog.Title as="h1" className="text-xl font-semibold text-gray-700">
             Account
           </Dialog.Title>
@@ -38,7 +40,15 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           </button>
         </div>
 
-        <article className="p-4 border border-gray-200 rounded-2xl">
+        <article className="p-4 mx-6 mb-6 border border-gray-200 rounded-2xl">
+          <header className="flex items-center justify-between mb-2">
+            <p className="text-sm text-gray-500">
+              Connected with {providerName}
+            </p>
+            <button className="text-sm font-medium text-red-600">
+              Disconnect
+            </button>
+          </header>
           <p className="mb-2 text-2xl text-gray-700">
             {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
           </p>
@@ -59,6 +69,12 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
               {addressCopied ? "Copied!" : "Copy Address"}
             </span>
           </button>
+        </article>
+
+        <article className="px-6 py-4 bg-gray-100 rounded-bl-3xl rounded-br-3xl">
+          <span className="text-lg text-gray-500">
+            Recent transactions will appear here...
+          </span>
         </article>
       </div>
     </Modal>

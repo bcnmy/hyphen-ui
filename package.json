@@ -47,8 +47,12 @@
   "scripts": {
     "start": "REACT_APP_ENV=local craco start",
     "start:prod": "REACT_APP_ENV=production craco start",
+    "start:test": "REACT_APP_ENV=test craco start",
+    "start:staging": "REACT_APP_ENV=staging craco start",
     "build": "REACT_APP_ENV=local craco build",
     "build:prod": "REACT_APP_ENV=production craco build",
+    "build:test": "REACT_APP_ENV=test craco build",
+    "build:staging": "REACT_APP_ENV=staging craco build",
     "test": "craco test",
     "eject": "react-scripts eject"
   },

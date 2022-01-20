@@ -5,9 +5,9 @@ name: Hyphen UI Deployment
 
 on:
   push:
-    branches: [ master, development ]
+    branches: [master, development]
   pull_request:
-    branches: [ master, development ]
+    branches: [master, development]
 
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
         name: Generate build
         run: |
           yarn install
-          yarn run build
+          yarn run build:test
         env:
           CI: false
           NODE_OPTIONS: --max_old_space_size=4096
@@ -43,13 +43,13 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
-      
+
       - if: github.ref == 'refs/heads/development' && github.event_name == 'push'
         name: Deploy to S3
         run: |
           aws s3 sync build s3://${{ secrets.S3_DEVELOPMENT_BUCKET_NAME }}
           aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_DEVELOPMENT_CF_ID }} --paths /
-      
+
       - if: github.ref == 'refs/heads/master' && github.event_name == 'push'
         name: Deploy to S3
         run: |

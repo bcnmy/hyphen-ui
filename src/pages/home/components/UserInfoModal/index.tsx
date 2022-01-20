@@ -37,7 +37,7 @@ const USER_TRANSACTIONS = gql`
 
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const [addressCopied, setAddressCopied] = useState(false);
-  const { accounts, rawEthereumProvider } = useWalletProvider()!;
+  const { accounts, disconnect, rawEthereumProvider } = useWalletProvider()!;
   const { fromChain } = useChains()!;
   const userAddress = accounts?.[0];
   const { loading, error, data } = useQuery(USER_TRANSACTIONS, {
@@ -47,6 +47,11 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const { name: providerName } = getProviderInfo(rawEthereumProvider);
 
   console.log({ loading, error, data });
+
+  function handleWalletDisconnect() {
+    disconnect();
+    onClose();
+  }
 
   function handleUserAddressCopy() {
     navigator.clipboard.writeText(userAddress || "");
@@ -73,7 +78,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
             <p className="text-sm text-gray-500">
               Connected with {providerName}
             </p>
-            <button className="text-sm font-medium text-red-600">
+            <button
+              className="text-sm font-medium text-red-600"
+              onClick={handleWalletDisconnect}
+            >
               Disconnect
             </button>
           </header>

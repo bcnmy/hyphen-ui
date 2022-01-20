@@ -46,7 +46,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   });
   const { name: providerName } = getProviderInfo(rawEthereumProvider);
 
-  console.log({ loading, error, data });
+  // console.log({ loading, error, data });
 
   function handleWalletDisconnect() {
     disconnect();

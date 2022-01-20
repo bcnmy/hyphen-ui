@@ -1,13 +1,5 @@
 import React, { useEffect } from "react";
-import { chainMap } from "../../config/chains/chainMap";
 
-import { HiOutlineExternalLink } from "react-icons/hi";
-import { IoMdClose } from "react-icons/io";
-import { FaArrowRight, FaInfoCircle } from "react-icons/fa";
-import { GrFormClose } from "react-icons/gr";
-
-import { Listbox, Transition } from "@headlessui/react";
-import Select from "../../components/Select";
 import { useWalletProvider } from "../../context/WalletProvider";
 import { useNavigate } from "react-router-dom";
 import { useChains } from "../../context/Chains";
@@ -20,25 +12,24 @@ import Navbar from "components/Navbar";
 import TransactionFee from "./components/TransactionFee";
 import CallToAction from "./components/CallToAction";
 import { Toggle } from "components/Toggle";
-import PrimaryButtonLight from "components/Buttons/PrimaryButtonLight";
 import useModal from "hooks/useModal";
 import ApprovalModal from "./components/ApprovalModal";
-import Modal from "components/Modal";
 import { useTokenApproval } from "context/TokenApproval";
-import useErrorModal from "hooks/useErrorModal";
 import ErrorModal from "./components/ErrorModal";
 import TransferModal from "./components/TransferModal";
 import UserInfoModal from "./components/UserInfoModal";
-import TransferInfoModal from "./components/TransferInfoModal";
 import { useTransaction } from "context/Transaction";
 import { useBiconomy } from "context/Biconomy";
 import { twMerge } from "tailwind-merge";
 import CustomTooltip from "./components/CustomTooltip";
+import isToChainEthereum from "utils/isToChainEthereum";
+import { FaInfoCircle } from "react-icons/fa";
+import { HiExclamation } from "react-icons/hi";
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
-  const { areChainsReady } = useChains()!;
+  const { areChainsReady, toChain } = useChains()!;
   const { changeTransferAmountInputValue } = useTransaction()!;
   const { selectedTokenBalance } = useToken()!;
 
@@ -51,6 +42,9 @@ const Home: React.FC<HomeProps> = () => {
 
   const navigate = useNavigate();
   const { isLoggedIn, connect } = useWalletProvider()!;
+  const showEthereumDisclaimer = toChain
+    ? isToChainEthereum(toChain.chainId)
+    : false;
 
   const {
     isVisible: isApprovalModalVisible,
@@ -98,7 +92,6 @@ const Home: React.FC<HomeProps> = () => {
         isVisible={isUserInfoModalVisible}
         onClose={hideUserInfoModal}
       />
-      {/* <TransferInfoModal isVisible={true} onClose={() => null} /> */}
       <ErrorModal error={executeApproveTokenError} title={"Approval Error"} />
       <div className="flex flex-col items-stretch gap-4">
         <span className="flex items-center gap-2 mx-auto mt-8">
@@ -156,6 +149,15 @@ const Home: React.FC<HomeProps> = () => {
                   <AmountInput disabled={!areChainsReady} />
                   <TokenSelector disabled={!areChainsReady} />
                 </div>
+                {showEthereumDisclaimer ? (
+                  <article className="flex items-start p-4 text-sm text-red-600 bg-red-100 rounded-xl">
+                    <HiExclamation className="w-auto h-6 mr-2" />
+                    <p>
+                      The received amount may differ due to gas price
+                      fluctuations on Ethereum.
+                    </p>
+                  </article>
+                ) : null}
                 <CallToAction
                   onApproveButtonClick={showApprovalModal}
                   onTransferButtonClick={showTransferModal}

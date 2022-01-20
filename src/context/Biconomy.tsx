@@ -97,8 +97,6 @@ const BiconomyProvider: React.FC = (props) => {
 
     let onErrorListener = (error: any, message: any) => {
       // Handle error while initializing mexa
-      console.log(error);
-      console.log(message);
       setIsBiconomyReady(false);
     };
 

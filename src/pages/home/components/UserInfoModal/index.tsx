@@ -9,6 +9,8 @@ import { IoMdClose } from "react-icons/io";
 import {
   HiOutlineClipboardCopy,
   HiOutlineClipboardCheck,
+  HiOutlineArrowNarrowRight,
+  HiOutlineArrowSmRight,
 } from "react-icons/hi";
 import Modal from "../../../../components/Modal";
 import { getProviderInfo } from "web3modal";
@@ -30,6 +32,24 @@ export interface ITransaction {
   toChainId: string;
   tokenAddress: string;
   __typename: string;
+}
+
+export interface ITransactionDetails {
+  amount: string;
+  amountReceived: string;
+  depositHash: string;
+  endTimeStamp: string;
+  fromChainId: number;
+  fromChainLabel: string;
+  lpFee: string;
+  receivedTokenAddress: string;
+  receivedTokenSymbol: string;
+  receiver: string;
+  sentTimeStamp: string;
+  toChainId: number;
+  toChainLabel: string;
+  tokenSymbol: string;
+  transferHash: string;
 }
 
 const USER_TRANSACTIONS = gql`
@@ -86,10 +106,8 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
       const tokenInfo = tokens.find((token) => {
         const { address } = token[fromChainId];
         return address.toLowerCase() === tokenAddress.toLowerCase();
-      });
-      const { decimal, symbol } = tokenInfo
-        ? tokenInfo[fromChainId]
-        : { decimal: 0, symbol: "" };
+      })!;
+      const { decimal, symbol } = tokenInfo[fromChainId];
       const formattedAmount = BigNumber.from(amount)
         .div(BigNumber.from(10).pow(decimal))
         .toString();
@@ -119,38 +137,32 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           id: transactionId,
           amount,
           receiver,
-          toChainId,
+          toChainId: toChainIdAsString,
           tokenAddress: sentTokenAddress,
           timestamp: sentTimeStamp,
         } = transaction;
         const { formattedAmount: sentAmount, symbol: sentTokenSymbol } =
           getTokenInfo(amount, sentTokenAddress, fromChainId);
-        const toChainLabel = chainsList.find(
-          (chain) => chain.chainId === Number.parseInt(toChainId, 10)
-        );
+        const toChainId = Number.parseInt(toChainIdAsString, 10);
+        const { name: toChainLabel } = chainsList.find(
+          (chain) => chain.chainId === toChainId
+        )!;
         const {
-          id: transferId,
+          id: transferHash,
           feeEarned,
           tokenAddress: receivedTokenAddress,
           timestamp: receviedTimeStamp,
           transferredAmount,
-        } = await getTransferInfo(
-          transactionId,
-          Number.parseInt(toChainId, 10)
-        );
+        } = await getTransferInfo(transactionId, toChainId);
         const { formattedAmount: receivedAmount, symbol: receivedTokenSymbol } =
-          getTokenInfo(
-            transferredAmount,
-            receivedTokenAddress,
-            Number.parseInt(toChainId, 10)
-          );
+          getTokenInfo(transferredAmount, receivedTokenAddress, toChainId);
         const { formattedAmount: lpFee } = getTokenInfo(
           feeEarned,
           receivedTokenAddress,
-          Number.parseInt(toChainId, 10)
+          toChainId
         );
 
-        const transformedTransaction = {
+        const transactionDetails = {
           amount: sentAmount,
           amountReceived: receivedAmount,
           depositHash: transactionId,
@@ -165,10 +177,12 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           toChainId,
           toChainLabel,
           tokenSymbol: sentTokenSymbol,
-          transferId: transferId,
+          transferHash,
         };
 
-        transformedTransactions.push(transformedTransaction);
+        console.log(transactionDetails);
+
+        transformedTransactions.push(transactionDetails);
       }
 
       setUserTransactions(transformedTransactions);
@@ -235,8 +249,8 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           </button>
         </article>
 
-        <article className="px-6 py-4 bg-gray-100 rounded-bl-3xl rounded-br-3xl">
-          <h2 className="text-lg text-gray-500">Recent Transactions</h2>
+        <article className="px-6 py-4 bg-gray-50 rounded-bl-3xl rounded-br-3xl">
+          <h2 className="mb-4 text-lg text-gray-500">Recent Transactions</h2>
           {loading ? (
             <Skeleton
               baseColor="#615ccd20"
@@ -247,8 +261,65 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           ) : null}
 
           {userTransactions.length > 0
-            ? "Hello World!"
-            : "No transactions yet."}
+            ? userTransactions.map((userTransaction: ITransactionDetails) => {
+                const { image, symbol } = tokens.find(
+                  (token) => token.symbol === userTransaction.tokenSymbol
+                )!;
+                const fromChainExplorerUrl = `${
+                  chainsList.find(
+                    (chain) => chain.chainId === userTransaction.fromChainId
+                  )!.explorerUrl
+                }/tx/${userTransaction.depositHash}`;
+                const toChainExplorerUrl = `${
+                  chainsList.find(
+                    (chain) => chain.chainId === userTransaction.toChainId
+                  )!.explorerUrl
+                }/tx/${userTransaction.transferHash}`;
+
+                return (
+                  <ul>
+                    <li className="flex items-center justify-between p-3 mb-2 border border-gray-200 rounded-lg">
+                      <div className="flex items-center">
+                        <img
+                          src={image}
+                          alt={symbol}
+                          className="w-10 h-10 mr-2"
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-gray-700">
+                            {userTransaction.amount}{" "}
+                            {userTransaction.tokenSymbol}
+                          </span>
+                          <span className="flex items-center text-sm">
+                            <a
+                              target="_blank"
+                              href={fromChainExplorerUrl}
+                              rel="noreferrer"
+                              className="text-hyphen-purple"
+                            >
+                              {userTransaction.fromChainLabel}
+                            </a>
+                            <HiOutlineArrowNarrowRight className="w-4 h-4 mx-1 text-gray-500" />
+                            <a
+                              target="_blank"
+                              href={toChainExplorerUrl}
+                              rel="noreferrer"
+                              className="text-hyphen-purple"
+                            >
+                              {userTransaction.toChainLabel}
+                            </a>
+                          </span>
+                        </div>
+                      </div>
+                      <button className="flex items-center p-2 text-sm text-gray-700 rounded-md hover:bg-gray-100">
+                        Details
+                        <HiOutlineArrowSmRight className="w-5 h-5 ml-1 -rotate-45" />
+                      </button>
+                    </li>
+                  </ul>
+                );
+              })
+            : null}
         </article>
       </div>
     </Modal>

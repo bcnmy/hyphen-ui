@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { gql, useQuery } from "@apollo/client";
+import { BigNumber, ethers } from "ethers";
 import { Dialog } from "@headlessui/react";
+import Skeleton from "react-loading-skeleton";
 import { useWalletProvider } from "context/WalletProvider";
+import { apolloClients } from "context/GraphQL";
 import { IoMdClose } from "react-icons/io";
 import {
   HiOutlineClipboardCopy,
@@ -10,10 +13,23 @@ import {
 import Modal from "../../../../components/Modal";
 import { getProviderInfo } from "web3modal";
 import { useChains } from "context/Chains";
+import { tokens } from "../../../../config/tokens";
+import { ChainConfig } from "../../../../config/chains";
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
   onClose: () => void;
+}
+
+export interface ITransaction {
+  amount: number;
+  from: string;
+  id: string;
+  receiver: string;
+  timestamp: string;
+  toChainId: string;
+  tokenAddress: string;
+  __typename: string;
 }
 
 const USER_TRANSACTIONS = gql`
@@ -35,18 +51,133 @@ const USER_TRANSACTIONS = gql`
   }
 `;
 
+const FUNDS_TO_USER = gql`
+  query FUNDS_TO_USER($depositHash: String!) {
+    fundsSentToUsers(where: { depositHash: $depositHash }) {
+      id
+      depositHash
+      tokenAddress
+      amount
+      transferredAmount
+      feeEarned
+      timestamp
+    }
+  }
+`;
+
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const [addressCopied, setAddressCopied] = useState(false);
+  const [userTransactions, setUserTransactions] = useState<any>([]);
   const { accounts, disconnect, rawEthereumProvider } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
+  const { chainsList, fromChain } = useChains()!;
+  const { name: providerName } = getProviderInfo(rawEthereumProvider);
   const userAddress = accounts?.[0];
   const { loading, error, data } = useQuery(USER_TRANSACTIONS, {
     skip: !isVisible,
     variables: { address: userAddress },
   });
-  const { name: providerName } = getProviderInfo(rawEthereumProvider);
 
-  // console.log({ loading, error, data });
+  useEffect(() => {
+    function getTokenInfo(
+      amount: number,
+      tokenAddress: string,
+      fromChainId: number
+    ): { formattedAmount: string; symbol: string } {
+      const tokenInfo = tokens.find((token) => {
+        const { address } = token[fromChainId];
+        return address.toLowerCase() === tokenAddress.toLowerCase();
+      });
+      const { decimal, symbol } = tokenInfo
+        ? tokenInfo[fromChainId]
+        : { decimal: 0, symbol: "" };
+      const formattedAmount = BigNumber.from(amount)
+        .div(BigNumber.from(10).pow(decimal))
+        .toString();
+
+      return { formattedAmount, symbol };
+    }
+
+    async function getTransferInfo(transactionId: string, toChainId: number) {
+      const apolloClient = apolloClients[toChainId];
+      const { data } = await apolloClient.query({
+        query: FUNDS_TO_USER,
+        variables: { depositHash: transactionId },
+      });
+      return data.fundsSentToUsers[0];
+    }
+
+    async function getUserTransactions(
+      chainsList: ChainConfig[],
+      data: { fundsDepositeds: ITransaction[] },
+      fromChain: ChainConfig
+    ) {
+      const { chainId: fromChainId, name: fromChainLabel } = fromChain;
+      const { fundsDepositeds } = data;
+      let transformedTransactions = [];
+      for (const transaction of fundsDepositeds) {
+        const {
+          id: transactionId,
+          amount,
+          receiver,
+          toChainId,
+          tokenAddress: sentTokenAddress,
+          timestamp: sentTimeStamp,
+        } = transaction;
+        const { formattedAmount: sentAmount, symbol: sentTokenSymbol } =
+          getTokenInfo(amount, sentTokenAddress, fromChainId);
+        const toChainLabel = chainsList.find(
+          (chain) => chain.chainId === Number.parseInt(toChainId, 10)
+        );
+        const {
+          id: transferId,
+          feeEarned,
+          tokenAddress: receivedTokenAddress,
+          timestamp: receviedTimeStamp,
+          transferredAmount,
+        } = await getTransferInfo(
+          transactionId,
+          Number.parseInt(toChainId, 10)
+        );
+        const { formattedAmount: receivedAmount, symbol: receivedTokenSymbol } =
+          getTokenInfo(
+            transferredAmount,
+            receivedTokenAddress,
+            Number.parseInt(toChainId, 10)
+          );
+        const { formattedAmount: lpFee } = getTokenInfo(
+          feeEarned,
+          receivedTokenAddress,
+          Number.parseInt(toChainId, 10)
+        );
+
+        const transformedTransaction = {
+          amount: sentAmount,
+          amountReceived: receivedAmount,
+          depositHash: transactionId,
+          endTimeStamp: receviedTimeStamp,
+          fromChainLabel,
+          fromChainId,
+          lpFee,
+          receivedTokenAddress,
+          receivedTokenSymbol,
+          receiver,
+          sentTimeStamp,
+          toChainId,
+          toChainLabel,
+          tokenSymbol: sentTokenSymbol,
+          transferId: transferId,
+        };
+
+        transformedTransactions.push(transformedTransaction);
+      }
+
+      setUserTransactions(transformedTransactions);
+    }
+
+    if (data && fromChain) {
+      getUserTransactions(chainsList, data, fromChain);
+    }
+  }, [chainsList, data, fromChain]);
 
   function handleWalletDisconnect() {
     disconnect();
@@ -105,9 +236,19 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         </article>
 
         <article className="px-6 py-4 bg-gray-100 rounded-bl-3xl rounded-br-3xl">
-          <span className="text-lg text-gray-500">
-            {loading ? "Loading..." : "Recent Transactions"}
-          </span>
+          <h2 className="text-lg text-gray-500">Recent Transactions</h2>
+          {loading ? (
+            <Skeleton
+              baseColor="#615ccd20"
+              count={5}
+              highlightColor="#615ccd05"
+              height={20}
+            />
+          ) : null}
+
+          {userTransactions.length > 0
+            ? "Hello World!"
+            : "No transactions yet."}
         </article>
       </div>
     </Modal>

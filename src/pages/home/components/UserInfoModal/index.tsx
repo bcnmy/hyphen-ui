@@ -230,7 +230,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
               Disconnect
             </button>
           </header>
-          <p className="mb-2 text-2xl text-gray-700">
+          <p className="mb-2 text-xl text-gray-700">
             {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
           </p>
           <button className="flex items-center" onClick={handleUserAddressCopy}>

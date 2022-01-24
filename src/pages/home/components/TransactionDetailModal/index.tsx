@@ -57,8 +57,8 @@ function TransactionDetailModal({
           </button>
         </div>
 
-        <article className="border border-gray-200 rounded-2xl">
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+        <article>
+          <div className="flex items-center justify-between pb-4 border-b border-gray-200">
             <div className="flex flex-col">
               <span className="text-xs text-gray-400">Sent</span>
               <span className="text-xl font-semibold text-gray-700">
@@ -92,7 +92,7 @@ function TransactionDetailModal({
             </div>
           </div>
 
-          <ul className="p-4">
+          <ul className="pt-4">
             <li className="flex justify-between mb-1">
               <span className="text-gray-500">Time taken</span>
               <span className="text-gray-700">{transactionTime}</span>

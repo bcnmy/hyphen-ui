@@ -35,13 +35,13 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = (
             (state === "exiting" || state === "exited") && "-translate-y-full"
           )}
         >
-          <div className="bg-white mx-10 bg-opacity-10 backdrop-blur border-white/10 border-x border-b rounded-b-md relative shadow-lg z-0">
+          <div className="relative z-0 mx-10 bg-white border-b shadow-lg bg-opacity-10 backdrop-blur border-white/10 border-x rounded-b-md">
             <div className="absolute opacity-80 -inset-[2px] bg-gradient-to-br from-white/10 to-hyphen-purple/30 blur-md -z-10"></div>
-            <div className="grid grid-cols-2 text-white/75 p-6 gap-y-2 text-sm">
-              <span className="font-medium flex items-center gap-2">
+            <div className="grid grid-cols-2 p-6 text-sm text-white/75 gap-y-2">
+              <span className="flex items-center gap-2 font-medium">
                 <FaInfoCircle /> Liquidity Provider Fee
               </span>
-              <span className="text-right font-mono">
+              <span className="font-mono text-right">
                 {fetchTransactionFeeStatus === Status.SUCCESS &&
                 transactionFee ? (
                   <>{`${transactionFee.lpFeeProcessedString} ${selectedToken?.symbol}`}</>
@@ -53,11 +53,11 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = (
                   />
                 )}
               </span>
-              <span className="font-medium flex items-center gap-2">
+              <span className="flex items-center gap-2 font-medium">
                 <FaInfoCircle />
                 Transaction Fee
               </span>
-              <span className="text-right font-mono">
+              <span className="font-mono text-right">
                 {fetchTransactionFeeStatus === Status.SUCCESS &&
                 transactionFee ? (
                   <>{`${transactionFee.transactionFeeProcessedString} ${selectedToken?.symbol}`}</>
@@ -69,11 +69,11 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = (
                   />
                 )}
               </span>
-              <span className="font-medium flex items-center gap-2">
+              <span className="flex items-center gap-2 font-medium">
                 <FaInfoCircle />
                 You get minimum
               </span>
-              <span className="text-right font-mono">
+              <span className="font-mono text-right">
                 {fetchTransactionFeeStatus === Status.SUCCESS &&
                 transactionFee ? (
                   <>{`${transactionFee.amountToGetProcessedString} ${selectedToken?.symbol}`}</>

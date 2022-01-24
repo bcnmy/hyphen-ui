@@ -14,6 +14,7 @@ interface IWalletProviderContext {
   signer: ethers.Signer | undefined;
   web3Modal: Web3Modal | undefined;
   connect: Web3Modal["connect"];
+  disconnect: Web3Modal["clearCachedProvider"];
   accounts: string[] | undefined;
   currentChainId: number | undefined;
   isLoggedIn: boolean;
@@ -158,6 +159,16 @@ const WalletProviderProvider: React.FC = (props) => {
     setWalletProvider(new ethers.providers.Web3Provider(provider));
   }, [web3Modal]);
 
+  const disconnect = useCallback(async () => {
+    if (!web3Modal) {
+      console.error("Web3Modal not initialized.");
+      return;
+    }
+    web3Modal.clearCachedProvider();
+    setRawEthereumProvider(undefined);
+    setWalletProvider(undefined);
+  }, [web3Modal]);
+
   return (
     <WalletProviderContext.Provider
       value={{
@@ -166,6 +177,7 @@ const WalletProviderProvider: React.FC = (props) => {
         signer,
         web3Modal,
         connect,
+        disconnect,
         accounts,
         currentChainId,
         isLoggedIn,

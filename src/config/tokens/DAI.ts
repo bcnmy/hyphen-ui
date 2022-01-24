@@ -3,11 +3,11 @@ import { ETHEREUM } from "../chains/constants/Ethereum";
 import { GOERLI } from "../chains/constants/Goerli";
 import { MUMBAI } from "../chains/constants/Mumbai";
 import { POLYGON } from "../chains/constants/Polygon";
-import daiLogo from "../../assets/images/tokens/dai-logo.svg";
+import daiIcon from "../../assets/images/tokens/dai-icon.svg";
 
 export const DAI: TokenConfig = {
   symbol: "DAI",
-  image: daiLogo,
+  image: daiIcon,
   [MUMBAI.chainId]: {
     address: "0x27a44456bEDb94DbD59D0f0A14fE977c777fC5C3",
     transferOverhead: 86147,

@@ -1,10 +1,10 @@
 import { ChainConfig } from "..";
 import { NATIVE_ADDRESS } from "../../constants";
-import ethLogo from "../../../assets/images/chains/eth-logo.svg"
+import ethIcon from "../../../assets/images/tokens/eth-icon.svg"
 
 export const GOERLI: ChainConfig = {
   name: "Goerli",
-  image: ethLogo,
+  image: ethIcon,
   subText: "Ethereum testnet",
   chainId: 5,
   rpcUrl: "https://goerli.infura.io/v3/d126f392798444609246423b06116c77",

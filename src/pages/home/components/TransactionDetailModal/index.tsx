@@ -58,57 +58,48 @@ function TransactionDetailModal({
         </div>
 
         <article>
-          <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-400">Sent</span>
-              <span className="text-xl font-semibold text-gray-700">
-                {amount} {tokenSymbol}
-              </span>
-              <a
-                target="_blank"
-                href={fromChainExplorerUrl}
-                rel="noreferrer"
-                className="flex items-center text-hyphen-purple"
-              >
-                {fromChainLabel}
-                <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
-              </a>
+          <div className="flex flex-col pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400">Sent</span>
+                <span className="text-xl font-semibold text-gray-700">
+                  {amount} {tokenSymbol}
+                </span>
+                <a
+                  target="_blank"
+                  href={fromChainExplorerUrl}
+                  rel="noreferrer"
+                  className="flex items-center text-hyphen-purple"
+                >
+                  {fromChainLabel}
+                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
+                </a>
+              </div>
+              <HiOutlineArrowNarrowRight className="w-8 h-8 text-gray-700" />
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400">Received</span>
+                <span className="text-xl font-semibold text-gray-700">
+                  {amountReceived} {receivedTokenSymbol}
+                </span>
+                <a
+                  target="_blank"
+                  href={toChainExplorerUrl}
+                  rel="noreferrer"
+                  className="flex items-center text-hyphen-purple"
+                >
+                  {toChainLabel}
+                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
+                </a>
+              </div>
             </div>
-            <HiOutlineArrowNarrowRight className="w-8 h-8 text-gray-700" />
-            <div className="flex flex-col">
-              <span className="text-xs text-gray-400">Received</span>
-              <span className="text-xl font-semibold text-gray-700">
-                {amountReceived} {receivedTokenSymbol}
-              </span>
-              <a
-                target="_blank"
-                href={toChainExplorerUrl}
-                rel="noreferrer"
-                className="flex items-center text-hyphen-purple"
-              >
-                {toChainLabel}
-                <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
-              </a>
-            </div>
+
+            <span className="text-center text-gray-500">
+              Tranfer completed in{" "}
+              <span className="text-hyphen-purple">{transactionTime}</span>
+            </span>
           </div>
 
           <ul className="pt-4">
-            <li className="flex justify-between mb-1">
-              <span className="text-gray-500">Time taken</span>
-              <span className="text-gray-700">{transactionTime}</span>
-            </li>
-            <li className="flex justify-between mb-1">
-              <span className="text-gray-500">Amount deposited</span>
-              <span className="text-gray-700">
-                {amount} {tokenSymbol}
-              </span>
-            </li>
-            <li className="flex justify-between mb-1">
-              <span className="text-gray-500">Amount received</span>
-              <span className="text-gray-700">
-                {amountReceived} {receivedTokenSymbol}
-              </span>
-            </li>
             <li className="flex justify-between mb-1">
               <span className="text-gray-500">Liquidity provider fee</span>
               <span className="text-gray-700">

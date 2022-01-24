@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql, NetworkStatus, useQuery } from "@apollo/client";
 import { BigNumber, ethers } from "ethers";
 import { Dialog } from "@headlessui/react";
 import Skeleton from "react-loading-skeleton";
@@ -11,6 +11,7 @@ import {
   HiOutlineClipboardCheck,
   HiOutlineArrowNarrowRight,
   HiOutlineArrowSmRight,
+  HiOutlineRefresh,
 } from "react-icons/hi";
 import Modal from "../../../../components/Modal";
 import { getProviderInfo } from "web3modal";
@@ -19,6 +20,7 @@ import { tokens } from "../../../../config/tokens";
 import { ChainConfig } from "../../../../config/chains";
 import TransactionDetailModal from "../TransactionDetailModal";
 import useModal from "hooks/useModal";
+import { twMerge } from "tailwind-merge";
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
@@ -98,9 +100,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const { chainsList, fromChain } = useChains()!;
   const { name: providerName } = getProviderInfo(rawEthereumProvider);
   const userAddress = accounts?.[0];
-  const { loading, error, data } = useQuery(USER_TRANSACTIONS, {
+  const { data, refetch, networkStatus } = useQuery(USER_TRANSACTIONS, {
     skip: !isVisible,
     variables: { address: userAddress },
+    notifyOnNetworkStatusChange: true,
   });
 
   useEffect(() => {
@@ -186,8 +189,6 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           transferHash,
         };
 
-        console.log(transactionDetails);
-
         transformedTransactions.push(transactionDetails);
       }
 
@@ -272,17 +273,31 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         </article>
 
         <article className="">
-          <h2 className="mb-4 text-lg text-gray-700">Recent Transactions</h2>
-          {loading && !userTransactions ? (
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg text-gray-700">Recent Transactions</h2>
+            <button
+              onClick={() => refetch()}
+              className="flex items-center p-2 text-sm text-gray-700 rounded-md hover:bg-gray-100"
+            >
+              Refresh
+              <HiOutlineRefresh
+                className={twMerge(
+                  "w-4 h-4 ml-1 text-gray-500",
+                  networkStatus === NetworkStatus.refetch ? "animate-spin" : ""
+                )}
+              />
+            </button>
+          </div>
+          {!userTransactions ? (
             <Skeleton
               baseColor="#615ccd20"
-              count={5}
+              count={1}
               highlightColor="#615ccd05"
               height={62}
             />
           ) : null}
 
-          {userTransactions && userTransactions.length > 0 ? (
+          {userTransactions ? (
             <ul>
               {userTransactions.map((userTransaction: ITransactionDetails) => {
                 const { image, symbol } = tokens.find(
@@ -300,7 +315,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
                 }/tx/${userTransaction.transferHash}`;
 
                 return (
-                  <li className="flex items-center justify-between p-2 mb-2 border border-gray-200 rounded-xl last:mb-0">
+                  <li
+                    className="flex items-center justify-between p-2 mb-2 border border-gray-200 rounded-xl last:mb-0"
+                    key={userTransaction.depositHash}
+                  >
                     <div className="flex items-center">
                       <img
                         src={image}
@@ -343,7 +361,6 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
                       }
                     >
                       Details
-                      <HiOutlineArrowSmRight className="w-5 h-5 ml-1 -rotate-45" />
                     </button>
                   </li>
                 );

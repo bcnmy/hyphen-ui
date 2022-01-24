@@ -48,7 +48,7 @@ function TransactionDetailModal({
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
       <div className="relative z-20 p-6 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-6">
           <Dialog.Title as="h1" className="text-xl font-semibold text-gray-700">
             Transaction details
           </Dialog.Title>

@@ -1,4 +1,3 @@
-import { DAI } from "./DAI";
 import { ETH } from "./ETH";
 import { USDC } from "./USDC";
 import { USDT } from "./USDT";
@@ -17,7 +16,6 @@ export type TokenConfig = {
 };
 
 export const tokens = [
-  DAI,
   ETH,
   USDC,
   USDT,

@@ -1,6 +1,6 @@
 import { ChainConfig } from "..";
 import { NATIVE_ADDRESS } from "../../constants";
-import avaxIcon from "../../../assets/images/chains/avax-logo.svg"
+import avaxIcon from "../../../assets/images/tokens/avax-icon.svg"
 
 export const FUJI: ChainConfig = {
   name: "Fuji",

@@ -424,10 +424,10 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
         <div className="relative z-20 p-6 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
           <div className="absolute opacity-50 -inset-2 bg-white/60 rounded-3xl blur-lg -z-10"></div>
           <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
               <Dialog.Title
                 as="h1"
-                className="p-2 text-xl font-semibold text-gray-700"
+                className="text-xl font-semibold text-gray-700"
               >
                 Transfer Activity
               </Dialog.Title>

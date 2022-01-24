@@ -11,6 +11,10 @@ import { useTransaction } from "context/Transaction";
 import { useToken } from "context/Token";
 import useAsync, { Status } from "hooks/useLoading";
 import { ITransferRecord } from "context/TransactionInfoModal";
+import {
+  HiOutlineArrowNarrowRight,
+  HiOutlineArrowSmRight,
+} from "react-icons/hi";
 
 export interface ITransferInfoModal {
   transferRecord: ITransferRecord;
@@ -40,151 +44,75 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className="mb-14">
-        <div className="relative">
-          <div className="relative p-6 bg-white shadow-2xl rounded-3xl">
-            <div className="absolute opacity-50 -inset-2 bg-white/60 rounded-3xl blur-lg -z-10"></div>
-            <div className="flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-                <Dialog.Title
-                  as="h1"
-                  className="font-semibold text-xl text-black text-opacity-[0.54] p-2"
-                >
-                  Transfer Details
-                </Dialog.Title>
-                <div className="ml-auto text-hyphen-purple-dark/80 hover">
-                  <button onClick={onClose}>
-                    <IoMdClose className="w-auto h-6" />
-                  </button>
-                </div>
-              </div>
-              <div
-                className="grid gap-4 p-2 place-items-stretch"
-                style={{ gridTemplateColumns: "1fr auto 1fr" }}
-              >
-                <div className="flex flex-col">
-                  <div className="transition-colors p-4 rounded-t-xl bg-hyphen-purple bg-opacity-[0.02] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-medium uppercase text-hyphen-purple-dark/70">
-                        From
-                      </span>
-                      <span className="font-mono text-lg font-medium text-hyphen-purple-dark/80">
-                        {transferRecord.fromChain.name}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="transition-colors p-4 rounded-b-xl bg-hyphen-purple bg-opacity-[0.02] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-medium uppercase text-hyphen-purple-dark/70">
-                        Deposited
-                      </span>
-                      <span className="font-mono text-lg font-medium text-hyphen-purple-dark/80">
-                        {transferRecord.depositAmount}{" "}
-                        {transferRecord.token.symbol}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-16">
-                  <div className="p-2 border rounded-full shadow-sm bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 text-hyphen-purple shadow-hyphen-purple/30">
-                    <FaArrowRight />
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <div className="transition-colors p-4 rounded-t-xl bg-hyphen-purple bg-opacity-[0.02] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-medium uppercase text-hyphen-purple-dark/70">
-                        To
-                      </span>
-                      <span className="font-mono text-lg font-medium text-hyphen-purple-dark/80">
-                        {transferRecord.toChain.name}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="transition-colors p-4 rounded-b-xl bg-hyphen-purple bg-opacity-[0.02] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
-                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-medium uppercase text-hyphen-purple-dark/70">
-                        Received
-                      </span>
-                      <span className="font-mono text-lg font-medium text-hyphen-purple-dark/80">
-                        {getExitInfoStatus === Status.SUCCESS && exitInfo ? (
-                          <>
-                            {exitInfo} {transferRecord.token.symbol}
-                          </>
-                        ) : (
-                          <>
-                            <Skeleton
-                              baseColor="#625ccd28"
-                              highlightColor="#625ccd0c"
-                            />
-                          </>
-                        )}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="font-medium text-center my-7 text-hyphen-purple-darker/80">
-                Transfer completed in{" "}
-                <span className="font-semibold text-hyphen-purple">
-                  {transferRecord.transferTime} 🚀
+      <div className="relative z-20 p-6 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
+        <div className="flex items-center justify-between mb-6">
+          <Dialog.Title as="h1" className="text-xl font-semibold text-gray-700">
+            Transaction details
+          </Dialog.Title>
+          <button onClick={onClose} className="rounded hover:bg-gray-100">
+            <IoMdClose className="w-auto h-6 text-gray-500" />
+          </button>
+        </div>
+
+        <article>
+          <div className="flex flex-col pb-4 border-b border-gray-200">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400">Sent</span>
+                <span className="text-xl font-semibold text-gray-700">
+                  {transferRecord.depositAmount} {transferRecord.token.symbol}
+                </span>
+                <span className="text-hyphen-purple">
+                  {transferRecord.fromChain.name}
                 </span>
               </div>
-              <div className="flex justify-center mb-3">
-                <PrimaryButtonLight
-                  className="px-8"
-                  onClick={() => {
-                    onClose();
-                  }}
-                >
-                  Import {transferRecord.token.symbol} to wallet
-                </PrimaryButtonLight>
+              <HiOutlineArrowNarrowRight className="w-8 h-8 text-gray-700" />
+              <div className="flex flex-col">
+                <span className="text-xs text-gray-400">Received</span>
+                <span className="text-xl font-semibold text-gray-700">
+                  {getExitInfoStatus === Status.SUCCESS && exitInfo ? (
+                    <>
+                      {exitInfo} {transferRecord.token.symbol}
+                    </>
+                  ) : (
+                    <>
+                      <Skeleton
+                        baseColor="#625ccd28"
+                        highlightColor="#625ccd0c"
+                        width={100}
+                      />
+                    </>
+                  )}
+                </span>
+                <span className="text-hyphen-purple">
+                  {transferRecord.toChain.name}
+                </span>
               </div>
             </div>
+
+            <span className="text-center text-gray-500">
+              Tranfer completed in{" "}
+              <span className="text-hyphen-purple">
+                {transferRecord.transferTime}
+              </span>
+            </span>
           </div>
-          <div className="relative z-0 mx-8 border-b shadow-lg bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker backdrop-blur border-white/20 border-x rounded-b-md">
-            <div className="absolute opacity-80 -inset-[2px] bg-gradient-to-br from-white/10 to-hyphen-purple/30 blur-md -z-10"></div>
-            <div className="grid grid-cols-2 p-6 text-white/75 gap-y-2">
-              <span className="flex items-center gap-2 font-medium">
-                <FaInfoCircle />
-                Amount Deposited
+
+          <ul className="pt-4">
+            <li className="flex justify-between mb-1">
+              <span className="text-gray-500">Liquidity provider fee</span>
+              <span className="text-gray-700">
+                {transferRecord.lpFee} {transferRecord.token.symbol}
               </span>
-              <span className="font-mono text-right">
-                <>{`${transferRecord.depositAmount} ${transferRecord.token.symbol}`}</>
+            </li>
+            <li className="flex justify-between">
+              <span className="text-gray-500">Transaction fee</span>
+              <span className="text-gray-700">
+                {transferRecord.transactionFee} {transferRecord.token.symbol}
               </span>
-              <span className="flex items-center gap-2 font-medium">
-                <FaInfoCircle />
-                Amount Received
-              </span>
-              <span className="font-mono text-right">
-                {getExitInfoStatus === Status.SUCCESS && exitInfo ? (
-                  <>
-                    {exitInfo} {transferRecord.token.symbol}
-                  </>
-                ) : (
-                  <Skeleton
-                    baseColor="#ffffff10"
-                    highlightColor="#ffffff15"
-                    className="max-w-[80px]"
-                  />
-                )}
-              </span>
-              <span className="flex items-center gap-2 font-medium">
-                <FaInfoCircle /> Liquidity Provider Fee
-              </span>
-              <span className="font-mono text-right">
-                <>{`${transferRecord.lpFee} ${transferRecord.token.symbol}`}</>
-              </span>
-              <span className="flex items-center gap-2 font-medium">
-                <FaInfoCircle />
-                Transaction Fee
-              </span>
-              <span className="font-mono text-right">
-                <>{`${transferRecord.transactionFee} ${transferRecord.token.symbol}`}</>
-              </span>
-            </div>
-          </div>
-        </div>
+            </li>
+          </ul>
+        </article>
       </div>
     </Modal>
   );

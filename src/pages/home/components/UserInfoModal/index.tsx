@@ -297,7 +297,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
             />
           ) : null}
 
-          {userTransactions.length === 0 ? (
+          {userTransactions && userTransactions.length === 0 ? (
             <span>No transactions found 😐</span>
           ) : null}
 

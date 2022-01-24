@@ -117,9 +117,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         return address.toLowerCase() === tokenAddress.toLowerCase();
       })!;
       const { decimal, symbol } = tokenInfo[fromChainId];
-      const formattedAmount = BigNumber.from(amount)
-        .div(BigNumber.from(10).pow(decimal))
-        .toString();
+      const formattedAmount = (+ethers.utils.formatUnits(
+        amount.toString(),
+        decimal
+      )).toFixed(2);
 
       return { formattedAmount, symbol };
     }
@@ -320,7 +321,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
                 return (
                   <li
-                    className="flex items-center justify-between p-2 mb-2 border border-gray-200 rounded-xl last:mb-0"
+                    className="flex items-center justify-between p-2 mb-2 last:mb-0 "
                     key={userTransaction.depositHash}
                   >
                     <div className="flex items-center">

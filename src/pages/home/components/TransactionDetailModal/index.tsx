@@ -40,10 +40,11 @@ function TransactionDetailModal({
     new Date(endTimeStamp * 1000),
     new Date(startTimeStamp * 1000)
   );
-  const transactionFee =
+  const transactionFee = (
     Number.parseFloat(amount) -
     Number.parseFloat(lpFee) -
-    Number.parseFloat(amountReceived);
+    Number.parseFloat(amountReceived)
+  ).toFixed(2);
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>

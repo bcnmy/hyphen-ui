@@ -297,6 +297,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
             />
           ) : null}
 
+          {userTransactions.length === 0 ? (
+            <span>No transactions found 😐</span>
+          ) : null}
+
           {userTransactions ? (
             <ul>
               {userTransactions.map((userTransaction: ITransactionDetails) => {

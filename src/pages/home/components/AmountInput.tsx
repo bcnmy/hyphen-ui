@@ -7,6 +7,7 @@ import { useTransaction, ValidationErrors } from "context/Transaction";
 import { twMerge } from "tailwind-merge";
 import { useChains } from "context/Chains";
 import CustomTooltip from "./CustomTooltip";
+import { Listbox } from "@headlessui/react";
 
 interface IAmountInputProps {
   disabled?: boolean;
@@ -24,8 +25,11 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
   } = useTransaction()!;
 
   return (
-    <div className="text-hyphen-purple-dark flex flex-col font-mono justify-end">
+    <div className="flex flex-col justify-end text-hyphen-purple-dark">
       <div className="block" data-tip data-for="transferAmount">
+        <label className="pl-1 text-xs font-semibold capitalize text-hyphen-purple-dark text-opacity-70">
+          Amount
+        </label>
         <input
           type="string"
           inputMode="decimal"
@@ -33,16 +37,19 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           value={transferAmountInputValue}
           onChange={(e) => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(
-            "inline-block w-full h-16 text-2xl font-mono font-medium bg-white px-4 py-2 my-0 tracking-tight border border-hyphen-purple border-opacity-20 focus:outline-none focus-visible:ring-2 rounded-lg focus-visible:ring-opacity-10 focus-visible:ring-white focus-visible:ring-offset-hyphen-purple/30 focus-visible:ring-offset-2 focus-visible:border-hyphen-purple",
+            "inline-block w-full h-10 text-2xl font-mono bg-white px-4 py-2 mt-1 tracking-tight border border-hyphen-purple border-opacity-20 focus:outline-none focus-visible:ring-2 rounded-lg focus-visible:ring-opacity-10 focus-visible:ring-white focus-visible:ring-offset-hyphen-purple/30 focus-visible:ring-offset-2 focus-visible:border-hyphen-purple",
             disabled && "cursor-not-allowed text-gray-900/80 bg-gray-200"
           )}
           disabled={disabled}
         />
       </div>
       {disabled && (
-        <CustomTooltip id="transferAmount" text="Select from & to chains" />
+        <CustomTooltip
+          id="transferAmount"
+          text="Select source & destination chains"
+        />
       )}
-      <div className="flex my-2 pl-2 text-xs gap-4 text-opacity-60 text-hyphen-purple-dark">
+      <div className="flex gap-4 pl-2 my-2 text-xs text-opacity-60 text-hyphen-purple-dark">
         <span
           className={twMerge(
             "flex items-center gap-2 transition-colors",

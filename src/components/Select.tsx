@@ -63,7 +63,7 @@ export const Select: React.FC<ISelectProps> = ({
 }) => {
   return (
     <Listbox value={selected} onChange={setSelected} disabled={disabled}>
-      <Listbox.Label className="pl-1 text-xs font-semibold uppercase text-hyphen-purple-dark text-opacity-70">
+      <Listbox.Label className="pl-1 text-xs font-semibold capitalize text-hyphen-purple-dark text-opacity-70">
         {label}
       </Listbox.Label>
       <div className="relative h-10 mt-1">

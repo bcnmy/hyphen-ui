@@ -108,7 +108,6 @@ const Home: React.FC<HomeProps> = () => {
         <div className="flex flex-grow">
           <div className="flex flex-col flex-grow max-w-xl mx-auto">
             <div className="relative z-10 flex-grow">
-              <div className="absolute opacity-80 inset-2 rounded-3xl bg-hyphen-purple/75 blur-lg -z-10"></div>
               <div className="flex flex-col flex-grow min-w-0 gap-2 p-6 mx-4 mt-4 bg-white shadow-lg rounded-3xl">
                 <div className="flex items-center justify-between">
                   <img
@@ -145,8 +144,9 @@ const Home: React.FC<HomeProps> = () => {
                 <div className="grid grid-cols-[1fr_34px_1fr] gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
                   <NetworkSelectors />
                 </div>
-                <div className="grid grid-cols-[244px_1fr] gap-3 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
+                <div className="grid grid-cols-[1fr_34px_1fr] items-center gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
                   <AmountInput disabled={!areChainsReady} />
+                  <div></div>
                   <TokenSelector disabled={!areChainsReady} />
                 </div>
                 {showEthereumDisclaimer ? (

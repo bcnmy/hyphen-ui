@@ -13,7 +13,7 @@ const SecondaryButtonLight: React.FunctionComponent<
   return (
     <button
       className={twMerge(
-        `pt-3.5 pb-3 px-8 rounded-full bg-hyphen-purple bg-opacity-5 border-hyphen-purple/20 border font-medium text-hyphen-purple-dark/80 shadow shadow-hyphen-purple/30 hover:shadow-sm transition-all  disabled:text-hyphen-purple/20 disabled:shadow-sm disabled:bg-opacity-5 disabled:border-hyphen-purple/5
+        `pt-3.5 pb-3 px-8 rounded-full bg-hyphen-purple bg-opacity-5 border-hyphen-purple/20 border font-medium text-hyphen-purple-dark/80 disabled:text-hyphen-purple/20 disabled:disabled:bg-opacity-5 disabled:border-hyphen-purple/5
         disabled:cursor-not-allowed`,
         className || ""
       )}

@@ -78,7 +78,10 @@ code {
 }
 
 .custom-tooltip {
+  max-width: 160px !important;
+  width: auto !important;
   font-size: 10px !important;
+  line-height: 16px !important;
   padding: 4px 8px !important;
   border-radius: 4px !important;
   background-color: #374151 !important;

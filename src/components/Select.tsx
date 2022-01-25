@@ -66,7 +66,7 @@ export const Select: React.FC<ISelectProps> = ({
       <Listbox.Label className="pl-1 text-xs font-semibold capitalize text-hyphen-purple-dark text-opacity-70">
         {label}
       </Listbox.Label>
-      <div className="relative h-10 mt-1">
+      <div className="relative h-12 mt-1">
         <Listbox.Button
           className={twMerge(
             "relative w-full h-full py-2 pl-4 pr-10 text-left bg-white rounded-lg border border-hyphen-purple border-opacity-20 cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm",

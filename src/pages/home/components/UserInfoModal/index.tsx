@@ -101,9 +101,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const { name: providerName } = getProviderInfo(rawEthereumProvider);
   const userAddress = accounts?.[0];
   const { data, refetch, networkStatus } = useQuery(USER_TRANSACTIONS, {
+    fetchPolicy: "no-cache",
+    notifyOnNetworkStatusChange: true,
     skip: !isVisible,
     variables: { address: userAddress },
-    notifyOnNetworkStatusChange: true,
   });
 
   useEffect(() => {
@@ -230,6 +231,11 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
     hideTransactionDetailModal();
   }
 
+  function handleTransactionsRefetch() {
+    setUserTransactions(undefined);
+    refetch();
+  }
+
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
       <div className="relative z-20 p-6 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
@@ -277,7 +283,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg text-gray-700">Recent Transactions</h2>
             <button
-              onClick={() => refetch()}
+              onClick={handleTransactionsRefetch}
               className="flex items-center p-2 text-sm text-gray-700 rounded-md hover:bg-gray-100"
             >
               Refresh

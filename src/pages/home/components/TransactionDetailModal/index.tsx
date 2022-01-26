@@ -1,4 +1,5 @@
 import { Dialog } from "@headlessui/react";
+import { DEFAULT_FIXED_DECIMAL_POINT } from "config/constants";
 import { formatDistanceStrict } from "date-fns";
 import {
   HiOutlineArrowNarrowRight,
@@ -44,7 +45,7 @@ function TransactionDetailModal({
     Number.parseFloat(amount) -
     Number.parseFloat(lpFee) -
     Number.parseFloat(amountReceived)
-  ).toFixed(2);
+  ).toFixed(DEFAULT_FIXED_DECIMAL_POINT);
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>

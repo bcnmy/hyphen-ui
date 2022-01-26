@@ -33,7 +33,10 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   const { fromChain } = useChains()!;
   const { walletProvider, currentChainId, connect, isLoggedIn } =
     useWalletProvider()!;
-  const { transactionAmountValidationErrors } = useTransaction()!;
+  const {
+    receiver: { receiverAddress, isReceiverValid },
+    transactionAmountValidationErrors,
+  } = useTransaction()!;
   const { isBiconomyEnabled } = useBiconomy()!;
 
   if (!isLoggedIn) {
@@ -58,6 +61,22 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
         >
           Switch to {fromChain?.name}
         </PrimaryButtonLight>
+      </div>
+    );
+  }
+
+  if (!isReceiverValid) {
+    return (
+      <div className="flex justify-center gap-8 mt-4">
+        <span data-tip data-for="invalidReceiverAddress">
+          <PrimaryButtonLight disabled>
+            Invalid receiver address
+          </PrimaryButtonLight>
+        </span>
+        <CustomTooltip
+          id="invalidReceiverAddress"
+          text="This receiver address is not valid, please check the address and try again."
+        />
       </div>
     );
   }

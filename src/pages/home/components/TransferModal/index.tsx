@@ -138,12 +138,15 @@ const DepositStep: React.FC<
   } = useTransaction()!;
   const { selectedToken } = useToken()!;
   const { toChainRpcUrlProvider, fromChain } = useChains()!;
+  const {
+    receiver: { receiverAddress },
+  } = useTransaction()!;
 
   const [executed, setExecuted] = useState(false);
 
   useEffect(() => {
     if (active) {
-      executeDeposit();
+      executeDeposit(receiverAddress);
       setExecuted(true);
     }
   }, [active, executeDeposit]);

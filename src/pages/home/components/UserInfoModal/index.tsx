@@ -21,6 +21,7 @@ import { ChainConfig } from "../../../../config/chains";
 import TransactionDetailModal from "../TransactionDetailModal";
 import useModal from "hooks/useModal";
 import { twMerge } from "tailwind-merge";
+import { DEFAULT_FIXED_DECIMAL_POINT } from "config/constants";
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
@@ -121,7 +122,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
       const formattedAmount = (+ethers.utils.formatUnits(
         amount.toString(),
         decimal
-      )).toFixed(2);
+      )).toFixed(DEFAULT_FIXED_DECIMAL_POINT);
 
       return { formattedAmount, symbol };
     }

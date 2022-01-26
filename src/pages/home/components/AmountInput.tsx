@@ -33,7 +33,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
         <input
           type="string"
           inputMode="decimal"
-          placeholder="0.00"
+          placeholder="0.000"
           value={transferAmountInputValue}
           onChange={(e) => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(

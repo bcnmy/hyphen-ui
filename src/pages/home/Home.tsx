@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 
 import { useWalletProvider } from "../../context/WalletProvider";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ import TokenSelector from "./components/TokenSelector";
 import AmountInput from "./components/AmountInput";
 import Navbar from "components/Navbar";
 import TransactionFee from "./components/TransactionFee";
+import ChangeReceiverAddress from "./components/ChangeReceiverAddress";
 import CallToAction from "./components/CallToAction";
 import { Toggle } from "components/Toggle";
 import useModal from "hooks/useModal";
@@ -32,39 +33,34 @@ const Home: React.FC<HomeProps> = () => {
   const { areChainsReady, toChain } = useChains()!;
   const { changeTransferAmountInputValue } = useTransaction()!;
   const { selectedTokenBalance } = useToken()!;
-
   const {
     isBiconomyAllowed,
     isBiconomyToggledOn,
     setIsBiconomyToggledOn,
     isBiconomyEnabled,
   } = useBiconomy()!;
-
   const navigate = useNavigate();
   const { isLoggedIn, connect } = useWalletProvider()!;
-  const showEthereumDisclaimer = toChain
-    ? isToChainEthereum(toChain.chainId)
-    : false;
-
   const {
     isVisible: isApprovalModalVisible,
     hideModal: hideApprovalModal,
     showModal: showApprovalModal,
   } = useModal();
-
   const {
     isVisible: isTransferModalVisible,
     hideModal: hideTransferlModal,
     showModal: showTransferModal,
   } = useModal();
-
   const {
     isVisible: isUserInfoModalVisible,
     hideModal: hideUserInfoModal,
     showModal: showUserInfoModal,
   } = useModal();
-
   const { executeApproveTokenError } = useTokenApproval()!;
+
+  const showEthereumDisclaimer = toChain
+    ? isToChainEthereum(toChain.chainId)
+    : false;
 
   useEffect(() => {
     (async () => {
@@ -149,6 +145,9 @@ const Home: React.FC<HomeProps> = () => {
                   <div></div>
                   <TokenSelector disabled={!areChainsReady} />
                 </div>
+
+                <ChangeReceiverAddress />
+
                 {showEthereumDisclaimer ? (
                   <article className="flex items-start p-4 text-sm text-red-600 bg-red-100 rounded-xl">
                     <HiExclamation className="w-auto h-6 mr-2" />
@@ -158,6 +157,7 @@ const Home: React.FC<HomeProps> = () => {
                     </p>
                   </article>
                 ) : null}
+
                 <CallToAction
                   onApproveButtonClick={showApprovalModal}
                   onTransferButtonClick={showTransferModal}

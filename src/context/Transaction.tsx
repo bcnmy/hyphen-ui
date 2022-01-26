@@ -2,6 +2,7 @@ import AwesomeDebouncePromise from "awesome-debounce-promise";
 import { BigNumber, ethers } from "ethers";
 import {
   createContext,
+  FormEvent,
   useCallback,
   useContext,
   useEffect,
@@ -56,8 +57,11 @@ interface ITransactionContext {
         amountToGetProcessedString: string;
       };
   transactionAmountValidationErrors: ValidationErrors[];
+  // receiver address
+  receiver: { receiverAddress: string; isReceiverValid: boolean };
+  changeReceiver: (event: FormEvent<HTMLInputElement>) => void;
   //deposit stuff
-  executeDeposit: () => void;
+  executeDeposit: (receiverAddress: string) => void;
   executeDepositError: Error | undefined;
   executeDepositStatus: Status;
   executeDepositValue: any;
@@ -113,6 +117,23 @@ const TransactionProvider: React.FC = (props) => {
 
   const [transferAmountInputValue, setTransferAmountInputValue] =
     useState<string>("");
+
+  const [receiver, setReceiver] = useState<{
+    receiverAddress: string;
+    isReceiverValid: boolean;
+  }>({
+    receiverAddress: "",
+    isReceiverValid: false,
+  });
+
+  useEffect(() => {
+    if (accounts) {
+      setReceiver({
+        receiverAddress: accounts[0],
+        isReceiverValid: true,
+      });
+    }
+  }, [accounts]);
 
   // reset the input after conditions change
   useEffect(() => {
@@ -412,56 +433,59 @@ const TransactionProvider: React.FC = (props) => {
     value: executePreDepositCheckValue,
   } = useAsync(preDepositCheck);
 
-  const deposit = useCallback(async () => {
-    // showFeedbackMessage("Checking approvals and initiating deposit transaction");
-    if (!executePreDepositCheckValue?.depositContract)
-      throw new Error("Pre deposit check not completed");
-    if (!fromChain || !toChain || !accounts?.[0] || !selectedToken)
-      throw new Error("Prerequisites missing from chain");
+  const deposit = useCallback(
+    async (receiverAddress) => {
+      // showFeedbackMessage("Checking approvals and initiating deposit transaction");
+      if (!executePreDepositCheckValue?.depositContract)
+        throw new Error("Pre deposit check not completed");
+      if (!fromChain || !toChain || !accounts?.[0] || !selectedToken)
+        throw new Error("Prerequisites missing from chain");
 
-    let tokenDecimals;
+      let tokenDecimals;
 
-    if (selectedToken[fromChain.chainId].address === NATIVE_ADDRESS) {
-      tokenDecimals = fromChain.nativeDecimal;
-    } else {
-      tokenDecimals = await hyphen.getERC20TokenDecimals(
-        selectedToken[fromChain.chainId].address
+      if (selectedToken[fromChain.chainId].address === NATIVE_ADDRESS) {
+        tokenDecimals = fromChain.nativeDecimal;
+      } else {
+        tokenDecimals = await hyphen.getERC20TokenDecimals(
+          selectedToken[fromChain.chainId].address
+        );
+      }
+
+      let depositTx = await hyphen.deposit({
+        sender: accounts[0],
+        receiver: receiverAddress,
+        tokenAddress: selectedToken[fromChain.chainId].address,
+        depositContractAddress: executePreDepositCheckValue.depositContract,
+        amount: ethers.utils
+          .parseUnits(transferAmount.toString(), tokenDecimals)
+          .toString(),
+        fromChainId: fromChain.chainId,
+        toChainId: toChain.chainId,
+        useBiconomy: isBiconomyEnabled,
+      });
+
+      addTxNotification(
+        depositTx,
+        "Deposit",
+        `${fromChain.explorerUrl}/tx/${depositTx.hash}`
       );
-    }
+      return depositTx;
 
-    let depositTx = await hyphen.deposit({
-      sender: accounts[0],
-      receiver: accounts[0],
-      tokenAddress: selectedToken[fromChain.chainId].address,
-      depositContractAddress: executePreDepositCheckValue.depositContract,
-      amount: ethers.utils
-        .parseUnits(transferAmount.toString(), tokenDecimals)
-        .toString(),
-      fromChainId: fromChain.chainId,
-      toChainId: toChain.chainId,
-      useBiconomy: isBiconomyEnabled,
-    });
-
-    addTxNotification(
-      depositTx,
-      "Deposit",
-      `${fromChain.explorerUrl}/tx/${depositTx.hash}`
-    );
-    return depositTx;
-
-    // postDepositTransaction(depositTx.hash);
-    // await depositTx.wait(1);
-  }, [
-    accounts,
-    executePreDepositCheckValue?.depositContract,
-    fromChain,
-    hyphen,
-    isBiconomyEnabled,
-    selectedToken,
-    toChain,
-    transferAmount,
-    addTxNotification,
-  ]);
+      // postDepositTransaction(depositTx.hash);
+      // await depositTx.wait(1);
+    },
+    [
+      accounts,
+      executePreDepositCheckValue?.depositContract,
+      fromChain,
+      hyphen,
+      isBiconomyEnabled,
+      selectedToken,
+      toChain,
+      transferAmount,
+      addTxNotification,
+    ]
+  );
 
   const {
     execute: executeDeposit,
@@ -536,6 +560,13 @@ const TransactionProvider: React.FC = (props) => {
     [fromChain, toChain, selectedToken, toChainRpcUrlProvider]
   );
 
+  const changeReceiver = useCallback((event: FormEvent<HTMLInputElement>) => {
+    setReceiver({
+      receiverAddress: event.currentTarget.value,
+      isReceiverValid: ethers.utils.isAddress(event.currentTarget.value),
+    });
+  }, []);
+
   return (
     <TransactionContext.Provider
       value={{
@@ -546,6 +577,9 @@ const TransactionProvider: React.FC = (props) => {
         fetchTransactionFeeStatus,
         fetchTransactionFeeError,
         transactionAmountValidationErrors: errors,
+        // receiver address
+        receiver,
+        changeReceiver,
         //deposit stuff
         executeDeposit,
         executeDepositError,

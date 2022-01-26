@@ -40,27 +40,6 @@ const WalletProviderProvider: React.FC = (props) => {
   const [currentChainId, setCurrentChainId] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  // useEffect(() => {
-  //   console.log(accounts);
-  // }, [accounts]);
-
-  // useEffect(() => {
-  //   console.log(currentChainId);
-  // }, [currentChainId]);
-
-  // // useEffect(() => {
-  // //   console.log(walletProvider);
-  // // }, [walletProvider]);
-
-  // useEffect(() => {
-  //   console.log({
-  //     provider: rawEthereumProvider,
-  //     walletProvider,
-  //     currentChainId,
-  //     accounts,
-  //   });
-  // }, [rawEthereumProvider, walletProvider, currentChainId, accounts]);
-
   useEffect(() => {
     if (
       rawEthereumProvider &&

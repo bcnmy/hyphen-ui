@@ -173,7 +173,7 @@ const TransactionProvider: React.FC = (props) => {
   // ]);
 
   const changeTransferAmountInputValue = (amount: string) => {
-    const regExp = /^((\d+)?(\.\d*)?)$/;
+    const regExp = /^((\d+)?(\.\d{0,3})?)$/;
     // match any number of digits, and after that also optionally match, one decimal point followed by any number of digits
     // having the string input value and number value seperate allows for the validation logic to run without intefering each other
     let status = regExp.test(amount);

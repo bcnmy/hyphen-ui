@@ -101,12 +101,17 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const { chainsList, fromChain } = useChains()!;
   const { name: providerName } = getProviderInfo(rawEthereumProvider);
   const userAddress = accounts?.[0];
-  const { data, refetch, networkStatus } = useQuery(USER_TRANSACTIONS, {
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true,
-    skip: !isVisible,
-    variables: { address: userAddress },
-  });
+  const { data, loading, networkStatus, refetch } = useQuery(
+    USER_TRANSACTIONS,
+    {
+      fetchPolicy: "no-cache",
+      notifyOnNetworkStatusChange: true,
+      skip: !isVisible,
+      variables: { address: userAddress },
+    }
+  );
+
+  console.log(data);
 
   useEffect(() => {
     function getTokenInfo(
@@ -296,20 +301,20 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
               />
             </button>
           </div>
-          {!userTransactions ? (
+          {loading ? (
             <Skeleton
               baseColor="#615ccd20"
               count={1}
               highlightColor="#615ccd05"
-              height={62}
+              height={60}
             />
           ) : null}
 
-          {userTransactions && userTransactions.length === 0 ? (
+          {!loading && userTransactions && userTransactions.length === 0 ? (
             <span>No transactions found 😐</span>
           ) : null}
 
-          {userTransactions ? (
+          {!loading && userTransactions && userTransactions.length > 0 ? (
             <ul>
               {userTransactions.map((userTransaction: ITransactionDetails) => {
                 const { image, symbol } = tokens.find(
@@ -328,7 +333,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
                 return (
                   <li
-                    className="flex items-center justify-between p-2 mb-2 last:mb-0 "
+                    className="flex items-center justify-between p-2 mb-2 last:mb-0"
                     key={userTransaction.depositHash}
                   >
                     <div className="flex items-center">

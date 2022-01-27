@@ -111,8 +111,6 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
     }
   );
 
-  console.log(data);
-
   useEffect(() => {
     function getTokenInfo(
       amount: number,
@@ -285,7 +283,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           </button>
         </article>
 
-        <article className="">
+        <article>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg text-gray-700">Recent Transactions</h2>
             <button

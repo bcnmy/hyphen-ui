@@ -1,32 +1,21 @@
 import PrimaryButtonLight from "components/Buttons/PrimaryButtonLight";
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatDistanceStrict } from "date-fns";
-import { FaInfoCircle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { twMerge } from "tailwind-merge";
 import Skeleton from "react-loading-skeleton";
 
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog } from "@headlessui/react";
 import Modal from "components/Modal";
-import { useTokenApproval } from "context/TokenApproval";
 import { useTransaction } from "context/Transaction";
 import { Transition as TransitionReact } from "react-transition-group";
 import { Status } from "hooks/useLoading";
-import SecondaryButtonLight from "components/Buttons/SecondaryButtonLight";
 import { PrimaryButtonDark } from "components/Buttons/PrimaryButtonDark";
 import Spinner from "components/Buttons/Spinner";
 import AnimateHeight from "react-animate-height";
-import { ethers } from "ethers";
-import { useWalletProvider } from "context/WalletProvider";
 import { useChains } from "context/Chains";
-import { useToken } from "context/Token";
 import { useHyphen } from "context/Hyphen";
+import { useToken } from "context/Token";
 import { HiOutlineExternalLink } from "react-icons/hi";
 import SpinnerDark from "components/Buttons/SpinnerDark";
 import {
@@ -34,6 +23,7 @@ import {
   useTransactionInfoModal,
 } from "context/TransactionInfoModal";
 import CustomTooltip from "../CustomTooltip";
+import { MANUAL_EXIT_RETRIES } from "../../../../config/constants";
 
 export interface ITransferModalProps {
   isVisible: boolean;
@@ -162,7 +152,6 @@ const DepositStep: React.FC<
       (async () => {
         await executeDepositValue.wait(1);
         setDepositState(Status.SUCCESS);
-        console.log("dep");
         onNextStep();
       })();
     }
@@ -211,9 +200,18 @@ const DepositStep: React.FC<
 
 const ReceivalStep: React.FC<
   Step & {
+    hideManualExit: () => void;
     setReceivalState: (state: Status) => void;
+    showManualExit: () => void;
   }
-> = ({ currentStepNumber, stepNumber, setReceivalState, onNextStep }) => {
+> = ({
+  currentStepNumber,
+  hideManualExit,
+  onNextStep,
+  setReceivalState,
+  showManualExit,
+  stepNumber,
+}) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
@@ -234,10 +232,12 @@ const ReceivalStep: React.FC<
           let hash = await checkReceival();
           if (hash) {
             clearInterval(keepChecking);
+            hideManualExit();
             setExitHash(hash);
             setExecuted(true);
-          }
-          if (tries > 300) {
+          } else if (tries > MANUAL_EXIT_RETRIES) {
+            showManualExit();
+          } else if (tries > 300) {
             clearInterval(keepChecking);
             throw new Error("exhauseted max retries");
           }
@@ -246,7 +246,7 @@ const ReceivalStep: React.FC<
         }
       }, 1000);
     }
-  }, [active, checkReceival, exitHash, setExitHash]);
+  }, [active, checkReceival, hideManualExit, setExitHash, showManualExit]);
 
   useEffect(() => {
     if (!toChainRpcUrlProvider) {
@@ -315,6 +315,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   const { transferAmount, executeDepositValue, exitHash, transactionFee } =
     useTransaction()!;
   const { fromChain, toChain } = useChains()!;
+  const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
 
@@ -324,11 +325,10 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
 
   const [depositState, setDepositState] = useState<Status>(Status.IDLE);
   const [receivalState, setReceivalState] = useState<Status>(Status.IDLE);
-
   const [startTime, setStartTime] = useState<Date>();
   const [endTime, setEndTime] = useState<Date>();
-
   const [activeStep, setActiveStep] = useState(0);
+  const [canManualExit, setCanManualExit] = useState(false);
   const nextStep = useCallback(
     () => setActiveStep((i) => i + 1),
     [setActiveStep]
@@ -415,11 +415,36 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
     endTime,
   ]);
 
+  const showManualExit = useCallback(() => {
+    setCanManualExit(true);
+  }, []);
+
+  const hideManualExit = useCallback(() => {
+    setCanManualExit(false);
+  }, []);
+
+  async function triggerManualExit() {
+    try {
+      console.log(
+        `Triggering manual exit for deposit hash ${executeDepositValue.hash} and chainId ${fromChain?.chainId}...`
+      );
+      const response = await hyphen.triggerManualTransfer(
+        executeDepositValue.hash,
+        fromChain?.chainId
+      );
+      if (response && response.exitHash) {
+        hideManualExit();
+        setReceivalState(Status.PENDING);
+      }
+    } catch (e) {
+      console.error("Failed to execute manual transfer: ", e);
+    }
+  }
+
   return (
     <Modal
       isVisible={isVisible}
       onClose={() => {
-        console.log(isExitAllowed);
         isExitAllowed && onClose();
       }}
     >
@@ -438,7 +463,6 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 <button
                   className="rounded hover:bg-gray-100"
                   onClick={() => {
-                    console.log(isExitAllowed);
                     isExitAllowed && onClose();
                   }}
                   disabled={!isExitAllowed}
@@ -469,9 +493,11 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
               />
               <ReceivalStep
                 currentStepNumber={activeStep}
-                stepNumber={3}
+                hideManualExit={hideManualExit}
                 onNextStep={nextStep}
                 setReceivalState={setReceivalState}
+                showManualExit={showManualExit}
+                stepNumber={3}
               />
             </div>
             <div className="flex justify-center pt-3 pb-2 mt-4">
@@ -526,7 +552,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                     style={{ gridTemplateColumns: "1fr auto" }}
                   >
                     <span className="flex items-center gap-3 font-normal">
-                      <FaInfoCircle /> Deposit on {fromChain?.name}
+                      Deposit on {fromChain?.name}
                     </span>
                     <span className="text-right">
                       {depositState === Status.PENDING ||
@@ -569,12 +595,20 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                       )}
                     </span>
                     <span className="flex items-center gap-3 font-normal">
-                      <FaInfoCircle />
-                      Transfer on {toChain?.name}
+                      {canManualExit
+                        ? "Transfer taking time?"
+                        : `Transfer on ${toChain?.name}`}
                     </span>
                     <span className="text-right">
-                      {receivalState === Status.PENDING ||
-                      receivalState === Status.SUCCESS ? (
+                      {canManualExit ? (
+                        <PrimaryButtonDark
+                          className="px-6"
+                          onClick={triggerManualExit}
+                        >
+                          Click here
+                        </PrimaryButtonDark>
+                      ) : receivalState === Status.PENDING ||
+                        receivalState === Status.SUCCESS ? (
                         <PrimaryButtonDark
                           className="px-6"
                           onClick={() => {

@@ -8,6 +8,7 @@ import NetworkSelectors from "./components/NetworkSelectors";
 import TokenSelector from "./components/TokenSelector";
 import AmountInput from "./components/AmountInput";
 import Navbar from "components/Navbar";
+import Footer from "components/Footer";
 import TransactionFee from "./components/TransactionFee";
 import ChangeReceiverAddress from "./components/ChangeReceiverAddress";
 import CallToAction from "./components/CallToAction";
@@ -77,29 +78,12 @@ const Home: React.FC<HomeProps> = () => {
         onClose={hideUserInfoModal}
       />
       <ErrorModal error={executeApproveTokenError} title={"Approval Error"} />
-      <div className="flex flex-col items-stretch gap-4">
-        <span className="flex items-center gap-2 mx-auto mt-8">
-          <span className="flex-shrink-0 text-xs font-bold text-white">
-            Powered By
-          </span>
-          <img
-            src={`${process.env.PUBLIC_URL}/biconomy-wordmark.svg`}
-            className="h-10"
-            alt="Biconomy Logo"
-          />
-        </span>
-
+      <div className="flex flex-col items-stretch gap-4 mt-14">
         <div className="flex flex-grow">
           <div className="flex flex-col flex-grow max-w-xl mx-auto">
             <div className="relative z-10 flex-grow">
-              <div className="flex flex-col flex-grow min-w-0 gap-2 p-6 mx-4 mt-4 bg-white shadow-lg rounded-3xl">
+              <div className="flex flex-col flex-grow min-w-0 gap-2 p-6 bg-white shadow-lg rounded-3xl">
                 <div className="flex items-center justify-between">
-                  <img
-                    src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
-                    className="h-8 m-2 opacity-100"
-                    alt="Hyphen Logo"
-                  />
-
                   <div
                     data-tip
                     data-for="whyGaslessDisabled"
@@ -146,6 +130,7 @@ const Home: React.FC<HomeProps> = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

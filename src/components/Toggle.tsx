@@ -15,9 +15,6 @@ export const Toggle: React.FC<IToggleProps> = ({
   return (
     <Switch.Group>
       <div className="flex flex-col">
-        {/* <Switch.Label className="mr-4 uppercase text-xs text-hyphen-purple-dark/70 font-bold">
-          {label}
-        </Switch.Label> */}
         <Switch
           checked={enabled}
           onChange={onToggle}

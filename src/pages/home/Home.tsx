@@ -83,21 +83,20 @@ const Home: React.FC<HomeProps> = () => {
           <div className="flex flex-col flex-grow max-w-xl mx-auto">
             <div className="relative z-10 flex-grow">
               <div className="flex flex-col flex-grow min-w-0 gap-2 p-6 bg-white shadow-lg rounded-3xl">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-end mb-2">
                   <div
                     data-tip
                     data-for="whyGaslessDisabled"
                     className={twMerge(
-                      "p-1 flex gap-4 items-center",
+                      "flex items-center",
                       !isBiconomyAllowed && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <span className="flex items-center gap-2 text-sm font-semibold uppercase text-hyphen-purple-dark/80">
-                      <FaInfoCircle />
-                      <span className="mt-0.5">Go Gasless</span>
+                    <span className="mr-2 text-base font-semibold text-hyphen-purple-dark/80">
+                      Toggle Gasless
                     </span>
                     <Toggle
-                      label="Go Gasless:"
+                      label="Toggle Gasless"
                       enabled={isBiconomyEnabled}
                       onToggle={(enabled) => setIsBiconomyToggledOn(enabled)}
                     />

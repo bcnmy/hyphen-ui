@@ -26,11 +26,12 @@ interface ITokenBalance {
 }
 
 interface ITokenContext {
+  changeSelectedToken: (token: TokenConfig) => void;
+  compatibleTokensForCurrentChains: undefined | TokenConfig[];
+  getSelectedTokenBalanceStatus: undefined | Status;
+  refreshSelectedTokenBalance: () => void;
   selectedToken: undefined | TokenConfig;
   selectedTokenBalance: undefined | ITokenBalance;
-  compatibleTokensForCurrentChains: undefined | TokenConfig[];
-  changeSelectedToken: (token: TokenConfig) => void;
-  getSelectedTokenBalanceStatus: undefined | Status;
   tokensList: TokenConfig[];
 }
 
@@ -153,8 +154,6 @@ const TokenProvider: React.FC = (props) => {
     // error: getSelectedTokenBalanceError,
   } = useAsync(getSelectedTokenBalance);
 
-  // console.log({selectedTokenBalance});
-
   useEffect(() => {
     refreshSelectedTokenBalance();
   }, [getSelectedTokenBalance, refreshSelectedTokenBalance]);
@@ -163,10 +162,11 @@ const TokenProvider: React.FC = (props) => {
     <TokenContext.Provider
       value={{
         changeSelectedToken,
-        selectedToken,
-        selectedTokenBalance,
         compatibleTokensForCurrentChains,
         getSelectedTokenBalanceStatus,
+        refreshSelectedTokenBalance,
+        selectedToken,
+        selectedTokenBalance,
         tokensList,
       }}
       {...props}

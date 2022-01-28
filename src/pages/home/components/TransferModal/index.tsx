@@ -32,8 +32,8 @@ export interface ITransferModalProps {
 
 interface Step {
   currentStepNumber: number;
-  stepNumber: number;
   onNextStep: () => void;
+  stepNumber: number;
 }
 
 const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
@@ -201,6 +201,7 @@ const DepositStep: React.FC<
 const ReceivalStep: React.FC<
   Step & {
     hideManualExit: () => void;
+    refreshSelectedTokenBalance: () => void;
     setReceivalState: (state: Status) => void;
     showManualExit: () => void;
   }
@@ -208,6 +209,7 @@ const ReceivalStep: React.FC<
   currentStepNumber,
   hideManualExit,
   onNextStep,
+  refreshSelectedTokenBalance,
   setReceivalState,
   showManualExit,
   stepNumber,
@@ -233,6 +235,7 @@ const ReceivalStep: React.FC<
           if (hash) {
             clearInterval(keepChecking);
             hideManualExit();
+            refreshSelectedTokenBalance();
             setExitHash(hash);
             setExecuted(true);
           } else if (tries > MANUAL_EXIT_RETRIES) {
@@ -311,7 +314,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   isVisible,
   onClose,
 }) => {
-  const { selectedToken } = useToken()!;
+  const { refreshSelectedTokenBalance, selectedToken } = useToken()!;
   const { transferAmount, executeDepositValue, exitHash, transactionFee } =
     useTransaction()!;
   const { fromChain, toChain } = useChains()!;
@@ -495,6 +498,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 currentStepNumber={activeStep}
                 hideManualExit={hideManualExit}
                 onNextStep={nextStep}
+                refreshSelectedTokenBalance={refreshSelectedTokenBalance}
                 setReceivalState={setReceivalState}
                 showManualExit={showManualExit}
                 stepNumber={3}

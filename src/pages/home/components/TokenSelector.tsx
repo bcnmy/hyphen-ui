@@ -4,7 +4,6 @@ import { useChains } from "context/Chains";
 import { useHyphen } from "context/Hyphen";
 import { useToken } from "context/Token";
 import { useTransaction, ValidationErrors } from "context/Transaction";
-import { useTransactionInfoModal } from "context/TransactionInfoModal";
 import { Status } from "hooks/useLoading";
 import React, { useMemo } from "react";
 import Skeleton from "react-loading-skeleton";
@@ -27,8 +26,6 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
     getSelectedTokenBalanceStatus,
   } = useToken()!;
   const { poolInfo } = useHyphen()!;
-
-  const { showTransactionInfoModal } = useTransactionInfoModal()!;
 
   const { changeTransferAmountInputValue, transactionAmountValidationErrors } =
     useTransaction()!;

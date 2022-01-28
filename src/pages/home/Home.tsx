@@ -1,11 +1,10 @@
-import React, { FormEvent, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import { useWalletProvider } from "../../context/WalletProvider";
 import { useNavigate } from "react-router-dom";
 import { useChains } from "../../context/Chains";
 
 import NetworkSelectors from "./components/NetworkSelectors";
-import { useToken } from "context/Token";
 import TokenSelector from "./components/TokenSelector";
 import AmountInput from "./components/AmountInput";
 import Navbar from "components/Navbar";
@@ -23,22 +22,15 @@ import { useTransaction } from "context/Transaction";
 import { useBiconomy } from "context/Biconomy";
 import { twMerge } from "tailwind-merge";
 import CustomTooltip from "./components/CustomTooltip";
-import isToChainEthereum from "utils/isToChainEthereum";
 import { FaInfoCircle } from "react-icons/fa";
-import { HiExclamation } from "react-icons/hi";
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
-  const { areChainsReady, toChain } = useChains()!;
+  const { areChainsReady } = useChains()!;
   const { changeTransferAmountInputValue } = useTransaction()!;
-  const { selectedTokenBalance } = useToken()!;
-  const {
-    isBiconomyAllowed,
-    isBiconomyToggledOn,
-    setIsBiconomyToggledOn,
-    isBiconomyEnabled,
-  } = useBiconomy()!;
+  const { isBiconomyAllowed, setIsBiconomyToggledOn, isBiconomyEnabled } =
+    useBiconomy()!;
   const navigate = useNavigate();
   const { isLoggedIn, connect } = useWalletProvider()!;
   const {
@@ -57,10 +49,6 @@ const Home: React.FC<HomeProps> = () => {
     showModal: showUserInfoModal,
   } = useModal();
   const { executeApproveTokenError } = useTokenApproval()!;
-
-  const showEthereumDisclaimer = toChain
-    ? isToChainEthereum(toChain.chainId)
-    : false;
 
   useEffect(() => {
     (async () => {
@@ -147,16 +135,6 @@ const Home: React.FC<HomeProps> = () => {
                 </div>
 
                 <ChangeReceiverAddress />
-
-                {showEthereumDisclaimer ? (
-                  <article className="flex items-start p-4 text-sm text-red-600 bg-red-100 rounded-xl">
-                    <HiExclamation className="w-auto h-6 mr-2" />
-                    <p>
-                      The received amount may differ due to gas price
-                      fluctuations on Ethereum.
-                    </p>
-                  </article>
-                ) : null}
 
                 <CallToAction
                   onApproveButtonClick={showApprovalModal}

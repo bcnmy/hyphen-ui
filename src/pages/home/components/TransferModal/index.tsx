@@ -317,7 +317,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   const { refreshSelectedTokenBalance, selectedToken } = useToken()!;
   const { transferAmount, executeDepositValue, exitHash, transactionFee } =
     useTransaction()!;
-  const { chainsList, fromChain, toChain } = useChains()!;
+  const { fromChain, toChain } = useChains()!;
   const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);

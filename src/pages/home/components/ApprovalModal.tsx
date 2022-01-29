@@ -53,7 +53,7 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
                   Allow Hyphen to spend Eth on Mumbai
                 </Dialog.Description>
                 <div className="flex items-center justify-center gap-4 p-4">
-                  <span className="text-xs font-bold uppercase text-hyphen-purple-dark/70">
+                  <span className="text-base font-semibold text-hyphen-purple-dark/70">
                     <div className="flex items-center gap-2">
                       <FaInfoCircle />
                       Infinite Approval

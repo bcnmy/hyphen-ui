@@ -387,8 +387,9 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
       !transactionFee ||
       !endTime ||
       !startTime
-    )
+    ) {
       return;
+    }
 
     let transferRecord: ITransferRecord = {
       depositHash: executeDepositValue.hash,

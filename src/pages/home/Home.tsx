@@ -92,11 +92,11 @@ const Home: React.FC<HomeProps> = () => {
                       !isBiconomyAllowed && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <span className="mr-2 text-base font-semibold text-hyphen-purple-dark/80">
-                      Toggle Gasless
+                    <span className="mr-2 text-base font-semibold text-gray-500">
+                      Gasless Mode
                     </span>
                     <Toggle
-                      label="Toggle Gasless"
+                      label="Gasless Mode"
                       enabled={isBiconomyEnabled}
                       onToggle={(enabled) => setIsBiconomyToggledOn(enabled)}
                     />

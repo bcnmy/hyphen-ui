@@ -1,20 +1,17 @@
-import PrimaryButtonLight from "components/Buttons/PrimaryButtonLight";
-import React, { Fragment, useEffect, useState } from "react";
-import { FaArrowRight, FaInfoCircle } from "react-icons/fa";
+import React, { useEffect } from "react";
 import { IoMdClose } from "react-icons/io";
 import Skeleton from "react-loading-skeleton";
-import { twMerge } from "tailwind-merge";
 
 import { Dialog } from "@headlessui/react";
 import Modal from "components/Modal";
 import { useTransaction } from "context/Transaction";
-import { useToken } from "context/Token";
 import useAsync, { Status } from "hooks/useLoading";
 import { ITransferRecord } from "context/TransactionInfoModal";
 import {
   HiOutlineArrowNarrowRight,
   HiOutlineArrowSmRight,
 } from "react-icons/hi";
+import { useChains } from "context/Chains";
 
 export interface ITransferInfoModal {
   transferRecord: ITransferRecord;
@@ -27,9 +24,8 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
   isVisible,
   onClose,
 }) => {
-  const { transactionFee, fetchTransactionFeeStatus, getExitInfoFromHash } =
-    useTransaction()!;
-  const { selectedToken } = useToken()!;
+  const { getExitInfoFromHash } = useTransaction()!;
+  const { chainsList } = useChains()!;
 
   const {
     value: exitInfo,
@@ -37,6 +33,17 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
     status: getExitInfoStatus,
     error: getExitInfoError,
   } = useAsync(getExitInfoFromHash);
+
+  const fromChainExplorerUrl = `${
+    chainsList.find(
+      (chain) => chain.chainId === transferRecord.fromChain.chainId
+    )!.explorerUrl
+  }/tx/${transferRecord.depositHash}`;
+  const toChainExplorerUrl = `${
+    chainsList.find(
+      (chain) => chain.chainId === transferRecord.toChain.chainId
+    )!.explorerUrl
+  }/tx/${transferRecord.exitHash}`;
 
   useEffect(() => {
     getExitInfo(transferRecord.exitHash);
@@ -62,9 +69,15 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
                 <span className="text-xl font-semibold text-gray-700">
                   {transferRecord.depositAmount} {transferRecord.token.symbol}
                 </span>
-                <span className="text-hyphen-purple">
+                <a
+                  target="_blank"
+                  href={fromChainExplorerUrl}
+                  rel="noreferrer"
+                  className="flex items-center text-hyphen-purple"
+                >
                   {transferRecord.fromChain.name}
-                </span>
+                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
+                </a>
               </div>
               <HiOutlineArrowNarrowRight className="w-8 h-8 text-gray-700" />
               <div className="flex flex-col">
@@ -84,9 +97,15 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
                     </>
                   )}
                 </span>
-                <span className="text-hyphen-purple">
+                <a
+                  target="_blank"
+                  href={toChainExplorerUrl}
+                  rel="noreferrer"
+                  className="flex items-center text-hyphen-purple"
+                >
                   {transferRecord.toChain.name}
-                </span>
+                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
+                </a>
               </div>
             </div>
 

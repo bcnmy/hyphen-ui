@@ -317,7 +317,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   const { refreshSelectedTokenBalance, selectedToken } = useToken()!;
   const { transferAmount, executeDepositValue, exitHash, transactionFee } =
     useTransaction()!;
-  const { fromChain, toChain } = useChains()!;
+  const { chainsList, fromChain, toChain } = useChains()!;
   const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
@@ -387,8 +387,9 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
       !transactionFee ||
       !endTime ||
       !startTime
-    )
+    ) {
       return;
+    }
 
     let transferRecord: ITransferRecord = {
       depositHash: executeDepositValue.hash,

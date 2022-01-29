@@ -27,7 +27,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
         </a>
       </div>
       <button
-        className="px-4 py-1 bg-white bg-opacity-10 rounded-lg text-white font-mono border border-opacity-10 border-white font-base relative backdrop-blur-md cursor-pointer hover:bg-opacity-[0.15] hover:text-opacity-90 hover:border-opacity-20"
+        className="px-4 py-1 bg-white bg-opacity-10 rounded-xl text-white font-mono border border-opacity-10 border-white font-base relative backdrop-blur-md cursor-pointer hover:bg-opacity-[0.15] hover:text-opacity-90 hover:border-opacity-20"
         onClick={isLoggedIn ? showUserInfoModal : connect}
       >
         {isLoggedIn

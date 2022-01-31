@@ -458,12 +458,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   }
 
   return (
-    <Modal
-      isVisible={isVisible}
-      onClose={() => {
-        isExitAllowed && onClose();
-      }}
-    >
+    <Modal isVisible={isVisible} onClose={() => {}}>
       <div className="mb-14">
         <div className="relative z-20 p-6 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
           <div className="absolute opacity-50 -inset-2 bg-white/60 rounded-3xl blur-lg -z-10"></div>

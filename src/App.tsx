@@ -1,14 +1,13 @@
 import React from "react";
-import Home from "./pages/home/Home";
+import Bridge from "./pages/bridge/Bridge";
 
-import { Routes, Route } from "react-router-dom";
-import { Auth } from "./pages/auth/Auth";
+import { Routes, Route, Navigate } from "react-router-dom";
 
 const App: React.FC = () => {
   return (
     <Routes>
-      <Route path="/login" element={<Auth />} />
-      <Route path="/" element={<Home />} />
+      <Route path="/bridge" element={<Bridge />} />
+      <Route path="/" element={<Navigate replace to="/bridge" />} />
     </Routes>
   );
 };

@@ -23,12 +23,11 @@ import { useTransaction } from "context/Transaction";
 import { useBiconomy } from "context/Biconomy";
 import { twMerge } from "tailwind-merge";
 import CustomTooltip from "./components/CustomTooltip";
-import { FaInfoCircle } from "react-icons/fa";
 import { HiInformationCircle } from "react-icons/hi";
 
-interface HomeProps {}
+interface BridgeProps {}
 
-const Home: React.FC<HomeProps> = () => {
+const Bridge: React.FC<BridgeProps> = () => {
   const { areChainsReady } = useChains()!;
   const { changeTransferAmountInputValue } = useTransaction()!;
   const { isBiconomyAllowed, setIsBiconomyToggledOn, isBiconomyEnabled } =
@@ -144,4 +143,4 @@ const Home: React.FC<HomeProps> = () => {
   );
 };
 
-export default Home;
+export default Bridge;

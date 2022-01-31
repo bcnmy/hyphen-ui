@@ -24,6 +24,7 @@ import { useBiconomy } from "context/Biconomy";
 import { twMerge } from "tailwind-merge";
 import CustomTooltip from "./components/CustomTooltip";
 import { FaInfoCircle } from "react-icons/fa";
+import { HiInformationCircle } from "react-icons/hi";
 
 interface HomeProps {}
 
@@ -92,6 +93,15 @@ const Home: React.FC<HomeProps> = () => {
                       !isBiconomyAllowed && "opacity-50 cursor-not-allowed"
                     )}
                   >
+                    <HiInformationCircle
+                      data-tip
+                      data-for="gaslessMode"
+                      className="mr-2 text-gray-500"
+                    />
+                    <CustomTooltip
+                      id="gaslessMode"
+                      text="This transaction is sponsored by Biconomy"
+                    />
                     <span className="mr-2 text-base font-semibold text-gray-500">
                       Gasless Mode
                     </span>

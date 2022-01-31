@@ -16,7 +16,7 @@ import AnimateHeight from "react-animate-height";
 import { useChains } from "context/Chains";
 import { useHyphen } from "context/Hyphen";
 import { useToken } from "context/Token";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { HiOutlineArrowSmRight } from "react-icons/hi";
 import SpinnerDark from "components/Buttons/SpinnerDark";
 import {
   ITransferRecord,
@@ -53,7 +53,6 @@ const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
   const {
     executePreDepositCheck,
     executePreDepositCheckError,
-    executePreDepositCheckValue,
     executePreDepositCheckStatus,
   } = useTransaction()!;
 
@@ -127,7 +126,7 @@ const DepositStep: React.FC<
     executeDepositError,
   } = useTransaction()!;
   const { selectedToken } = useToken()!;
-  const { toChainRpcUrlProvider, fromChain } = useChains()!;
+  const { fromChain } = useChains()!;
   const {
     receiver: { receiverAddress },
   } = useTransaction()!;
@@ -139,7 +138,7 @@ const DepositStep: React.FC<
       executeDeposit(receiverAddress);
       setExecuted(true);
     }
-  }, [active, executeDeposit]);
+  }, [active, executeDeposit, receiverAddress]);
 
   useEffect(() => {
     if (executed && executeDepositError && active) onError();
@@ -249,7 +248,14 @@ const ReceivalStep: React.FC<
         }
       }, 1000);
     }
-  }, [active, checkReceival, hideManualExit, setExitHash, showManualExit]);
+  }, [
+    active,
+    checkReceival,
+    hideManualExit,
+    refreshSelectedTokenBalance,
+    setExitHash,
+    showManualExit,
+  ]);
 
   useEffect(() => {
     if (!toChainRpcUrlProvider) {
@@ -332,6 +338,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   const [endTime, setEndTime] = useState<Date>();
   const [activeStep, setActiveStep] = useState(0);
   const [canManualExit, setCanManualExit] = useState(false);
+  const [isManualExitDisabled, setIsManualExitDisabled] = useState(false);
   const nextStep = useCallback(
     () => setActiveStep((i) => i + 1),
     [setActiveStep]
@@ -427,11 +434,16 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
     setCanManualExit(false);
   }, []);
 
+  const disableManualExit = () => {
+    setIsManualExitDisabled(true);
+  };
+
   async function triggerManualExit() {
     try {
       console.log(
         `Triggering manual exit for deposit hash ${executeDepositValue.hash} and chainId ${fromChain?.chainId}...`
       );
+      disableManualExit();
       const response = await hyphen.triggerManualTransfer(
         executeDepositValue.hash,
         fromChain?.chainId
@@ -577,7 +589,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                               <span className="flex items-center gap-2">
                                 <span>Pending</span>
                                 <span>
-                                  <HiOutlineExternalLink />
+                                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                                 </span>
                               </span>
                             </div>
@@ -586,7 +598,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                             <div className="flex items-center gap-2">
                               <span>Confirmed</span>
                               <span>
-                                <HiOutlineExternalLink />
+                                <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                               </span>
                             </div>
                           )}
@@ -609,6 +621,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                         <PrimaryButtonDark
                           className="px-6"
                           onClick={triggerManualExit}
+                          disabled={isManualExitDisabled}
                         >
                           Click here
                         </PrimaryButtonDark>
@@ -629,7 +642,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                               <span className="flex items-center gap-2">
                                 <span>Pending</span>
                                 <span>
-                                  <HiOutlineExternalLink />
+                                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                                 </span>
                               </span>
                             </div>
@@ -638,7 +651,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                             <div className="flex items-center gap-2">
                               <span>Confirmed</span>
                               <span>
-                                <HiOutlineExternalLink />
+                                <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                               </span>
                             </div>
                           )}

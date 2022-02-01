@@ -112,12 +112,14 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
               poolInfo &&
               parseFloat(selectedTokenBalance.formattedBalance) &&
               changeTransferAmountInputValue(
-                Math.min(
-                  parseFloat(selectedTokenBalance?.displayBalance),
-                  poolInfo?.maxDepositAmount
-                )
-                  .toFixed(3)
-                  .toString()
+                (
+                  Math.trunc(
+                    Math.min(
+                      parseFloat(selectedTokenBalance?.displayBalance),
+                      poolInfo?.maxDepositAmount
+                    ) * 1000
+                  ) / 1000
+                ).toString()
               );
           }}
         >

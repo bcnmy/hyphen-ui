@@ -8,15 +8,20 @@ import "react-toastify/dist/ReactToastify.css";
 
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AppProviders from "./context";
+import Pool from "pages/pool/Pool";
 
 ReactDOM.render(
   <React.StrictMode>
-    <ToastContainer className="font-sans font-semibold"/>
+    <ToastContainer className="font-sans font-semibold" />
     <AppProviders>
       <BrowserRouter>
-        <App />
+        <Routes>
+          <Route path="/" element={<Navigate replace to="/bridge" />} />
+          <Route path="/bridge" element={<App />} />
+          <Route path="/pool" element={<Pool />} />
+        </Routes>
       </BrowserRouter>
     </AppProviders>
   </React.StrictMode>,

@@ -7,8 +7,7 @@ import { useChains } from "../../context/Chains";
 import NetworkSelectors from "./components/NetworkSelectors";
 import TokenSelector from "./components/TokenSelector";
 import AmountInput from "./components/AmountInput";
-import Navbar from "components/Navbar";
-import Footer from "components/Footer";
+import Layout from "components/Layout";
 import TransactionFee from "./components/TransactionFee";
 import ChangeReceiverAddress from "./components/ChangeReceiverAddress";
 import CallToAction from "./components/CallToAction";
@@ -18,10 +17,8 @@ import ApprovalModal from "./components/ApprovalModal";
 import { useTokenApproval } from "context/TokenApproval";
 import ErrorModal from "./components/ErrorModal";
 import TransferModal from "./components/TransferModal";
-import UserInfoModal from "./components/UserInfoModal";
 import { useTransaction } from "context/Transaction";
 import { useBiconomy } from "context/Biconomy";
-import { twMerge } from "tailwind-merge";
 import CustomTooltip from "./components/CustomTooltip";
 import { HiInformationCircle } from "react-icons/hi";
 
@@ -44,11 +41,6 @@ const Bridge: React.FC<BridgeProps> = () => {
     hideModal: hideTransferlModal,
     showModal: showTransferModal,
   } = useModal();
-  const {
-    isVisible: isUserInfoModalVisible,
-    hideModal: hideUserInfoModal,
-    showModal: showUserInfoModal,
-  } = useModal();
   const { executeApproveTokenError } = useTokenApproval()!;
 
   useEffect(() => {
@@ -60,8 +52,7 @@ const Bridge: React.FC<BridgeProps> = () => {
   }, [isLoggedIn, navigate, connect]);
 
   return (
-    <div className="grid grid-rows-[4rem_1fr_3rem] w-full min-h-screen">
-      <Navbar showUserInfoModal={showUserInfoModal} />
+    <Layout>
       <ApprovalModal
         isVisible={isApprovalModalVisible}
         onClose={hideApprovalModal}
@@ -72,10 +63,6 @@ const Bridge: React.FC<BridgeProps> = () => {
           changeTransferAmountInputValue("");
           hideTransferlModal();
         }}
-      />
-      <UserInfoModal
-        isVisible={isUserInfoModalVisible}
-        onClose={hideUserInfoModal}
       />
       <ErrorModal error={executeApproveTokenError} title={"Approval Error"} />
       <div className="my-14">
@@ -139,8 +126,7 @@ const Bridge: React.FC<BridgeProps> = () => {
           <TransactionFee />
         </div>
       </div>
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 

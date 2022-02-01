@@ -1,4 +1,4 @@
-import { Link, NavLink, Route, useSearchParams } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useWalletProvider } from "context/WalletProvider";
 import { HiOutlineArrowSmRight } from "react-icons/hi";
 
@@ -33,7 +33,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
               <span
                 className={
                   isActive
-                    ? "absolute block h-[5px] bg-white -inset-1 top-[34px] rounded-t-full"
+                    ? "absolute block h-[5px] bg-white -inset-1 top-[33px] rounded-t-full"
                     : "hidden"
                 }
                 aria-hidden="true"
@@ -57,7 +57,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
               <span
                 className={
                   isActive
-                    ? "absolute block h-[5px] bg-white -inset-1 top-[34px] rounded-t-full"
+                    ? "absolute block h-[5px] bg-white -inset-1 top-[33px] rounded-t-full"
                     : "hidden"
                 }
                 aria-hidden="true"

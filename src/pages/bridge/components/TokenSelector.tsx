@@ -115,7 +115,9 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
                 Math.min(
                   parseFloat(selectedTokenBalance?.displayBalance),
                   poolInfo?.maxDepositAmount
-                ).toString()
+                )
+                  .toFixed(3)
+                  .toString()
               );
           }}
         >

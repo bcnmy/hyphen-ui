@@ -29,18 +29,6 @@ export const USDT: TokenConfig = {
     decimal: 18,
     symbol: "USDT",
   },
-  [FUJI.chainId]: {
-    address: "0xb4e0f6fef81bdfea0856bb846789985c9cff7e85",
-    transferOverhead: 107848,
-    decimal: 18,
-    symbol: "USDT",
-  },
-  [AVALANCHE.chainId]: {
-    address: "0xc7198437980c041c805a1edcba50c1ce5db95118",
-    transferOverhead: 107848,
-    decimal: 18,
-    symbol: "USDT",
-  },
   [POLYGON.chainId]: {
     address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     transferOverhead: 130000,

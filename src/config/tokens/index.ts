@@ -1,6 +1,7 @@
 import { ETH } from "./ETH";
 import { USDC } from "./USDC";
 import { USDT } from "./USDT";
+import { BICO } from "./BICO";
 
 export type TokenConfig = {
   symbol: string;
@@ -19,6 +20,7 @@ export const tokens = [
   ETH,
   USDC,
   USDT,
+  BICO
 ];
 
 export default tokens;

@@ -60,7 +60,7 @@ const Bridge: React.FC<BridgeProps> = () => {
   }, [isLoggedIn, navigate, connect]);
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="grid grid-rows-[4rem_1fr_3rem] w-full min-h-screen">
       <Navbar showUserInfoModal={showUserInfoModal} />
       <ApprovalModal
         isVisible={isApprovalModalVisible}
@@ -78,67 +78,65 @@ const Bridge: React.FC<BridgeProps> = () => {
         onClose={hideUserInfoModal}
       />
       <ErrorModal error={executeApproveTokenError} title={"Approval Error"} />
-      <div className="flex flex-col items-stretch gap-4 mt-14">
-        <div className="flex flex-grow">
-          <div className="flex flex-col flex-grow max-w-xl mx-auto">
-            <div className="relative z-10 flex-grow">
-              <div className="flex flex-col flex-grow min-w-0 gap-2 p-6 bg-white shadow-lg rounded-3xl">
-                <div className="flex items-center justify-end mb-2">
-                  <div className="flex items-center">
-                    <HiInformationCircle
-                      data-tip
-                      data-for="gaslessMode"
-                      className="mr-2 text-gray-500"
+      <div className="my-14">
+        <div className="max-w-xl mx-auto">
+          <div className="relative z-10">
+            <div className="flex flex-col gap-2 p-6 bg-white shadow-lg rounded-3xl">
+              <div className="flex items-center justify-end mb-2">
+                <div className="flex items-center">
+                  <HiInformationCircle
+                    data-tip
+                    data-for="gaslessMode"
+                    className="mr-2 text-gray-500"
+                  />
+                  <CustomTooltip
+                    id="gaslessMode"
+                    text="This transaction is sponsored by Biconomy"
+                  />
+                  <div
+                    className={
+                      !isBiconomyAllowed
+                        ? "flex opacity-50 cursor-not-allowed"
+                        : "flex"
+                    }
+                    data-tip
+                    data-for="whyGaslessDisabled"
+                  >
+                    <span className="mr-2 text-base font-semibold text-gray-500">
+                      Gasless Mode
+                    </span>
+                    <Toggle
+                      label="Gasless Mode"
+                      enabled={isBiconomyEnabled}
+                      onToggle={(enabled) => setIsBiconomyToggledOn(enabled)}
                     />
-                    <CustomTooltip
-                      id="gaslessMode"
-                      text="This transaction is sponsored by Biconomy"
-                    />
-                    <div
-                      className={
-                        !isBiconomyAllowed
-                          ? "flex opacity-50 cursor-not-allowed"
-                          : "flex"
-                      }
-                      data-tip
-                      data-for="whyGaslessDisabled"
-                    >
-                      <span className="mr-2 text-base font-semibold text-gray-500">
-                        Gasless Mode
-                      </span>
-                      <Toggle
-                        label="Gasless Mode"
-                        enabled={isBiconomyEnabled}
-                        onToggle={(enabled) => setIsBiconomyToggledOn(enabled)}
-                      />
-                    </div>
                   </div>
-                  {!isBiconomyAllowed && (
-                    <CustomTooltip
-                      id="whyGaslessDisabled"
-                      text="Disabled for selected chain"
-                    />
-                  )}
                 </div>
-                <div className="grid grid-cols-[1fr_34px_1fr] gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
-                  <NetworkSelectors />
-                </div>
-                <div className="grid grid-cols-[1fr_34px_1fr] items-center gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
-                  <AmountInput disabled={!areChainsReady} />
-                  <div></div>
-                  <TokenSelector disabled={!areChainsReady} />
-                </div>
-
-                <ChangeReceiverAddress />
-
-                <CallToAction
-                  onApproveButtonClick={showApprovalModal}
-                  onTransferButtonClick={showTransferModal}
-                />
+                {!isBiconomyAllowed && (
+                  <CustomTooltip
+                    id="whyGaslessDisabled"
+                    text="Disabled for selected chain"
+                  />
+                )}
               </div>
+              <div className="grid grid-cols-[1fr_34px_1fr] gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
+                <NetworkSelectors />
+              </div>
+              <div className="grid grid-cols-[1fr_34px_1fr] items-center gap-2 p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
+                <AmountInput disabled={!areChainsReady} />
+                <div></div>
+                <TokenSelector disabled={!areChainsReady} />
+              </div>
+
+              <ChangeReceiverAddress />
+
+              <CallToAction
+                onApproveButtonClick={showApprovalModal}
+                onTransferButtonClick={showTransferModal}
+              />
             </div>
-            <TransactionFee />
           </div>
+          <TransactionFee />
         </div>
       </div>
       <Footer />

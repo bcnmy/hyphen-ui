@@ -246,7 +246,7 @@ const ReceivalStep: React.FC<
         } catch (e) {
           setReceivalError(e);
         }
-      }, 1000);
+      }, 5000);
     }
   }, [
     active,

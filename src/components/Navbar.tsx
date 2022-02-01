@@ -10,7 +10,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
   const userAddress = accounts?.[0];
 
   return (
-    <div className="sticky top-0 flex items-center justify-between px-6 py-3 text-white border-b border-black shadow-sm bg-hyphen-purple bg-opacity-10 backdrop-blur-sm border-opacity-20">
+    <div className="flex items-center justify-between w-full px-6 text-white border-b border-black shadow-sm bg-hyphen-purple bg-opacity-10 backdrop-blur-sm border-opacity-20">
       <div className="flex">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}

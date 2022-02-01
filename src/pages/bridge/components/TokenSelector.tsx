@@ -69,11 +69,11 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-4 pl-2 my-2 font-mono text-xs font-bold text-opacity-80 text-hyphen-purple-dark">
+      <div className="flex items-center justify-between gap-4 pl-2 my-2 text-xs text-hyphen-purple-dark">
         <span className="flex items-baseline flex-grow">
           <span
             className={twMerge(
-              "text-opacity-40 text-hyphen-purple-dark font-sans font-medium mr-2",
+              "mr-1",
               transactionAmountValidationErrors.includes(
                 ValidationErrors.INADEQUATE_BALANCE
               ) && "text-red-600",
@@ -82,7 +82,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           >
             Balance:
           </span>
-          <span className="flex-grow">
+          <span className="flex-grow font-mono">
             {getSelectedTokenBalanceStatus &&
             getSelectedTokenBalanceStatus === Status.SUCCESS &&
             selectedTokenBalance?.displayBalance ? (

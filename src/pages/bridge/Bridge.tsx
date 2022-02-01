@@ -84,14 +84,7 @@ const Bridge: React.FC<BridgeProps> = () => {
             <div className="relative z-10 flex-grow">
               <div className="flex flex-col flex-grow min-w-0 gap-2 p-6 bg-white shadow-lg rounded-3xl">
                 <div className="flex items-center justify-end mb-2">
-                  <div
-                    data-tip
-                    data-for="whyGaslessDisabled"
-                    className={twMerge(
-                      "flex items-center",
-                      !isBiconomyAllowed && "opacity-50 cursor-not-allowed"
-                    )}
-                  >
+                  <div className="flex items-center">
                     <HiInformationCircle
                       data-tip
                       data-for="gaslessMode"
@@ -101,14 +94,24 @@ const Bridge: React.FC<BridgeProps> = () => {
                       id="gaslessMode"
                       text="This transaction is sponsored by Biconomy"
                     />
-                    <span className="mr-2 text-base font-semibold text-gray-500">
-                      Gasless Mode
-                    </span>
-                    <Toggle
-                      label="Gasless Mode"
-                      enabled={isBiconomyEnabled}
-                      onToggle={(enabled) => setIsBiconomyToggledOn(enabled)}
-                    />
+                    <div
+                      className={
+                        !isBiconomyAllowed
+                          ? "flex opacity-50 cursor-not-allowed"
+                          : "flex"
+                      }
+                      data-tip
+                      data-for="whyGaslessDisabled"
+                    >
+                      <span className="mr-2 text-base font-semibold text-gray-500">
+                        Gasless Mode
+                      </span>
+                      <Toggle
+                        label="Gasless Mode"
+                        enabled={isBiconomyEnabled}
+                        onToggle={(enabled) => setIsBiconomyToggledOn(enabled)}
+                      />
+                    </div>
                   </div>
                   {!isBiconomyAllowed && (
                     <CustomTooltip

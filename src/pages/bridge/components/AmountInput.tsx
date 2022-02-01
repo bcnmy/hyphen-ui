@@ -18,7 +18,6 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
 }) => {
   const { poolInfo, getPoolInfoStatus } = useHyphen()!;
   const {
-    transferAmount,
     changeTransferAmountInputValue,
     transferAmountInputValue,
     transactionAmountValidationErrors,
@@ -49,17 +48,22 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           text="Select source & destination chains"
         />
       )}
-      <div className="flex gap-4 pl-2 my-2 text-xs text-opacity-60 text-hyphen-purple-dark">
-        <span
+      <div className="flex justify-between px-2 my-2 text-xs text-hyphen-purple-dark">
+        <button
           className={twMerge(
-            "flex items-center gap-2 transition-colors",
+            "flex items-center transition-colors",
             transactionAmountValidationErrors.includes(
               ValidationErrors.AMOUNT_LT_MIN
             ) && "text-red-600"
           )}
+          onClick={() =>
+            changeTransferAmountInputValue(
+              poolInfo?.minDepositAmount.toString() || ""
+            )
+          }
         >
           Min:
-          <span className="min-w-[40px]">
+          <span className="min-w-[40px] ml-1 text-left">
             {getPoolInfoStatus === Status.SUCCESS &&
             poolInfo?.minDepositAmount ? (
               <>{poolInfo.minDepositAmount}</>
@@ -73,17 +77,22 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
               </>
             )}
           </span>
-        </span>
-        <span
+        </button>
+        <button
           className={twMerge(
-            "flex items-center gap-2 transition-colors",
+            "flex items-center transition-colors",
             transactionAmountValidationErrors.includes(
               ValidationErrors.AMOUNT_GT_MAX
             ) && "text-red-600"
           )}
+          onClick={() =>
+            changeTransferAmountInputValue(
+              poolInfo?.maxDepositAmount.toString() || ""
+            )
+          }
         >
           Max:
-          <span className="min-w-[40px]">
+          <span className="min-w-[40px] ml-1 text-left">
             {getPoolInfoStatus === Status.SUCCESS &&
             poolInfo?.maxDepositAmount ? (
               <>{poolInfo.maxDepositAmount}</>
@@ -97,7 +106,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
               </>
             )}
           </span>
-        </span>
+        </button>
       </div>
     </div>
   );

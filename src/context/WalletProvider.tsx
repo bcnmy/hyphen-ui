@@ -14,6 +14,7 @@ interface IWalletProviderContext {
   signer: ethers.Signer | undefined;
   web3Modal: Web3Modal | undefined;
   connect: Web3Modal["connect"];
+  disconnect: Web3Modal["clearCachedProvider"];
   accounts: string[] | undefined;
   currentChainId: number | undefined;
   isLoggedIn: boolean;
@@ -38,27 +39,6 @@ const WalletProviderProvider: React.FC = (props) => {
   const [accounts, setAccounts] = useState<string[]>();
   const [currentChainId, setCurrentChainId] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-
-  // useEffect(() => {
-  //   console.log(accounts);
-  // }, [accounts]);
-
-  // useEffect(() => {
-  //   console.log(currentChainId);
-  // }, [currentChainId]);
-
-  // // useEffect(() => {
-  // //   console.log(walletProvider);
-  // // }, [walletProvider]);
-
-  // useEffect(() => {
-  //   console.log({
-  //     provider: rawEthereumProvider,
-  //     walletProvider,
-  //     currentChainId,
-  //     accounts,
-  //   });
-  // }, [rawEthereumProvider, walletProvider, currentChainId, accounts]);
 
   useEffect(() => {
     if (
@@ -158,6 +138,16 @@ const WalletProviderProvider: React.FC = (props) => {
     setWalletProvider(new ethers.providers.Web3Provider(provider));
   }, [web3Modal]);
 
+  const disconnect = useCallback(async () => {
+    if (!web3Modal) {
+      console.error("Web3Modal not initialized.");
+      return;
+    }
+    web3Modal.clearCachedProvider();
+    setRawEthereumProvider(undefined);
+    setWalletProvider(undefined);
+  }, [web3Modal]);
+
   return (
     <WalletProviderContext.Provider
       value={{
@@ -166,6 +156,7 @@ const WalletProviderProvider: React.FC = (props) => {
         signer,
         web3Modal,
         connect,
+        disconnect,
         accounts,
         currentChainId,
         isLoggedIn,

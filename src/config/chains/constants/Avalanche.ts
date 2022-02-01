@@ -1,10 +1,10 @@
 import { ChainConfig } from "..";
 import { NATIVE_ADDRESS } from "../../constants";
-import avaxLogo from "../../../assets/images/chains/avax-logo.svg"
+import avaxIcon from "../../../assets/images/tokens/avax-icon.svg"
 
 export const AVALANCHE: ChainConfig = {
   name: "Avalanche",
-  image: avaxLogo,
+  image: avaxIcon,
   subText: "Avalanche mainnet",
   chainId: 43114,
   rpcUrl: "https://api.avax.network/ext/bc/C/rpc",

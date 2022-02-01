@@ -1,39 +1,29 @@
 import PrimaryButtonLight from "components/Buttons/PrimaryButtonLight";
-import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { formatDistanceStrict } from "date-fns";
-import { FaInfoCircle } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { twMerge } from "tailwind-merge";
 import Skeleton from "react-loading-skeleton";
 
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog } from "@headlessui/react";
 import Modal from "components/Modal";
-import { useTokenApproval } from "context/TokenApproval";
 import { useTransaction } from "context/Transaction";
 import { Transition as TransitionReact } from "react-transition-group";
 import { Status } from "hooks/useLoading";
-import SecondaryButtonLight from "components/Buttons/SecondaryButtonLight";
 import { PrimaryButtonDark } from "components/Buttons/PrimaryButtonDark";
 import Spinner from "components/Buttons/Spinner";
 import AnimateHeight from "react-animate-height";
-import { ethers } from "ethers";
-import { useWalletProvider } from "context/WalletProvider";
 import { useChains } from "context/Chains";
-import { useToken } from "context/Token";
 import { useHyphen } from "context/Hyphen";
-import { HiOutlineExternalLink } from "react-icons/hi";
+import { useToken } from "context/Token";
+import { HiOutlineArrowSmRight } from "react-icons/hi";
 import SpinnerDark from "components/Buttons/SpinnerDark";
 import {
   ITransferRecord,
   useTransactionInfoModal,
 } from "context/TransactionInfoModal";
 import CustomTooltip from "../CustomTooltip";
+import { MANUAL_EXIT_RETRIES } from "../../../../config/constants";
 
 export interface ITransferModalProps {
   isVisible: boolean;
@@ -42,8 +32,8 @@ export interface ITransferModalProps {
 
 interface Step {
   currentStepNumber: number;
-  stepNumber: number;
   onNextStep: () => void;
+  stepNumber: number;
 }
 
 const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
@@ -63,7 +53,6 @@ const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
   const {
     executePreDepositCheck,
     executePreDepositCheckError,
-    executePreDepositCheckValue,
     executePreDepositCheckStatus,
   } = useTransaction()!;
 
@@ -87,9 +76,9 @@ const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
 
   return (
     <div className={!active && !completed ? "opacity-30" : ""}>
-      <div className="text-hyphen-purple-darker/70 font-medium py-2 flex items-center gap-4">
-        <div className="bg-hyphen-purple/30 border border-hyphen-purple-dark/10 shadow-sm p-3 rounded-full text-hyphen-purple-darker/80 relative">
-          <span className="absolute inset-0 text-center flex items-center justify-center text-xs">
+      <div className="flex items-center gap-4 py-2 font-medium text-hyphen-purple-darker/70">
+        <div className="relative p-3 border rounded-full shadow-sm bg-hyphen-purple/30 border-hyphen-purple-dark/10 text-hyphen-purple-darker/80">
+          <span className="absolute inset-0 flex items-center justify-center text-xs text-center">
             <span className="mb-0.5">{stepNumber}</span>
           </span>
         </div>
@@ -97,13 +86,13 @@ const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
       </div>
       <AnimateHeight height={active ? "auto" : 0}>
         <div className="transition-colors p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30 mx-10 mt-2">
-          <div className="text-sm text-hyphen-purple-dark/60 font-medium text-center">
+          <div className="text-sm font-medium text-center text-hyphen-purple-dark/60">
             {executePreDepositCheckError ? (
-              <span className="text-red-700/70 font-semibold">
+              <span className="font-semibold text-red-700/70">
                 {executePreDepositCheckError.toString()}
               </span>
             ) : (
-              <div className="flex items-center gap-4 justify-center">
+              <div className="flex items-center justify-center gap-4">
                 <Spinner />
                 <span> Checking Available liquidity on {toChain?.name}</span>
               </div>
@@ -137,16 +126,19 @@ const DepositStep: React.FC<
     executeDepositError,
   } = useTransaction()!;
   const { selectedToken } = useToken()!;
-  const { toChainRpcUrlProvider, fromChain } = useChains()!;
+  const { fromChain } = useChains()!;
+  const {
+    receiver: { receiverAddress },
+  } = useTransaction()!;
 
   const [executed, setExecuted] = useState(false);
 
   useEffect(() => {
     if (active) {
-      executeDeposit();
+      executeDeposit(receiverAddress);
       setExecuted(true);
     }
-  }, [active, executeDeposit]);
+  }, [active, executeDeposit, receiverAddress]);
 
   useEffect(() => {
     if (executed && executeDepositError && active) onError();
@@ -159,7 +151,6 @@ const DepositStep: React.FC<
       (async () => {
         await executeDepositValue.wait(1);
         setDepositState(Status.SUCCESS);
-        console.log("dep");
         onNextStep();
       })();
     }
@@ -173,9 +164,9 @@ const DepositStep: React.FC<
 
   return (
     <div className={!active && !completed ? "opacity-30" : ""}>
-      <div className="text-hyphen-purple-darker/70 font-medium py-2 flex items-center gap-4">
-        <div className="bg-hyphen-purple/30 border border-hyphen-purple-dark/10 shadow-sm p-3 rounded-full text-hyphen-purple-darker/80 relative">
-          <span className="absolute inset-0 text-center flex items-center justify-center text-xs">
+      <div className="flex items-center gap-4 py-2 font-medium text-hyphen-purple-darker/70">
+        <div className="relative p-3 border rounded-full shadow-sm bg-hyphen-purple/30 border-hyphen-purple-dark/10 text-hyphen-purple-darker/80">
+          <span className="absolute inset-0 flex items-center justify-center text-xs text-center">
             <span className="mb-0.5">{stepNumber}</span>
           </span>
         </div>
@@ -186,11 +177,11 @@ const DepositStep: React.FC<
       <AnimateHeight height={active ? "auto" : 0}>
         <div className="transition-colors p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30 mx-10 mt-2">
           {executeDepositError ? (
-            <span className="text-red-700/70 font-medium text-sm">
+            <span className="text-sm font-medium text-red-700/70">
               {executeDepositError?.message || executeDepositError.toString()}
             </span>
           ) : (
-            <div className="text-sm text-hyphen-purple-dark/60 font-medium text-center flex items-center gap-4 justify-center">
+            <div className="flex items-center justify-center gap-4 text-sm font-medium text-center text-hyphen-purple-dark/60">
               <Spinner />
               <div>
                 {executeDepositStatus === Status.PENDING &&
@@ -208,9 +199,20 @@ const DepositStep: React.FC<
 
 const ReceivalStep: React.FC<
   Step & {
+    hideManualExit: () => void;
+    refreshSelectedTokenBalance: () => void;
     setReceivalState: (state: Status) => void;
+    showManualExit: () => void;
   }
-> = ({ currentStepNumber, stepNumber, setReceivalState, onNextStep }) => {
+> = ({
+  currentStepNumber,
+  hideManualExit,
+  onNextStep,
+  refreshSelectedTokenBalance,
+  setReceivalState,
+  showManualExit,
+  stepNumber,
+}) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
@@ -231,10 +233,13 @@ const ReceivalStep: React.FC<
           let hash = await checkReceival();
           if (hash) {
             clearInterval(keepChecking);
+            hideManualExit();
+            refreshSelectedTokenBalance();
             setExitHash(hash);
             setExecuted(true);
-          }
-          if (tries > 300) {
+          } else if (tries > MANUAL_EXIT_RETRIES) {
+            showManualExit();
+          } else if (tries > 300) {
             clearInterval(keepChecking);
             throw new Error("exhauseted max retries");
           }
@@ -243,7 +248,14 @@ const ReceivalStep: React.FC<
         }
       }, 1000);
     }
-  }, [active, checkReceival, exitHash, setExitHash]);
+  }, [
+    active,
+    checkReceival,
+    hideManualExit,
+    refreshSelectedTokenBalance,
+    setExitHash,
+    showManualExit,
+  ]);
 
   useEffect(() => {
     if (!toChainRpcUrlProvider) {
@@ -272,9 +284,9 @@ const ReceivalStep: React.FC<
 
   return (
     <div className={!active && !completed ? "opacity-30" : ""}>
-      <div className="text-hyphen-purple-darker/70 font-medium py-2 flex items-center gap-4">
-        <div className="bg-hyphen-purple/30 border border-hyphen-purple-dark/10 shadow-sm p-3 rounded-full text-hyphen-purple-darker/80 relative">
-          <span className="absolute inset-0 text-center flex items-center justify-center text-xs">
+      <div className="flex items-center gap-4 py-2 font-medium text-hyphen-purple-darker/70">
+        <div className="relative p-3 border rounded-full shadow-sm bg-hyphen-purple/30 border-hyphen-purple-dark/10 text-hyphen-purple-darker/80">
+          <span className="absolute inset-0 flex items-center justify-center text-xs text-center">
             <span className="mb-0.5">{stepNumber}</span>
           </span>
         </div>
@@ -286,11 +298,11 @@ const ReceivalStep: React.FC<
       <AnimateHeight height={active ? "auto" : 0}>
         <div className="transition-colors p-4 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30 mx-10 mt-2">
           {receivalError ? (
-            <span className="text-red-700/70 font-medium">
+            <span className="font-medium text-red-700/70">
               {receivalError?.message || receivalError.toString()}
             </span>
           ) : (
-            <div className="text-sm text-hyphen-purple-dark/60 font-medium text-center flex items-center gap-4 justify-center">
+            <div className="flex items-center justify-center gap-4 text-sm font-medium text-center text-hyphen-purple-dark/60">
               <Spinner />
               Waiting to receive ~{
                 transactionFee?.amountToGetProcessedString
@@ -308,10 +320,11 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   isVisible,
   onClose,
 }) => {
-  const { selectedToken } = useToken()!;
+  const { refreshSelectedTokenBalance, selectedToken } = useToken()!;
   const { transferAmount, executeDepositValue, exitHash, transactionFee } =
     useTransaction()!;
   const { fromChain, toChain } = useChains()!;
+  const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
 
@@ -321,11 +334,11 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
 
   const [depositState, setDepositState] = useState<Status>(Status.IDLE);
   const [receivalState, setReceivalState] = useState<Status>(Status.IDLE);
-
   const [startTime, setStartTime] = useState<Date>();
   const [endTime, setEndTime] = useState<Date>();
-
   const [activeStep, setActiveStep] = useState(0);
+  const [canManualExit, setCanManualExit] = useState(false);
+  const [isManualExitDisabled, setIsManualExitDisabled] = useState(false);
   const nextStep = useCallback(
     () => setActiveStep((i) => i + 1),
     [setActiveStep]
@@ -381,8 +394,9 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
       !transactionFee ||
       !endTime ||
       !startTime
-    )
+    ) {
       return;
+    }
 
     let transferRecord: ITransferRecord = {
       depositHash: executeDepositValue.hash,
@@ -412,46 +426,69 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
     endTime,
   ]);
 
+  const showManualExit = useCallback(() => {
+    setCanManualExit(true);
+  }, []);
+
+  const hideManualExit = useCallback(() => {
+    setCanManualExit(false);
+  }, []);
+
+  const disableManualExit = () => {
+    setIsManualExitDisabled(true);
+  };
+
+  async function triggerManualExit() {
+    try {
+      console.log(
+        `Triggering manual exit for deposit hash ${executeDepositValue.hash} and chainId ${fromChain?.chainId}...`
+      );
+      disableManualExit();
+      const response = await hyphen.triggerManualTransfer(
+        executeDepositValue.hash,
+        fromChain?.chainId
+      );
+      if (response && response.exitHash) {
+        hideManualExit();
+        setReceivalState(Status.PENDING);
+      }
+    } catch (e) {
+      console.error("Failed to execute manual transfer: ", e);
+    }
+  }
+
   return (
-    <Modal
-      isVisible={isVisible}
-      onClose={() => {
-        console.log(isExitAllowed);
-        isExitAllowed && onClose();
-      }}
-    >
+    <Modal isVisible={isVisible} onClose={() => {}}>
       <div className="mb-14">
-        <div className="bg-white p-6 rounded-3xl shadow-lg relative z-20 border-hyphen-purple-darker/50 border">
-          <div className="absolute -inset-2 bg-white/60 opacity-50 rounded-3xl blur-lg -z-10"></div>
+        <div className="relative z-20 p-6 bg-white border shadow-lg rounded-3xl border-hyphen-purple-darker/50">
+          <div className="absolute opacity-50 -inset-2 bg-white/60 rounded-3xl blur-lg -z-10"></div>
           <div className="flex flex-col">
-            <div className="flex items-center mb-6">
+            <div className="flex items-center justify-between mb-4">
               <Dialog.Title
                 as="h1"
-                className="font-semibold text-xl text-black text-opacity-[0.54] p-2"
+                className="text-xl font-semibold text-gray-700"
               >
                 Transfer Activity
               </Dialog.Title>
-              <div className="text-hyphen-purple-dark/80 ml-auto hover">
-                <span data-tip data-for="whyModalExitDisabled">
-                  <button
-                    onClick={() => {
-                      console.log(isExitAllowed);
-                      isExitAllowed && onClose();
-                    }}
-                    disabled={!isExitAllowed}
-                  >
-                    <IoMdClose className="h-6 w-auto" />
-                  </button>
-                </span>
-                {!isExitAllowed && (
-                  <CustomTooltip
-                    id="whyModalExitDisabled"
-                    text="Exit is disabled because transfer is in progress"
-                  />
-                )}
-              </div>
+              <span data-tip data-for="whyModalExitDisabled">
+                <button
+                  className="rounded hover:bg-gray-100"
+                  onClick={() => {
+                    isExitAllowed && onClose();
+                  }}
+                  disabled={!isExitAllowed}
+                >
+                  <IoMdClose className="w-auto h-6 text-gray-500" />
+                </button>
+              </span>
+              {!isExitAllowed && (
+                <CustomTooltip
+                  id="whyModalExitDisabled"
+                  text="Exit is disabled because transfer is in progress"
+                />
+              )}
             </div>
-            <div className="pl-2 flex flex-col gap-2">
+            <div className="flex flex-col gap-2 pl-2">
               <PreDepositStep
                 currentStepNumber={activeStep}
                 stepNumber={1}
@@ -467,12 +504,15 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
               />
               <ReceivalStep
                 currentStepNumber={activeStep}
-                stepNumber={3}
+                hideManualExit={hideManualExit}
                 onNextStep={nextStep}
+                refreshSelectedTokenBalance={refreshSelectedTokenBalance}
                 setReceivalState={setReceivalState}
+                showManualExit={showManualExit}
+                stepNumber={3}
               />
             </div>
-            <div className="mt-4 pt-3 pb-2 flex justify-center">
+            <div className="flex justify-center pt-3 pb-2 mt-4">
               {modalErrored ? (
                 <PrimaryButtonLight
                   className="px-8"
@@ -516,15 +556,15 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                   "-translate-y-full"
               )}
             >
-              <div className="mx-10 relative">
+              <div className="relative mx-10">
                 <div className="absolute opacity-80 -inset-[2px] bg-gradient-to-br from-white/10 to-hyphen-purple/30 blur-md -z-10"></div>
-                <div className="bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker backdrop-blur border-white/20 border-x border-b rounded-b-md relative shadow-lg z-0">
+                <div className="relative z-0 border-b shadow-lg bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker backdrop-blur border-white/20 border-x rounded-b-md">
                   <div
-                    className="grid text-white/75 p-6 gap-y-2"
+                    className="grid p-6 text-white/75 gap-y-2"
                     style={{ gridTemplateColumns: "1fr auto" }}
                   >
-                    <span className="font-normal flex items-center gap-3">
-                      <FaInfoCircle /> Deposit on {fromChain?.name}
+                    <span className="flex items-center gap-3 font-normal">
+                      Deposit on {fromChain?.name}
                     </span>
                     <span className="text-right">
                       {depositState === Status.PENDING ||
@@ -544,7 +584,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                               <span className="flex items-center gap-2">
                                 <span>Pending</span>
                                 <span>
-                                  <HiOutlineExternalLink />
+                                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                                 </span>
                               </span>
                             </div>
@@ -553,7 +593,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                             <div className="flex items-center gap-2">
                               <span>Confirmed</span>
                               <span>
-                                <HiOutlineExternalLink />
+                                <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                               </span>
                             </div>
                           )}
@@ -566,13 +606,22 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                         />
                       )}
                     </span>
-                    <span className="font-normal flex items-center gap-3">
-                      <FaInfoCircle />
-                      Transfer on {toChain?.name}
+                    <span className="flex items-center gap-3 font-normal">
+                      {canManualExit
+                        ? "Transfer taking time?"
+                        : `Transfer on ${toChain?.name}`}
                     </span>
                     <span className="text-right">
-                      {receivalState === Status.PENDING ||
-                      receivalState === Status.SUCCESS ? (
+                      {canManualExit ? (
+                        <PrimaryButtonDark
+                          className="px-6"
+                          onClick={triggerManualExit}
+                          disabled={isManualExitDisabled}
+                        >
+                          Click here
+                        </PrimaryButtonDark>
+                      ) : receivalState === Status.PENDING ||
+                        receivalState === Status.SUCCESS ? (
                         <PrimaryButtonDark
                           className="px-6"
                           onClick={() => {
@@ -588,7 +637,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                               <span className="flex items-center gap-2">
                                 <span>Pending</span>
                                 <span>
-                                  <HiOutlineExternalLink />
+                                  <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                                 </span>
                               </span>
                             </div>
@@ -597,7 +646,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                             <div className="flex items-center gap-2">
                               <span>Confirmed</span>
                               <span>
-                                <HiOutlineExternalLink />
+                                <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                               </span>
                             </div>
                           )}

@@ -1,23 +1,28 @@
-import { useTransaction } from "context/Transaction";
-import * as React from "react";
-import { FaInfoCircle } from "react-icons/fa";
-import { Status } from "hooks/useLoading";
+import React from "react";
+import Skeleton from "react-loading-skeleton";
+import { HiExclamation, HiInformationCircle } from "react-icons/hi";
 import { Transition } from "react-transition-group";
 import { twMerge } from "tailwind-merge";
-import Skeleton from "react-loading-skeleton";
+import { useChains } from "context/Chains";
 import { useToken } from "context/Token";
+import { useTransaction } from "context/Transaction";
+import { Status } from "hooks/useLoading";
+import isToChainEthereum from "utils/isToChainEthereum";
+import CustomTooltip from "./CustomTooltip";
 
 interface ITransactionFeeProps {}
 
-const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = (
-  props
-) => {
+const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
   const {
     transactionFee,
     fetchTransactionFeeStatus,
     transactionAmountValidationErrors,
   } = useTransaction()!;
   const { selectedToken } = useToken()!;
+  const { toChain } = useChains()!;
+  const showEthereumDisclaimer = toChain
+    ? isToChainEthereum(toChain.chainId)
+    : false;
 
   return (
     <Transition
@@ -35,56 +40,101 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = (
             (state === "exiting" || state === "exited") && "-translate-y-full"
           )}
         >
-          <div className="bg-white mx-10 bg-opacity-10 backdrop-blur border-white/10 border-x border-b rounded-b-md relative shadow-lg z-0">
-            <div className="absolute opacity-80 -inset-[2px] bg-gradient-to-br from-white/10 to-hyphen-purple/30 blur-md -z-10"></div>
-            <div className="grid grid-cols-2 text-white/75 p-6 gap-y-2 text-sm">
-              <span className="font-medium flex items-center gap-2">
-                <FaInfoCircle /> Liquidity Provider Fee
-              </span>
-              <span className="text-right font-mono">
-                {fetchTransactionFeeStatus === Status.SUCCESS &&
-                transactionFee ? (
-                  <>{`${transactionFee.lpFeeProcessedString} ${selectedToken?.symbol}`}</>
-                ) : (
-                  <Skeleton
-                    baseColor="#ffffff10"
-                    highlightColor="#ffffff15"
-                    className="max-w-[80px]"
+          <div className="mx-10 bg-white border-b rounded-b-lg bg-opacity-10 border-white/10 border-x">
+            <div className="flex flex-col p-4 text-sm text-white/75 gap-y-2">
+              {showEthereumDisclaimer ? (
+                <article className="flex items-start p-2 mb-2 text-sm text-red-600 bg-red-100 rounded-xl">
+                  <HiExclamation className="w-auto h-6 mr-2" />
+                  <p>
+                    The received amount may differ due to gas price fluctuations
+                    on Ethereum.
+                  </p>
+                </article>
+              ) : null}
+              <article className="flex items-center justify-between font-medium">
+                <div className="flex items-center">
+                  <HiInformationCircle
+                    data-tip
+                    data-for="lpFee"
+                    className="mr-2"
                   />
-                )}
-              </span>
-              <span className="font-medium flex items-center gap-2">
-                <FaInfoCircle />
-                Transaction Fee
-              </span>
-              <span className="text-right font-mono">
-                {fetchTransactionFeeStatus === Status.SUCCESS &&
-                transactionFee ? (
-                  <>{`${transactionFee.transactionFeeProcessedString} ${selectedToken?.symbol}`}</>
-                ) : (
-                  <Skeleton
-                    baseColor="#ffffff10"
-                    highlightColor="#ffffff15"
-                    className="max-w-[80px]"
+                  {transactionFee ? (
+                    <CustomTooltip
+                      id="lpFee"
+                      text={`${transactionFee.lpFeeProcessedString}% fee to be given to liquidity providers`}
+                    />
+                  ) : null}
+                  Liquidity Provider Fee
+                </div>
+                <div className="font-mono text-right">
+                  {fetchTransactionFeeStatus === Status.SUCCESS &&
+                  transactionFee ? (
+                    <>{`${transactionFee.lpFeeProcessedString} ${selectedToken?.symbol}`}</>
+                  ) : (
+                    <Skeleton
+                      baseColor="#ffffff10"
+                      highlightColor="#ffffff15"
+                      className="max-w-[80px]"
+                    />
+                  )}
+                </div>
+              </article>
+              <article className="flex items-center justify-between font-medium">
+                <div className="flex items-center">
+                  <HiInformationCircle
+                    data-tip
+                    data-for="transactionFee"
+                    className="mr-2"
                   />
-                )}
-              </span>
-              <span className="font-medium flex items-center gap-2">
-                <FaInfoCircle />
-                You get minimum
-              </span>
-              <span className="text-right font-mono">
-                {fetchTransactionFeeStatus === Status.SUCCESS &&
-                transactionFee ? (
-                  <>{`${transactionFee.amountToGetProcessedString} ${selectedToken?.symbol}`}</>
-                ) : (
-                  <Skeleton
-                    baseColor="#ffffff10"
-                    highlightColor="#ffffff15"
-                    className="max-w-[80px]"
+                  {toChain ? (
+                    <CustomTooltip
+                      id="transactionFee"
+                      text={`Fee corresponding to the transaction done by Biconomy to transfer funds on ${toChain.name}. It varies as per the market gas price on ${toChain.name}.`}
+                    />
+                  ) : null}
+                  Transaction Fee
+                </div>
+                <div className="font-mono text-right">
+                  {fetchTransactionFeeStatus === Status.SUCCESS &&
+                  transactionFee ? (
+                    <>{`${transactionFee.transactionFeeProcessedString} ${selectedToken?.symbol}`}</>
+                  ) : (
+                    <Skeleton
+                      baseColor="#ffffff10"
+                      highlightColor="#ffffff15"
+                      className="max-w-[80px]"
+                    />
+                  )}
+                </div>
+              </article>
+              <article className="flex items-center justify-between font-medium">
+                <div className="flex items-center">
+                  <HiInformationCircle
+                    data-tip
+                    data-for="minimumFunds"
+                    className="mr-2"
                   />
-                )}
-              </span>
+                  {toChain ? (
+                    <CustomTooltip
+                      id="minimumFunds"
+                      text={`Minimum funds you will get on ${toChain.name}. Actual amount may vary slightly based on on-chain data.`}
+                    />
+                  ) : null}
+                  You get minimum
+                </div>
+                <div className="font-mono text-right">
+                  {fetchTransactionFeeStatus === Status.SUCCESS &&
+                  transactionFee ? (
+                    <>{`${transactionFee.amountToGetProcessedString} ${selectedToken?.symbol}`}</>
+                  ) : (
+                    <Skeleton
+                      baseColor="#ffffff10"
+                      highlightColor="#ffffff15"
+                      className="max-w-[80px]"
+                    />
+                  )}
+                </div>
+              </article>
             </div>
           </div>
         </div>

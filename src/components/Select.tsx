@@ -36,12 +36,7 @@ const OptionContent: React.FC<IOptionContentProps> = ({
           selected ? "font-medium" : "font-normal"
         } flex items-center truncate`}
       >
-        {/* Uncomment when better icons are available */}
-        {/* <img
-      className="w-6 h-6"
-      src={option.image}
-      alt={option.name}
-    /> */}
+        <img className="w-5 h-5 mr-2" src={option.image} alt={option.name} />
         {option.name}
       </span>
       {selected ? (
@@ -68,10 +63,10 @@ export const Select: React.FC<ISelectProps> = ({
 }) => {
   return (
     <Listbox value={selected} onChange={setSelected} disabled={disabled}>
-      <Listbox.Label className="text-xs uppercase font-semibold text-hyphen-purple-dark text-opacity-70 pl-1">
+      <Listbox.Label className="pl-1 text-xs font-semibold capitalize text-hyphen-purple-dark text-opacity-70">
         {label}
       </Listbox.Label>
-      <div className="h-10 relative mt-1">
+      <div className="relative h-12 mt-1">
         <Listbox.Button
           className={twMerge(
             "relative w-full h-full py-2 pl-4 pr-10 text-left bg-white rounded-lg border border-hyphen-purple border-opacity-20 cursor-default focus:outline-none focus-visible:ring-2 focus-visible:ring-opacity-75 focus-visible:ring-white focus-visible:ring-offset-orange-300 focus-visible:ring-offset-2 focus-visible:border-indigo-500 sm:text-sm",
@@ -81,12 +76,11 @@ export const Select: React.FC<ISelectProps> = ({
           <span className="flex items-center truncate">
             {selected ? (
               <>
-                {/* Uncomment when better icons are available */}
-                {/* <img
-                  className="w-6 h-6"
+                <img
+                  className="w-5 h-5 mr-2"
                   src={selected.image}
                   alt={selected.name}
-                /> */}
+                />
                 {selected.name}
               </>
             ) : (
@@ -103,7 +97,7 @@ export const Select: React.FC<ISelectProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className="absolute min-w-full py-1 mt-2 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm z-10">
+          <Listbox.Options className="absolute z-10 min-w-full py-1 mt-2 overflow-auto text-base bg-white rounded-md shadow-lg max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
             {options.map((option) => (
               <Listbox.Option
                 key={option.id}

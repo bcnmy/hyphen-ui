@@ -1,53 +1,51 @@
-import React, { useEffect } from "react";
-import { IoMdClose } from "react-icons/io";
-import Skeleton from "react-loading-skeleton";
-
 import { Dialog } from "@headlessui/react";
-import Modal from "components/Modal";
-import { useTransaction } from "context/Transaction";
-import useAsync, { Status } from "hooks/useLoading";
-import { ITransferRecord } from "context/TransactionInfoModal";
+import { DEFAULT_FIXED_DECIMAL_POINT } from "config/constants";
+import { formatDistanceStrict } from "date-fns";
 import {
   HiOutlineArrowNarrowRight,
   HiOutlineArrowSmRight,
 } from "react-icons/hi";
-import { useChains } from "context/Chains";
+import { IoMdClose } from "react-icons/io";
+import Modal from "../../../../components/Modal";
+import { ITransactionDetails } from "../UserInfoModal";
 
-export interface ITransferInfoModal {
-  transferRecord: ITransferRecord;
+export interface ITransactionDetailModal {
   isVisible: boolean;
   onClose: () => void;
+  transactionDetails: ITransactionDetails | undefined;
 }
 
-export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
-  transferRecord,
+function TransactionDetailModal({
   isVisible,
   onClose,
-}) => {
-  const { getExitInfoFromHash } = useTransaction()!;
-  const { chainsList } = useChains()!;
+  transactionDetails,
+}: ITransactionDetailModal) {
+  if (!transactionDetails) {
+    return null;
+  }
 
   const {
-    value: exitInfo,
-    execute: getExitInfo,
-    status: getExitInfoStatus,
-    error: getExitInfoError,
-  } = useAsync(getExitInfoFromHash);
-
-  const fromChainExplorerUrl = `${
-    chainsList.find(
-      (chain) => chain.chainId === transferRecord.fromChain.chainId
-    )!.explorerUrl
-  }/tx/${transferRecord.depositHash}`;
-  const toChainExplorerUrl = `${
-    chainsList.find(
-      (chain) => chain.chainId === transferRecord.toChain.chainId
-    )!.explorerUrl
-  }/tx/${transferRecord.exitHash}`;
-
-  useEffect(() => {
-    getExitInfo(transferRecord.exitHash);
-  }, [getExitInfo, transferRecord.exitHash]);
+    amount,
+    amountReceived,
+    endTimeStamp,
+    fromChainExplorerUrl,
+    fromChainLabel,
+    lpFee,
+    receivedTokenSymbol,
+    startTimeStamp,
+    toChainExplorerUrl,
+    toChainLabel,
+    tokenSymbol,
+  } = transactionDetails!;
+  const transactionTime = formatDistanceStrict(
+    new Date(endTimeStamp * 1000),
+    new Date(startTimeStamp * 1000)
+  );
+  const transactionFee = (
+    Number.parseFloat(amount) -
+    Number.parseFloat(lpFee) -
+    Number.parseFloat(amountReceived)
+  ).toFixed(DEFAULT_FIXED_DECIMAL_POINT);
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
@@ -67,7 +65,7 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Sent</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {transferRecord.depositAmount} {transferRecord.token.symbol}
+                  {amount} {tokenSymbol}
                 </span>
                 <a
                   target="_blank"
@@ -75,7 +73,7 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
                   rel="noreferrer"
                   className="flex items-center text-hyphen-purple"
                 >
-                  {transferRecord.fromChain.name}
+                  {fromChainLabel}
                   <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                 </a>
               </div>
@@ -83,19 +81,7 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Received</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {getExitInfoStatus === Status.SUCCESS && exitInfo ? (
-                    <>
-                      {exitInfo} {transferRecord.token.symbol}
-                    </>
-                  ) : (
-                    <>
-                      <Skeleton
-                        baseColor="#625ccd28"
-                        highlightColor="#625ccd0c"
-                        width={100}
-                      />
-                    </>
-                  )}
+                  {amountReceived} {receivedTokenSymbol}
                 </span>
                 <a
                   target="_blank"
@@ -103,7 +89,7 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
                   rel="noreferrer"
                   className="flex items-center text-hyphen-purple"
                 >
-                  {transferRecord.toChain.name}
+                  {toChainLabel}
                   <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                 </a>
               </div>
@@ -111,9 +97,7 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
 
             <span className="text-center text-gray-500">
               Tranfer completed in{" "}
-              <span className="text-hyphen-purple">
-                {transferRecord.transferTime}
-              </span>
+              <span className="text-hyphen-purple">{transactionTime}</span>
             </span>
           </div>
 
@@ -121,13 +105,13 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
             <li className="flex justify-between mb-1">
               <span className="text-gray-500">Liquidity provider fee</span>
               <span className="text-gray-700">
-                {transferRecord.lpFee} {transferRecord.token.symbol}
+                {lpFee} {tokenSymbol}
               </span>
             </li>
             <li className="flex justify-between">
               <span className="text-gray-500">Transaction fee</span>
               <span className="text-gray-700">
-                {transferRecord.transactionFee} {transferRecord.token.symbol}
+                {transactionFee} {tokenSymbol}
               </span>
             </li>
           </ul>
@@ -135,6 +119,6 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
       </div>
     </Modal>
   );
-};
+}
 
-export default TransferInfoModal;
+export default TransactionDetailModal;

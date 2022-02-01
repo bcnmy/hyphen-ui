@@ -1,6 +1,7 @@
 import React from "react";
 import { BiconomyProvider } from "./Biconomy";
 import { ChainsProvider } from "./Chains";
+import { GraphQLProvider } from "./GraphQL";
 import { HyphenProvider } from "./Hyphen";
 import { NotificationsProvider } from "./Notifications";
 import { TokenProvider } from "./Token";
@@ -13,21 +14,23 @@ export const AppProviders: React.FC = ({ children }) => {
   return (
     <WalletProviderProvider>
       <ChainsProvider>
-        <NotificationsProvider>
-          <TokenProvider>
-            <BiconomyProvider>
-              <HyphenProvider>
-                <TokenApprovalProvider>
-                  <TransactionProvider>
-                    <TransactionInfoModalProvider>
-                      {children}
-                    </TransactionInfoModalProvider>
-                  </TransactionProvider>
-                </TokenApprovalProvider>
-              </HyphenProvider>
-            </BiconomyProvider>
-          </TokenProvider>
-        </NotificationsProvider>
+        <GraphQLProvider>
+          <NotificationsProvider>
+            <TokenProvider>
+              <BiconomyProvider>
+                <HyphenProvider>
+                  <TokenApprovalProvider>
+                    <TransactionProvider>
+                      <TransactionInfoModalProvider>
+                        {children}
+                      </TransactionInfoModalProvider>
+                    </TransactionProvider>
+                  </TokenApprovalProvider>
+                </HyphenProvider>
+              </BiconomyProvider>
+            </TokenProvider>
+          </NotificationsProvider>
+        </GraphQLProvider>
       </ChainsProvider>
     </WalletProviderProvider>
   );

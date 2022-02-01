@@ -4,7 +4,6 @@ import { useChains } from "context/Chains";
 import { useHyphen } from "context/Hyphen";
 import { useToken } from "context/Token";
 import { useTransaction, ValidationErrors } from "context/Transaction";
-import { useTransactionInfoModal } from "context/TransactionInfoModal";
 import { Status } from "hooks/useLoading";
 import React, { useMemo } from "react";
 import Skeleton from "react-loading-skeleton";
@@ -27,8 +26,6 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
     getSelectedTokenBalanceStatus,
   } = useToken()!;
   const { poolInfo } = useHyphen()!;
-
-  const { showTransactionInfoModal } = useTransactionInfoModal()!;
 
   const { changeTransferAmountInputValue, transactionAmountValidationErrors } =
     useTransaction()!;
@@ -61,19 +58,22 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
                 tokensList.find((t) => t.symbol === opt.id) as TokenConfig
               );
           }}
-          label={"Token"}
+          label={"token"}
           disabled={disabled}
         />
         {disabled && (
-          <CustomTooltip id="tokenSelect" text="Select from & to chains" />
+          <CustomTooltip
+            id="tokenSelect"
+            text="Select source & destination chains"
+          />
         )}
       </div>
 
-      <div className="flex items-center my-2 pl-2 text-xs font-bold gap-4 text-opacity-80 text-hyphen-purple-dark font-mono justify-between">
-        <span className="flex flex-grow items-baseline">
+      <div className="flex items-center justify-between gap-4 pl-2 my-2 text-xs text-hyphen-purple-dark">
+        <span className="flex items-baseline flex-grow">
           <span
             className={twMerge(
-              "text-opacity-40 text-hyphen-purple-dark font-sans font-medium mr-2",
+              "mr-1",
               transactionAmountValidationErrors.includes(
                 ValidationErrors.INADEQUATE_BALANCE
               ) && "text-red-600",
@@ -82,7 +82,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           >
             Balance:
           </span>
-          <span className="flex-grow">
+          <span className="flex-grow font-mono">
             {getSelectedTokenBalanceStatus &&
             getSelectedTokenBalanceStatus === Status.SUCCESS &&
             selectedTokenBalance?.displayBalance ? (
@@ -106,7 +106,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           </span>
         </span>
         <button
-          className="text-hyphen-purple shadow-sm shadow-hyphen-purple/20 border-hyphen-purple border border-opacity-20 rounded-full px-2 hover:bg-hyphen-purple/10 transition-colors"
+          className="px-2 transition-colors border rounded-full shadow-sm text-hyphen-purple shadow-hyphen-purple/20 border-hyphen-purple border-opacity-20 hover:bg-hyphen-purple/10"
           onClick={() => {
             selectedTokenBalance &&
               poolInfo &&

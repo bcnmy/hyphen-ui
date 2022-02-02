@@ -65,10 +65,10 @@ const Bridge: React.FC<BridgeProps> = () => {
         }}
       />
       <ErrorModal error={executeApproveTokenError} title={"Approval Error"} />
-      <div className="my-14">
+      <div className="my-24">
         <div className="max-w-xl mx-auto">
           <div className="relative z-10">
-            <div className="flex flex-col gap-2 p-6 bg-white shadow-lg rounded-3xl">
+            <div className="flex flex-col gap-2 p-6 bg-white shadow-lg rounded-[40px]">
               <div className="flex items-center justify-end mb-2">
                 <div className="flex items-center">
                   <HiInformationCircle

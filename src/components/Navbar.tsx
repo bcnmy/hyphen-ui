@@ -11,11 +11,11 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
   const userAddress = accounts?.[0];
 
   return (
-    <header className="flex items-center justify-between w-full px-6 text-white border-b border-black shadow-sm bg-hyphen-purple bg-opacity-10 backdrop-blur-sm border-opacity-20">
-      <Link to="/bridge">
+    <header className="relative flex items-center justify-center w-full px-6 text-white border-b border-black shadow-sm bg-hyphen-purple bg-opacity-10 backdrop-blur-sm border-opacity-20">
+      <Link to="/bridge" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
-          className="w-auto h-8 mr-8"
+          className="w-auto h-8"
           alt="Hyphen Logo"
         />
       </Link>
@@ -76,7 +76,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
         </a>
       </nav>
       <button
-        className="px-4 py-1 bg-white bg-opacity-10 rounded-xl text-white font-mono border border-opacity-10 border-white font-base relative backdrop-blur-md cursor-pointer hover:bg-opacity-[0.15] hover:text-opacity-90 hover:border-opacity-20"
+        className="absolute right-6 px-4 py-1 bg-white bg-opacity-10 rounded-xl text-white font-mono border border-opacity-10 border-white font-base backdrop-blur-md cursor-pointer hover:bg-opacity-[0.15] hover:text-opacity-90 hover:border-opacity-20"
         onClick={isLoggedIn ? showUserInfoModal : connect}
       >
         {isLoggedIn

@@ -17,6 +17,9 @@ module.exports = {
           mid: "#464470",
           darker: "#353358",
         },
+        "hyphen-gray": {
+          100: "#c1c1c1",
+        },
       },
     },
   },

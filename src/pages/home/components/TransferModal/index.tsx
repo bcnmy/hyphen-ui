@@ -23,7 +23,7 @@ import {
   useTransactionInfoModal,
 } from "context/TransactionInfoModal";
 import CustomTooltip from "../CustomTooltip";
-import { MANUAL_EXIT_RETRIES } from "../../../../config/constants";
+// import { MANUAL_EXIT_RETRIES } from "../../../../config/constants";
 
 export interface ITransferModalProps {
   isVisible: boolean;
@@ -199,18 +199,18 @@ const DepositStep: React.FC<
 
 const ReceivalStep: React.FC<
   Step & {
-    hideManualExit: () => void;
+    // hideManualExit: () => void;
     refreshSelectedTokenBalance: () => void;
     setReceivalState: (state: Status) => void;
-    showManualExit: () => void;
+    // showManualExit: () => void;
   }
 > = ({
   currentStepNumber,
-  hideManualExit,
+  // hideManualExit,
   onNextStep,
   refreshSelectedTokenBalance,
   setReceivalState,
-  showManualExit,
+  // showManualExit,
   stepNumber,
 }) => {
   const active = currentStepNumber === stepNumber;
@@ -233,13 +233,15 @@ const ReceivalStep: React.FC<
           let hash = await checkReceival();
           if (hash) {
             clearInterval(keepChecking);
-            hideManualExit();
+            // hideManualExit();
             refreshSelectedTokenBalance();
             setExitHash(hash);
             setExecuted(true);
-          } else if (tries > MANUAL_EXIT_RETRIES) {
-            showManualExit();
-          } else if (tries > 300) {
+          }
+          // else if (tries > MANUAL_EXIT_RETRIES) {
+          //   showManualExit();
+          // }
+          else if (tries > 300) {
             clearInterval(keepChecking);
             throw new Error("exhauseted max retries");
           }
@@ -248,14 +250,8 @@ const ReceivalStep: React.FC<
         }
       }, 5000);
     }
-  }, [
-    active,
-    checkReceival,
-    hideManualExit,
-    refreshSelectedTokenBalance,
-    setExitHash,
-    showManualExit,
-  ]);
+    // Note: Remember to update the dependency array if adding manual exit.
+  }, [active, checkReceival, refreshSelectedTokenBalance, setExitHash]);
 
   useEffect(() => {
     if (!toChainRpcUrlProvider) {
@@ -337,8 +333,8 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   const [startTime, setStartTime] = useState<Date>();
   const [endTime, setEndTime] = useState<Date>();
   const [activeStep, setActiveStep] = useState(0);
-  const [canManualExit, setCanManualExit] = useState(false);
-  const [isManualExitDisabled, setIsManualExitDisabled] = useState(false);
+  // const [canManualExit, setCanManualExit] = useState(false);
+  // const [isManualExitDisabled, setIsManualExitDisabled] = useState(false);
   const nextStep = useCallback(
     () => setActiveStep((i) => i + 1),
     [setActiveStep]
@@ -426,36 +422,36 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
     endTime,
   ]);
 
-  const showManualExit = useCallback(() => {
-    setCanManualExit(true);
-  }, []);
+  // const showManualExit = useCallback(() => {
+  //   setCanManualExit(true);
+  // }, []);
 
-  const hideManualExit = useCallback(() => {
-    setCanManualExit(false);
-  }, []);
+  // const hideManualExit = useCallback(() => {
+  //   setCanManualExit(false);
+  // }, []);
 
-  const disableManualExit = () => {
-    setIsManualExitDisabled(true);
-  };
+  // const disableManualExit = () => {
+  //   setIsManualExitDisabled(true);
+  // };
 
-  async function triggerManualExit() {
-    try {
-      console.log(
-        `Triggering manual exit for deposit hash ${executeDepositValue.hash} and chainId ${fromChain?.chainId}...`
-      );
-      disableManualExit();
-      const response = await hyphen.triggerManualTransfer(
-        executeDepositValue.hash,
-        fromChain?.chainId
-      );
-      if (response && response.exitHash) {
-        hideManualExit();
-        setReceivalState(Status.PENDING);
-      }
-    } catch (e) {
-      console.error("Failed to execute manual transfer: ", e);
-    }
-  }
+  // async function triggerManualExit() {
+  //   try {
+  //     console.log(
+  //       `Triggering manual exit for deposit hash ${executeDepositValue.hash} and chainId ${fromChain?.chainId}...`
+  //     );
+  //     disableManualExit();
+  //     const response = await hyphen.triggerManualTransfer(
+  //       executeDepositValue.hash,
+  //       fromChain?.chainId
+  //     );
+  //     if (response && response.exitHash) {
+  //       hideManualExit();
+  //       setReceivalState(Status.PENDING);
+  //     }
+  //   } catch (e) {
+  //     console.error("Failed to execute manual transfer: ", e);
+  //   }
+  // }
 
   return (
     <Modal isVisible={isVisible} onClose={() => {}}>
@@ -504,11 +500,11 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
               />
               <ReceivalStep
                 currentStepNumber={activeStep}
-                hideManualExit={hideManualExit}
+                // hideManualExit={hideManualExit}
                 onNextStep={nextStep}
                 refreshSelectedTokenBalance={refreshSelectedTokenBalance}
                 setReceivalState={setReceivalState}
-                showManualExit={showManualExit}
+                // showManualExit={showManualExit}
                 stepNumber={3}
               />
             </div>
@@ -607,57 +603,61 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                       )}
                     </span>
                     <span className="flex items-center gap-3 font-normal">
-                      {canManualExit
+                      Transfer on {toChain?.name}
+                      {/* {canManualExit
                         ? "Transfer taking time?"
-                        : `Transfer on ${toChain?.name}`}
+                        : `Transfer on ${toChain?.name}`} */}
                     </span>
                     <span className="text-right">
-                      {canManualExit ? (
-                        <PrimaryButtonDark
-                          className="px-6"
-                          onClick={triggerManualExit}
-                          disabled={isManualExitDisabled}
-                        >
-                          Click here
-                        </PrimaryButtonDark>
-                      ) : receivalState === Status.PENDING ||
+                      {
+                        // canManualExit ? (
+                        //   <PrimaryButtonDark
+                        //     className="px-6"
+                        //     onClick={triggerManualExit}
+                        //     disabled={isManualExitDisabled}
+                        //   >
+                        //     Click here
+                        //   </PrimaryButtonDark>
+                        // ) :
+                        receivalState === Status.PENDING ||
                         receivalState === Status.SUCCESS ? (
-                        <PrimaryButtonDark
-                          className="px-6"
-                          onClick={() => {
-                            window.open(
-                              `${toChain?.explorerUrl}/tx/${exitHash}`,
-                              "_blank"
-                            );
-                          }}
-                        >
-                          {receivalState === Status.PENDING && (
-                            <div className="flex items-center gap-3">
-                              <SpinnerDark />
-                              <span className="flex items-center gap-2">
-                                <span>Pending</span>
+                          <PrimaryButtonDark
+                            className="px-6"
+                            onClick={() => {
+                              window.open(
+                                `${toChain?.explorerUrl}/tx/${exitHash}`,
+                                "_blank"
+                              );
+                            }}
+                          >
+                            {receivalState === Status.PENDING && (
+                              <div className="flex items-center gap-3">
+                                <SpinnerDark />
+                                <span className="flex items-center gap-2">
+                                  <span>Pending</span>
+                                  <span>
+                                    <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
+                                  </span>
+                                </span>
+                              </div>
+                            )}
+                            {receivalState === Status.SUCCESS && (
+                              <div className="flex items-center gap-2">
+                                <span>Confirmed</span>
                                 <span>
                                   <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
                                 </span>
-                              </span>
-                            </div>
-                          )}
-                          {receivalState === Status.SUCCESS && (
-                            <div className="flex items-center gap-2">
-                              <span>Confirmed</span>
-                              <span>
-                                <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
-                              </span>
-                            </div>
-                          )}
-                        </PrimaryButtonDark>
-                      ) : (
-                        <Skeleton
-                          baseColor="#ffffff10"
-                          highlightColor="#ffffff15"
-                          className="max-w-[100px] my-4 mr-2"
-                        />
-                      )}
+                              </div>
+                            )}
+                          </PrimaryButtonDark>
+                        ) : (
+                          <Skeleton
+                            baseColor="#ffffff10"
+                            highlightColor="#ffffff15"
+                            className="max-w-[100px] my-4 mr-2"
+                          />
+                        )
+                      }
                     </span>
                   </div>
                 </div>

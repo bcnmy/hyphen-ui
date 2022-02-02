@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.5.7",
-    "@biconomy/hyphen": "^0.0.19",
+    "@biconomy/hyphen": "^0.0.20",
     "@biconomy/mexa": "^2.0.24",
     "@craco/craco": "^6.4.3",
     "@headlessui/react": "^1.4.2",

@@ -6,8 +6,10 @@ import { IoMdClose } from "react-icons/io";
 import { defaultMaxListeners } from "stream";
 import { twMerge } from "tailwind-merge";
 
-import { Dialog, Transition } from "@headlessui/react";
+import { Dialog } from "@headlessui/react";
 import Modal from "components/Modal";
+import { useChains } from "context/Chains";
+import { useToken } from "context/Token";
 import { useTokenApproval } from "context/TokenApproval";
 import { useTransaction } from "context/Transaction";
 
@@ -20,6 +22,8 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
   isVisible,
   onClose,
 }) => {
+  const { fromChain, toChain } = useChains()!;
+  const { selectedToken } = useToken()!;
   const { executeApproveToken } = useTokenApproval()!;
   const { transferAmount } = useTransaction()!;
 
@@ -50,7 +54,8 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
                   as="div"
                   className="py-2 font-medium text-center text-hyphen-purple-dark/80"
                 >
-                  Allow Hyphen to spend Eth on Mumbai
+                  Allow Hyphen to spend {selectedToken?.symbol} on{" "}
+                  {fromChain?.name}
                 </Dialog.Description>
                 <div className="flex items-center justify-center gap-4 p-4">
                   <span className="text-base font-semibold text-hyphen-purple-dark/70">
@@ -66,8 +71,9 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
                   />
                 </div>
                 <div className="text-xs font-medium text-center text-hyphen-purple-dark/60">
-                  Note: This approval will only be used when you deposit your
-                  ETH on Hyphen Contracts on Goeril for cross chain transfers.
+                  Note: This approval will only be used when you deposit your{" "}
+                  {selectedToken?.symbol} in Hyphen contracts on {toChain?.name}{" "}
+                  for cross chain transfers.
                 </div>
               </div>
             </div>

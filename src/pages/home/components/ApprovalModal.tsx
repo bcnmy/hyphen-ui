@@ -22,7 +22,7 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
   isVisible,
   onClose,
 }) => {
-  const { fromChain, toChain } = useChains()!;
+  const { fromChain } = useChains()!;
   const { selectedToken } = useToken()!;
   const { executeApproveToken } = useTokenApproval()!;
   const { transferAmount } = useTransaction()!;
@@ -72,8 +72,8 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
                 </div>
                 <div className="text-xs font-medium text-center text-hyphen-purple-dark/60">
                   Note: This approval will only be used when you deposit your{" "}
-                  {selectedToken?.symbol} in Hyphen contracts on {toChain?.name}{" "}
-                  for cross chain transfers.
+                  {selectedToken?.symbol} in Hyphen contracts on{" "}
+                  {fromChain?.name} for cross chain transfers.
                 </div>
               </div>
             </div>

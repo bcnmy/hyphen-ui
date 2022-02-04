@@ -1913,10 +1913,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@biconomy/hyphen@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-0.0.19.tgz#cf24814aadc3c31a508f6f354ccb094e0e9195ec"
-  integrity sha512-nihPT45NE8v1RvSq67e0fii/FGDbBc0SiZsgH81j2W+Pun9UmKk07FVdoTHvpsRFt9DJx1BiR8kqYbmA1sDBFQ==
+"@biconomy/hyphen@^0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-0.0.20.tgz#b856a25a9d812add14cf81a3e4f212fa120d1820"
+  integrity sha512-WFsP52sOzyX6MtlZf8aIk9pfiZWcfhrHvRF92ye2bTPHCZ+NqpCxNmqfXWm89aun5ZQc6ea2UfZDJ/Q4WFlU0A==
   dependencies:
     "@biconomy/mexa" "^2.0.24"
     ethers "^5.0.24"
@@ -10062,6 +10062,16 @@ prelude-ls@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.1.2.tgz#21932a549f5e52ffd9a827f570e04be62a97da54"
   integrity sha1-IZMqVJ9eUv/ZqCf1cOBL5iqX2lQ=
+
+prettier-plugin-tailwindcss@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/prettier-plugin-tailwindcss/-/prettier-plugin-tailwindcss-0.1.4.tgz#b09e826a57a0f69b0662eededd659b3d5a5551e7"
+  integrity sha512-kt3YFWqxcG9+bilBI0hPF7RjQZNtgBRvjJZGw6B2MNAjPqlfcYIiZnNaIEnq4XimKLTzZYxz6jQnUXmSQ/5njg==
+
+prettier@2.5.1:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.1.tgz#fff75fa9d519c54cf0fce328c1017d94546bc56a"
+  integrity sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==
 
 pretty-bytes@^5.3.0, pretty-bytes@^5.4.1:
   version "5.6.0"

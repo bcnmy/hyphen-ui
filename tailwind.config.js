@@ -19,6 +19,7 @@ module.exports = {
         },
         "hyphen-gray": {
           100: "#c1c1c1",
+          200: "#545757",
         },
       },
     },

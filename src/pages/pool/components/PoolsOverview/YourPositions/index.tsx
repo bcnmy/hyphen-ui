@@ -1,3 +1,5 @@
+import AssetOverview from "../../AssetOverview";
+
 function YourPositions() {
   return (
     <article className="bg-white rounded-[40px] p-2.5">
@@ -17,6 +19,13 @@ function YourPositions() {
           + Add Liquidity
         </button>
       </header>
+
+      <section className="grid grid-cols-2 gap-[10px]">
+        <AssetOverview />
+        <AssetOverview />
+        <AssetOverview />
+        <AssetOverview />
+      </section>
     </article>
   );
 }

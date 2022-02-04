@@ -11,7 +11,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
   const userAddress = accounts?.[0];
 
   return (
-    <header className="relative flex items-center justify-center w-full px-6 text-white border-b border-black shadow-sm bg-hyphen-purple bg-opacity-10 backdrop-blur-sm border-opacity-20">
+    <header className="relative flex items-center justify-center w-full text-white border-b border-black shadow-sm bg-hyphen-purple bg-opacity-10 backdrop-blur-sm border-opacity-20">
       <Link to="/bridge" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}

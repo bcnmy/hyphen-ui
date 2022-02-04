@@ -51,8 +51,12 @@ const HyphenProvider: React.FC = (props) => {
       hyphen = new Hyphen(fromChainRpcUrlProvider, {
         debug: true,
         infiniteApproval: true,
-        environment:
-          process.env.REACT_APP_ENV === ENV.production ? "prod" : "test",
+        environment: {
+          [ENV.production]: "prod",
+          [ENV.test]: "test",
+          [ENV.staging]: "staging",
+          local: "",
+        }[process.env.REACT_APP_ENV],
         biconomy: {
           enable: isBiconomyEnabled,
           apiKey: fromChain?.biconomy.apiKey,
@@ -64,8 +68,12 @@ const HyphenProvider: React.FC = (props) => {
       hyphen = new Hyphen(rawEthereumProvider, {
         debug: true,
         infiniteApproval: true,
-        environment:
-          process.env.REACT_APP_ENV === ENV.production ? "prod" : "test",
+        environment: {
+          [ENV.production]: "prod",
+          [ENV.test]: "test",
+          [ENV.staging]: "staging",
+          local: "",
+        }[process.env.REACT_APP_ENV],
         signatureType: SIGNATURE_TYPES.EIP712,
       });
     }

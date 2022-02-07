@@ -76,14 +76,3 @@ code {
 * {
   box-sizing: border-box;
 }
-
-.custom-tooltip {
-  max-width: 160px !important;
-  width: auto !important;
-  font-size: 10px !important;
-  line-height: 16px !important;
-  padding: 4px 8px !important;
-  border: none !important;
-  border-radius: 4px !important;
-  background-color: #615ccd75 !important;
-}

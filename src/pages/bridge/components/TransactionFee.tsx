@@ -8,7 +8,7 @@ import { useToken } from 'context/Token';
 import { useTransaction } from 'context/Transaction';
 import { Status } from 'hooks/useLoading';
 import isToChainEthereum from 'utils/isToChainEthereum';
-import CustomTooltip from './CustomTooltip';
+import CustomTooltip from '../../../components/CustomTooltip';
 
 interface ITransactionFeeProps {}
 

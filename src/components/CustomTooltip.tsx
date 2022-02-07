@@ -9,10 +9,10 @@ const CustomTooltip: React.FC<ICustomTooltipProps> = ({ id, children }) => {
   return (
     <ReactTooltip
       id={id}
-      className="custom-tooltip"
+      className="!w-auto !max-w-[160px] !rounded-md !bg-hyphen-purple !px-2 !py-1 !font-sans !text-[10px]"
       effect="solid"
       place="bottom"
-      arrowColor="#615CCD75"
+      arrowColor="#615ccd"
     >
       {children}
     </ReactTooltip>

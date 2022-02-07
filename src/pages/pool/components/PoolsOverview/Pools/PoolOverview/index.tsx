@@ -1,7 +1,7 @@
 import ProgressBar from 'components/ProgressBar';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
-import CustomTooltip from 'pages/bridge/components/CustomTooltip';
+import CustomTooltip from 'components/CustomTooltip';
 import { HiInformationCircle } from 'react-icons/hi';
 
 interface IPoolOverview {
@@ -31,7 +31,6 @@ function PoolOverview({
     [chainId]: { chainColor },
   } = token;
   const chain = chains.find((chain) => chain.chainId === chainId)!;
-  console.log(chain);
   const { name: chainName } = chain;
 
   return (
@@ -50,18 +49,18 @@ function PoolOverview({
       </div>
 
       <div className="flex flex-col">
-        <span className="flex items-center font-mono text-2xl">
-          {apy}%
+        <div className="flex items-center">
+          <span className="font-mono text-2xl">{apy}%</span>
           <HiInformationCircle
+            className="ml-1 h-4 w-4 text-gray-500"
             data-tip
             data-for="apy"
-            className="ml-1 h-4 w-4 text-gray-500"
           />
           <CustomTooltip id="apy">
-            <p className="block">Reward APY: ${rewardApy}</p>
-            <p>Fee APY: ${feeApy}</p>
+            <p>Reward APY: {rewardApy}%</p>
+            <p>Fee APY: {feeApy}</p>
           </CustomTooltip>
-        </span>
+        </div>
         <span className="text-[10px] font-bold uppercase text-hyphen-gray-100">
           Annualized
         </span>

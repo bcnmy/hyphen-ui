@@ -8,7 +8,7 @@ import { Status } from 'hooks/useLoading';
 import React, { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { twMerge } from 'tailwind-merge';
-import CustomTooltip from './CustomTooltip';
+import CustomTooltip from '../../../components/CustomTooltip';
 
 interface ITokenSelectorProps {
   disabled?: boolean;

@@ -22,7 +22,7 @@ import {
   ITransferRecord,
   useTransactionInfoModal,
 } from 'context/TransactionInfoModal';
-import CustomTooltip from '../CustomTooltip';
+import CustomTooltip from '../../../../components/CustomTooltip';
 // import { MANUAL_EXIT_RETRIES } from "../../../../config/constants";
 
 export interface ITransferModalProps {

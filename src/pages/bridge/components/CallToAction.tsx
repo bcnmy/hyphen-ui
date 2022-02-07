@@ -9,7 +9,7 @@ import { useWalletProvider } from 'context/WalletProvider';
 import { Status } from 'hooks/useLoading';
 import * as React from 'react';
 import switchNetwork from 'utils/switchNetwork';
-import CustomTooltip from './CustomTooltip';
+import CustomTooltip from '../../../components/CustomTooltip';
 
 export interface ICallToActionProps {
   onApproveButtonClick: () => void;

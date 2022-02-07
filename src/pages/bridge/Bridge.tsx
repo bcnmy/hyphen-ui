@@ -19,7 +19,7 @@ import ErrorModal from './components/ErrorModal';
 import TransferModal from './components/TransferModal';
 import { useTransaction } from 'context/Transaction';
 import { useBiconomy } from 'context/Biconomy';
-import CustomTooltip from './components/CustomTooltip';
+import CustomTooltip from '../../components/CustomTooltip';
 import { HiInformationCircle } from 'react-icons/hi';
 
 interface BridgeProps {}

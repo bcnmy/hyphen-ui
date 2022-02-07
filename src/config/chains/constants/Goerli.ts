@@ -7,6 +7,7 @@ export const GOERLI: ChainConfig = {
   image: ethIcon,
   subText: "Ethereum testnet",
   chainId: 5,
+  chainColor: "#C4C4C41A",
   rpcUrl: "https://goerli.infura.io/v3/d126f392798444609246423b06116c77",
   currency: "GETH",
   // currency: "Goerli ETH",

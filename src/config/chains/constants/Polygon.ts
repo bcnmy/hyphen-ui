@@ -7,6 +7,7 @@ export const POLYGON: ChainConfig = {
   image: maticIcon,
   subText: "Polygon Mainnet",
   chainId: 137,
+  chainColor: "#8247E51A",
   rpcUrl: "https://polygon-rpc.com/",
   currency: "MATIC",
   nativeToken: NATIVE_ADDRESS,

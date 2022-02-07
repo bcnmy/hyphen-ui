@@ -1,5 +1,5 @@
-import YourPositions from "./YourPositions";
-import Pools from "./Pools";
+import Pools from './Pools';
+import YourPositions from './YourPositions';
 
 function PoolsOverview() {
   return (

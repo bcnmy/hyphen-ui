@@ -7,6 +7,7 @@ export const AVALANCHE: ChainConfig = {
   image: avaxIcon,
   subText: "Avalanche mainnet",
   chainId: 43114,
+  chainColor: "#E841421A",
   rpcUrl: "https://api.avax.network/ext/bc/C/rpc",
   currency: "AVAX",
   nativeToken: NATIVE_ADDRESS,

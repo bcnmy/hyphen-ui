@@ -13,23 +13,27 @@ export const BICO: TokenConfig = {
     transferOverhead: 121335,
     decimal: 18,
     symbol: "BICO",
+    chainColor: MUMBAI.chainColor
   },
   [GOERLI.chainId]: {
     address: "0xDdc47b0cA071682e8dc373391aCA18dA0Fe28699",
     transferOverhead: 121335,
     decimal: 18,
     symbol: "BICO",
+    chainColor: GOERLI.chainColor
   },
   [POLYGON.chainId]: {
     address: "0x91c89A94567980f0e9723b487b0beD586eE96aa7",
     transferOverhead: 121335,
     decimal: 18,
     symbol: "BICO",
+    chainColor: POLYGON.chainColor
   },
   [ETHEREUM.chainId]: {
     address: "0xf17e65822b568b3903685a7c9f496cf7656cc6c2",
     transferOverhead: 121335,
     decimal: 18,
     symbol: "BICO",
+    chainColor: ETHEREUM.chainColor
   },
 };

@@ -14,6 +14,7 @@ export type ChainConfig = {
   image?: string;
   subText: string;
   chainId: number;
+  chainColor: string;
   rpcUrl: string;
   currency: string;
   nativeDecimal: number;

@@ -1,15 +1,15 @@
-import PrimaryButtonLight from "components/Buttons/PrimaryButtonLight";
-import SecondaryButtonLight from "components/Buttons/SecondaryButtonLight";
-import Spinner from "components/Buttons/Spinner";
-import { useBiconomy } from "context/Biconomy";
-import { useChains } from "context/Chains";
-import { useTokenApproval } from "context/TokenApproval";
-import { useTransaction } from "context/Transaction";
-import { useWalletProvider } from "context/WalletProvider";
-import { Status } from "hooks/useLoading";
-import * as React from "react";
-import switchNetwork from "utils/switchNetwork";
-import CustomTooltip from "./CustomTooltip";
+import PrimaryButtonLight from 'components/Buttons/PrimaryButtonLight';
+import SecondaryButtonLight from 'components/Buttons/SecondaryButtonLight';
+import Spinner from 'components/Buttons/Spinner';
+import { useBiconomy } from 'context/Biconomy';
+import { useChains } from 'context/Chains';
+import { useTokenApproval } from 'context/TokenApproval';
+import { useTransaction } from 'context/Transaction';
+import { useWalletProvider } from 'context/WalletProvider';
+import { Status } from 'hooks/useLoading';
+import * as React from 'react';
+import switchNetwork from 'utils/switchNetwork';
+import CustomTooltip from './CustomTooltip';
 
 export interface ICallToActionProps {
   onApproveButtonClick: () => void;
@@ -41,7 +41,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isLoggedIn) {
     return (
-      <div className="flex justify-center gap-8 mt-4">
+      <div className="mt-4 flex justify-center gap-8">
         <PrimaryButtonLight onClick={() => connect()}>
           Connect Wallet
         </PrimaryButtonLight>
@@ -51,11 +51,11 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isBiconomyEnabled && fromChain?.chainId !== currentChainId) {
     return (
-      <div className="flex justify-center gap-8 mt-4">
+      <div className="mt-4 flex justify-center gap-8">
         <PrimaryButtonLight
           onClick={() => {
             if (!walletProvider || !fromChain)
-              throw new Error("Prerequisites missing");
+              throw new Error('Prerequisites missing');
             switchNetwork(walletProvider, fromChain);
           }}
         >
@@ -67,22 +67,24 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isReceiverValid) {
     return (
-      <div className="flex justify-center gap-8 mt-4">
+      <div className="mt-4 flex justify-center gap-8">
         <span data-tip data-for="invalidReceiverAddress">
           <PrimaryButtonLight disabled>
             Invalid receiver address
           </PrimaryButtonLight>
         </span>
-        <CustomTooltip
-          id="invalidReceiverAddress"
-          text="This receiver address is not valid, please check the address and try again."
-        />
+        <CustomTooltip id="invalidReceiverAddress">
+          <span>
+            This receiver address is not valid, please check the address and try
+            again.
+          </span>
+        </CustomTooltip>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center gap-8 mt-4">
+    <div className="mt-4 flex justify-center gap-8">
       {fetchSelectedTokenApprovalStatus === Status.IDLE ||
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (
@@ -90,15 +92,14 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
           <span data-tip data-for="whyTransferDisabled">
             <PrimaryButtonLight disabled>Transfer</PrimaryButtonLight>
           </span>
-          <CustomTooltip
-            id="whyTransferDisabled"
-            text={
-              fetchSelectedTokenApprovalError &&
-              transactionAmountValidationErrors.length === 0
-                ? "Error trying to fetch token approval"
-                : "Enter a valid transfer amount"
-            }
-          />
+          <CustomTooltip id="whyTransferDisabled">
+            {fetchSelectedTokenApprovalError &&
+            transactionAmountValidationErrors.length === 0 ? (
+              <span>Error trying to fetch token approval</span>
+            ) : (
+              <span>Enter a valid transfer amount</span>
+            )}
+          </CustomTooltip>
         </>
       ) : (
         <>
@@ -112,7 +113,9 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
                   </span>
                 </PrimaryButtonLight>
               </span>
-              <CustomTooltip id="whyTransferDisabled" text="Approval loading" />
+              <CustomTooltip id="whyTransferDisabled">
+                <span>Approval loading</span>
+              </CustomTooltip>
             </>
           )}
           {fetchSelectedTokenApprovalStatus === Status.SUCCESS &&
@@ -133,10 +136,9 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
                 <span data-tip data-for="whyTransferDisabled">
                   <PrimaryButtonLight disabled>Transfer</PrimaryButtonLight>
                 </span>
-                <CustomTooltip
-                  id="whyTransferDisabled"
-                  text="Approve token to enable token transfers"
-                />
+                <CustomTooltip id="whyTransferDisabled">
+                  <span>Approve token to enable token transfers</span>
+                </CustomTooltip>
               </>
             )}
 

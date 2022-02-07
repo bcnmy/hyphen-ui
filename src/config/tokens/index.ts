@@ -13,6 +13,7 @@ export type TokenConfig = {
     decimal: number;
     symbol: string;
     fixedDecimalPoint?: number;
+    chainColor: string;
   };
 };
 

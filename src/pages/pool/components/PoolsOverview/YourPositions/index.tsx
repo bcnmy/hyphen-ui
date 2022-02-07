@@ -2,7 +2,7 @@ import AssetOverview from '../../AssetOverview';
 
 function YourPositions() {
   return (
-    <article className="rounded-[40px] bg-white p-2.5">
+    <article className="mb-2.5 rounded-[40px] bg-white p-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
         <div className="absolute left-10">
           <button className="mr-7 text-xs text-hyphen-purple">
@@ -23,31 +23,35 @@ function YourPositions() {
       <section className="grid grid-cols-2 gap-[10px]">
         <AssetOverview
           apy={81.19}
-          assetSymbol="ETH"
-          assetValue={459.64}
+          tokenSymbol="ETH"
+          tokenSupplied={59.64}
+          chainId={1}
           poolShare={0.02}
-          unclaimedFees={64}
+          unclaimedFees={651}
         />
         <AssetOverview
-          apy={81.19}
-          assetSymbol="ETH"
-          assetValue={459.64}
-          poolShare={0.02}
-          unclaimedFees={64}
+          apy={91.91}
+          tokenSymbol="USDC"
+          tokenSupplied={459.64}
+          chainId={43114}
+          poolShare={0.03}
+          unclaimedFees={154}
         />
         <AssetOverview
-          apy={81.19}
-          assetSymbol="ETH"
-          assetValue={459.64}
+          apy={80.5}
+          tokenSymbol="USDT"
+          tokenSupplied={1059.64}
+          chainId={1}
           poolShare={0.02}
-          unclaimedFees={64}
+          unclaimedFees={157}
         />
         <AssetOverview
-          apy={81.19}
-          assetSymbol="ETH"
-          assetValue={459.64}
-          poolShare={0.02}
-          unclaimedFees={64}
+          apy={71.55}
+          tokenSymbol="BICO"
+          tokenSupplied={9999.64}
+          chainId={137}
+          poolShare={0.025}
+          unclaimedFees={1547}
         />
       </section>
     </article>

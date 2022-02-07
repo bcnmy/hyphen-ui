@@ -7,6 +7,7 @@ export const MUMBAI: ChainConfig = {
   image: maticIcon,
   subText: "Polygon testnet",
   chainId: 80001,
+  chainColor: "#8247E51A",
   rpcUrl: "https://rpc-mumbai.maticvigil.com",
   currency: "MATIC",
   // currency: "Test MATIC",

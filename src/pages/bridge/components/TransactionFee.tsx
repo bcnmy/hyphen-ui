@@ -1,14 +1,14 @@
-import React from "react";
-import Skeleton from "react-loading-skeleton";
-import { HiExclamation, HiInformationCircle } from "react-icons/hi";
-import { Transition } from "react-transition-group";
-import { twMerge } from "tailwind-merge";
-import { useChains } from "context/Chains";
-import { useToken } from "context/Token";
-import { useTransaction } from "context/Transaction";
-import { Status } from "hooks/useLoading";
-import isToChainEthereum from "utils/isToChainEthereum";
-import CustomTooltip from "./CustomTooltip";
+import React from 'react';
+import Skeleton from 'react-loading-skeleton';
+import { HiExclamation, HiInformationCircle } from 'react-icons/hi';
+import { Transition } from 'react-transition-group';
+import { twMerge } from 'tailwind-merge';
+import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
+import { useTransaction } from 'context/Transaction';
+import { Status } from 'hooks/useLoading';
+import isToChainEthereum from 'utils/isToChainEthereum';
+import CustomTooltip from './CustomTooltip';
 
 interface ITransactionFeeProps {}
 
@@ -36,15 +36,15 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
       {(state) => (
         <div
           className={twMerge(
-            "transition-transform transform-gpu",
-            (state === "exiting" || state === "exited") && "-translate-y-full"
+            'transform-gpu transition-transform',
+            (state === 'exiting' || state === 'exited') && '-translate-y-full',
           )}
         >
-          <div className="mx-10 bg-white border-b rounded-b-lg bg-opacity-10 border-white/10 border-x">
-            <div className="flex flex-col p-4 text-sm text-white/75 gap-y-2">
+          <div className="mx-10 rounded-b-lg border-x border-b border-white/10 bg-white bg-opacity-10">
+            <div className="flex flex-col gap-y-2 p-4 text-sm text-white/75">
               {showEthereumDisclaimer ? (
-                <article className="flex items-start p-2 mb-2 text-sm text-red-600 bg-red-100 rounded-xl">
-                  <HiExclamation className="w-auto h-6 mr-2" />
+                <article className="mb-2 flex items-start rounded-xl bg-red-100 p-2 text-sm text-red-600">
+                  <HiExclamation className="mr-2 h-6 w-auto" />
                   <p>
                     The received amount may differ due to gas price fluctuations
                     on Ethereum.
@@ -59,14 +59,16 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                     className="mr-2"
                   />
                   {transactionFee ? (
-                    <CustomTooltip
-                      id="lpFee"
-                      text={`${transactionFee.lpFeeProcessedString}% fee to be given to liquidity providers`}
-                    />
+                    <CustomTooltip id="lpFee">
+                      <span>
+                        {transactionFee.lpFeeProcessedString}% fee to be given
+                        to liquidity providers
+                      </span>
+                    </CustomTooltip>
                   ) : null}
                   Liquidity Provider Fee
                 </div>
-                <div className="font-mono text-right">
+                <div className="text-right font-mono">
                   {fetchTransactionFeeStatus === Status.SUCCESS &&
                   transactionFee ? (
                     <>{`${transactionFee.lpFeeProcessedString} ${selectedToken?.symbol}`}</>
@@ -87,14 +89,17 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                     className="mr-2"
                   />
                   {toChain ? (
-                    <CustomTooltip
-                      id="transactionFee"
-                      text={`Fee corresponding to the transaction done by Biconomy to transfer funds on ${toChain.name}. It varies as per the market gas price on ${toChain.name}.`}
-                    />
+                    <CustomTooltip id="transactionFee">
+                      <span>
+                        Fee corresponding to the transaction done by Biconomy to
+                        transfer funds on {toChain.name}. It varies as per the
+                        market gas price on {toChain.name}.
+                      </span>
+                    </CustomTooltip>
                   ) : null}
                   Transaction Fee
                 </div>
-                <div className="font-mono text-right">
+                <div className="text-right font-mono">
                   {fetchTransactionFeeStatus === Status.SUCCESS &&
                   transactionFee ? (
                     <>{`${transactionFee.transactionFeeProcessedString} ${selectedToken?.symbol}`}</>
@@ -115,14 +120,16 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                     className="mr-2"
                   />
                   {toChain ? (
-                    <CustomTooltip
-                      id="minimumFunds"
-                      text={`Minimum funds you will get on ${toChain.name}. Actual amount may vary slightly based on on-chain data.`}
-                    />
+                    <CustomTooltip id="minimumFunds">
+                      <span>
+                        Minimum funds you will get on {toChain.name}. Actual
+                        amount may vary slightly based on on-chain data.
+                      </span>
+                    </CustomTooltip>
                   ) : null}
                   You get minimum
                 </div>
-                <div className="font-mono text-right">
+                <div className="text-right font-mono">
                   {fetchTransactionFeeStatus === Status.SUCCESS &&
                   transactionFee ? (
                     <>{`${transactionFee.amountToGetProcessedString} ${selectedToken?.symbol}`}</>

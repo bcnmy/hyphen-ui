@@ -1,34 +1,43 @@
 import tokens from 'config/tokens';
 
 interface IAssetOverview {
-  apy?: number;
-  assetSymbol?: string;
-  assetValue?: number;
-  poolShare?: number;
-  unclaimedFees?: number;
+  apy: number;
+  tokenSymbol: string;
+  tokenSupplied: number;
+  chainId: number;
+  poolShare: number;
+  unclaimedFees: number;
 }
 
 function AssetOverview({
   apy,
-  assetSymbol,
-  assetValue,
+  tokenSymbol,
+  tokenSupplied,
+  chainId,
   poolShare,
   unclaimedFees,
 }: IAssetOverview) {
-  const { image: assetImage } = tokens.find(
-    (token) => token.symbol === assetSymbol,
-  )!;
+  if (!chainId) return null;
+
+  const token = tokens.find((token) => token.symbol === tokenSymbol)!;
+  const {
+    image: tokenImage,
+    [chainId]: { chainColor },
+  } = token;
 
   return (
-    <section className="flex h-[150px] items-center justify-between rounded-[30px] border px-10 py-6 text-hyphen-gray-200">
+    <section
+      className="flex h-[150px] items-center justify-between rounded-[30px] border px-10 py-6 text-hyphen-gray-200"
+      style={{ backgroundColor: chainColor }}
+    >
       <div className="flex flex-col">
         <span className="mb-2.5 text-[10px] font-bold uppercase">
           Asset supplied
         </span>
         <div className="mb-5 flex items-center">
-          <img src={assetImage} alt={assetSymbol} className="mr-2 h-5 w-5" />
+          <img src={tokenImage} alt={tokenSymbol} className="mr-2 h-5 w-5" />
           <span className="font-mono text-2xl ">
-            {assetValue} {assetSymbol}
+            {tokenSupplied} {tokenSymbol}
           </span>
         </div>
         <span className="font-mono text-xs">Pool Share: {poolShare}%</span>

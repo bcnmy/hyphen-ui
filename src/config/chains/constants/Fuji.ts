@@ -7,6 +7,7 @@ export const FUJI: ChainConfig = {
   image: avaxIcon,
   subText: "Avalanche testnet",
   chainId: 43113,
+  chainColor: "#E841421A",
   rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
   // currency: "Test AVAX",
   currency: "AVAX",

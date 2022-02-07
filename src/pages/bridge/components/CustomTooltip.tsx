@@ -1,20 +1,20 @@
-import ReactTooltip from "react-tooltip";
+import ReactTooltip from 'react-tooltip';
 
 interface ICustomTooltipProps {
   id: string;
-  text: string;
+  children?: React.ReactNode;
 }
 
-const CustomTooltip: React.FC<ICustomTooltipProps> = ({ id, text }) => {
+const CustomTooltip: React.FC<ICustomTooltipProps> = ({ id, children }) => {
   return (
     <ReactTooltip
       id={id}
       className="custom-tooltip"
       effect="solid"
       place="bottom"
-      arrowColor="#374151"
+      arrowColor="#615CCD75"
     >
-      <span>{text}</span>
+      {children}
     </ReactTooltip>
   );
 };

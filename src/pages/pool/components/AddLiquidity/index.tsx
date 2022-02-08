@@ -1,3 +1,6 @@
+import { HiArrowSmLeft } from 'react-icons/hi';
+import { useNavigate } from 'react-router-dom';
+
 interface IAddLiquidity {
   apy: number;
   currentLiquidity: number;
@@ -7,20 +10,21 @@ interface IAddLiquidity {
 }
 
 function AddLiquidity() {
+  const navigate = useNavigate();
+
   return (
-    <article className="rounded-[40px] bg-white p-[50px]">
+    <article className="my-24 rounded-[40px] bg-white p-[50px] pt-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
-        <button className="text-xs text-hyphen-gray-100">
-          Show Closed Positions
-        </button>
-
-        <h2 className="text-xl text-hyphen-purple">Add Liquidity</h2>
-
-        <div className="absolute right-0">
-          <button className="absolute right-10 h-9 w-28 rounded-xl bg-hyphen-purple text-xs text-white">
-            + Add Liquidity
+        <div className="absolute left-0">
+          <button
+            className="flex items-center rounded text-hyphen-gray-200 hover:bg-gray-100"
+            onClick={() => navigate(-1)}
+          >
+            <HiArrowSmLeft className="h-6 w-auto" />
           </button>
         </div>
+
+        <h2 className="text-xl text-hyphen-purple">Add Liquidity</h2>
       </header>
     </article>
   );

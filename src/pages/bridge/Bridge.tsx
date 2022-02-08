@@ -28,7 +28,6 @@ const Bridge: React.FC<BridgeProps> = () => {
   const { changeTransferAmountInputValue } = useTransaction()!;
   const { isBiconomyAllowed, setIsBiconomyToggledOn, isBiconomyEnabled } =
     useBiconomy()!;
-  const navigate = useNavigate();
   const { isLoggedIn, connect } = useWalletProvider()!;
   const {
     isVisible: isApprovalModalVisible,
@@ -48,7 +47,7 @@ const Bridge: React.FC<BridgeProps> = () => {
         console.error(e);
       });
     })();
-  }, [isLoggedIn, navigate, connect]);
+  }, [isLoggedIn, connect]);
 
   return (
     <>

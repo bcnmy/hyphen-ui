@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import AssetOverview from '../../AssetOverview';
 
 function YourPositions() {
@@ -15,9 +16,12 @@ function YourPositions() {
 
         <h2 className="text-xl text-hyphen-purple">Your Positions</h2>
 
-        <button className="absolute right-10 h-9 w-28 rounded-xl bg-hyphen-purple text-xs text-white">
+        <Link
+          to="add-liquidity"
+          className="absolute right-10 flex h-9 w-28 items-center justify-center rounded-xl bg-hyphen-purple text-xs text-white"
+        >
           + Add Liquidity
-        </button>
+        </Link>
       </header>
 
       <section className="grid grid-cols-2 gap-[10px]">

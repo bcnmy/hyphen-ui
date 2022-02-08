@@ -13,6 +13,8 @@ import AppProviders from './context';
 import Pool from 'pages/pool/Pool';
 import Bridge from 'pages/bridge/Bridge';
 import AddLiquidity from 'pages/pool/components/AddLiquidity';
+import PoolsOverview from 'pages/pool/components/PoolsOverview';
+import PoolOverview from 'pages/pool/components/PoolsOverview/Pools/PoolOverview';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -24,6 +26,7 @@ ReactDOM.render(
             <Route path="/" element={<Navigate replace to="/bridge" />} />
             <Route path="/bridge" element={<Bridge />} />
             <Route path="/pool" element={<Pool />}>
+              <Route path="" element={<PoolsOverview />} />
               <Route path="add-liquidity" element={<AddLiquidity />} />
             </Route>
           </Route>

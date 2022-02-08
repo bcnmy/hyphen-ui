@@ -1,11 +1,13 @@
-import React from "react";
-import Bridge from "./pages/bridge/Bridge";
-import Pool from "./pages/pool/Pool";
-
-import { Routes, Route, Navigate } from "react-router-dom";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Layout from '../src/components/Layout';
 
 const App: React.FC = () => {
-  return <Bridge />;
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
 };
 
 export default App;

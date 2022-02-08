@@ -7,7 +7,6 @@ import { useChains } from '../../context/Chains';
 import NetworkSelectors from './components/NetworkSelectors';
 import TokenSelector from './components/TokenSelector';
 import AmountInput from './components/AmountInput';
-import Layout from 'components/Layout';
 import TransactionFee from './components/TransactionFee';
 import ChangeReceiverAddress from './components/ChangeReceiverAddress';
 import CallToAction from './components/CallToAction';
@@ -52,7 +51,7 @@ const Bridge: React.FC<BridgeProps> = () => {
   }, [isLoggedIn, navigate, connect]);
 
   return (
-    <Layout>
+    <>
       <ApprovalModal
         isVisible={isApprovalModalVisible}
         onClose={hideApprovalModal}
@@ -124,7 +123,7 @@ const Bridge: React.FC<BridgeProps> = () => {
           <TransactionFee />
         </div>
       </div>
-    </Layout>
+    </>
   );
 };
 

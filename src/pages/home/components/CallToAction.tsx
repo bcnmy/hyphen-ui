@@ -50,7 +50,9 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     return (
       <div className="mt-4 flex justify-center gap-8">
         <span data-tip data-for="sameFromAndToChains">
-          <PrimaryButtonLight disabled>Transfer</PrimaryButtonLight>
+          <PrimaryButtonLight disabled>
+            Invalid Source & Destination
+          </PrimaryButtonLight>
         </span>
         <CustomTooltip
           id="sameFromAndToChains"

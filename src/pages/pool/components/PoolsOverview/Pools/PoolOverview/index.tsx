@@ -35,14 +35,14 @@ function PoolOverview({
 
   return (
     <section
-      className="relative flex h-[150px] w-full cursor-pointer items-center justify-center text-hyphen-gray-200"
+      className="relative flex h-[150px] w-full cursor-pointer items-center justify-center text-hyphen-gray-300"
       style={{ backgroundColor: chainColor }}
     >
       <div className="absolute left-[50px] flex items-center">
         <img src={tokenImage} alt={tokenSymbol} className="mr-2 h-8 w-8" />
         <div className="flex flex-col">
           <span className="font-mono text-2xl">{tokenSymbol}</span>
-          <span className="text-[10px] font-bold uppercase text-hyphen-gray-100">
+          <span className="text-[10px] font-bold uppercase text-hyphen-gray-300">
             {chainName}
           </span>
         </div>
@@ -61,14 +61,14 @@ function PoolOverview({
             <p>Fee APY: {feeApy}</p>
           </CustomTooltip>
         </div>
-        <span className="text-[10px] font-bold uppercase text-hyphen-gray-100">
+        <span className="text-[10px] font-bold uppercase text-hyphen-gray-300">
           Annualized
         </span>
       </div>
 
       <div className="absolute right-[50px] flex h-[47px] w-[250px] flex-col justify-end">
         <ProgressBar currentProgress={25} />
-        <div className="mt-1 flex justify-between text-[10px] font-bold uppercase text-hyphen-gray-100">
+        <div className="mt-1 flex justify-between text-[10px] font-bold uppercase text-hyphen-gray-300">
           <span>Pool cap</span>
           <span>
             {currentLiquidity} {tokenSymbol} / {totalLiquidity} {tokenSymbol}

@@ -9,7 +9,7 @@ function YourPositions() {
           <button className="mr-7 text-xs text-hyphen-purple">
             Active Position (2)
           </button>
-          <button className="text-xs text-hyphen-gray-100">
+          <button className="text-xs text-hyphen-gray-300">
             Show Closed Positions
           </button>
         </div>

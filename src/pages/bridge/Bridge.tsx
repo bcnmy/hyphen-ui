@@ -105,9 +105,8 @@ const Bridge: React.FC<BridgeProps> = () => {
               <div className="grid grid-cols-[1fr_34px_1fr] gap-2 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 hover:border-opacity-30">
                 <NetworkSelectors />
               </div>
-              <div className="grid grid-cols-[1fr_34px_1fr] items-center gap-2 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 hover:border-opacity-30">
+              <div className="grid grid-cols-2 items-center gap-12 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 hover:border-opacity-30">
                 <AmountInput disabled={!areChainsReady} />
-                <div></div>
                 <TokenSelector disabled={!areChainsReady} />
               </div>
 

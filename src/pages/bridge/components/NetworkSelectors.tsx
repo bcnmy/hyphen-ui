@@ -1,8 +1,8 @@
-import Select from "components/Select";
-import { ChainConfig } from "config/chains";
-import { useChains } from "context/Chains";
-import React, { useMemo } from "react";
-import { HiArrowRight } from "react-icons/hi";
+import Select from 'components/Select';
+import { ChainConfig } from 'config/chains';
+import { useChains } from 'context/Chains';
+import React, { useMemo } from 'react';
+import { HiArrowRight } from 'react-icons/hi';
 
 interface INetworkSelectorsProps {}
 
@@ -24,7 +24,7 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
         name: chain.name,
         image: chain.image,
       })),
-    [chainsList]
+    [chainsList],
   );
 
   const toChainOptions = useMemo(() => {
@@ -57,16 +57,16 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
             chainsList &&
               changeFromChain(
                 chainsList.find(
-                  (chain) => chain.chainId === opt.id
-                ) as ChainConfig
+                  (chain) => chain.chainId === opt.id,
+                ) as ChainConfig,
               );
           }}
-          label={"source"}
+          label={'source'}
         />
       </div>
-      <div className="flex items-end mb-1.5">
+      <div className="mb-3 flex items-end">
         <button
-          className="p-2 transition-all border rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 text-hyphen-purple"
+          className="rounded-full border border-hyphen-purple/10 bg-hyphen-purple bg-opacity-20 p-2 text-hyphen-purple transition-all"
           onClick={switchChains}
         >
           <HiArrowRight />
@@ -80,11 +80,11 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
             chainsList &&
               changeToChain(
                 chainsList.find(
-                  (chain) => chain.chainId === opt.id
-                ) as ChainConfig
+                  (chain) => chain.chainId === opt.id,
+                ) as ChainConfig,
               );
           }}
-          label={"destination"}
+          label={'destination'}
         />
       </div>
     </>

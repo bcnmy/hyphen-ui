@@ -105,7 +105,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           </span>
         </span>
         <button
-          className="rounded-full border border-hyphen-purple border-opacity-20 px-2 text-hyphen-purple shadow-sm shadow-hyphen-purple/20 transition-colors hover:bg-hyphen-purple/10"
+          className="flex h-4 items-center rounded-full border border-hyphen-purple border-opacity-20 px-2 text-[10px] text-hyphen-purple transition-colors hover:bg-hyphen-purple/10"
           onClick={() => {
             selectedTokenBalance &&
               poolInfo &&

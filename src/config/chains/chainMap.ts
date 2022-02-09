@@ -14,17 +14,11 @@ const chainPairs = [
   [GOERLI, MUMBAI],
 ];
 
-// TODO: REVERT BEFORE DEPLOY!
 export const chainMap = chainPairs.reduce((acc, pair) => {
-  acc[pair[0].chainId] = [...(acc[pair[0].chainId] || []), pair[0].chainId, pair[1].chainId];
-  acc[pair[1].chainId] = [...(acc[pair[1].chainId] || []), pair[1].chainId, pair[0].chainId];
+  acc[pair[0].chainId] = [...(acc[pair[0].chainId] || []), pair[1].chainId];
+  acc[pair[1].chainId] = [...(acc[pair[1].chainId] || []), pair[0].chainId];
   return acc;
-}, {} as ChainMap)
-
-// {
-//   1: [143, 2002],
-//   2: [...]
-// }
+}, {} as ChainMap);
 
 export type ChainMap = { [fromChainId: number]: number[] };
 

@@ -360,8 +360,12 @@ const TransactionProvider: React.FC = (props) => {
     if (!transferAmount || errors.length > 0) {
       throw new Error("Invalid transfer amount");
     }
-    if (!fromChain || !toChain || !selectedToken)
+    if (!fromChain || !toChain || !selectedToken) {
       throw new Error("Prerequisites missing");
+    }
+    if (fromChain.chainId === toChain.chainId) {
+      throw new Error("Transfers between same chains are not allowed");
+    }
 
     if (!accounts || !accounts[0]) throw new Error("Wallet not connected");
     if (!hyphen) throw new Error("Hyphen not initialized");
@@ -440,6 +444,9 @@ const TransactionProvider: React.FC = (props) => {
         throw new Error("Pre deposit check not completed");
       if (!fromChain || !toChain || !accounts?.[0] || !selectedToken)
         throw new Error("Prerequisites missing from chain");
+      if (fromChain.chainId === toChain.chainId) {
+        throw new Error("Transfers between same chains are not allowed");
+      }
 
       let tokenDecimals;
 

@@ -20,5 +20,10 @@ export const chainMap = chainPairs.reduce((acc, pair) => {
   return acc;
 }, {} as ChainMap);
 
+// { 
+//   1: [143, 2002],
+//   2: [...]
+// }
+
 export type ChainMap = { [fromChainId: number]: number[] };
 

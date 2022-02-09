@@ -21,24 +21,27 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   onTransferButtonClick,
 }) => {
   const {
+    executeApproveToken,
+    executeApproveTokenError,
     executeApproveTokenStatus,
+    fetchSelectedTokenApproval,
     fetchSelectedTokenApprovalError,
     fetchSelectedTokenApprovalStatus,
     fetchSelectedTokenApprovalValue,
   } = useTokenApproval()!;
 
-  const { fromChain, toChain } = useChains()!;
+  const { fromChain } = useChains()!;
   const { walletProvider, currentChainId, connect, isLoggedIn } =
     useWalletProvider()!;
   const {
-    receiver: { isReceiverValid },
+    receiver: { receiverAddress, isReceiverValid },
     transactionAmountValidationErrors,
   } = useTransaction()!;
   const { isBiconomyEnabled } = useBiconomy()!;
 
   if (!isLoggedIn) {
     return (
-      <div className="mt-4 flex justify-center gap-8">
+      <div className="flex justify-center gap-8 mt-4">
         <PrimaryButtonLight onClick={() => connect()}>
           Connect Wallet
         </PrimaryButtonLight>
@@ -46,25 +49,9 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     );
   }
 
-  if (fromChain?.chainId === toChain?.chainId) {
-    return (
-      <div className="mt-4 flex justify-center gap-8">
-        <span data-tip data-for="sameFromAndToChains">
-          <PrimaryButtonLight disabled>
-            Invalid Source & Destination
-          </PrimaryButtonLight>
-        </span>
-        <CustomTooltip
-          id="sameFromAndToChains"
-          text="Same chain transfers are not supported."
-        />
-      </div>
-    );
-  }
-
   if (!isBiconomyEnabled && fromChain?.chainId !== currentChainId) {
     return (
-      <div className="mt-4 flex justify-center gap-8">
+      <div className="flex justify-center gap-8 mt-4">
         <PrimaryButtonLight
           onClick={() => {
             if (!walletProvider || !fromChain)
@@ -80,7 +67,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isReceiverValid) {
     return (
-      <div className="mt-4 flex justify-center gap-8">
+      <div className="flex justify-center gap-8 mt-4">
         <span data-tip data-for="invalidReceiverAddress">
           <PrimaryButtonLight disabled>
             Invalid receiver address
@@ -95,7 +82,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   }
 
   return (
-    <div className="mt-4 flex justify-center gap-8">
+    <div className="flex justify-center gap-8 mt-4">
       {fetchSelectedTokenApprovalStatus === Status.IDLE ||
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (

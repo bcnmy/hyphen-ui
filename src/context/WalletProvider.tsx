@@ -105,10 +105,9 @@ const WalletProviderProvider: React.FC = (props) => {
       reinit(rawEthereumProvider);
     });
 
-    // Subscribe to chainId change
-    rawEthereumProvider.on("chainChanged", (chainId: number) => {
-      // console.log(chainId);
-      setCurrentChainId(chainId);
+    // Subscribe to network change
+    rawEthereumProvider.on("networkChanged", (networkId: number) => {
+      setCurrentChainId(networkId);
       reinit(rawEthereumProvider);
     });
 

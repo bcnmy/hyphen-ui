@@ -51,6 +51,7 @@ const ChainsProvider: React.FC = (props) => {
   // default from chain to current metamak chain on startup
   // else if default chain is not supported, then use the first supported chain
   useEffect(() => {
+    setToChain(undefined);
     if (!currentChainId) {
       setFromChain(chainsList[0]);
       return;

@@ -364,7 +364,7 @@ const TransactionProvider: React.FC = (props) => {
       throw new Error("Prerequisites missing");
     }
     if (fromChain.chainId === toChain.chainId) {
-      throw new Error("Transfers between same chains are not allowed");
+      throw new Error("Same chain transfers are not allowed, please refresh.");
     }
 
     if (!accounts || !accounts[0]) throw new Error("Wallet not connected");
@@ -445,7 +445,9 @@ const TransactionProvider: React.FC = (props) => {
       if (!fromChain || !toChain || !accounts?.[0] || !selectedToken)
         throw new Error("Prerequisites missing from chain");
       if (fromChain.chainId === toChain.chainId) {
-        throw new Error("Transfers between same chains are not allowed");
+        throw new Error(
+          "Same chain transfers are not allowed, please refresh."
+        );
       }
 
       let tokenDecimals;

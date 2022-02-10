@@ -46,22 +46,6 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     );
   }
 
-  if (fromChain?.chainId === toChain?.chainId) {
-    return (
-      <div className="mt-4 flex justify-center gap-8">
-        <span data-tip data-for="sameFromAndToChains">
-          <PrimaryButtonLight disabled>
-            Invalid Source & Destination
-          </PrimaryButtonLight>
-        </span>
-        <CustomTooltip
-          id="sameFromAndToChains"
-          text="Same chain transfers are not supported."
-        />
-      </div>
-    );
-  }
-
   if (!isBiconomyEnabled && fromChain?.chainId !== currentChainId) {
     return (
       <div className="mt-4 flex justify-center gap-8">

@@ -41,7 +41,7 @@ function AddLiquidity() {
       <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
         <div className="absolute left-0">
           <button
-            className="flex items-center rounded text-hyphen-gray-300"
+            className="flex items-center rounded text-hyphen-gray-400"
             onClick={() => navigate(-1)}
           >
             <HiArrowSmLeft className="h-5 w-auto" />
@@ -52,7 +52,7 @@ function AddLiquidity() {
 
         <div className="absolute right-0 flex">
           <button className="mr-4 text-xs text-hyphen-purple">Clear All</button>
-          <button className="flex items-center rounded text-hyphen-gray-300">
+          <button className="flex items-center rounded text-hyphen-gray-400">
             <HiAdjustments className="h-4 w-auto rotate-90" />
           </button>
         </div>
@@ -76,16 +76,47 @@ function AddLiquidity() {
           </div>
           <label
             htmlFor="liquidityAmount"
-            className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-300"
+            className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400"
           >
             Input
           </label>
           <input
             type="text"
-            className="mt-2 mb-6 h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-300 focus:outline-none"
+            className="mt-2 mb-6 h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
-          <Slider className="mb-9" />
-          <button className="mb-2.5 h-[60px] w-full rounded-[10px] bg-gray-100 font-semibold text-hyphen-gray-200">
+          <Slider
+            className="mb-9"
+            step={25}
+            dots
+            activeDotStyle={{
+              backgroundColor: '#615ccd',
+              borderColor: 'white',
+              bottom: '-3px',
+              height: '10px',
+              width: '10px',
+            }}
+            dotStyle={{
+              backgroundColor: '#c4c4c4',
+              borderColor: 'white',
+              bottom: '-3px',
+              height: '10px',
+              width: '10px',
+            }}
+            handleStyle={{
+              backgroundColor: '#615ccd',
+              borderColor: 'white',
+              height: '20px',
+              width: '20px',
+              marginTop: '-8px',
+            }}
+            railStyle={{
+              backgroundColor: '#c4c4c4',
+            }}
+            trackStyle={{
+              backgroundColor: '#615ccd',
+            }}
+          />
+          <button className="mb-2.5 h-[60px] w-full rounded-[10px] bg-gray-100 font-semibold text-hyphen-gray-300">
             ETH Approved
           </button>
           <button className="h-[60px] w-full rounded-[10px] bg-hyphen-purple font-semibold text-white">
@@ -95,18 +126,18 @@ function AddLiquidity() {
         <div className="pl-[50px]">
           <div className="mb-14 grid grid-cols-2 gap-2.5">
             <div className="flex flex-col">
-              <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-300">
+              <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400">
                 APY
               </span>
-              <div className="mt-2 flex h-[60px] items-center rounded-[10px] bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-300">
+              <div className="mt-2 flex h-[60px] items-center rounded-[10px] bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
                 81.19%
               </div>
             </div>
             <div className="flex flex-col">
-              <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-300">
+              <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400">
                 Your pool share
               </span>
-              <div className="mt-2 flex h-[60px] items-center rounded-[10px] bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-300">
+              <div className="mt-2 flex h-[60px] items-center rounded-[10px] bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
                 0.02%
               </div>
             </div>
@@ -114,7 +145,7 @@ function AddLiquidity() {
 
           <div className="mb-16">
             <ProgressBar currentProgress={25} />
-            <div className="mt-1 flex justify-between text-[10px] font-bold uppercase text-hyphen-gray-200">
+            <div className="mt-1 flex justify-between text-[10px] font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
               <span>19.8 ETH / 100 ETH</span>
             </div>

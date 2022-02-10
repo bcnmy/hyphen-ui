@@ -35,7 +35,7 @@ function PoolOverview({
 
   return (
     <section
-      className="relative flex h-[150px] w-full cursor-pointer items-center justify-center text-hyphen-gray-300"
+      className="relative flex h-[150px] w-full cursor-pointer items-center justify-center text-hyphen-gray-400"
       style={{ backgroundColor: chainColor }}
     >
       <div className="absolute left-[50px] flex items-center">

@@ -66,7 +66,7 @@ export const Select: React.FC<ISelectProps> = ({
   return (
     <div className="flex flex-col">
       <Listbox value={selected} onChange={setSelected} disabled={disabled}>
-        <Listbox.Label className="pl-5 text-[10px] font-semibold uppercase text-hyphen-gray-300">
+        <Listbox.Label className="pl-5 text-[10px] font-semibold uppercase text-hyphen-gray-400">
           {label}
         </Listbox.Label>
         <div className="relative mt-2 h-[60px]">

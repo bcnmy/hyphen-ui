@@ -26,7 +26,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
   return (
     <div className="flex flex-col justify-end text-hyphen-purple-dark">
       <div className="flex flex-col" data-tip data-for="transferAmount">
-        <label className="pl-5 text-[10px] font-semibold uppercase text-hyphen-gray-300">
+        <label className="pl-5 text-[10px] font-semibold uppercase text-hyphen-gray-400">
           Amount
         </label>
         <input
@@ -36,7 +36,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           value={transferAmountInputValue}
           onChange={(e) => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(
-            'mt-2 inline-block h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-300 focus:outline-none',
+            'mt-2 inline-block h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
             disabled && 'cursor-not-allowed bg-gray-200',
           )}
           disabled={disabled}

@@ -27,7 +27,7 @@ function AssetOverview({
 
   return (
     <section
-      className="flex h-[150px] items-center justify-between rounded-[30px] border px-10 py-6 text-hyphen-gray-300"
+      className="flex h-[150px] items-center justify-between rounded-[30px] border px-10 py-6 text-hyphen-gray-400"
       style={{ backgroundColor: chainColor }}
     >
       <div className="flex flex-col">

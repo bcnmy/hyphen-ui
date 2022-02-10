@@ -5,7 +5,7 @@ function LiquidityInfo() {
   return (
     <section className="grid grid-cols-2 gap-2.5">
       <div>
-        <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-300">
+        <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400">
           Top pools
         </span>
         <a
@@ -19,7 +19,7 @@ function LiquidityInfo() {
         </a>
       </div>
       <div>
-        <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-300">
+        <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400">
           Learn more
         </span>
         <a

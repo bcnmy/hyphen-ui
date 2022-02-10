@@ -76,3 +76,8 @@ code {
 * {
   box-sizing: border-box;
 }
+
+.rc-slider-handle:active {
+  border-color: white !important;
+  box-shadow: none !important;
+}

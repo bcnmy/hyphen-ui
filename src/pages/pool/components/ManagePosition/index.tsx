@@ -6,8 +6,12 @@ import StepSlider from '../StepSlider';
 import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import LiquidityInfo from '../LiquidityInfo';
 
-function ManageLiquidity() {
+function ManagePosition() {
   const navigate = useNavigate();
+
+  function handleIncreaseLiquidity() {
+    navigate('../increase-liquidity');
+  }
 
   return (
     <article className="my-24 rounded-[40px] bg-white p-[50px] pt-2.5">
@@ -21,7 +25,7 @@ function ManageLiquidity() {
           </button>
         </div>
 
-        <h2 className="text-xl text-hyphen-purple">Manage Liquidity</h2>
+        <h2 className="text-xl text-hyphen-purple">Manage Position</h2>
 
         <div className="absolute right-0 flex">
           <button className="mr-4 text-xs text-hyphen-purple">Clear All</button>
@@ -67,7 +71,10 @@ function ManageLiquidity() {
           <button className="mt-9 mb-2.5 h-[60px] w-full rounded-[10px] bg-hyphen-purple font-semibold text-white">
             Confirm Removal
           </button>
-          <button className="h-[60px] w-full rounded-[10px] border-2 border-hyphen-purple font-semibold text-hyphen-purple">
+          <button
+            className="h-[60px] w-full rounded-[10px] border-2 border-hyphen-purple font-semibold text-hyphen-purple"
+            onClick={handleIncreaseLiquidity}
+          >
             + Increase Liquidity
           </button>
         </div>
@@ -96,4 +103,4 @@ function ManageLiquidity() {
   );
 }
 
-export default ManageLiquidity;
+export default ManagePosition;

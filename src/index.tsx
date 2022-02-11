@@ -15,7 +15,8 @@ import Bridge from 'pages/bridge/Bridge';
 import AddLiquidity from 'pages/pool/components/AddLiquidity';
 import PoolsOverview from 'pages/pool/components/PoolsOverview';
 import PoolOverview from 'pages/pool/components/PoolsOverview/Pools/PoolOverview';
-import ManageLiquidity from 'pages/pool/components/ManageLiquidity';
+import ManagePosition from 'pages/pool/components/ManagePosition';
+import IncreaseLiquidity from 'pages/pool/components/IncreaseLiquidity';
 
 ReactDOM.render(
   <React.StrictMode>
@@ -29,7 +30,11 @@ ReactDOM.render(
             <Route path="/pool" element={<Pool />}>
               <Route path="" element={<PoolsOverview />} />
               <Route path="add-liquidity" element={<AddLiquidity />} />
-              <Route path="manage-liquidity" element={<ManageLiquidity />} />
+              <Route path="manage-position" element={<ManagePosition />} />
+              <Route
+                path="increase-liquidity"
+                element={<IncreaseLiquidity />}
+              />
             </Route>
           </Route>
         </Routes>

@@ -29,7 +29,7 @@ function AssetOverview({
 
   function handleAssetOverviewClick() {
     if (redirectToManageLiquidity) {
-      navigate('manage-liquidity');
+      navigate('manage-position');
     }
   }
 

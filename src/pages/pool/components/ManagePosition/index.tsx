@@ -56,12 +56,19 @@ function ManagePosition() {
 
           <label
             htmlFor="liquidityAmount"
-            className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400"
+            className="flex justify-between px-5 text-[10px] font-bold uppercase"
           >
-            Input
+            <span className="text-hyphen-gray-400">Input</span>
+            <span className="flex items-center text-hyphen-gray-300">
+              Balance: Ξ80
+              <button className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-[10px] text-white">
+                MAX
+              </button>
+            </span>
           </label>
           <input
             id="liquidityAmount"
+            placeholder="0.000"
             type="text"
             className="mt-2 mb-6 h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
@@ -87,6 +94,7 @@ function ManagePosition() {
           </label>
           <input
             id="unclaimedFees"
+            placeholder="0.000"
             type="text"
             className="mt-2 mb-10 h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />

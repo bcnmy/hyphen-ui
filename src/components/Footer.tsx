@@ -12,12 +12,11 @@ function Footer() {
       >
         <img src={poweredByBiconomy} alt="Powered by Biconomy" />
       </a>
-      <div className="flex text-[#808080]">
+      <div className="mb-0.5 flex text-[#808080]">
         <a
           href="https://discord.com/channels/692403655474937856/841926541235585035"
           target="_blank"
           rel="noreferrer"
-          className="ml-2"
         >
           Join our Discord
         </a>

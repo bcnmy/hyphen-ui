@@ -12,18 +12,17 @@ function Footer() {
       >
         <img src={poweredByBiconomy} alt="Powered by Biconomy" />
       </a>
-      <div className="absolute right-6 flex text-white">
-        <span className="font-medium">Support:</span>
+      <div className="flex text-[#808080]">
         <a
           href="https://discord.com/channels/692403655474937856/841926541235585035"
           target="_blank"
           rel="noreferrer"
           className="ml-2"
         >
-          Discord
+          Join our Discord
         </a>
         <p className="mx-2">|</p>
-        <a href="mailto:hyphen-support@biconomy.io">Email</a>
+        <a href="mailto:hyphen-support@biconomy.io">Email Us</a>
       </div>
     </footer>
   );

@@ -1,33 +1,42 @@
 import tokens from 'config/tokens';
+import { useNavigate } from 'react-router-dom';
 
 interface IAssetOverview {
   apy: number;
-  tokenSymbol: string;
-  tokenSupplied: number;
   chainId: number;
   poolShare: number;
+  redirectToManageLiquidity?: boolean | false;
+  tokenSupplied: number;
+  tokenSymbol: string;
   unclaimedFees: number;
 }
 
 function AssetOverview({
   apy,
-  tokenSymbol,
-  tokenSupplied,
   chainId,
   poolShare,
+  redirectToManageLiquidity,
+  tokenSupplied,
+  tokenSymbol,
   unclaimedFees,
 }: IAssetOverview) {
-  if (!chainId) return null;
-
+  const navigate = useNavigate();
   const token = tokens.find((token) => token.symbol === tokenSymbol)!;
   const {
     image: tokenImage,
     [chainId]: { chainColor },
   } = token;
 
+  function handleAssetOverviewClick() {
+    if (redirectToManageLiquidity) {
+      navigate('manage-liquidity');
+    }
+  }
+
   return (
     <section
       className="flex h-[150px] items-center justify-between rounded-[30px] border px-10 py-6 text-hyphen-gray-400"
+      onClick={handleAssetOverviewClick}
       style={{ backgroundColor: chainColor }}
     >
       <div className="flex flex-col">

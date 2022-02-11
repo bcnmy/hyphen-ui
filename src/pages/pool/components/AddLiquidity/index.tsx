@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Slider from 'rc-slider';
 import { HiAdjustments, HiArrowSmLeft } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
@@ -8,7 +7,7 @@ import Select, { Option } from 'components/Select';
 import { chains } from 'config/chains';
 import { tokens } from 'config/tokens';
 import LiquidityInfo from '../LiquidityInfo';
-import 'rc-slider/assets/index.css';
+import StepSlider from '../StepSlider';
 
 interface IAddLiquidity {
   apy: number;
@@ -58,8 +57,8 @@ function AddLiquidity() {
         </div>
       </header>
 
-      <section className="grid h-[400px] grid-cols-2">
-        <div className="border-r pr-[50px]">
+      <section className="grid grid-cols-2">
+        <div className="h-[25rem] max-h-[25rem] border-r pr-[50px]">
           <div className="mb-6 grid grid-cols-2 gap-2.5">
             <Select
               options={tokenOptions}
@@ -84,46 +83,15 @@ function AddLiquidity() {
             type="text"
             className="mt-2 mb-6 h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
-          <Slider
-            className="mb-9"
-            step={25}
-            dots
-            activeDotStyle={{
-              backgroundColor: '#615ccd',
-              borderColor: 'white',
-              bottom: '-3px',
-              height: '10px',
-              width: '10px',
-            }}
-            dotStyle={{
-              backgroundColor: '#c4c4c4',
-              borderColor: 'white',
-              bottom: '-3px',
-              height: '10px',
-              width: '10px',
-            }}
-            handleStyle={{
-              backgroundColor: '#615ccd',
-              borderColor: 'white',
-              height: '20px',
-              width: '20px',
-              marginTop: '-8px',
-            }}
-            railStyle={{
-              backgroundColor: '#c4c4c4',
-            }}
-            trackStyle={{
-              backgroundColor: '#615ccd',
-            }}
-          />
-          <button className="mb-2.5 h-[60px] w-full rounded-[10px] bg-gray-100 font-semibold text-hyphen-gray-300">
+          <StepSlider dots step={25} />
+          <button className="mt-9 mb-2.5 h-[60px] w-full rounded-[10px] bg-gray-100 font-semibold text-hyphen-gray-300">
             ETH Approved
           </button>
           <button className="h-[60px] w-full rounded-[10px] bg-hyphen-purple font-semibold text-white">
             Confirm Supply
           </button>
         </div>
-        <div className="pl-[50px]">
+        <div className="h-[25rem] max-h-[25rem] pl-[50px]">
           <div className="mb-14 grid grid-cols-2 gap-2.5">
             <div className="flex flex-col">
               <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400">

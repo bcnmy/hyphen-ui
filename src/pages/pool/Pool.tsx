@@ -7,7 +7,6 @@ function Pool() {
 
   useEffect(() => {
     (async () => {
-      console.log('Hello World!');
       await connect().catch((e) => {
         console.error(e);
       });

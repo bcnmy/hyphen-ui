@@ -23,8 +23,6 @@ function PoolOverview({
   tokenSymbol,
   totalLiquidity,
 }: IPoolOverview) {
-  if (!chainId) return null;
-
   const token = tokens.find((token) => token.symbol === tokenSymbol)!;
   const {
     image: tokenImage,

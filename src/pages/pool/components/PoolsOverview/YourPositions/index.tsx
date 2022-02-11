@@ -27,34 +27,38 @@ function YourPositions() {
       <section className="grid grid-cols-2 gap-[10px]">
         <AssetOverview
           apy={81.19}
-          tokenSymbol="ETH"
-          tokenSupplied={59.64}
           chainId={1}
           poolShare={0.02}
+          redirectToManageLiquidity
+          tokenSupplied={59.64}
+          tokenSymbol="ETH"
           unclaimedFees={651}
         />
         <AssetOverview
           apy={91.91}
-          tokenSymbol="USDC"
-          tokenSupplied={459.64}
           chainId={43114}
           poolShare={0.03}
+          redirectToManageLiquidity
+          tokenSupplied={459.64}
+          tokenSymbol="USDC"
           unclaimedFees={154}
         />
         <AssetOverview
           apy={80.5}
-          tokenSymbol="USDT"
-          tokenSupplied={1059.64}
           chainId={1}
           poolShare={0.02}
+          redirectToManageLiquidity
+          tokenSupplied={1059.64}
+          tokenSymbol="USDT"
           unclaimedFees={157}
         />
         <AssetOverview
           apy={71.55}
-          tokenSymbol="BICO"
-          tokenSupplied={9999.64}
           chainId={137}
           poolShare={0.025}
+          redirectToManageLiquidity
+          tokenSupplied={9999.64}
+          tokenSymbol="BICO"
           unclaimedFees={1547}
         />
       </section>

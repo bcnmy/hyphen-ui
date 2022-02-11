@@ -1,5 +1,4 @@
 import { useWalletProvider } from "context/WalletProvider";
-import { HiOutlineArrowSmRight } from "react-icons/hi";
 
 interface INavbarProps {
   showUserInfoModal: () => void;
@@ -18,15 +17,30 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
           alt="Hyphen Logo"
         />
       </a>
-      <nav className="flex gap-7 text-white">
+      <nav className="flex h-full gap-7 text-white">
         <a
           target="_blank"
           href="https://hyphen-info.biconomy.io/"
           rel="noreferrer"
-          className="relative flex items-center text-white"
+          className="group relative flex items-center text-sm font-medium uppercase text-white"
         >
           Stats
-          <HiOutlineArrowSmRight className="absolute top-[2px] right-[-12px] h-3 w-3 -rotate-45" />
+          <span
+            className="absolute -inset-1 top-[58px] hidden h-[5px] rounded-t-full bg-white group-hover:block"
+            aria-hidden="true"
+          ></span>
+        </a>
+        <a
+          target="_blank"
+          href="https://docs.biconomy.io/products/hyphen-instant-cross-chain-transfers"
+          rel="noreferrer"
+          className="group relative flex items-center text-sm font-medium uppercase text-white"
+        >
+          Docs
+          <span
+            className="absolute -inset-1 top-[58px] hidden h-[5px] rounded-t-full bg-white group-hover:block"
+            aria-hidden="true"
+          ></span>
         </a>
       </nav>
       <button

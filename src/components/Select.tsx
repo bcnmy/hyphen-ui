@@ -66,13 +66,13 @@ export const Select: React.FC<ISelectProps> = ({
   return (
     <div className="flex flex-col">
       <Listbox value={selected} onChange={setSelected} disabled={disabled}>
-        <Listbox.Label className="pl-5 text-[10px] font-semibold uppercase text-hyphen-gray-400">
+        <Listbox.Label className="pl-5 text-xxs font-semibold uppercase text-hyphen-gray-400">
           {label}
         </Listbox.Label>
-        <div className="relative mt-2 h-[60px]">
+        <div className="relative mt-2 h-15">
           <Listbox.Button
             className={twMerge(
-              'relative h-full w-full cursor-default rounded-[10px] border bg-white py-2 pl-4 pr-10 text-left focus:outline-none',
+              'rounded-2.5 relative h-full w-full cursor-default border bg-white py-2 pl-4 pr-10 text-left focus:outline-none',
               disabled && 'cursor-not-allowed bg-gray-200 text-gray-900/80',
             )}
           >

@@ -3,7 +3,7 @@ import AssetOverview from '../../AssetOverview';
 
 function YourPositions() {
   return (
-    <article className="mb-2.5 rounded-[40px] bg-white p-2.5">
+    <article className="rounded-10 mb-2.5 bg-white p-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
         <div className="absolute left-10">
           <button className="mr-7 text-xs text-hyphen-purple">
@@ -24,7 +24,7 @@ function YourPositions() {
         </Link>
       </header>
 
-      <section className="grid grid-cols-2 gap-[10px]">
+      <section className="grid grid-cols-2 gap-2.5">
         <AssetOverview
           apy={81.19}
           chainId={1}

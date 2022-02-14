@@ -14,7 +14,7 @@ function ManagePosition() {
   }
 
   return (
-    <article className="my-24 rounded-[40px] bg-white p-[50px] pt-2.5">
+    <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
       <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
         <div className="absolute left-0">
           <button
@@ -45,10 +45,10 @@ function ManagePosition() {
       />
 
       <section className="mt-8 grid grid-cols-2">
-        <div className="h-[25rem] max-h-[25rem] border-r pr-[50px] pt-9">
+        <div className="max-h-100 h-100 border-r pr-12.5 pt-9">
           <div className="mb-8">
             <ProgressBar currentProgress={25} />
-            <div className="mt-1 flex justify-between text-[10px] font-bold uppercase text-hyphen-gray-300">
+            <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
               <span>19.8 ETH / 100 ETH</span>
             </div>
@@ -56,12 +56,12 @@ function ManagePosition() {
 
           <label
             htmlFor="liquidityAmount"
-            className="flex justify-between px-5 text-[10px] font-bold uppercase"
+            className="flex justify-between px-5 text-xxs font-bold uppercase"
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
               Balance: Ξ80
-              <button className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-[10px] text-white">
+              <button className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white">
                 MAX
               </button>
             </span>
@@ -70,25 +70,25 @@ function ManagePosition() {
             id="liquidityAmount"
             placeholder="0.000"
             type="text"
-            className="mt-2 mb-6 h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            className="rounded-2.5 mt-2 mb-6 h-15 w-full border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
 
           <StepSlider dots step={25} />
 
-          <button className="mt-9 mb-2.5 h-[60px] w-full rounded-[10px] bg-hyphen-purple font-semibold text-white">
+          <button className="rounded-2.5 mt-9 mb-2.5 h-15 w-full bg-hyphen-purple font-semibold text-white">
             Confirm Removal
           </button>
           <button
-            className="h-[60px] w-full rounded-[10px] border-2 border-hyphen-purple font-semibold text-hyphen-purple"
+            className="rounded-2.5 h-15 w-full border-2 border-hyphen-purple font-semibold text-hyphen-purple"
             onClick={handleIncreaseLiquidity}
           >
             + Increase Liquidity
           </button>
         </div>
-        <div className="h-[25rem] max-h-[25rem] pl-[50px] pt-1">
+        <div className="max-h-100 h-100 pl-12.5 pt-1">
           <label
             htmlFor="unclaimedFees"
-            className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400"
+            className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400"
           >
             Unclaimed Fees
           </label>
@@ -96,10 +96,10 @@ function ManagePosition() {
             id="unclaimedFees"
             placeholder="0.000"
             type="text"
-            className="mt-2 mb-10 h-[60px] w-full rounded-[10px] border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            className="rounded-2.5 mt-2 mb-10 h-15 w-full border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
 
-          <button className="mb-11 flex h-[60px] w-full items-center justify-center rounded-[10px] bg-hyphen-purple font-semibold text-white">
+          <button className="rounded-2.5 mb-11 flex h-15 w-full items-center justify-center bg-hyphen-purple font-semibold text-white">
             <img src={collectFeesIcon} alt="Collect fees" className="mr-1" />
             Collect Fees
           </button>

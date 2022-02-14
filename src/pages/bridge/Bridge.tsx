@@ -66,7 +66,7 @@ const Bridge: React.FC<BridgeProps> = () => {
       <div className="my-24">
         <div className="mx-auto max-w-xl">
           <div className="relative z-10">
-            <div className="flex flex-col gap-2 rounded-[40px] bg-white p-6 shadow-lg">
+            <div className="rounded-10 flex flex-col gap-2 bg-white p-6 shadow-lg">
               <div className="mb-2 flex items-center justify-end">
                 <div className="flex items-center">
                   <HiInformationCircle

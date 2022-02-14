@@ -5,11 +5,11 @@ function LiquidityInfo() {
   return (
     <section className="grid grid-cols-2 gap-2.5">
       <div>
-        <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400">
+        <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
           Top pools
         </span>
         <a
-          className="mt-2 flex h-[130px] flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple"
+          className="mt-2 flex h-32.5 flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple"
           href="https://hyphen-info.biconomy.io/"
           target="_blank"
           rel="noreferrer"
@@ -19,11 +19,11 @@ function LiquidityInfo() {
         </a>
       </div>
       <div>
-        <span className="pl-5 text-[10px] font-bold uppercase text-hyphen-gray-400">
+        <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
           Learn more
         </span>
         <a
-          className="mt-2 flex h-[130px] flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple"
+          className="mt-2 flex h-32.5 flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple"
           href="https://hyphen-info.biconomy.io/"
           target="_blank"
           rel="noreferrer"

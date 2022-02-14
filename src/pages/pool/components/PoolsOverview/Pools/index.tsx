@@ -2,7 +2,7 @@ import PoolOverview from './PoolOverview';
 
 function Pools() {
   return (
-    <article className="rounded-[40px] bg-white pt-2.5">
+    <article className="rounded-10 bg-white pt-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
         <h2 className="text-xl text-hyphen-purple">Pools</h2>
       </header>

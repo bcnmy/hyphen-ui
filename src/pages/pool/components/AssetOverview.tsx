@@ -35,12 +35,12 @@ function AssetOverview({
 
   return (
     <section
-      className="flex h-[150px] items-center justify-between rounded-[30px] border px-10 py-6 text-hyphen-gray-400"
+      className="flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400"
       onClick={handleAssetOverviewClick}
       style={{ backgroundColor: chainColor }}
     >
       <div className="flex flex-col">
-        <span className="mb-2.5 text-[10px] font-bold uppercase">
+        <span className="mb-2.5 text-xxs font-bold uppercase">
           Asset supplied
         </span>
         <div className="mb-5 flex items-center">
@@ -52,7 +52,7 @@ function AssetOverview({
         <span className="font-mono text-xs">Pool Share: {poolShare}%</span>
       </div>
       <div className="flex flex-col items-end">
-        <span className="mb-2.5 text-[10px] font-bold uppercase ">APY</span>
+        <span className="mb-2.5 text-xxs font-bold uppercase ">APY</span>
         <span className="mb-5 font-mono text-2xl">{apy}%</span>
         <span className="font-mono text-xs">
           Unclaimed Fees: ~ ${unclaimedFees}

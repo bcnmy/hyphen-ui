@@ -20,8 +20,6 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
     compatibleToChainsForCurrentFromChain,
   } = useChains()!;
 
-  console.log({ isLoggedIn });
-
   const fromChainOptions = useMemo(
     () =>
       chainsList.map((chain) => ({

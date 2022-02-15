@@ -1,21 +1,56 @@
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiOutlineChevronDown } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
+import switchNetwork from 'utils/switchNetwork';
+import { useWalletProvider } from 'context/WalletProvider';
+
+interface INetwork {
+  id: number;
+  name: string;
+  image: string;
+}
 
 function NetworkSelector() {
   const { chainsList } = useChains()!;
-  const networks = chainsList.map((chain) => ({
-    id: chain.chainId,
-    name: chain.name,
-    image: chain.image,
-  }));
+  const { currentChainId, walletProvider } = useWalletProvider()!;
+  const networks = useMemo(
+    () =>
+      chainsList.map(
+        (chain) =>
+          ({
+            id: chain.chainId,
+            name: chain.name,
+            image: chain.image,
+          } as INetwork),
+      ),
+    [chainsList],
+  );
 
-  const [selected, setSelected] = useState(networks[0]);
+  const [selected, setSelected] = useState<INetwork>();
+
+  useEffect(() => {
+    const network = networks.find((network) => network.id === currentChainId);
+    if (network) {
+      setSelected(network);
+    }
+  }, [currentChainId, networks]);
+
+  function handleNetworkChange(selectedNetwork: INetwork) {
+    const network = chainsList.find(
+      (chain) => chain.chainId === selectedNetwork.id,
+    );
+    if (walletProvider && network) {
+      switchNetwork(walletProvider, network);
+    }
+    setSelected(selectedNetwork);
+  }
+
+  if (!selected) return null;
 
   return (
     <div className="w-[146px]">
-      <Listbox value={selected} onChange={setSelected}>
+      <Listbox value={selected} onChange={handleNetworkChange}>
         <div className="relative">
           <Listbox.Button className="relative h-8 w-full cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 pl-3 pr-10 text-left focus:outline-none sm:text-sm">
             <span className="flex items-center truncate">

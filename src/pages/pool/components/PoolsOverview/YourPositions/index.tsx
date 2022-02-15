@@ -1,9 +1,36 @@
+import { useEffect, useMemo, useState } from 'react';
+import { useChains } from 'context/Chains';
+import { ethers } from 'ethers';
 import { Link } from 'react-router-dom';
 import AssetOverview from '../../AssetOverview';
+import lpTokenABI from 'contracts/LPToken.abi.json';
+import { useWalletProvider } from 'context/WalletProvider';
 
 function YourPositions() {
+  const { accounts } = useWalletProvider()!;
+  const { fromChainRpcUrlProvider } = useChains()!;
+  const lpContract = useMemo(() => {
+    return new ethers.Contract(
+      '0xF9e13773D10C0ec25369CC4C0fAEef05eC00B18b',
+      lpTokenABI,
+      fromChainRpcUrlProvider,
+    );
+  }, [fromChainRpcUrlProvider]);
+  const [userPositions, setUserPositions] = useState(null);
+
+  useEffect(() => {
+    async function getUserPositions(userAddress: string) {
+      const userPositions = await lpContract.getAllNftIdsByUser(userAddress);
+      setUserPositions(userPositions);
+    }
+
+    if (accounts) {
+      getUserPositions(accounts[0]);
+    }
+  }, [accounts, lpContract]);
+
   return (
-    <article className="rounded-10 mb-2.5 bg-white p-2.5">
+    <article className="mb-2.5 rounded-10 bg-white p-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
         <div className="absolute left-10">
           <button className="mr-7 text-xs text-hyphen-purple">

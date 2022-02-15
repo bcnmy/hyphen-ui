@@ -4,12 +4,28 @@ import { HiOutlineChevronDown } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import switchNetwork from 'utils/switchNetwork';
 import { useWalletProvider } from 'context/WalletProvider';
+import avaxIcon from '../assets/images/networks/avax-network-icon.svg';
+import ethIcon from '../assets/images/networks/eth-network-icon.svg';
+import maticIcon from '../assets/images/networks/matic-network-icon.svg';
 
 interface INetwork {
   id: number;
   name: string;
   image: string;
+  symbol: string;
 }
+
+interface INetworkImages {
+  [key: string]: string;
+}
+
+const networkImages: INetworkImages = {
+  ETH: ethIcon,
+  GETH: ethIcon,
+  RETH: ethIcon,
+  AVAX: avaxIcon,
+  MATIC: maticIcon,
+};
 
 function NetworkSelector() {
   const { chainsList } = useChains()!;
@@ -22,6 +38,7 @@ function NetworkSelector() {
             id: chain.chainId,
             name: chain.name,
             image: chain.image,
+            symbol: chain.currency,
           } as INetwork),
       ),
     [chainsList],
@@ -55,9 +72,9 @@ function NetworkSelector() {
           <Listbox.Button className="relative h-8 w-full cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 pl-3 pr-10 text-left focus:outline-none sm:text-sm">
             <span className="flex items-center truncate">
               <img
-                src={selected.image}
+                src={networkImages[selected.symbol]}
                 alt={selected.name}
-                className="mr-2 h-5 w-5"
+                className="mr-2 h-4 w-auto"
               />
               {selected.name}
             </span>
@@ -84,9 +101,9 @@ function NetworkSelector() {
                   {({ selected, active }) => (
                     <>
                       <img
-                        src={network.image}
+                        src={networkImages[network.symbol]}
                         alt={network.name}
-                        className="mr-2 h-5 w-5"
+                        className="mr-2 h-4 w-auto"
                       />
                       <span
                         className={`${

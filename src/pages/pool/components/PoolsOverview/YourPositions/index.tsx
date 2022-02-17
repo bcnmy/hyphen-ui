@@ -1,52 +1,58 @@
-import {useEffect, useMemo, useState} from 'react';
-import {ethers} from 'ethers';
-import {Link} from 'react-router-dom';
-import {useQuery} from 'react-query';
+import { useEffect, useMemo, useState } from 'react';
+import { BigNumber, ethers } from 'ethers';
+import { Link } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import Skeleton from 'react-loading-skeleton';
-import {useChains} from 'context/Chains';
+import { useChains } from 'context/Chains';
 import AssetOverview from '../../AssetOverview';
 import lpTokenABI from 'contracts/LPToken.abi.json';
-import {useWalletProvider} from 'context/WalletProvider';
+import liquidityProvidersABI from 'contracts/LiquidityProviders.abi.json';
+import { useWalletProvider } from 'context/WalletProvider';
 
 function YourPositions() {
-  const {accounts} = useWalletProvider()!;
-  const {fromChainRpcUrlProvider} = useChains()!;
-  const lpContract = useMemo(() => {
+  const { accounts } = useWalletProvider()!;
+  const { fromChainRpcUrlProvider } = useChains()!;
+  const lpTokenContract = useMemo(() => {
     return new ethers.Contract(
       '0xF9e13773D10C0ec25369CC4C0fAEef05eC00B18b',
       lpTokenABI,
-      fromChainRpcUrlProvider,
+      new ethers.providers.Web3Provider(window.ethereum),
     );
-  }, [fromChainRpcUrlProvider]);
-  const {isLoading, isError, data} = useQuery(
-    'userPositions',
-    getUserPositions,
-    {
-      // Execute only when accounts are available.
-      enabled: !!accounts,
-    },
-  );
-  const [userPositions, setUserPositions] = useState(null);
+  }, []);
+  const liquidityProvidersContract = useMemo(() => {
+    return new ethers.Contract(
+      '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+      liquidityProvidersABI,
+      new ethers.providers.Web3Provider(window.ethereum),
+    );
+  }, []);
 
   function getUserPositions() {
-    console.log(accounts?.[0]);
-    return lpContract
+    return lpTokenContract
       .getAllNftIdsByUser(accounts?.[0])
-      .then((res: any) => res.json());
+      .then((res: any) => res);
   }
 
-  console.log({isLoading, isError, data});
+  function getPositionMetadata(positionId: BigNumber) {
+    return lpTokenContract.tokenMetadata(positionId);
+  }
 
-  // useEffect(() => {
-  //   async function getUserPositions(userAddress: string) {
-  //     const userPositions = await lpContract.getAllNftIdsByUser(userAddress);
-  //     setUserPositions(userPositions);
-  //   }
+  function getTotalLiquidity(tokenAddress: string) {
+    return liquidityProvidersContract.totalReserve(tokenAddress);
+  }
 
-  //   if (accounts) {
-  //     getUserPositions(accounts[0]);
-  //   }
-  // }, [accounts, lpContract]);
+  function getTokenAmount(shares: BigNumber, tokenAddress: string) {
+    return liquidityProvidersContract.sharesToTokenAmount(shares, tokenAddress);
+  }
+
+  const {
+    isLoading,
+    isError,
+    data: userPositions,
+  } = useQuery('userPositions', getUserPositions, {
+    // Execute only when accounts are available.
+    enabled: !!accounts,
+  });
 
   return (
     <article className="mb-2.5 rounded-10 bg-white p-2.5">
@@ -73,7 +79,19 @@ function YourPositions() {
       <section className="grid grid-cols-2 gap-2.5">
         {!isLoading ? (
           <>
-            <AssetOverview
+            {userPositions?.map((userPositionId: BigNumber) => {
+              return (
+                <AssetOverview
+                  key={userPositionId.toNumber()}
+                  getPositionMetadata={getPositionMetadata}
+                  getTokenAmount={getTokenAmount}
+                  getTotalLiquidity={getTotalLiquidity}
+                  positionId={userPositionId}
+                  redirectToManageLiquidity
+                />
+              );
+            })}
+            {/* <AssetOverview
               apy={81.19}
               chainId={1}
               poolShare={0.02}
@@ -81,34 +99,7 @@ function YourPositions() {
               tokenSupplied={59.64}
               tokenSymbol="ETH"
               unclaimedFees={651}
-            />
-            <AssetOverview
-              apy={91.91}
-              chainId={43114}
-              poolShare={0.03}
-              redirectToManageLiquidity
-              tokenSupplied={459.64}
-              tokenSymbol="USDC"
-              unclaimedFees={154}
-            />
-            <AssetOverview
-              apy={80.5}
-              chainId={1}
-              poolShare={0.02}
-              redirectToManageLiquidity
-              tokenSupplied={1059.64}
-              tokenSymbol="USDT"
-              unclaimedFees={157}
-            />
-            <AssetOverview
-              apy={71.55}
-              chainId={137}
-              poolShare={0.025}
-              redirectToManageLiquidity
-              tokenSupplied={9999.64}
-              tokenSymbol="BICO"
-              unclaimedFees={1547}
-            />
+            /> */}
           </>
         ) : (
           <>

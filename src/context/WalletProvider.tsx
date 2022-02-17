@@ -4,28 +4,28 @@ import {
   useContext,
   useEffect,
   useState,
-} from "react";
-import { ethers } from "ethers";
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+} from 'react';
+import { ethers } from 'ethers';
+import Web3Modal from 'web3modal';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
   signer: ethers.Signer | undefined;
   web3Modal: Web3Modal | undefined;
-  connect: Web3Modal["connect"];
-  disconnect: Web3Modal["clearCachedProvider"];
+  connect: Web3Modal['connect'];
+  disconnect: Web3Modal['clearCachedProvider'];
   accounts: string[] | undefined;
-  currentChainId: number | undefined;
+  currentChainId: number;
   isLoggedIn: boolean;
   rawEthereumProvider: undefined | any;
 }
 
 const WalletProviderContext = createContext<IWalletProviderContext | null>(
-  null
+  null,
 );
 
-const WalletProviderProvider: React.FC = (props) => {
+const WalletProviderProvider: React.FC = props => {
   const [walletProvider, setWalletProvider] = useState<
     undefined | ethers.providers.Web3Provider
   >();
@@ -37,7 +37,7 @@ const WalletProviderProvider: React.FC = (props) => {
   const [rawEthereumProvider, setRawEthereumProvider] = useState<any>();
 
   const [accounts, setAccounts] = useState<string[]>();
-  const [currentChainId, setCurrentChainId] = useState<number>();
+  const [currentChainId, setCurrentChainId] = useState<number>(0);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const WalletProviderProvider: React.FC = (props) => {
             },
           },
         },
-      })
+      }),
     );
   }, []);
 
@@ -84,7 +84,7 @@ const WalletProviderProvider: React.FC = (props) => {
     (async () => {
       let { chainId } = await walletProvider.getNetwork();
       let accounts = await walletProvider.listAccounts();
-      setAccounts(accounts.map((a) => a.toLowerCase()));
+      setAccounts(accounts.map(a => a.toLowerCase()));
       setCurrentChainId(chainId);
     })();
   }, [walletProvider]);
@@ -99,21 +99,21 @@ const WalletProviderProvider: React.FC = (props) => {
     if (!rawEthereumProvider) return;
 
     // Subscribe to accounts change
-    rawEthereumProvider.on("accountsChanged", (accounts: string[]) => {
+    rawEthereumProvider.on('accountsChanged', (accounts: string[]) => {
       // console.log(accounts);
-      setAccounts(accounts.map((a) => a.toLowerCase()));
+      setAccounts(accounts.map(a => a.toLowerCase()));
       reinit(rawEthereumProvider);
     });
 
     // Subscribe to chainId change
-    rawEthereumProvider.on("chainChanged", (chainId: number) => {
+    rawEthereumProvider.on('chainChanged', (chainId: number) => {
       // console.log(chainId);
       setCurrentChainId(chainId);
       reinit(rawEthereumProvider);
     });
 
     // Subscribe to provider connection
-    rawEthereumProvider.on("connect", (info: { chainId: number }) => {
+    rawEthereumProvider.on('connect', (info: { chainId: number }) => {
       // console.log(info);
       setCurrentChainId(info.chainId);
       reinit(rawEthereumProvider);
@@ -121,16 +121,16 @@ const WalletProviderProvider: React.FC = (props) => {
 
     // Subscribe to provider disconnection
     rawEthereumProvider.on(
-      "disconnect",
+      'disconnect',
       (error: { code: number; message: string }) => {
         console.error(error);
-      }
+      },
     );
   }, [rawEthereumProvider]);
 
   const connect = useCallback(async () => {
     if (!web3Modal) {
-      console.error("Web3Modal not initialized.");
+      console.error('Web3Modal not initialized.');
       return;
     }
     let provider = await web3Modal.connect();
@@ -140,7 +140,7 @@ const WalletProviderProvider: React.FC = (props) => {
 
   const disconnect = useCallback(async () => {
     if (!web3Modal) {
-      console.error("Web3Modal not initialized.");
+      console.error('Web3Modal not initialized.');
       return;
     }
     web3Modal.clearCachedProvider();

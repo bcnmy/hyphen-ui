@@ -30,14 +30,14 @@ function IncreaseLiquidity() {
         </div>
       </header>
 
-      <AssetOverview
+      {/* <AssetOverview
         apy={91.91}
         tokenSymbol="USDC"
         tokenSupplied={459.64}
         chainId={43114}
         poolShare={0.03}
         unclaimedFees={154}
-      />
+      /> */}
 
       <section className="mt-8 grid grid-cols-2">
         <div className="max-h-84 h-84 border-r pr-12.5 pt-9">

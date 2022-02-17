@@ -35,14 +35,14 @@ function ManagePosition() {
         </div>
       </header>
 
-      <AssetOverview
+      {/* <AssetOverview
         apy={91.91}
         tokenSymbol="USDC"
         tokenSupplied={459.64}
         chainId={43114}
         poolShare={0.03}
         unclaimedFees={154}
-      />
+      /> */}
 
       <section className="mt-8 grid grid-cols-2">
         <div className="max-h-100 h-100 border-r pr-12.5 pt-9">
@@ -70,16 +70,16 @@ function ManagePosition() {
             id="liquidityAmount"
             placeholder="0.000"
             type="text"
-            className="rounded-2.5 mt-2 mb-6 h-15 w-full border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
 
           <StepSlider dots step={25} />
 
-          <button className="rounded-2.5 mt-9 mb-2.5 h-15 w-full bg-hyphen-purple font-semibold text-white">
+          <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
             Confirm Removal
           </button>
           <button
-            className="rounded-2.5 h-15 w-full border-2 border-hyphen-purple font-semibold text-hyphen-purple"
+            className="h-15 w-full rounded-2.5 border-2 border-hyphen-purple font-semibold text-hyphen-purple"
             onClick={handleIncreaseLiquidity}
           >
             + Increase Liquidity
@@ -96,10 +96,10 @@ function ManagePosition() {
             id="unclaimedFees"
             placeholder="0.000"
             type="text"
-            className="rounded-2.5 mt-2 mb-10 h-15 w-full border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            className="mt-2 mb-10 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
 
-          <button className="rounded-2.5 mb-11 flex h-15 w-full items-center justify-center bg-hyphen-purple font-semibold text-white">
+          <button className="mb-11 flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white">
             <img src={collectFeesIcon} alt="Collect fees" className="mr-1" />
             Collect Fees
           </button>

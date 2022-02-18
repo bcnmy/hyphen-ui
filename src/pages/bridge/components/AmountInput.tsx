@@ -30,13 +30,13 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           Amount
         </label>
         <input
-          type="string"
+          type="text"
           inputMode="decimal"
           placeholder="0.000"
           value={transferAmountInputValue}
-          onChange={(e) => changeTransferAmountInputValue(e.target.value)}
+          onChange={e => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(
-            'rounded-2.5 mt-2 inline-block h-15 w-full border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
+            'mt-2 inline-block h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
             disabled && 'cursor-not-allowed bg-gray-200',
           )}
           disabled={disabled}

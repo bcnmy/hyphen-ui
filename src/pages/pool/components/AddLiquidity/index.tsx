@@ -1,13 +1,20 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HiAdjustments, HiArrowSmLeft } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
 import Select, { Option } from 'components/Select';
-import { chains } from 'config/chains';
-import { tokens } from 'config/tokens';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
+import { useToken } from 'context/Token';
+import { useWalletProvider } from 'context/WalletProvider';
+import switchNetwork from 'utils/switchNetwork';
+import getTokenBalance from 'utils/getTokenBalance';
+import { ethers } from 'ethers';
+import erc20ABI from 'contracts/erc20.abi.json';
+import Skeleton from 'react-loading-skeleton';
+import whitelistPeriodManagerABI from 'contracts/WhitelistPeriodManager.abi.json';
+import { useQuery } from 'react-query';
 
 interface IAddLiquidity {
   apy: number;
@@ -19,21 +26,137 @@ interface IAddLiquidity {
 
 function AddLiquidity() {
   const navigate = useNavigate();
-  const tokenOptions = tokens.map((token) => {
-    return {
-      id: token.symbol,
-      name: token.symbol,
-      image: token.image,
-    };
-  });
-  const [selectedToken, setSelectedToken] = useState<Option>();
-  const networkOptions = chains.map((chain) => {
-    return {
-      id: chain.chainId,
-      name: chain.name,
-    };
-  });
-  const [selectedNetwork, setSelectedNetwork] = useState<Option>();
+  const { accounts, currentChainId, walletProvider } = useWalletProvider()!;
+  const { chainsList } = useChains()!;
+  const { tokensList } = useToken()!;
+  const whitelistPeriodManagerContract = useMemo(() => {
+    return new ethers.Contract(
+      '0xE6A9E731Bf796a9368a61d125092D3E8871ebace',
+      whitelistPeriodManagerABI,
+      new ethers.providers.Web3Provider(window.ethereum),
+    );
+  }, []);
+
+  const [selectedToken, setSelectedToken] = useState<Option | undefined>();
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState<
+    string | undefined
+  >();
+  const [selectedNetwork, setSelectedNetwork] = useState<Option | undefined>();
+  const [balance, setBalance] = useState<string | undefined>();
+  const [liquidityAmount, setLiquidityAmount] = useState<string>('');
+  const tokenOptions = useMemo(() => {
+    if (!currentChainId) return [];
+    return tokensList
+      .filter(token => token[currentChainId])
+      .map(token => ({
+        id: token.symbol,
+        name: token.symbol,
+        image: token.image,
+      }));
+  }, [currentChainId, tokensList]);
+  const networkOptions = useMemo(() => {
+    return chainsList.map(chain => {
+      return {
+        id: chain.chainId,
+        name: chain.name,
+        image: chain.image,
+        symbol: chain.currency,
+      };
+    });
+  }, [chainsList]);
+
+  const { data: tokenWalletCap } = useQuery(
+    ['tokenWalletCap', selectedTokenAddress],
+    () => getTokenWalletCap(selectedTokenAddress),
+    {
+      // Execute only when accounts are available.
+      enabled: !!selectedTokenAddress,
+    },
+  );
+
+  if (tokenWalletCap) {
+    console.log(tokenWalletCap.toNumber());
+  }
+
+  useEffect(() => {
+    setSelectedToken(tokenOptions[0]);
+    setSelectedNetwork(
+      networkOptions.find(network => network.id === currentChainId),
+    );
+  }, [currentChainId, networkOptions, tokenOptions]);
+
+  useEffect(() => {
+    async function handleTokenChange() {
+      if (accounts && currentChainId && selectedToken) {
+        const token = tokensList.find(
+          token => token.symbol === selectedToken.id,
+        )!;
+        const chain = chainsList.find(
+          chain => chain.chainId === currentChainId,
+        )!;
+        const chainRpcProvider = new ethers.providers.JsonRpcProvider(
+          chain.rpcUrl,
+        );
+
+        const tokenContract = new ethers.Contract(
+          token[currentChainId].address,
+          erc20ABI,
+          chainRpcProvider,
+        );
+        const { displayBalance, userRawBalance } = await getTokenBalance(
+          accounts[0],
+          chain,
+          chainRpcProvider,
+          token,
+          tokenContract,
+        );
+        console.log(userRawBalance.toString());
+        setSelectedTokenAddress(token[currentChainId].address);
+        setBalance(displayBalance);
+      }
+    }
+
+    setSelectedTokenAddress(undefined);
+    setBalance(undefined);
+    handleTokenChange();
+  }, [accounts, chainsList, currentChainId, selectedToken, tokensList]);
+
+  function getTokenWalletCap(tokenAddress: string | undefined) {
+    return whitelistPeriodManagerContract.perTokenWalletCap(tokenAddress);
+  }
+
+  async function handleNetworkChange(selectedNetwork: Option) {
+    const network = chainsList.find(
+      chain => chain.chainId === selectedNetwork.id,
+    );
+    if (walletProvider && network) {
+      const res = await switchNetwork(walletProvider, network);
+      if (res === null) {
+        setSelectedNetwork(selectedNetwork);
+      }
+    }
+  }
+
+  function handleLiquidityAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const regExp = /^((\d+)?(\.\d{0,3})?)$/;
+    const newLiquidityAmount = e.target.value;
+    const isInputValid = regExp.test(newLiquidityAmount);
+
+    if (isInputValid) {
+      setLiquidityAmount(newLiquidityAmount);
+    }
+  }
+
+  function handleSliderChange(value: number) {
+    if (value === 0) {
+      setLiquidityAmount('');
+    } else if (balance && parseFloat(balance) > 0) {
+      const newLiquidityAmount = (
+        Math.trunc(parseFloat(balance) * (value / 100) * 1000) / 1000
+      ).toString();
+      setLiquidityAmount(newLiquidityAmount);
+    }
+  }
 
   return (
     <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
@@ -62,14 +185,14 @@ function AddLiquidity() {
           <div className="mb-6 grid grid-cols-2 gap-2.5">
             <Select
               options={tokenOptions}
-              selected={tokenOptions[0]}
-              setSelected={(token) => setSelectedToken(token)}
+              selected={selectedToken}
+              setSelected={token => setSelectedToken(token)}
               label={'asset'}
             />
             <Select
               options={networkOptions}
-              selected={networkOptions[0]}
-              setSelected={(network) => setSelectedNetwork(network)}
+              selected={selectedNetwork}
+              setSelected={network => handleNetworkChange(network)}
               label={'network'}
             />
           </div>
@@ -78,21 +201,34 @@ function AddLiquidity() {
             className="flex justify-between px-5 text-xxs font-bold uppercase"
           >
             <span className="text-hyphen-gray-400">Input</span>
-            <span className="text-hyphen-gray-300">
-              Your address limit: Ξ80
+            <span className="flex text-hyphen-gray-300">
+              Your address limit:{' '}
+              {balance ? (
+                balance
+              ) : (
+                <Skeleton
+                  baseColor="#615ccd20"
+                  enableAnimation={!!selectedToken}
+                  highlightColor="#615ccd05"
+                  className="!ml-1 !w-11"
+                />
+              )}
             </span>
           </label>
           <input
             id="liquidityAmount"
             placeholder="0.000"
             type="text"
-            className="rounded-2.5 mt-2 mb-6 h-15 w-full border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            inputMode="decimal"
+            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            value={liquidityAmount}
+            onChange={handleLiquidityAmountChange}
           />
-          <StepSlider dots step={25} />
-          <button className="rounded-2.5 mt-9 mb-2.5 h-15 w-full bg-gray-100 font-semibold text-hyphen-gray-300">
+          <StepSlider dots onChange={handleSliderChange} step={25} />
+          <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-gray-100 font-semibold text-hyphen-gray-300">
             ETH Approved
           </button>
-          <button className="rounded-2.5 h-15 w-full bg-hyphen-purple font-semibold text-white">
+          <button className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
             Confirm Supply
           </button>
         </div>
@@ -102,7 +238,7 @@ function AddLiquidity() {
               <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
                 APY
               </span>
-              <div className="rounded-2.5 mt-2 flex h-15 items-center bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+              <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
                 81.19%
               </div>
             </div>
@@ -110,7 +246,7 @@ function AddLiquidity() {
               <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
                 Your pool share
               </span>
-              <div className="rounded-2.5 mt-2 flex h-15 items-center bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+              <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
                 0.02%
               </div>
             </div>

@@ -8,6 +8,10 @@ import StepSlider from '../StepSlider';
 function IncreaseLiquidity() {
   const navigate = useNavigate();
 
+  function handleSliderChange(value: number) {
+    console.log(value);
+  }
+
   return (
     <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
       <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
@@ -68,7 +72,7 @@ function IncreaseLiquidity() {
             className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
 
-          <StepSlider dots step={25} />
+          <StepSlider dots onChange={handleSliderChange} step={25} />
 
           <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
             Confirm Supply

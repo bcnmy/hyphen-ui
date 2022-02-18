@@ -3,10 +3,11 @@ import 'rc-slider/assets/index.css';
 
 interface IStepSlider {
   dots?: boolean | false;
+  onChange: (value: number) => void;
   step?: number | 1;
 }
 
-function StepSlider({ dots, step }: IStepSlider) {
+function StepSlider({ dots, onChange, step }: IStepSlider) {
   return (
     <Slider
       step={step}
@@ -38,6 +39,7 @@ function StepSlider({ dots, step }: IStepSlider) {
       trackStyle={{
         backgroundColor: '#615ccd',
       }}
+      onChange={onChange}
     />
   );
 }

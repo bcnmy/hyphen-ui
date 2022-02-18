@@ -8,7 +8,7 @@ import avaxIcon from '../assets/images/networks/avax-network-icon.svg';
 import ethIcon from '../assets/images/networks/eth-network-icon.svg';
 import maticIcon from '../assets/images/networks/matic-network-icon.svg';
 
-interface INetwork {
+export interface INetwork {
   id: number;
   name: string;
   image: string;
@@ -33,7 +33,7 @@ function NetworkSelector() {
   const networks = useMemo(
     () =>
       chainsList.map(
-        (chain) =>
+        chain =>
           ({
             id: chain.chainId,
             name: chain.name,
@@ -47,7 +47,7 @@ function NetworkSelector() {
   const [selected, setSelected] = useState<INetwork>();
 
   useEffect(() => {
-    const network = networks.find((network) => network.id === currentChainId);
+    const network = networks.find(network => network.id === currentChainId);
     if (network) {
       setSelected(network);
     }
@@ -55,12 +55,14 @@ function NetworkSelector() {
 
   function handleNetworkChange(selectedNetwork: INetwork) {
     const network = chainsList.find(
-      (chain) => chain.chainId === selectedNetwork.id,
+      chain => chain.chainId === selectedNetwork.id,
     );
     if (walletProvider && network) {
-      switchNetwork(walletProvider, network);
+      const res = switchNetwork(walletProvider, network);
+      if (res === null) {
+        setSelected(selectedNetwork);
+      }
     }
-    setSelected(selectedNetwork);
   }
 
   if (!selected) return null;
@@ -92,7 +94,7 @@ function NetworkSelector() {
             leaveTo="opacity-0"
           >
             <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-xl bg-hyphen-purple py-1 text-base focus:outline-none sm:text-sm">
-              {networks.map((network) => (
+              {networks.map(network => (
                 <Listbox.Option
                   key={network.id}
                   className="relative flex cursor-pointer select-none items-center py-2 pl-3 pr-4 text-white hover:bg-hyphen-purple-dark hover:bg-opacity-50"

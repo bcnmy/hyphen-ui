@@ -1,12 +1,15 @@
 import Select from "components/Select";
 import { ChainConfig } from "config/chains";
 import { useChains } from "context/Chains";
+import { useWalletProvider } from "context/WalletProvider";
 import React, { useMemo } from "react";
 import { HiArrowRight } from "react-icons/hi";
+import CustomTooltip from "./CustomTooltip";
 
 interface INetworkSelectorsProps {}
 
 const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
+  const { isLoggedIn } = useWalletProvider()!;
   const {
     chainsList,
     fromChain,
@@ -64,16 +67,17 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
           label={"source"}
         />
       </div>
-      <div className="flex items-end mb-1.5">
+      <div className="mb-1.5 flex items-end">
         <button
-          className="p-2 transition-all border rounded-full bg-hyphen-purple bg-opacity-20 border-hyphen-purple/10 text-hyphen-purple"
+          className="bg-hyphen-purple border-hyphen-purple/10 text-hyphen-purple rounded-full border bg-opacity-20 p-2 transition-all"
           onClick={switchChains}
         >
           <HiArrowRight />
         </button>
       </div>
-      <div>
+      <div data-tip data-for="networkSelect">
         <Select
+          disabled={!isLoggedIn}
           options={toChainOptions}
           selected={selectedToChain}
           setSelected={(opt) => {
@@ -86,6 +90,9 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
           }}
           label={"destination"}
         />
+        {!isLoggedIn && (
+          <CustomTooltip id="networkSelect" text="Please connect your wallet" />
+        )}
       </div>
     </>
   );

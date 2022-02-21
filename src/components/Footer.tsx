@@ -3,7 +3,7 @@ import poweredByBiconomy from "../assets/images/powered-by-biconomy.svg";
 
 function Footer() {
   return (
-    <footer className="sticky bottom-0 flex w-full items-center justify-center px-6 py-4">
+    <footer className="sticky bottom-0 z-20 flex w-full items-center justify-center bg-black bg-opacity-30 px-6 py-4 backdrop-blur-md">
       <a
         target="_blank"
         href="https://biconomy.io/"

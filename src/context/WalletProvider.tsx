@@ -106,9 +106,14 @@ const WalletProviderProvider: React.FC = (props) => {
 
     // Wallet documentation recommends reloading page on chain change.
     // Ref: https://docs.metamask.io/guide/ethereum-provider.html#events
-    function handleChainChanged(chainId: number) {
+    function handleChainChanged(chainId: string | number) {
       console.log("chainChanged!");
-      window.location.reload();
+      if (typeof chainId === "string") {
+        setCurrentChainId(Number.parseInt(chainId));
+      } else {
+        setCurrentChainId(chainId);
+      }
+      reinit(rawEthereumProvider);
     }
 
     function handleConnect(info: { chainId: number }) {

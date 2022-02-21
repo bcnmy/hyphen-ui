@@ -9,7 +9,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
   const userAddress = accounts?.[0];
 
   return (
-    <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-black text-white">
+    <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">
       <a href="/" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}

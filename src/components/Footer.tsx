@@ -17,11 +17,17 @@ function Footer() {
           href="https://discord.com/channels/692403655474937856/841926541235585035"
           target="_blank"
           rel="noreferrer"
+          className="hover:text-white"
         >
           Join our Discord
         </a>
         <p className="mx-2">|</p>
-        <a href="mailto:hyphen-support@biconomy.io">Email Us</a>
+        <a
+          href="mailto:hyphen-support@biconomy.io"
+          className="hover:text-white"
+        >
+          Email Us
+        </a>
       </div>
     </footer>
   );

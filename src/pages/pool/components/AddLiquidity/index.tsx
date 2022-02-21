@@ -42,7 +42,7 @@ function AddLiquidity() {
     string | undefined
   >();
   const [selectedNetwork, setSelectedNetwork] = useState<Option | undefined>();
-  const [balance, setBalance] = useState<string | undefined>();
+  const [walletBalance, setWalletBalance] = useState<string | undefined>();
   const [liquidityAmount, setLiquidityAmount] = useState<string>('');
   const tokenOptions = useMemo(() => {
     if (!currentChainId) return [];
@@ -110,14 +110,13 @@ function AddLiquidity() {
           token,
           tokenContract,
         );
-        console.log(userRawBalance.toString());
         setSelectedTokenAddress(token[currentChainId].address);
-        setBalance(displayBalance);
+        setWalletBalance(displayBalance);
       }
     }
 
     setSelectedTokenAddress(undefined);
-    setBalance(undefined);
+    setWalletBalance(undefined);
     handleTokenChange();
   }, [accounts, chainsList, currentChainId, selectedToken, tokensList]);
 
@@ -150,9 +149,9 @@ function AddLiquidity() {
   function handleSliderChange(value: number) {
     if (value === 0) {
       setLiquidityAmount('');
-    } else if (balance && parseFloat(balance) > 0) {
+    } else if (walletBalance && parseFloat(walletBalance) > 0) {
       const newLiquidityAmount = (
-        Math.trunc(parseFloat(balance) * (value / 100) * 1000) / 1000
+        Math.trunc(parseFloat(walletBalance) * (value / 100) * 1000) / 1000
       ).toString();
       setLiquidityAmount(newLiquidityAmount);
     }
@@ -203,8 +202,8 @@ function AddLiquidity() {
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex text-hyphen-gray-300">
               Your address limit:{' '}
-              {balance ? (
-                balance
+              {walletBalance ? (
+                walletBalance
               ) : (
                 <Skeleton
                   baseColor="#615ccd20"

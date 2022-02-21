@@ -4,23 +4,22 @@ import { useQuery } from 'react-query';
 import tokens from 'config/tokens';
 import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
+import useLPTokenContract from 'hooks/useLPTokenContract';
+import useLPContract from 'hooks/useLPContract';
+
 interface IAssetOverview {
-  getPositionMetadata: (positionId: BigNumber) => Promise<any>;
-  getTokenAmount: (shares: BigNumber, tokenAddress: string) => Promise<any>;
-  getTotalLiquidity: (tokenAddress: string) => Promise<any>;
   positionId: BigNumber;
   redirectToManageLiquidity?: boolean | false;
 }
 
 function AssetOverview({
-  getPositionMetadata,
-  getTokenAmount,
-  getTotalLiquidity,
   positionId,
   redirectToManageLiquidity,
 }: IAssetOverview) {
   const navigate = useNavigate();
   const { currentChainId } = useWalletProvider()!;
+  const { getPositionMetadata } = useLPTokenContract();
+  const { getTokenAmount, getTotalLiquidity } = useLPContract();
   const { isLoading, data: positionMetadata } = useQuery(
     ['positionMetadata', positionId],
     () => getPositionMetadata(positionId),

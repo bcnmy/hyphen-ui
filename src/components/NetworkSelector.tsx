@@ -47,9 +47,11 @@ function NetworkSelector() {
   const [selected, setSelected] = useState<INetwork>();
 
   useEffect(() => {
-    const network = networks.find(network => network.id === currentChainId);
+    const network = networks.find(network => network.id === currentChainId)!;
     if (network) {
       setSelected(network);
+    } else {
+      setSelected(networks[0]);
     }
   }, [currentChainId, networks]);
 

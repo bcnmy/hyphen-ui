@@ -16,7 +16,7 @@ interface IWalletProviderContext {
   connect: Web3Modal['connect'];
   disconnect: Web3Modal['clearCachedProvider'];
   accounts: string[] | undefined;
-  currentChainId: number;
+  currentChainId: number | undefined;
   isLoggedIn: boolean;
   rawEthereumProvider: undefined | any;
 }
@@ -37,7 +37,7 @@ const WalletProviderProvider: React.FC = props => {
   const [rawEthereumProvider, setRawEthereumProvider] = useState<any>();
 
   const [accounts, setAccounts] = useState<string[]>();
-  const [currentChainId, setCurrentChainId] = useState<number>(0);
+  const [currentChainId, setCurrentChainId] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
   useEffect(() => {

@@ -41,6 +41,11 @@ function AddLiquidity() {
     useWhitelistPeriodManager();
 
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
+  const tokenDecimals = useMemo(() => {
+    if (!currentChainId || !selectedToken) return undefined;
+    const token = tokensList.find(token => token.symbol === selectedToken?.id)!;
+    return token[currentChainId].decimal;
+  }, [currentChainId, selectedToken, tokensList]);
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<
     string | undefined
   >();
@@ -94,7 +99,7 @@ function AddLiquidity() {
           erc20ABI,
           chainRpcProvider,
         );
-        const { displayBalance, userRawBalance } = await getTokenBalance(
+        const { displayBalance } = await getTokenBalance(
           accounts[0],
           chain,
           chainRpcProvider,
@@ -117,6 +122,9 @@ function AddLiquidity() {
       enabled: !!selectedTokenAddress,
     },
   );
+  const formattedTotalLiquidity = tokenDecimals
+    ? totalLiquidity / 10 ** tokenDecimals
+    : totalLiquidity;
 
   const { data: tokenWalletCap } = useQuery(
     ['tokenWalletCap', selectedTokenAddress],
@@ -160,23 +168,17 @@ function AddLiquidity() {
     const isInputValid = regExp.test(newLiquidityAmount);
 
     if (isInputValid) {
-      const token = tokensList.find(
-        token => token.symbol === selectedToken?.id,
-      )!;
-      const tokenDecimals = token[currentChainId].decimal;
-
       setLiquidityAmount(newLiquidityAmount);
-      updatePoolShare(newLiquidityAmount, totalLiquidity);
+      updatePoolShare(newLiquidityAmount);
     }
   }
 
-  function updatePoolShare(newLiquidityAmount: string, totalLiquidity: string) {
+  function updatePoolShare(newLiquidityAmount: string) {
     const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
-    const totalLiquidityInFloat = Number.parseFloat(totalLiquidity);
     const newPoolShare =
       liquidityAmountInFloat > 0
         ? (liquidityAmountInFloat /
-            (liquidityAmountInFloat + totalLiquidityInFloat)) *
+            (liquidityAmountInFloat + formattedTotalLiquidity)) *
           100
         : 0;
 
@@ -186,13 +188,13 @@ function AddLiquidity() {
   function handleSliderChange(value: number) {
     if (value === 0) {
       setLiquidityAmount('');
-      updatePoolShare('0', totalLiquidity);
+      updatePoolShare('0');
     } else if (walletBalance && parseFloat(walletBalance) > 0) {
       const newLiquidityAmount = (
         Math.trunc(parseFloat(walletBalance) * (value / 100) * 1000) / 1000
       ).toString();
       setLiquidityAmount(newLiquidityAmount);
-      updatePoolShare(newLiquidityAmount, totalLiquidity);
+      updatePoolShare(newLiquidityAmount);
     }
   }
 

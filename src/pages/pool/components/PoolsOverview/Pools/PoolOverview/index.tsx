@@ -23,12 +23,12 @@ function PoolOverview({
   tokenSymbol,
   totalLiquidity,
 }: IPoolOverview) {
-  const token = tokens.find((token) => token.symbol === tokenSymbol)!;
+  const token = tokens.find(token => token.symbol === tokenSymbol)!;
   const {
     image: tokenImage,
     [chainId]: { chainColor },
   } = token;
-  const chain = chains.find((chain) => chain.chainId === chainId)!;
+  const chain = chains.find(chain => chain.chainId === chainId)!;
   const { name: chainName } = chain;
 
   return (
@@ -65,7 +65,7 @@ function PoolOverview({
       </div>
 
       <div className="absolute right-12.5 flex h-12 w-[250px] flex-col justify-end">
-        <ProgressBar currentProgress={25} />
+        <ProgressBar currentProgress={25} totalProgress={100} />
         <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
           <span>Pool cap</span>
           <span>

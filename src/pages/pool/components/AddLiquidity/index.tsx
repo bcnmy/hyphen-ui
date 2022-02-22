@@ -37,8 +37,7 @@ function AddLiquidity() {
   const { tokensList } = useToken()!;
   const { hyphen } = useHyphen()!;
   const { getTotalLiquidity } = useLiquidityProviders();
-  const { getTokenWalletCap, getTotalLiquidityByLP } =
-    useWhitelistPeriodManager();
+  const { getTokenTotalCap, getTokenWalletCap } = useWhitelistPeriodManager();
 
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
   const tokenDecimals = useMemo(() => {
@@ -125,6 +124,18 @@ function AddLiquidity() {
   const formattedTotalLiquidity = tokenDecimals
     ? totalLiquidity / 10 ** tokenDecimals
     : totalLiquidity;
+
+  const { data: tokenTotalCap } = useQuery(
+    ['tokenTotalCap', selectedTokenAddress],
+    () => getTokenTotalCap(selectedTokenAddress),
+    {
+      // Execute only when accounts are available.
+      enabled: !!selectedTokenAddress,
+    },
+  );
+  const formattedTokenTotalCap = tokenDecimals
+    ? tokenTotalCap / 10 ** tokenDecimals
+    : tokenTotalCap;
 
   const { data: tokenWalletCap } = useQuery(
     ['tokenWalletCap', selectedTokenAddress],
@@ -298,10 +309,15 @@ function AddLiquidity() {
           </div>
 
           <div className="mb-16">
-            <ProgressBar currentProgress={25} />
+            <ProgressBar
+              currentProgress={formattedTotalLiquidity}
+              totalProgress={formattedTokenTotalCap}
+            />
             <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
-              <span>19.8 ETH / 100 ETH</span>
+              <span>
+                {formattedTotalLiquidity} ETH / {formattedTokenTotalCap} ETH
+              </span>
             </div>
           </div>
 

@@ -46,7 +46,7 @@ function IncreaseLiquidity() {
       <section className="mt-8 grid grid-cols-2">
         <div className="max-h-84 h-84 border-r pr-12.5 pt-9">
           <div className="mb-9">
-            <ProgressBar currentProgress={25} />
+            <ProgressBar currentProgress={25} totalProgress={100} />
             <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
               <span>19.8 ETH / 100 ETH</span>

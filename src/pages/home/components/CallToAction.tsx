@@ -104,14 +104,24 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
         <>
           {fetchSelectedTokenApprovalStatus === Status.PENDING && (
             <>
-              <span data-tip data-for="whyTransferDisabled">
-                <PrimaryButtonLight disabled>
-                  <span className="flex items-center gap-2">
-                    <Spinner />
-                    <span>Transfer</span>
-                  </span>
+              <div
+                data-tip
+                data-for="whyTransferDisabled"
+                className="flex items-center"
+              >
+                {fetchSelectedTokenApprovalValue === false ? (
+                  <SecondaryButtonLight disabled className="mr-8">
+                    Approve
+                  </SecondaryButtonLight>
+                ) : null}
+                <PrimaryButtonLight
+                  disabled
+                  className="flex items-center gap-2"
+                >
+                  <Spinner />
+                  Transfer
                 </PrimaryButtonLight>
-              </span>
+              </div>
               <CustomTooltip id="whyTransferDisabled" text="Approval loading" />
             </>
           )}

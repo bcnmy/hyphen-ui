@@ -1,5 +1,4 @@
 import { useWalletProvider } from "context/WalletProvider";
-import { HiOutlineArrowSmRight } from "react-icons/hi";
 
 interface INavbarProps {
   showUserInfoModal: () => void;
@@ -10,31 +9,49 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
   const userAddress = accounts?.[0];
 
   return (
-    <div className="flex items-center justify-between w-full px-6 text-white border-b border-black shadow-sm bg-hyphen-purple bg-opacity-10 backdrop-blur-sm border-opacity-20">
-      <div className="flex">
+    <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">
+      <a href="/" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
-          className="w-auto h-8 mr-8"
+          className="h-8 w-auto"
           alt="Hyphen Logo"
         />
+      </a>
+      <nav className="flex h-full gap-7 text-white">
         <a
           target="_blank"
           href="https://hyphen-info.biconomy.io/"
           rel="noreferrer"
-          className="flex items-center text-white"
+          className="group relative flex items-center text-sm font-medium uppercase text-white"
         >
-          Analytics <HiOutlineArrowSmRight className="w-5 h-5 -rotate-45" />
+          Stats
+          <span
+            className="absolute -inset-1 top-[58px] hidden h-[5px] rounded-t-full bg-white group-hover:block"
+            aria-hidden="true"
+          ></span>
         </a>
-      </div>
+        <a
+          target="_blank"
+          href="https://docs.biconomy.io/products/hyphen-instant-cross-chain-transfers"
+          rel="noreferrer"
+          className="group relative flex items-center text-sm font-medium uppercase text-white"
+        >
+          Docs
+          <span
+            className="absolute -inset-1 top-[58px] hidden h-[5px] rounded-t-full bg-white group-hover:block"
+            aria-hidden="true"
+          ></span>
+        </a>
+      </nav>
       <button
-        className="px-4 py-1 bg-white bg-opacity-10 rounded-xl text-white font-mono border border-opacity-10 border-white font-base relative backdrop-blur-md cursor-pointer hover:bg-opacity-[0.15] hover:text-opacity-90 hover:border-opacity-20"
+        className="font-base absolute right-6 cursor-pointer rounded-xl border border-white border-opacity-10 bg-white bg-opacity-10 px-4 py-1 font-mono text-white backdrop-blur-md hover:border-opacity-20 hover:bg-opacity-[0.15] hover:text-opacity-90"
         onClick={isLoggedIn ? showUserInfoModal : connect}
       >
         {isLoggedIn
           ? `${userAddress?.slice(0, 6)}...${userAddress?.slice(-6)}`
           : "Connect Wallet"}
       </button>
-    </div>
+    </header>
   );
 }
 

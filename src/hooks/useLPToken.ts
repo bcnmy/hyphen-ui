@@ -20,7 +20,6 @@ function useLPToken() {
 
   const getUserPositions = useCallback(
     (accounts: string[] | undefined) => {
-      console.log(accounts);
       return accounts
         ? lpTokenContract
             .getAllNftIdsByUser(accounts[0])

@@ -11,6 +11,13 @@ function useWhitelistPeriodManager() {
     );
   }, []);
 
+  const getTokenTotalCap = useCallback(
+    (tokenAddress: string | undefined) => {
+      return whitelistPeriodManagerContract.perTokenTotalCap(tokenAddress);
+    },
+    [whitelistPeriodManagerContract],
+  );
+
   const getTokenWalletCap = useCallback(
     (tokenAddress: string | undefined) => {
       return whitelistPeriodManagerContract.perTokenWalletCap(tokenAddress);
@@ -27,6 +34,7 @@ function useWhitelistPeriodManager() {
 
   return {
     whitelistPeriodManagerContract,
+    getTokenTotalCap,
     getTokenWalletCap,
     getTotalLiquidityByLP,
   };

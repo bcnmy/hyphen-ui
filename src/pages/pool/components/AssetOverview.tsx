@@ -20,10 +20,10 @@ function AssetOverview({
   const { currentChainId } = useWalletProvider()!;
   const { getPositionMetadata } = useLPTokenContract();
   const { getTokenAmount, getTotalLiquidity } = useLPContract();
-  const { isLoading, data: positionMetadata } = useQuery(
-    ['positionMetadata', positionId],
-    () => getPositionMetadata(positionId),
-  );
+  const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
+    useQuery(['positionMetadata', positionId], () =>
+      getPositionMetadata(positionId),
+    );
   const {
     shares,
     suppliedLiquidity,
@@ -52,17 +52,17 @@ function AssetOverview({
     }
   }
 
-  if (isLoading) return null;
+  if (isPositionMetadataLoading || !currentChainId) return null;
 
-  const chain = currentChainId
-    ? chains.find(chain => chain.chainId === currentChainId)
-    : null;
-  const token = currentChainId
-    ? tokens.find(token => {
-        const { address } = token[currentChainId];
-        return address.toLowerCase() === tokenAddress.toLowerCase();
-      })
-    : null;
+  const chain = chains.find(chain => chain.chainId === currentChainId)!;
+  const token = tokens.find(token => {
+    const { address } = token[currentChainId];
+    return address.toLowerCase() === tokenAddress.toLowerCase();
+  })!;
+  const tokenDecimals = token[currentChainId].decimal;
+  const formattedTotalLiquidity = totalLiquidity / 10 ** tokenDecimals;
+  const formattedSuppliedLiquidity = suppliedLiquidity / 10 ** tokenDecimals;
+  const formattedTokenAmount = tokenAmount / 10 ** tokenDecimals;
 
   const { name: chainName } = chain!;
   const {
@@ -72,13 +72,13 @@ function AssetOverview({
   } = token!;
   const poolShare =
     suppliedLiquidity && totalLiquidity
-      ? (suppliedLiquidity.toNumber() / totalLiquidity.toNumber()) * 100
+      ? (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100
       : 0;
 
   const apy = 81.19;
   const unclaimedFees =
     suppliedLiquidity && tokenAmount
-      ? suppliedLiquidity.toNumber() - tokenAmount.toNumber()
+      ? formattedSuppliedLiquidity - formattedTokenAmount
       : 0;
 
   return (
@@ -95,7 +95,7 @@ function AssetOverview({
           <img src={tokenImage} alt={tokenSymbol} className="mr-2 h-8 w-8" />
           <div className="flex flex-col">
             <span className="font-mono text-2xl ">
-              {suppliedLiquidity.toNumber()} {tokenSymbol}
+              {formattedSuppliedLiquidity} {tokenSymbol}
             </span>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
               {chainName}

@@ -4,8 +4,8 @@ import { useQuery } from 'react-query';
 import tokens from 'config/tokens';
 import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
-import useLPTokenContract from 'hooks/useLPTokenContract';
-import useLPContract from 'hooks/useLPContract';
+import useLPTokenContract from 'hooks/useLPToken';
+import useLPContract from 'hooks/useLiquidityProviders';
 
 interface IAssetOverview {
   positionId: BigNumber;

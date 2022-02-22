@@ -72,7 +72,7 @@ export const Select: React.FC<ISelectProps> = ({
         <div className="relative mt-2 h-15">
           <Listbox.Button
             className={twMerge(
-              'rounded-2.5 relative h-full w-full cursor-default border bg-white py-2 pl-4 pr-10 text-left focus:outline-none',
+              'relative h-full w-full cursor-default rounded-2.5 border bg-white py-2 pl-4 pr-10 text-left focus:outline-none',
               disabled && 'cursor-not-allowed bg-gray-200 text-gray-900/80',
             )}
           >
@@ -106,7 +106,7 @@ export const Select: React.FC<ISelectProps> = ({
             leaveTo="opacity-0"
           >
             <Listbox.Options className="absolute z-10 mt-2 max-h-60 min-w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              {options.map((option) => (
+              {options.map(option => (
                 <Listbox.Option
                   key={option.id}
                   className={({ active }) =>

@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityProvidersABI from 'contracts/LiquidityProviders.abi.json';
 
-function useLPContract() {
+function useLiquidityProviders() {
   const liquidityProvidersContract = useMemo(() => {
     return new ethers.Contract(
       '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
@@ -22,7 +22,7 @@ function useLPContract() {
   );
 
   const getTotalLiquidity = useCallback(
-    (tokenAddress: string) => {
+    (tokenAddress: string | undefined) => {
       return liquidityProvidersContract.totalReserve(tokenAddress);
     },
     [liquidityProvidersContract],
@@ -31,4 +31,4 @@ function useLPContract() {
   return { liquidityProvidersContract, getTokenAmount, getTotalLiquidity };
 }
 
-export default useLPContract;
+export default useLiquidityProviders;

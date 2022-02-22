@@ -2,10 +2,9 @@ import { BigNumber } from 'ethers';
 import { Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import Skeleton from 'react-loading-skeleton';
-import { useChains } from 'context/Chains';
 import AssetOverview from '../../AssetOverview';
 import { useWalletProvider } from 'context/WalletProvider';
-import useLPTokenContract from 'hooks/useLPTokenContract';
+import useLPTokenContract from 'hooks/useLPToken';
 
 function YourPositions() {
   const { accounts } = useWalletProvider()!;

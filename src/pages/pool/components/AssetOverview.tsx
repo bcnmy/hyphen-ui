@@ -46,12 +46,6 @@ function AssetOverview({
     },
   );
 
-  function handleAssetOverviewClick() {
-    if (redirectToManageLiquidity) {
-      navigate('manage-position');
-    }
-  }
-
   if (isPositionMetadataLoading || !currentChainId) return null;
 
   const chain = chains.find(chain => chain.chainId === currentChainId)!;
@@ -81,9 +75,19 @@ function AssetOverview({
       ? formattedSuppliedLiquidity - formattedTokenAmount
       : 0;
 
+  function handleAssetOverviewClick() {
+    if (redirectToManageLiquidity) {
+      navigate(
+        `manage-position/chain=${currentChainId}/position=${positionId}`,
+      );
+    }
+  }
+
   return (
     <section
-      className="flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400"
+      className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
+        redirectToManageLiquidity ? 'cursor-pointer' : ''
+      }`}
       onClick={handleAssetOverviewClick}
       style={{ backgroundColor: chainColor }}
     >

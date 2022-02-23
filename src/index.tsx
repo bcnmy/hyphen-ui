@@ -30,7 +30,10 @@ ReactDOM.render(
             <Route path="/pool" element={<Pool />}>
               <Route path="" element={<PoolsOverview />} />
               <Route path="add-liquidity" element={<AddLiquidity />} />
-              <Route path="manage-position" element={<ManagePosition />} />
+              <Route
+                path="manage-position/chain=:chainId/position=:positionId"
+                element={<ManagePosition />}
+              />
               <Route
                 path="increase-liquidity"
                 element={<IncreaseLiquidity />}

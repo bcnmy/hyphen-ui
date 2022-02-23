@@ -21,6 +21,7 @@ import { useHyphen } from 'context/Hyphen';
 import { NATIVE_ADDRESS } from 'config/constants';
 import { TokenConfig } from 'config/tokens';
 import useDebounce from 'hooks/useDebounce';
+import getTokenAllowance from 'utils/getTokenAllowance';
 
 interface IAddLiquidity {
   apy: number;
@@ -45,6 +46,11 @@ function AddLiquidity() {
     const token = tokensList.find(token => token.symbol === selectedToken?.id)!;
     return token[currentChainId].decimal;
   }, [currentChainId, selectedToken, tokensList]);
+  const [isSelectedTokenApproved, setIsSelectedTokenApproved] = useState<
+    boolean | undefined
+  >();
+  const [selectedTokenAllowance, setSelectedTokenAllowance] =
+    useState<BigNumber>();
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<
     string | undefined
   >();
@@ -92,7 +98,6 @@ function AddLiquidity() {
         const chainRpcProvider = new ethers.providers.JsonRpcProvider(
           chain.rpcUrl,
         );
-
         const tokenContract = new ethers.Contract(
           token[currentChainId].address,
           erc20ABI,
@@ -105,8 +110,17 @@ function AddLiquidity() {
           token,
           tokenContract,
         );
+        if (token[currentChainId].address !== NATIVE_ADDRESS) {
+          const tokenAllowance = await getTokenAllowance(
+            accounts[0],
+            '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+            token[currentChainId].address,
+          );
+          setSelectedTokenAllowance(tokenAllowance);
+        }
         setSelectedTokenAddress(token[currentChainId].address);
         setWalletBalance(displayBalance);
+        setIsSelectedTokenApproved(true);
       }
     }
 
@@ -181,6 +195,26 @@ function AddLiquidity() {
     if (isInputValid) {
       setLiquidityAmount(newLiquidityAmount);
       updatePoolShare(newLiquidityAmount);
+
+      if (
+        newLiquidityAmount !== '' &&
+        selectedTokenAddress !== NATIVE_ADDRESS &&
+        selectedTokenAllowance
+      ) {
+        let rawLiquidityAmount = ethers.utils.parseUnits(
+          newLiquidityAmount,
+          tokenDecimals,
+        );
+        let rawLiquidityAmountHexString = rawLiquidityAmount.toHexString();
+
+        if (selectedTokenAllowance.lt(rawLiquidityAmountHexString)) {
+          setIsSelectedTokenApproved(false);
+        } else {
+          setIsSelectedTokenApproved(true);
+        }
+      } else {
+        setIsSelectedTokenApproved(true);
+      }
     }
   }
 
@@ -250,6 +284,7 @@ function AddLiquidity() {
                 setWalletBalance(undefined);
                 setSelectedToken(tokenOption);
                 setSelectedTokenAddress(undefined);
+                setIsSelectedTokenApproved(undefined);
               }}
               label={'asset'}
             />
@@ -290,12 +325,22 @@ function AddLiquidity() {
             disabled={!totalLiquidity}
           />
           <StepSlider dots onChange={handleSliderChange} step={25} />
-          <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-gray-100 font-semibold text-hyphen-gray-300">
-            ETH Approved
+          <button
+            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+            disabled={
+              isSelectedTokenApproved || isSelectedTokenApproved === undefined
+            }
+          >
+            {isSelectedTokenApproved === undefined
+              ? `Loading Token Approval`
+              : isSelectedTokenApproved
+              ? `${selectedToken?.name} Approved`
+              : `Approve ${selectedToken?.name}`}
           </button>
           <button
-            className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+            className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
             onClick={handleConfirmSupplyClick}
+            disabled={liquidityAmount === '' || !isSelectedTokenApproved}
           >
             Confirm Supply
           </button>

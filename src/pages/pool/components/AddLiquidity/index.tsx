@@ -36,7 +36,7 @@ function AddLiquidity() {
   const { chainsList, fromChain } = useChains()!;
   const { tokensList } = useToken()!;
   const { hyphen } = useHyphen()!;
-  const { getTotalLiquidity } = useLiquidityProviders();
+  const { addTokenLiquidity, getTotalLiquidity } = useLiquidityProviders();
   const { getTokenTotalCap, getTokenWalletCap } = useWhitelistPeriodManager();
 
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
@@ -209,6 +209,15 @@ function AddLiquidity() {
     }
   }
 
+  function handleConfirmSupplyClick() {
+    if (selectedTokenAddress && liquidityAmount && tokenDecimals) {
+      addTokenLiquidity(
+        selectedTokenAddress,
+        ethers.utils.parseUnits(liquidityAmount, tokenDecimals),
+      );
+    }
+  }
+
   return (
     <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
       <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
@@ -284,7 +293,10 @@ function AddLiquidity() {
           <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-gray-100 font-semibold text-hyphen-gray-300">
             ETH Approved
           </button>
-          <button className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
+          <button
+            className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+            onClick={handleConfirmSupplyClick}
+          >
             Confirm Supply
           </button>
         </div>

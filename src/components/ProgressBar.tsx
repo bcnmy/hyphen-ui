@@ -10,7 +10,7 @@ function ProgressBar({ currentProgress, totalProgress }: IProgressBar) {
     <div className="flex h-4.5 w-full items-center rounded-full bg-hyphen-purple p-1">
       <div
         className="h-full rounded-full bg-white"
-        style={{ width: `${completed}%` }}
+        style={{ width: `${completed > 2.5 ? completed : 2.5}%` }}
       ></div>
     </div>
   );

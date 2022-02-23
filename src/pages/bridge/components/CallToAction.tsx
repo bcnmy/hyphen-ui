@@ -21,10 +21,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   onTransferButtonClick,
 }) => {
   const {
-    executeApproveToken,
-    executeApproveTokenError,
     executeApproveTokenStatus,
-    fetchSelectedTokenApproval,
     fetchSelectedTokenApprovalError,
     fetchSelectedTokenApprovalStatus,
     fetchSelectedTokenApprovalValue,
@@ -34,7 +31,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   const { walletProvider, currentChainId, connect, isLoggedIn } =
     useWalletProvider()!;
   const {
-    receiver: { receiverAddress, isReceiverValid },
+    receiver: { isReceiverValid },
     transactionAmountValidationErrors,
   } = useTransaction()!;
   const { isBiconomyEnabled } = useBiconomy()!;

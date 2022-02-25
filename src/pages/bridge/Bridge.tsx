@@ -20,12 +20,14 @@ import { useTransaction } from 'context/Transaction';
 import { useBiconomy } from 'context/Biconomy';
 import CustomTooltip from '../../components/CustomTooltip';
 import { HiInformationCircle } from 'react-icons/hi';
+import { useToken } from 'context/Token';
 
 interface BridgeProps {}
 
 const Bridge: React.FC<BridgeProps> = () => {
-  const { areChainsReady } = useChains()!;
-  const { changeTransferAmountInputValue } = useTransaction()!;
+  const { fromChain, areChainsReady } = useChains()!;
+  const { selectedToken } = useToken()!;
+  const { transferAmount, changeTransferAmountInputValue } = useTransaction()!;
   const { isBiconomyAllowed, setIsBiconomyToggledOn, isBiconomyEnabled } =
     useBiconomy()!;
   const { isLoggedIn, connect } = useWalletProvider()!;
@@ -39,11 +41,11 @@ const Bridge: React.FC<BridgeProps> = () => {
     hideModal: hideTransferlModal,
     showModal: showTransferModal,
   } = useModal();
-  const { executeApproveTokenError } = useTokenApproval()!;
+  const { executeApproveTokenError, executeApproveToken } = useTokenApproval()!;
 
   useEffect(() => {
     (async () => {
-      await connect().catch((e) => {
+      await connect().catch(e => {
         console.error(e);
       });
     })();
@@ -51,10 +53,16 @@ const Bridge: React.FC<BridgeProps> = () => {
 
   return (
     <>
-      <ApprovalModal
-        isVisible={isApprovalModalVisible}
-        onClose={hideApprovalModal}
-      />
+      {fromChain && selectedToken && transferAmount ? (
+        <ApprovalModal
+          executeTokenApproval={executeApproveToken}
+          isVisible={isApprovalModalVisible}
+          onClose={hideApprovalModal}
+          selectedChainName={fromChain.name}
+          selectedTokenName={selectedToken.symbol}
+          transferAmount={transferAmount}
+        />
+      ) : null}
       <TransferModal
         isVisible={isTransferModalVisible}
         onClose={() => {
@@ -66,7 +74,7 @@ const Bridge: React.FC<BridgeProps> = () => {
       <div className="my-24">
         <div className="mx-auto max-w-xl">
           <div className="relative z-10">
-            <div className="rounded-10 flex flex-col gap-2 bg-white p-6 shadow-lg">
+            <div className="flex flex-col gap-2 rounded-10 bg-white p-6 shadow-lg">
               <div className="mb-2 flex items-center justify-end">
                 <div className="flex items-center">
                   <HiInformationCircle
@@ -92,7 +100,7 @@ const Bridge: React.FC<BridgeProps> = () => {
                     <Toggle
                       label="Gasless Mode"
                       enabled={isBiconomyEnabled}
-                      onToggle={(enabled) => setIsBiconomyToggledOn(enabled)}
+                      onToggle={enabled => setIsBiconomyToggledOn(enabled)}
                     />
                   </div>
                 </div>

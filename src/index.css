@@ -81,3 +81,8 @@ code {
   border-color: white !important;
   box-shadow: none !important;
 }
+
+.rc-slider-disabled {
+  background-color: #ffffff !important;
+  opacity: 0.5;
+}

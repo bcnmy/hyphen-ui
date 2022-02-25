@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
-import lpTokenABI from 'contracts/LPToken.abi.json';
+import lpTokenABI from 'abis/LPToken.abi.json';
 
 function useLPToken() {
   const lpTokenContract = useMemo(() => {

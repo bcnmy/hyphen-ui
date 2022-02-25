@@ -2,12 +2,13 @@ import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
 interface IStepSlider {
+  disabled?: boolean | false;
   dots?: boolean | false;
   onChange: (value: number) => void;
   step?: number | 1;
 }
 
-function StepSlider({ dots, onChange, step }: IStepSlider) {
+function StepSlider({ disabled, dots, onChange, step }: IStepSlider) {
   return (
     <Slider
       step={step}
@@ -40,6 +41,7 @@ function StepSlider({ dots, onChange, step }: IStepSlider) {
         backgroundColor: '#615ccd',
       }}
       onChange={onChange}
+      disabled={disabled}
     />
   );
 }

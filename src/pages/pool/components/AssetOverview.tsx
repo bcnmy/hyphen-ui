@@ -66,7 +66,9 @@ function AssetOverview({
   } = token!;
   const poolShare =
     suppliedLiquidity && totalLiquidity
-      ? (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100
+      ? Math.round(
+          (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
+        ) / 100
       : 0;
 
   const apy = 81.19;

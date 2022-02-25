@@ -11,17 +11,17 @@ import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
 import getTokenBalance from 'utils/getTokenBalance';
 import { BigNumber, ethers } from 'ethers';
-import erc20ABI from 'contracts/erc20.abi.json';
+import erc20ABI from 'abis/erc20.abi.json';
 import Skeleton from 'react-loading-skeleton';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
-import useLPToken from 'hooks/useLPToken';
-import { useHyphen } from 'context/Hyphen';
 import { NATIVE_ADDRESS } from 'config/constants';
-import { TokenConfig } from 'config/tokens';
-import useDebounce from 'hooks/useDebounce';
 import getTokenAllowance from 'utils/getTokenAllowance';
+import ApprovalModal from 'pages/bridge/components/ApprovalModal';
+import useModal from 'hooks/useModal';
+import setTokenAllowance from 'utils/giveTokenAllowance';
+import { useNotifications } from 'context/Notifications';
 
 interface IAddLiquidity {
   apy: number;
@@ -36,7 +36,7 @@ function AddLiquidity() {
   const { accounts, currentChainId, walletProvider } = useWalletProvider()!;
   const { chainsList, fromChain } = useChains()!;
   const { tokensList } = useToken()!;
-  const { hyphen } = useHyphen()!;
+  const { addTxNotification } = useNotifications()!;
   const { addTokenLiquidity, getTotalLiquidity } = useLiquidityProviders();
   const { getTokenTotalCap, getTokenWalletCap } = useWhitelistPeriodManager();
 
@@ -78,6 +78,11 @@ function AddLiquidity() {
       };
     });
   }, [chainsList]);
+  const {
+    isVisible: isApprovalModalVisible,
+    hideModal: hideApprovalModal,
+    showModal: showApprovalModal,
+  } = useModal();
 
   useEffect(() => {
     setSelectedToken(tokenOptions[0]);
@@ -117,13 +122,18 @@ function AddLiquidity() {
             token[currentChainId].address,
           );
           setSelectedTokenAllowance(tokenAllowance);
+        } else {
+          setIsSelectedTokenApproved(true);
         }
         setSelectedTokenAddress(token[currentChainId].address);
         setWalletBalance(displayBalance);
-        setIsSelectedTokenApproved(true);
       }
     }
 
+    setWalletBalance(undefined);
+    setSelectedTokenAddress(undefined);
+    setSelectedTokenAllowance(undefined);
+    setIsSelectedTokenApproved(undefined);
     handleTokenChange();
   }, [accounts, chainsList, currentChainId, selectedToken, tokensList]);
 
@@ -173,6 +183,53 @@ function AddLiquidity() {
   //   console.log(tokenWalletCap.toString(), totalLiquidityByLP.toString());
   // }
 
+  const {
+    isLoading: approveTokenLoading,
+    isSuccess: approveTokenSuccess,
+    data: approveTokenTx,
+    mutate: approveTokenMutation,
+  } = useMutation(
+    ({
+      isInfiniteApproval,
+      tokenAmount,
+    }: {
+      isInfiniteApproval: boolean;
+      tokenAmount: number;
+    }) => approveToken(isInfiniteApproval, tokenAmount),
+  );
+
+  // console.log({ approveTokenLoading, approveTokenSuccess, approveTokenTx });
+
+  const {
+    isLoading: addTokenLiquidityLoading,
+    isSuccess: addTokenLiquiditySuccess,
+    data: addTokenLiquidityTx,
+    mutate: addTokenLiquidityMutation,
+  } = useMutation(
+    async ({
+      tokenAddress,
+      amount,
+    }: {
+      tokenAddress: string;
+      amount: BigNumber;
+    }) => {
+      const addTokenLiquidityTx = await addTokenLiquidity(tokenAddress, amount);
+      addTxNotification(
+        addTokenLiquidityTx,
+        'Approval',
+        `${fromChain?.explorerUrl}/tx/${addTokenLiquidityTx.hash}`,
+      );
+      return await addTokenLiquidityTx.wait(1);
+    },
+  );
+
+  console.log({
+    tokenAllowance: selectedTokenAllowance?.toString(),
+    addTokenLiquidityLoading,
+    addTokenLiquiditySuccess,
+    addTokenLiquidityTx,
+  });
+
   async function handleNetworkChange(selectedNetwork: Option) {
     const network = chainsList.find(
       chain => chain.chainId === selectedNetwork.id,
@@ -218,6 +275,40 @@ function AddLiquidity() {
     }
   }
 
+  function handleSliderChange(value: number) {
+    if (value === 0) {
+      setIsSelectedTokenApproved(undefined);
+      setLiquidityAmount('');
+      updatePoolShare('0');
+    } else if (walletBalance && parseFloat(walletBalance) > 0) {
+      const newLiquidityAmount = (
+        Math.trunc(parseFloat(walletBalance) * (value / 100) * 1000) / 1000
+      ).toString();
+      setLiquidityAmount(newLiquidityAmount);
+      updatePoolShare(newLiquidityAmount);
+
+      if (
+        newLiquidityAmount !== '' &&
+        selectedTokenAddress !== NATIVE_ADDRESS &&
+        selectedTokenAllowance
+      ) {
+        let rawLiquidityAmount = ethers.utils.parseUnits(
+          newLiquidityAmount,
+          tokenDecimals,
+        );
+        let rawLiquidityAmountHexString = rawLiquidityAmount.toHexString();
+
+        if (selectedTokenAllowance.lt(rawLiquidityAmountHexString)) {
+          setIsSelectedTokenApproved(false);
+        } else {
+          setIsSelectedTokenApproved(true);
+        }
+      } else {
+        setIsSelectedTokenApproved(true);
+      }
+    }
+  }
+
   function updatePoolShare(newLiquidityAmount: string) {
     const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
     const newPoolShare =
@@ -230,158 +321,236 @@ function AddLiquidity() {
     setPoolShare(Math.round(newPoolShare * 100) / 100);
   }
 
-  function handleSliderChange(value: number) {
-    if (value === 0) {
-      setLiquidityAmount('');
-      updatePoolShare('0');
-    } else if (walletBalance && parseFloat(walletBalance) > 0) {
-      const newLiquidityAmount = (
-        Math.trunc(parseFloat(walletBalance) * (value / 100) * 1000) / 1000
-      ).toString();
-      setLiquidityAmount(newLiquidityAmount);
-      updatePoolShare(newLiquidityAmount);
+  function executeTokenApproval(
+    isInfiniteApproval: boolean,
+    tokenAmount: number,
+  ) {
+    approveTokenMutation(
+      { isInfiniteApproval, tokenAmount },
+      {
+        onSuccess: onTokenApprovalSuccess,
+      },
+    );
+  }
+
+  async function approveToken(
+    isInfiniteApproval: boolean,
+    tokenAmount: number,
+  ) {
+    if (isInfiniteApproval && selectedTokenAddress) {
+      const something = setTokenAllowance(
+        '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+        selectedTokenAddress,
+        ethers.constants.MaxUint256,
+      );
+      console.log(something);
+    } else if (selectedTokenAddress) {
+      const rawTokenAmount = ethers.utils.parseUnits(
+        tokenAmount.toString(),
+        tokenDecimals,
+      );
+      console.log(rawTokenAmount.toString());
+      const tokenApproveTx = await setTokenAllowance(
+        '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+        selectedTokenAddress,
+        rawTokenAmount,
+      );
+      addTxNotification(
+        tokenApproveTx,
+        'Approval',
+        `${fromChain?.explorerUrl}/tx/${tokenApproveTx.hash}`,
+      );
+      return await tokenApproveTx.wait(1);
     }
+  }
+
+  function onTokenApprovalSuccess() {
+    setIsSelectedTokenApproved(true);
   }
 
   function handleConfirmSupplyClick() {
     if (selectedTokenAddress && liquidityAmount && tokenDecimals) {
-      addTokenLiquidity(
-        selectedTokenAddress,
-        ethers.utils.parseUnits(liquidityAmount, tokenDecimals),
+      addTokenLiquidityMutation(
+        {
+          tokenAddress: selectedTokenAddress,
+          amount: ethers.utils.parseUnits(liquidityAmount, tokenDecimals),
+        },
+        {
+          onSuccess: onAddTokenLiquiditySuccess,
+        },
       );
     }
   }
 
+  function onAddTokenLiquiditySuccess() {
+    navigate('/pool');
+  }
+
   return (
-    <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
-      <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
-        <div className="absolute left-0">
-          <button
-            className="flex items-center rounded text-hyphen-gray-400"
-            onClick={() => navigate(-1)}
-          >
-            <HiArrowSmLeft className="h-5 w-auto" />
-          </button>
-        </div>
-
-        <h2 className="text-xl text-hyphen-purple">Add Liquidity</h2>
-
-        <div className="absolute right-0 flex">
-          <button className="mr-4 text-xs text-hyphen-purple">Clear All</button>
-          <button className="flex items-center rounded text-hyphen-gray-400">
-            <HiAdjustments className="h-4 w-auto rotate-90" />
-          </button>
-        </div>
-      </header>
-
-      <section className="grid grid-cols-2">
-        <div className="max-h-100 h-100 border-r pr-12.5">
-          <div className="mb-6 grid grid-cols-2 gap-2.5">
-            <Select
-              options={tokenOptions}
-              selected={selectedToken}
-              setSelected={tokenOption => {
-                setWalletBalance(undefined);
-                setSelectedToken(tokenOption);
-                setSelectedTokenAddress(undefined);
-                setIsSelectedTokenApproved(undefined);
-              }}
-              label={'asset'}
-            />
-            <Select
-              options={networkOptions}
-              selected={selectedNetwork}
-              setSelected={networkOption => handleNetworkChange(networkOption)}
-              label={'network'}
-            />
+    <>
+      {selectedNetwork && selectedToken && liquidityAmount ? (
+        <ApprovalModal
+          executeTokenApproval={executeTokenApproval}
+          isVisible={isApprovalModalVisible}
+          onClose={hideApprovalModal}
+          selectedChainName={selectedNetwork.name}
+          selectedTokenName={selectedToken.name}
+          transferAmount={parseFloat(liquidityAmount)}
+        />
+      ) : null}
+      <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
+        <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
+          <div className="absolute left-0">
+            <button
+              className="flex items-center rounded text-hyphen-gray-400"
+              onClick={() => navigate(-1)}
+            >
+              <HiArrowSmLeft className="h-5 w-auto" />
+            </button>
           </div>
-          <label
-            htmlFor="liquidityAmount"
-            className="flex justify-between px-5 text-xxs font-bold uppercase"
-          >
-            <span className="text-hyphen-gray-400">Input</span>
-            <span className="flex text-hyphen-gray-300">
-              Your address limit:{' '}
-              {walletBalance ? (
-                walletBalance
-              ) : (
-                <Skeleton
-                  baseColor="#615ccd20"
-                  enableAnimation={!!selectedToken}
-                  highlightColor="#615ccd05"
-                  className="!ml-1 !w-11"
-                />
-              )}
-            </span>
-          </label>
-          <input
-            id="liquidityAmount"
-            placeholder="0.000"
-            type="number"
-            inputMode="decimal"
-            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
-            value={liquidityAmount}
-            onChange={handleLiquidityAmountChange}
-            disabled={!totalLiquidity}
-          />
-          <StepSlider dots onChange={handleSliderChange} step={25} />
-          <button
-            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-            disabled={
-              isSelectedTokenApproved || isSelectedTokenApproved === undefined
-            }
-          >
-            {isSelectedTokenApproved === undefined
-              ? `Loading Token Approval`
-              : isSelectedTokenApproved
-              ? `${selectedToken?.name} Approved`
-              : `Approve ${selectedToken?.name}`}
-          </button>
-          <button
-            className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-            onClick={handleConfirmSupplyClick}
-            disabled={liquidityAmount === '' || !isSelectedTokenApproved}
-          >
-            Confirm Supply
-          </button>
-        </div>
-        <div className="max-h-100 h-100 pl-12.5">
-          <div className="mb-14 grid grid-cols-2 gap-2.5">
-            <div className="flex flex-col">
-              <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
-                APY
+
+          <h2 className="text-xl text-hyphen-purple">Add Liquidity</h2>
+
+          <div className="absolute right-0 flex">
+            <button className="mr-4 text-xs text-hyphen-purple">
+              Clear All
+            </button>
+            <button className="flex items-center rounded text-hyphen-gray-400">
+              <HiAdjustments className="h-4 w-auto rotate-90" />
+            </button>
+          </div>
+        </header>
+
+        <section className="grid grid-cols-2">
+          <div className="max-h-100 h-100 border-r pr-12.5">
+            <div className="mb-6 grid grid-cols-2 gap-2.5">
+              <Select
+                options={tokenOptions}
+                selected={selectedToken}
+                setSelected={tokenOption => {
+                  setSelectedToken(tokenOption);
+                }}
+                label={'asset'}
+              />
+              <Select
+                options={networkOptions}
+                selected={selectedNetwork}
+                setSelected={networkOption =>
+                  handleNetworkChange(networkOption)
+                }
+                label={'network'}
+              />
+            </div>
+            <label
+              htmlFor="liquidityAmount"
+              className="flex justify-between px-5 text-xxs font-bold uppercase"
+            >
+              <span className="text-hyphen-gray-400">Input</span>
+              <span className="flex text-hyphen-gray-300">
+                Your address limit:{' '}
+                {walletBalance ? (
+                  walletBalance
+                ) : (
+                  <Skeleton
+                    baseColor="#615ccd20"
+                    enableAnimation={!!selectedToken}
+                    highlightColor="#615ccd05"
+                    className="!ml-1 !w-11"
+                  />
+                )}
               </span>
-              <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                81.19%
+            </label>
+            <input
+              id="liquidityAmount"
+              placeholder="0.000"
+              type="number"
+              inputMode="decimal"
+              className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+              value={liquidityAmount}
+              onChange={handleLiquidityAmountChange}
+              disabled={
+                !totalLiquidity ||
+                approveTokenLoading ||
+                addTokenLiquidityLoading
+              }
+            />
+            <StepSlider
+              disabled={approveTokenLoading || addTokenLiquidityLoading}
+              dots
+              onChange={handleSliderChange}
+              step={25}
+            />
+            <button
+              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              disabled={
+                isSelectedTokenApproved ||
+                isSelectedTokenApproved === undefined ||
+                approveTokenLoading ||
+                addTokenLiquidityLoading
+              }
+              onClick={showApprovalModal}
+            >
+              {liquidityAmount === '' && !isSelectedTokenApproved
+                ? 'Enter amount to see approval'
+                : approveTokenLoading
+                ? 'Approving Token...'
+                : isSelectedTokenApproved
+                ? `${selectedToken?.name} Approved`
+                : `Approve ${selectedToken?.name}`}
+            </button>
+            <button
+              className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              onClick={handleConfirmSupplyClick}
+              disabled={
+                liquidityAmount === '' ||
+                !isSelectedTokenApproved ||
+                addTokenLiquidityLoading
+              }
+            >
+              {addTokenLiquidityLoading
+                ? 'Adding Liquidity...'
+                : 'Confirm Supply'}
+            </button>
+          </div>
+          <div className="max-h-100 h-100 pl-12.5">
+            <div className="mb-14 grid grid-cols-2 gap-2.5">
+              <div className="flex flex-col">
+                <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                  APY
+                </span>
+                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                  81.19%
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                  Your pool share
+                </span>
+                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                  {poolShare}%
+                </div>
               </div>
             </div>
-            <div className="flex flex-col">
-              <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
-                Your pool share
-              </span>
-              <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                {poolShare}%
+
+            <div className="mb-16">
+              <ProgressBar
+                currentProgress={formattedTotalLiquidity}
+                totalProgress={formattedTokenTotalCap}
+              />
+              <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
+                <span>Pool cap</span>
+                <span>
+                  {formattedTotalLiquidity || '...'} {selectedToken?.name} /{' '}
+                  {formattedTokenTotalCap || '...'} {selectedToken?.name}
+                </span>
               </div>
             </div>
-          </div>
 
-          <div className="mb-16">
-            <ProgressBar
-              currentProgress={formattedTotalLiquidity}
-              totalProgress={formattedTokenTotalCap}
-            />
-            <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
-              <span>Pool cap</span>
-              <span>
-                {formattedTotalLiquidity} ETH / {formattedTokenTotalCap} ETH
-              </span>
-            </div>
+            <LiquidityInfo />
           </div>
-
-          <LiquidityInfo />
-        </div>
-      </section>
-    </article>
+        </section>
+      </article>
+    </>
   );
 }
 

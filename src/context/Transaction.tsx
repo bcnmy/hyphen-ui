@@ -1,5 +1,5 @@
-import AwesomeDebouncePromise from "awesome-debounce-promise";
-import { BigNumber, ethers } from "ethers";
+import AwesomeDebouncePromise from 'awesome-debounce-promise';
+import { BigNumber, ethers } from 'ethers';
 import {
   createContext,
   FormEvent,
@@ -8,31 +8,31 @@ import {
   useEffect,
   useMemo,
   useState,
-} from "react";
+} from 'react';
 
-import lpmanagerABI from "contracts/lpmanager.abi.json";
+import lpmanagerABI from 'abis/lpmanager.abi.json';
 
 // @ts-ignore
-import { RESPONSE_CODES } from "@biconomy/hyphen";
+import { RESPONSE_CODES } from '@biconomy/hyphen';
 
 import {
   DEFAULT_FIXED_DECIMAL_POINT,
   LP_FEE_FRACTION,
   NATIVE_ADDRESS,
-} from "config/constants";
-import { useChains } from "./Chains";
-import { useHyphen } from "./Hyphen";
-import { useToken } from "./Token";
-import { useTokenApproval } from "./TokenApproval";
-import config from "config";
-import toFixed from "utils/toFixed";
-import formatRawEthValue from "utils/formatRawEthValue";
-import useAsync, { Status } from "hooks/useLoading";
-import { useWalletProvider } from "./WalletProvider";
-import { IoMdReturnLeft } from "react-icons/io";
-import { useBiconomy } from "./Biconomy";
-import { exit } from "process";
-import { useNotifications } from "./Notifications";
+} from 'config/constants';
+import { useChains } from './Chains';
+import { useHyphen } from './Hyphen';
+import { useToken } from './Token';
+import { useTokenApproval } from './TokenApproval';
+import config from 'config';
+import toFixed from 'utils/toFixed';
+import formatRawEthValue from 'utils/formatRawEthValue';
+import useAsync, { Status } from 'hooks/useLoading';
+import { useWalletProvider } from './WalletProvider';
+import { IoMdReturnLeft } from 'react-icons/io';
+import { useBiconomy } from './Biconomy';
+import { exit } from 'process';
+import { useNotifications } from './Notifications';
 
 export enum ValidationErrors {
   INVALID_AMOUNT,
@@ -83,15 +83,15 @@ const TransactionContext = createContext<ITransactionContext | null>(null);
 const getTokenGasPrice = (
   tokenAddress: string,
   networkId: number,
-  fetchOptions: any
+  fetchOptions: any,
 ) =>
   fetch(
     `${config.hyphen.baseURL}${config.hyphen.getTokenGasPricePath}?tokenAddress=${tokenAddress}&networkId=${networkId}`,
-    fetchOptions
+    fetchOptions,
   );
 const getTokenGasPriceDebounced = AwesomeDebouncePromise(getTokenGasPrice, 500);
 
-const TransactionProvider: React.FC = (props) => {
+const TransactionProvider: React.FC = props => {
   const { selectedToken, selectedTokenBalance } = useToken()!;
   const { toChainRpcUrlProvider } = useChains()!;
   const { poolInfo, hyphen } = useHyphen()!;
@@ -116,13 +116,13 @@ const TransactionProvider: React.FC = (props) => {
   const [errors, setErrors] = useState<ValidationErrors[]>([]);
 
   const [transferAmountInputValue, setTransferAmountInputValue] =
-    useState<string>("");
+    useState<string>('');
 
   const [receiver, setReceiver] = useState<{
     receiverAddress: string;
     isReceiverValid: boolean;
   }>({
-    receiverAddress: "",
+    receiverAddress: '',
     isReceiverValid: false,
   });
 
@@ -137,12 +137,12 @@ const TransactionProvider: React.FC = (props) => {
 
   // reset the input after conditions change
   useEffect(() => {
-    setTransferAmountInputValue("");
+    setTransferAmountInputValue('');
   }, [fromChain, toChain, selectedToken]);
 
   const transferAmount = useMemo(
     () => parseFloat(transferAmountInputValue),
-    [transferAmountInputValue]
+    [transferAmountInputValue],
   );
 
   // Fetch token approval when conditions change
@@ -189,17 +189,17 @@ const TransactionProvider: React.FC = (props) => {
 
   const calculateTransactionFee = useCallback(async () => {
     const fetchOptions = {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "Content-Type": "application/json;charset=utf-8",
+        'Content-Type': 'application/json;charset=utf-8',
       },
     };
 
     if (!fromChain || !selectedToken || !toChain || !transferAmount)
-      throw new Error("App not initialised");
+      throw new Error('App not initialised');
 
-    if (isNaN(transferAmount)) throw new Error("Transfer amount is invalid");
-    console.log("calculate fee for amount", transferAmount);
+    if (isNaN(transferAmount)) throw new Error('Transfer amount is invalid');
+    console.log('calculate fee for amount', transferAmount);
 
     let fixedDecimalPoint =
       selectedToken[fromChain.chainId].fixedDecimalPoint ||
@@ -213,7 +213,7 @@ const TransactionProvider: React.FC = (props) => {
     let fetchResponse = await getTokenGasPriceDebounced(
       selectedToken[toChain.chainId].address,
       toChain.chainId,
-      fetchOptions
+      fetchOptions,
     );
 
     // Check the balance again using tokenAmount
@@ -232,19 +232,19 @@ const TransactionProvider: React.FC = (props) => {
 
     if (!response || !response.tokenGasPrice) {
       throw new Error(
-        `Unable to get token gas price for ${selectedToken.symbol}`
+        `Unable to get token gas price for ${selectedToken.symbol}`,
       );
     }
 
     console.log(
-      `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`
+      `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
     );
 
     let tokenGasPrice = response.tokenGasPrice;
 
     if (!tokenGasPrice) {
       throw new Error(
-        "Error while getting selectedTokenConfig and tokenGasPrice from hyphen API"
+        'Error while getting selectedTokenConfig and tokenGasPrice from hyphen API',
       );
     }
 
@@ -253,7 +253,7 @@ const TransactionProvider: React.FC = (props) => {
 
     if (!overhead || !decimal) {
       throw new Error(
-        "Error while getting token overhead gas and decimal from config"
+        'Error while getting token overhead gas and decimal from config',
       );
     }
 
@@ -261,12 +261,12 @@ const TransactionProvider: React.FC = (props) => {
 
     let transactionFee = formatRawEthValue(
       transactionFeeRaw.toString(),
-      decimal
+      decimal,
     );
 
     let transactionFeeProcessedString = toFixed(
       transactionFee,
-      fixedDecimalPoint
+      fixedDecimalPoint,
     );
 
     let amountToGet =
@@ -276,10 +276,10 @@ const TransactionProvider: React.FC = (props) => {
 
     let amountToGetProcessedString = toFixed(
       amountToGet.toString(),
-      fixedDecimalPoint
+      fixedDecimalPoint,
     );
 
-    if (amountToGet <= 0) throw new Error("Amount too low");
+    if (amountToGet <= 0) throw new Error('Amount too low');
 
     return {
       lpFeeProcessedString,
@@ -332,13 +332,13 @@ const TransactionProvider: React.FC = (props) => {
 
       // Don't reassign errors array if both new and old are empty
       // This prevents duplicate fetching of transaction fees
-      setErrors((oldErrors) => {
+      setErrors(oldErrors => {
         if (newErrors.length === 0 && oldErrors.length === 0) {
           return oldErrors;
         } else return newErrors;
       });
     },
-    [poolInfo, selectedTokenBalance]
+    [poolInfo, selectedTokenBalance],
   );
 
   // both pool info and selected token balance upon changing
@@ -358,13 +358,13 @@ const TransactionProvider: React.FC = (props) => {
 
   const preDepositCheck = useCallback(async () => {
     if (!transferAmount || errors.length > 0) {
-      throw new Error("Invalid transfer amount");
+      throw new Error('Invalid transfer amount');
     }
     if (!fromChain || !toChain || !selectedToken)
-      throw new Error("Prerequisites missing");
+      throw new Error('Prerequisites missing');
 
-    if (!accounts || !accounts[0]) throw new Error("Wallet not connected");
-    if (!hyphen) throw new Error("Hyphen not initialized");
+    if (!accounts || !accounts[0]) throw new Error('Wallet not connected');
+    if (!hyphen) throw new Error('Hyphen not initialized');
 
     let tokenDecimals;
 
@@ -372,16 +372,16 @@ const TransactionProvider: React.FC = (props) => {
       tokenDecimals = fromChain.nativeDecimal;
     } else {
       tokenDecimals = await hyphen.getERC20TokenDecimals(
-        selectedToken[fromChain.chainId].address
+        selectedToken[fromChain.chainId].address,
       );
     }
 
     const amount = ethers.utils.parseUnits(
       transferAmount.toString(),
-      tokenDecimals
+      tokenDecimals,
     );
 
-    console.log("Total amount to  be transfered: ", amount.toString());
+    console.log('Total amount to  be transfered: ', amount.toString());
 
     let transferStatus = await hyphen.preDepositStatus({
       tokenAddress: selectedToken[fromChain.chainId].address,
@@ -392,26 +392,26 @@ const TransactionProvider: React.FC = (props) => {
     });
 
     if (transferStatus.code === RESPONSE_CODES.ALLOWANCE_NOT_GIVEN) {
-      throw new Error("Approval not given for token");
+      throw new Error('Approval not given for token');
     }
 
     if (transferStatus.code === RESPONSE_CODES.UNSUPPORTED_NETWORK) {
-      throw new Error("Target chain id is not supported yet");
+      throw new Error('Target chain id is not supported yet');
     }
 
     if (transferStatus.code === RESPONSE_CODES.NO_LIQUIDITY) {
       throw new Error(
-        `No liquidity available for ${transferAmount} ${selectedToken.symbol}`
+        `No liquidity available for ${transferAmount} ${selectedToken.symbol}`,
       );
     }
 
     if (transferStatus.code === RESPONSE_CODES.UNSUPPORTED_TOKEN) {
-      throw new Error("Requested token is not supported yet");
+      throw new Error('Requested token is not supported yet');
     }
 
     if (transferStatus.code !== RESPONSE_CODES.OK) {
       throw new Error(
-        `Error while doing preDeposit check ${transferStatus.message}`
+        `Error while doing preDeposit check ${transferStatus.message}`,
       );
     }
 
@@ -434,12 +434,12 @@ const TransactionProvider: React.FC = (props) => {
   } = useAsync(preDepositCheck);
 
   const deposit = useCallback(
-    async (receiverAddress) => {
+    async receiverAddress => {
       // showFeedbackMessage("Checking approvals and initiating deposit transaction");
       if (!executePreDepositCheckValue?.depositContract)
-        throw new Error("Pre deposit check not completed");
+        throw new Error('Pre deposit check not completed');
       if (!fromChain || !toChain || !accounts?.[0] || !selectedToken)
-        throw new Error("Prerequisites missing from chain");
+        throw new Error('Prerequisites missing from chain');
 
       let tokenDecimals;
 
@@ -447,7 +447,7 @@ const TransactionProvider: React.FC = (props) => {
         tokenDecimals = fromChain.nativeDecimal;
       } else {
         tokenDecimals = await hyphen.getERC20TokenDecimals(
-          selectedToken[fromChain.chainId].address
+          selectedToken[fromChain.chainId].address,
         );
       }
 
@@ -466,8 +466,8 @@ const TransactionProvider: React.FC = (props) => {
 
       addTxNotification(
         depositTx,
-        "Deposit",
-        `${fromChain.explorerUrl}/tx/${depositTx.hash}`
+        'Deposit',
+        `${fromChain.explorerUrl}/tx/${depositTx.hash}`,
       );
       return depositTx;
 
@@ -484,7 +484,7 @@ const TransactionProvider: React.FC = (props) => {
       toChain,
       transferAmount,
       addTxNotification,
-    ]
+    ],
   );
 
   const {
@@ -496,18 +496,18 @@ const TransactionProvider: React.FC = (props) => {
 
   const checkReceival = useCallback(async () => {
     if (!executeDepositValue?.hash)
-      throw new Error("Deposit transaction unsuccesful");
+      throw new Error('Deposit transaction unsuccesful');
 
     const data = await hyphen.checkDepositStatus({
       depositHash: executeDepositValue.hash,
       fromChainId: fromChain?.chainId,
     });
-    if (data.statusCode === 1 && data.exitHash && data.exitHash !== "") {
+    if (data.statusCode === 1 && data.exitHash && data.exitHash !== '') {
       // Exit hash found but transaction is not yet confirmed
       console.log(`Exit hash on chainId ${data.toChainId} is ${data.exitHash}`);
       return data.exitHash;
-    } else if (data.statusCode === 2 && data.exitHash && data.exitHash !== "") {
-      console.log("Funds transfer successful");
+    } else if (data.statusCode === 2 && data.exitHash && data.exitHash !== '') {
+      console.log('Funds transfer successful');
       console.log(`Exit hash on chainId ${data.toChainId} is ${data.exitHash}`);
       return data.exitHash;
     } else {
@@ -516,48 +516,48 @@ const TransactionProvider: React.FC = (props) => {
   }, [executeDepositValue?.hash, fromChain, hyphen]);
 
   const getExitInfoFromHash = useCallback(
-    async (hash) => {
+    async hash => {
       if (!toChainRpcUrlProvider || !toChain || !fromChain || !selectedToken)
-        throw new Error("Prerequisites missing");
+        throw new Error('Prerequisites missing');
       let receipt;
       try {
         receipt = await toChainRpcUrlProvider.getTransactionReceipt(hash);
       } catch (e) {
-        throw new Error("Cannot get transaction");
+        throw new Error('Cannot get transaction');
       }
 
-      if (!receipt?.logs) throw new Error("No error logs");
+      if (!receipt?.logs) throw new Error('No error logs');
 
       let lpManagerInterface = new ethers.utils.Interface(lpmanagerABI);
 
       let tokenReceipt = receipt.logs.find(
-        (receiptLog) => receiptLog.topics[0] === toChain.assetSentTopicId
+        receiptLog => receiptLog.topics[0] === toChain.assetSentTopicId,
       );
 
       if (!tokenReceipt) {
-        throw new Error("No valid receipt log data");
+        throw new Error('No valid receipt log data');
       }
 
       const data = lpManagerInterface.parseLog(tokenReceipt);
 
-      if (!data?.args?.transferredAmount) throw new Error("Invalid log data");
+      if (!data?.args?.transferredAmount) throw new Error('Invalid log data');
 
       let amount = data.args.transferredAmount;
 
       let processedAmount = ethers.utils.formatUnits(
         amount,
-        selectedToken[fromChain.chainId].decimal
+        selectedToken[fromChain.chainId].decimal,
       );
 
       processedAmount = toFixed(
         processedAmount,
         selectedToken[fromChain.chainId].fixedDecimalPoint ||
-          DEFAULT_FIXED_DECIMAL_POINT
+          DEFAULT_FIXED_DECIMAL_POINT,
       );
 
       return processedAmount;
     },
-    [fromChain, toChain, selectedToken, toChainRpcUrlProvider]
+    [fromChain, toChain, selectedToken, toChainRpcUrlProvider],
   );
 
   const changeReceiver = useCallback((event: FormEvent<HTMLInputElement>) => {

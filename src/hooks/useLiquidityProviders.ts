@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
-import liquidityProvidersABI from 'contracts/LiquidityProviders.abi.json';
+import liquidityProvidersABI from 'abis/LiquidityProviders.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
 
 function useLiquidityProviders() {
@@ -24,8 +24,10 @@ function useLiquidityProviders() {
 
   const addTokenLiquidity = useCallback(
     (tokenAddress: string, amount: BigNumber) => {
-      console.log(tokenAddress, amount);
-      liquidityProvidersContractSigner.addTokenLiquidity(tokenAddress, amount);
+      return liquidityProvidersContractSigner.addTokenLiquidity(
+        tokenAddress,
+        amount,
+      );
     },
     [liquidityProvidersContractSigner],
   );

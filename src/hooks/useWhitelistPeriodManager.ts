@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
-import whitelistPeriodManagerABI from 'contracts/WhitelistPeriodManager.abi.json';
+import whitelistPeriodManagerABI from 'abis/WhitelistPeriodManager.abi.json';
 
 function useWhitelistPeriodManager() {
   const whitelistPeriodManagerContract = useMemo(() => {

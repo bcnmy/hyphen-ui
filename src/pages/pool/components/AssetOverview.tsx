@@ -79,9 +79,7 @@ function AssetOverview({
 
   function handleAssetOverviewClick() {
     if (redirectToManageLiquidity) {
-      navigate(
-        `manage-position/chain=${currentChainId}/position=${positionId}`,
-      );
+      navigate(`manage-position/${currentChainId}/${positionId}`);
     }
   }
 

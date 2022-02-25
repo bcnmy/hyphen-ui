@@ -31,7 +31,7 @@ ReactDOM.render(
               <Route path="" element={<PoolsOverview />} />
               <Route path="add-liquidity" element={<AddLiquidity />} />
               <Route
-                path="manage-position/chain=:chainId/position=:positionId"
+                path="manage-position/:chainId/:positionId"
                 element={<ManagePosition />}
               />
               <Route

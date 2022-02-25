@@ -38,7 +38,8 @@ function AddLiquidity() {
   const { tokensList } = useToken()!;
   const { addTxNotification } = useNotifications()!;
   const { addTokenLiquidity, getTotalLiquidity } = useLiquidityProviders();
-  const { getTokenTotalCap, getTokenWalletCap } = useWhitelistPeriodManager();
+  const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLP } =
+    useWhitelistPeriodManager();
 
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
   const tokenDecimals = useMemo(() => {
@@ -121,6 +122,7 @@ function AddLiquidity() {
             '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
             token[currentChainId].address,
           );
+          console.log(tokenAllowance.toString());
           setSelectedTokenAllowance(tokenAllowance);
         } else {
           setIsSelectedTokenApproved(true);
@@ -170,6 +172,7 @@ function AddLiquidity() {
     },
   );
 
+  // TODO: Will be taken care by SDK.
   // const { data: totalLiquidityByLP } = useQuery(
   //   ['totalLiquidityByLP', selectedTokenAddress],
   //   () => getTotalLiquidityByLP(selectedTokenAddress),
@@ -179,8 +182,8 @@ function AddLiquidity() {
   //   },
   // );
 
-  // if (tokenWalletCap && totalLiquidityByLP) {
-  //   console.log(tokenWalletCap.toString(), totalLiquidityByLP.toString());
+  // if (totalLiquidityByLP) {
+  //   console.log(totalLiquidityByLP.toString());
   // }
 
   const {
@@ -222,13 +225,6 @@ function AddLiquidity() {
       return await addTokenLiquidityTx.wait(1);
     },
   );
-
-  console.log({
-    tokenAllowance: selectedTokenAllowance?.toString(),
-    addTokenLiquidityLoading,
-    addTokenLiquiditySuccess,
-    addTokenLiquidityTx,
-  });
 
   async function handleNetworkChange(selectedNetwork: Option) {
     const network = chainsList.find(
@@ -337,19 +333,11 @@ function AddLiquidity() {
     isInfiniteApproval: boolean,
     tokenAmount: number,
   ) {
-    if (isInfiniteApproval && selectedTokenAddress) {
-      const something = setTokenAllowance(
-        '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
-        selectedTokenAddress,
-        ethers.constants.MaxUint256,
-      );
-      console.log(something);
-    } else if (selectedTokenAddress) {
-      const rawTokenAmount = ethers.utils.parseUnits(
-        tokenAmount.toString(),
-        tokenDecimals,
-      );
-      console.log(rawTokenAmount.toString());
+    const rawTokenAmount = isInfiniteApproval
+      ? ethers.constants.MaxUint256
+      : ethers.utils.parseUnits(tokenAmount.toString(), tokenDecimals);
+
+    if (selectedTokenAddress) {
       const tokenApproveTx = await setTokenAllowance(
         '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
         selectedTokenAddress,
@@ -364,8 +352,16 @@ function AddLiquidity() {
     }
   }
 
-  function onTokenApprovalSuccess() {
-    setIsSelectedTokenApproved(true);
+  async function onTokenApprovalSuccess() {
+    if (accounts && selectedTokenAddress) {
+      const tokenAllowance = await getTokenAllowance(
+        accounts[0],
+        '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+        selectedTokenAddress,
+      );
+      setSelectedTokenAllowance(tokenAllowance);
+      setIsSelectedTokenApproved(true);
+    }
   }
 
   function handleConfirmSupplyClick() {

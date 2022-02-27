@@ -43,13 +43,13 @@ function useTokenApproval(): {
       if (!amount && amount <= 0) throw new Error("Invalid approval amount");
       // console.log({ poolInfo, selectedToken, accounts });
 
-      let tokenAllowance = await hyphen.getERC20Allowance(
+      let tokenAllowance = await hyphen.tokens.getERC20Allowance(
         selectedToken[fromChain.chainId].address,
         accounts[0],
         poolInfo.fromLPManagerAddress
       );
 
-      let tokenDecimals = await hyphen.getERC20TokenDecimals(
+      let tokenDecimals = await hyphen.tokens.getERC20TokenDecimals(
         selectedToken[fromChain.chainId].address
       );
 
@@ -93,14 +93,14 @@ function useTokenApproval(): {
     }
 
     try {
-      let tokenDecimals = await hyphen.getERC20TokenDecimals(
+      let tokenDecimals = await hyphen.tokens.getERC20TokenDecimals(
         selectedToken[fromChain.chainId].address
       );
 
       let rawAmount = tokenAmount * Math.pow(10, tokenDecimals);
       let rawAmountHexString = BigNumber.from(rawAmount).toHexString();
 
-      let approveTx = await hyphen.approveERC20(
+      let approveTx = await hyphen.tokens.approveERC20(
         selectedToken[fromChain.chainId].address,
         poolInfo.fromLPManagerAddress,
         rawAmountHexString,

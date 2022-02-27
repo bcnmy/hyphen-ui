@@ -99,7 +99,7 @@ const HyphenProvider: React.FC = (props) => {
     ) {
       throw new Error("Prerequisites not met");
     }
-    return hyphen.getPoolInformation(
+    return hyphen.liquidityPool.getPoolInformation(
       selectedToken[fromChain.chainId].address,
       fromChain.chainId,
       toChain.chainId

@@ -371,7 +371,7 @@ const TransactionProvider: React.FC = props => {
     if (selectedToken[fromChain.chainId].address === NATIVE_ADDRESS) {
       tokenDecimals = fromChain.nativeDecimal;
     } else {
-      tokenDecimals = await hyphen.getERC20TokenDecimals(
+      tokenDecimals = await hyphen.tokens.getERC20TokenDecimals(
         selectedToken[fromChain.chainId].address,
       );
     }
@@ -383,7 +383,7 @@ const TransactionProvider: React.FC = props => {
 
     console.log('Total amount to  be transfered: ', amount.toString());
 
-    let transferStatus = await hyphen.preDepositStatus({
+    let transferStatus = await hyphen.depositManager.preDepositStatus({
       tokenAddress: selectedToken[fromChain.chainId].address,
       amount: amount.toString(),
       fromChainId: fromChain.chainId,
@@ -446,12 +446,12 @@ const TransactionProvider: React.FC = props => {
       if (selectedToken[fromChain.chainId].address === NATIVE_ADDRESS) {
         tokenDecimals = fromChain.nativeDecimal;
       } else {
-        tokenDecimals = await hyphen.getERC20TokenDecimals(
+        tokenDecimals = await hyphen.tokens.getERC20TokenDecimals(
           selectedToken[fromChain.chainId].address,
         );
       }
 
-      let depositTx = await hyphen.deposit({
+      let depositTx = await hyphen.depositManager.deposit({
         sender: accounts[0],
         receiver: receiverAddress,
         tokenAddress: selectedToken[fromChain.chainId].address,
@@ -462,6 +462,7 @@ const TransactionProvider: React.FC = props => {
         fromChainId: fromChain.chainId,
         toChainId: toChain.chainId,
         useBiconomy: isBiconomyEnabled,
+        tag: config.constants.DEPOSIT_TAG
       });
 
       addTxNotification(
@@ -498,7 +499,7 @@ const TransactionProvider: React.FC = props => {
     if (!executeDepositValue?.hash)
       throw new Error('Deposit transaction unsuccesful');
 
-    const data = await hyphen.checkDepositStatus({
+    const data = await hyphen.depositManager.checkDepositStatus({
       depositHash: executeDepositValue.hash,
       fromChainId: fromChain?.chainId,
     });

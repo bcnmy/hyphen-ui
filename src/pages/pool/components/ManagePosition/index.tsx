@@ -264,12 +264,12 @@ function ManagePosition() {
           </div>
 
           <label
-            htmlFor="liquidityAmount"
+            htmlFor="liquidityRemovalAmount"
             className="flex justify-between px-5 text-xxs font-bold uppercase"
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
-              Balance: {formattedSuppliedLiquidity}
+              Balance: {formattedSuppliedLiquidity || '...'} {token?.symbol}
               <button
                 className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}
@@ -279,7 +279,7 @@ function ManagePosition() {
             </span>
           </label>
           <input
-            id="liquidityAmount"
+            id="liquidityRemovalAmount"
             placeholder="0.000"
             type="number"
             inputMode="decimal"

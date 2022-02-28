@@ -1,12 +1,16 @@
 import ProgressBar from 'components/ProgressBar';
+import { chains } from 'config/chains';
 import tokens from 'config/tokens';
+import { useWalletProvider } from 'context/WalletProvider';
 import { BigNumber } from 'ethers';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 import useLPToken from 'hooks/useLPToken';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
+import { useEffect, useState } from 'react';
 import { HiArrowSmLeft } from 'react-icons/hi';
 import { useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
+import getTokenBalance from 'utils/getTokenBalance';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import AssetOverview from '../AssetOverview';
 import LiquidityInfo from '../LiquidityInfo';
@@ -16,9 +20,16 @@ function IncreaseLiquidity() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
 
+  const { accounts } = useWalletProvider()!;
+
   const { getPositionMetadata } = useLPToken();
   const { getTotalLiquidity } = useLiquidityProviders();
   const { getTokenTotalCap } = useWhitelistPeriodManager();
+
+  const [walletBalance, setWalletBalance] = useState<string | undefined>();
+  const [liquidityIncreaseAmount, setLiquidityIncreaseAmount] =
+    useState<string>('');
+  const [sliderValue, setSliderValue] = useState<number>(0);
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(
@@ -34,6 +45,12 @@ function IncreaseLiquidity() {
     suppliedLiquidity,
     token: tokenAddress,
   } = positionMetadata || {};
+
+  const chain = chainId
+    ? chains.find(chainObj => {
+        return chainObj.chainId === Number.parseInt(chainId);
+      })
+    : null;
 
   const token =
     chainId && tokenAddress
@@ -66,6 +83,22 @@ function IncreaseLiquidity() {
     },
   );
 
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  useEffect(() => {
+    async function getWalletBalance() {
+      if (!accounts || !chain || !token) return;
+
+      const { displayBalance } = await getTokenBalance(
+        accounts[0],
+        chain,
+        token,
+      );
+      setWalletBalance(displayBalance);
+    }
+
+    getWalletBalance();
+  }, [accounts, chain, token]);
+
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
       ? totalLiquidity / 10 ** tokenDecimals
@@ -76,8 +109,39 @@ function IncreaseLiquidity() {
       ? tokenTotalCap / 10 ** tokenDecimals
       : tokenTotalCap;
 
+  async function handleLiquidityAmountChange(
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) {
+    const regExp = /^((\d+)?(\.\d{0,3})?)$/;
+    const newLiquidityIncreaseAmount = e.target.value;
+    const isInputValid = regExp.test(newLiquidityIncreaseAmount);
+
+    if (isInputValid) {
+      setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
+    }
+  }
+
   function handleSliderChange(value: number) {
-    console.log(value);
+    setSliderValue(value);
+
+    if (value === 0) {
+      setLiquidityIncreaseAmount('');
+    } else if (walletBalance) {
+      const newLiquidityRemovalAmount = (
+        Math.trunc(Number.parseFloat(walletBalance) * (value / 100) * 1000) /
+        1000
+      ).toString();
+      setLiquidityIncreaseAmount(newLiquidityRemovalAmount);
+    }
+  }
+
+  function handleMaxButtonClick() {
+    if (walletBalance) {
+      setSliderValue(100);
+      setLiquidityIncreaseAmount(
+        (Math.trunc(Number.parseFloat(walletBalance) * 1000) / 1000).toString(),
+      );
+    }
   }
 
   return (
@@ -120,25 +184,36 @@ function IncreaseLiquidity() {
           </div>
 
           <label
-            htmlFor="liquidityAmount"
+            htmlFor="liquidityIncreaseAmount"
             className="flex justify-between px-5 text-xxs font-bold uppercase"
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
-              Balance: Ξ80
-              <button className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white">
+              Balance: {walletBalance || '...'} {token?.symbol}
+              <button
+                className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                onClick={handleMaxButtonClick}
+              >
                 MAX
               </button>
             </span>
           </label>
           <input
-            id="liquidityAmount"
+            id="liquidityIncreaseAmount"
             placeholder="0.000"
-            type="text"
+            type="number"
+            inputMode="decimal"
             className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            value={liquidityIncreaseAmount}
+            onChange={handleLiquidityAmountChange}
           />
 
-          {/* <StepSlider dots onChange={handleSliderChange} step={25} /> */}
+          <StepSlider
+            dots
+            onChange={handleSliderChange}
+            step={25}
+            value={sliderValue}
+          />
 
           <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
             Confirm Supply

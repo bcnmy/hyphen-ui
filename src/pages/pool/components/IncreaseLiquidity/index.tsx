@@ -28,9 +28,6 @@ function IncreaseLiquidity() {
 
         <div className="absolute right-0 flex">
           <button className="mr-4 text-xs text-hyphen-purple">Clear All</button>
-          <button className="flex items-center rounded text-hyphen-gray-400">
-            <HiAdjustments className="h-4 w-auto rotate-90" />
-          </button>
         </div>
       </header>
 
@@ -72,7 +69,7 @@ function IncreaseLiquidity() {
             className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
           />
 
-          <StepSlider dots onChange={handleSliderChange} step={25} />
+          {/* <StepSlider dots onChange={handleSliderChange} step={25} /> */}
 
           <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
             Confirm Supply

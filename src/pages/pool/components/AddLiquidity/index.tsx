@@ -22,6 +22,9 @@ import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
 import setTokenAllowance from 'utils/giveTokenAllowance';
 import { useNotifications } from 'context/Notifications';
+import { makeNumberCompact } from 'utils/makeNumberCompact';
+import { chains } from 'config/chains';
+import tokens from 'config/tokens';
 
 interface IAddLiquidity {
   apy: number;
@@ -34,8 +37,7 @@ interface IAddLiquidity {
 function AddLiquidity() {
   const navigate = useNavigate();
   const { accounts, currentChainId, walletProvider } = useWalletProvider()!;
-  const { chainsList, fromChain } = useChains()!;
-  const { tokensList } = useToken()!;
+  const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
   const { addTokenLiquidity, getTotalLiquidity } = useLiquidityProviders();
   const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLP } =
@@ -44,9 +46,9 @@ function AddLiquidity() {
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
   const tokenDecimals = useMemo(() => {
     if (!currentChainId || !selectedToken) return undefined;
-    const token = tokensList.find(token => token.symbol === selectedToken?.id)!;
+    const token = tokens.find(token => token.symbol === selectedToken?.id)!;
     return token[currentChainId].decimal;
-  }, [currentChainId, selectedToken, tokensList]);
+  }, [currentChainId, selectedToken]);
   const [isSelectedTokenApproved, setIsSelectedTokenApproved] = useState<
     boolean | undefined
   >();
@@ -58,86 +60,34 @@ function AddLiquidity() {
   const [selectedNetwork, setSelectedNetwork] = useState<Option | undefined>();
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
   const [liquidityAmount, setLiquidityAmount] = useState<string>('');
+  const [sliderValue, setSliderValue] = useState<number>(0);
+
   const [poolShare, setPoolShare] = useState<number>(0);
   const tokenOptions = useMemo(() => {
     if (!currentChainId) return [];
-    return tokensList
-      .filter(token => token[currentChainId])
-      .map(token => ({
-        id: token.symbol,
-        name: token.symbol,
-        image: token.image,
+    return tokens
+      .filter(tokenObj => tokenObj[currentChainId])
+      .map(tokenObj => ({
+        id: tokenObj.symbol,
+        name: tokenObj.symbol,
+        image: tokenObj.image,
       }));
-  }, [currentChainId, tokensList]);
+  }, [currentChainId]);
   const networkOptions = useMemo(() => {
-    return chainsList.map(chain => {
+    return chains.map(chainObj => {
       return {
-        id: chain.chainId,
-        name: chain.name,
-        image: chain.image,
-        symbol: chain.currency,
+        id: chainObj.chainId,
+        name: chainObj.name,
+        image: chainObj.image,
+        symbol: chainObj.currency,
       };
     });
-  }, [chainsList]);
+  }, []);
   const {
     isVisible: isApprovalModalVisible,
     hideModal: hideApprovalModal,
     showModal: showApprovalModal,
   } = useModal();
-
-  useEffect(() => {
-    setSelectedToken(tokenOptions[0]);
-    setSelectedNetwork(
-      networkOptions.find(network => network.id === currentChainId),
-    );
-  }, [currentChainId, networkOptions, tokenOptions]);
-
-  useEffect(() => {
-    async function handleTokenChange() {
-      if (accounts && currentChainId && selectedToken) {
-        const token = tokensList.find(
-          token => token.symbol === selectedToken.id,
-        )!;
-        const chain = chainsList.find(
-          chain => chain.chainId === currentChainId,
-        )!;
-        const chainRpcProvider = new ethers.providers.JsonRpcProvider(
-          chain.rpcUrl,
-        );
-        const tokenContract = new ethers.Contract(
-          token[currentChainId].address,
-          erc20ABI,
-          chainRpcProvider,
-        );
-        const { displayBalance } = await getTokenBalance(
-          accounts[0],
-          chain,
-          chainRpcProvider,
-          token,
-          tokenContract,
-        );
-        if (token[currentChainId].address !== NATIVE_ADDRESS) {
-          const tokenAllowance = await getTokenAllowance(
-            accounts[0],
-            '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
-            token[currentChainId].address,
-          );
-          console.log(tokenAllowance.toString());
-          setSelectedTokenAllowance(tokenAllowance);
-        } else {
-          setIsSelectedTokenApproved(true);
-        }
-        setSelectedTokenAddress(token[currentChainId].address);
-        setWalletBalance(displayBalance);
-      }
-    }
-
-    setWalletBalance(undefined);
-    setSelectedTokenAddress(undefined);
-    setSelectedTokenAllowance(undefined);
-    setIsSelectedTokenApproved(undefined);
-    handleTokenChange();
-  }, [accounts, chainsList, currentChainId, selectedToken, tokensList]);
 
   const { data: totalLiquidity } = useQuery(
     ['totalLiquidity', selectedTokenAddress],
@@ -147,9 +97,10 @@ function AddLiquidity() {
       enabled: !!selectedTokenAddress,
     },
   );
-  const formattedTotalLiquidity = tokenDecimals
-    ? totalLiquidity / 10 ** tokenDecimals
-    : totalLiquidity;
+  const formattedTotalLiquidity =
+    tokenDecimals && totalLiquidity
+      ? totalLiquidity / 10 ** tokenDecimals
+      : totalLiquidity;
 
   const { data: tokenTotalCap } = useQuery(
     ['tokenTotalCap', selectedTokenAddress],
@@ -159,9 +110,10 @@ function AddLiquidity() {
       enabled: !!selectedTokenAddress,
     },
   );
-  const formattedTokenTotalCap = tokenDecimals
-    ? tokenTotalCap / 10 ** tokenDecimals
-    : tokenTotalCap;
+  const formattedTokenTotalCap =
+    tokenDecimals && tokenTotalCap
+      ? tokenTotalCap / 10 ** tokenDecimals
+      : tokenTotalCap;
 
   const { data: tokenWalletCap } = useQuery(
     ['tokenWalletCap', selectedTokenAddress],
@@ -226,10 +178,53 @@ function AddLiquidity() {
     },
   );
 
-  async function handleNetworkChange(selectedNetwork: Option) {
-    const network = chainsList.find(
-      chain => chain.chainId === selectedNetwork.id,
+  useEffect(() => {
+    setSelectedToken(tokenOptions[0]);
+    setSelectedNetwork(
+      networkOptions.find(network => network.id === currentChainId),
     );
+  }, [currentChainId, networkOptions, tokenOptions]);
+
+  useEffect(() => {
+    async function handleTokenChange() {
+      if (!accounts || !currentChainId || !selectedToken) {
+        return null;
+      }
+
+      const chain = chains.find(
+        chainObj => chainObj.chainId === currentChainId,
+      )!;
+      const token = tokens.find(
+        tokenObj => tokenObj.symbol === selectedToken.id,
+      )!;
+      const { displayBalance } = await getTokenBalance(
+        accounts[0],
+        chain,
+        token,
+      );
+      if (token[currentChainId].address !== NATIVE_ADDRESS) {
+        const tokenAllowance = await getTokenAllowance(
+          accounts[0],
+          '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+          token[currentChainId].address,
+        );
+        setSelectedTokenAllowance(tokenAllowance);
+      } else {
+        setIsSelectedTokenApproved(true);
+      }
+      setSelectedTokenAddress(token[currentChainId].address);
+      setWalletBalance(displayBalance);
+    }
+
+    setWalletBalance(undefined);
+    setSelectedTokenAddress(undefined);
+    setSelectedTokenAllowance(undefined);
+    setIsSelectedTokenApproved(undefined);
+    handleTokenChange();
+  }, [accounts, currentChainId, selectedToken]);
+
+  async function handleNetworkChange(selectedNetwork: Option) {
+    const network = chains.find(chain => chain.chainId === selectedNetwork.id);
     if (walletProvider && network) {
       const res = await switchNetwork(walletProvider, network);
       if (res === null) {
@@ -272,6 +267,8 @@ function AddLiquidity() {
   }
 
   function handleSliderChange(value: number) {
+    setSliderValue(value);
+
     if (value === 0) {
       setIsSelectedTokenApproved(undefined);
       setLiquidityAmount('');
@@ -307,6 +304,7 @@ function AddLiquidity() {
 
   function updatePoolShare(newLiquidityAmount: string) {
     const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
+
     const newPoolShare =
       liquidityAmountInFloat > 0
         ? (liquidityAmountInFloat /
@@ -411,9 +409,6 @@ function AddLiquidity() {
             <button className="mr-4 text-xs text-hyphen-purple">
               Clear All
             </button>
-            <button className="flex items-center rounded text-hyphen-gray-400">
-              <HiAdjustments className="h-4 w-auto rotate-90" />
-            </button>
           </div>
         </header>
 
@@ -475,6 +470,7 @@ function AddLiquidity() {
               dots
               onChange={handleSliderChange}
               step={25}
+              value={sliderValue}
             />
             <button
               className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
@@ -536,8 +532,10 @@ function AddLiquidity() {
               <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
                 <span>Pool cap</span>
                 <span>
-                  {formattedTotalLiquidity || '...'} {selectedToken?.name} /{' '}
-                  {formattedTokenTotalCap || '...'} {selectedToken?.name}
+                  {makeNumberCompact(formattedTotalLiquidity) || '...'}{' '}
+                  {selectedToken?.name} /{' '}
+                  {makeNumberCompact(formattedTokenTotalCap) || '...'}{' '}
+                  {selectedToken?.name}
                 </span>
               </div>
             </div>

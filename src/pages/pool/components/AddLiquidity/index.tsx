@@ -178,6 +178,7 @@ function AddLiquidity() {
     },
   );
 
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     setSelectedToken(tokenOptions[0]);
     setSelectedNetwork(
@@ -185,6 +186,7 @@ function AddLiquidity() {
     );
   }, [currentChainId, networkOptions, tokenOptions]);
 
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function handleTokenChange() {
       if (!accounts || !currentChainId || !selectedToken) {

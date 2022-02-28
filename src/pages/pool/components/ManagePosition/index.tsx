@@ -1,5 +1,5 @@
 import ProgressBar from 'components/ProgressBar';
-import { HiAdjustments, HiArrowSmLeft } from 'react-icons/hi';
+import { HiArrowSmLeft } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import AssetOverview from '../AssetOverview';
 import StepSlider from '../StepSlider';
@@ -9,13 +9,12 @@ import { BigNumber } from 'ethers';
 import { useQuery } from 'react-query';
 import useLPTokenContract from 'hooks/useLPToken';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
-import { useEffect, useMemo, useState } from 'react';
 import tokens from 'config/tokens';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import getTokenBalance from 'utils/getTokenBalance';
 import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
+import { useState } from 'react';
 
 function ManagePosition() {
   const navigate = useNavigate();
@@ -24,8 +23,8 @@ function ManagePosition() {
   const { getPositionMetadata } = useLPTokenContract();
   const { getTotalLiquidity } = useLiquidityProviders();
   const { getTokenTotalCap } = useWhitelistPeriodManager();
-  const [walletBalance, setWalletBalance] = useState<string | undefined>();
-  const [liquidityAmount, setLiquidityAmount] = useState<string>('');
+  const [liquidityRemovalAmount, setLiquidityRemovalAmount] =
+    useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
@@ -62,6 +61,10 @@ function ManagePosition() {
   const tokenDecimals =
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;
 
+  const formattedSuppliedLiquidity = tokenDecimals
+    ? suppliedLiquidity / 10 ** tokenDecimals
+    : null;
+
   const { data: totalLiquidity } = useQuery(
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
@@ -90,23 +93,6 @@ function ManagePosition() {
       ? tokenTotalCap / 10 ** tokenDecimals
       : tokenTotalCap;
 
-  useEffect(() => {
-    async function getWalletBalance() {
-      if (!accounts || !chain || !token) {
-        return null;
-      }
-
-      const { displayBalance } = await getTokenBalance(
-        accounts[0],
-        chain,
-        token,
-      );
-      setWalletBalance(displayBalance);
-    }
-
-    getWalletBalance();
-  }, [accounts, chain, token]);
-
   function handleIncreaseLiquidity() {
     navigate('../increase-liquidity');
   }
@@ -115,11 +101,11 @@ function ManagePosition() {
     e: React.ChangeEvent<HTMLInputElement>,
   ) {
     const regExp = /^((\d+)?(\.\d{0,3})?)$/;
-    const newLiquidityAmount = e.target.value;
-    const isInputValid = regExp.test(newLiquidityAmount);
+    const newLiquidityRemovalAmount = e.target.value;
+    const isInputValid = regExp.test(newLiquidityRemovalAmount);
 
     if (isInputValid) {
-      setLiquidityAmount(newLiquidityAmount);
+      setLiquidityRemovalAmount(newLiquidityRemovalAmount);
     }
   }
 
@@ -127,20 +113,20 @@ function ManagePosition() {
     setSliderValue(value);
 
     if (value === 0) {
-      setLiquidityAmount('');
-    } else if (walletBalance && parseFloat(walletBalance) > 0) {
-      const newLiquidityAmount = (
-        Math.trunc(parseFloat(walletBalance) * (value / 100) * 1000) / 1000
+      setLiquidityRemovalAmount('');
+    } else if (formattedSuppliedLiquidity) {
+      const newLiquidityRemovalAmount = (
+        Math.trunc(formattedSuppliedLiquidity * (value / 100) * 1000) / 1000
       ).toString();
-      setLiquidityAmount(newLiquidityAmount);
+      setLiquidityRemovalAmount(newLiquidityRemovalAmount);
     }
   }
 
   function handleMaxButtonClick() {
-    if (walletBalance && parseFloat(walletBalance) > 0) {
+    if (formattedSuppliedLiquidity) {
       setSliderValue(100);
-      setLiquidityAmount(
-        (Math.trunc(parseFloat(walletBalance) * 1000) / 1000).toString(),
+      setLiquidityRemovalAmount(
+        (Math.trunc(formattedSuppliedLiquidity * 1000) / 1000).toString(),
       );
     }
   }
@@ -192,7 +178,7 @@ function ManagePosition() {
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
-              Balance: {walletBalance}
+              Balance: {formattedSuppliedLiquidity}
               <button
                 className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}
@@ -207,7 +193,7 @@ function ManagePosition() {
             type="number"
             inputMode="decimal"
             className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
-            value={liquidityAmount}
+            value={liquidityRemovalAmount}
             onChange={handleLiquidityAmountChange}
           />
 

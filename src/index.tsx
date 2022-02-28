@@ -35,7 +35,7 @@ ReactDOM.render(
                 element={<ManagePosition />}
               />
               <Route
-                path="increase-liquidity"
+                path="increase-liquidity/:chainId/:positionId"
                 element={<IncreaseLiquidity />}
               />
             </Route>

@@ -1,12 +1,80 @@
 import ProgressBar from 'components/ProgressBar';
-import { HiAdjustments, HiArrowSmLeft } from 'react-icons/hi';
-import { useNavigate } from 'react-router-dom';
+import tokens from 'config/tokens';
+import { BigNumber } from 'ethers';
+import useLiquidityProviders from 'hooks/useLiquidityProviders';
+import useLPToken from 'hooks/useLPToken';
+import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
+import { HiArrowSmLeft } from 'react-icons/hi';
+import { useQuery } from 'react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { makeNumberCompact } from 'utils/makeNumberCompact';
 import AssetOverview from '../AssetOverview';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
+  const { chainId, positionId } = useParams();
+
+  const { getPositionMetadata } = useLPToken();
+  const { getTotalLiquidity } = useLiquidityProviders();
+  const { getTokenTotalCap } = useWhitelistPeriodManager();
+
+  const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
+    useQuery(
+      ['positionMetadata', positionId],
+      () => getPositionMetadata(BigNumber.from(positionId)),
+      {
+        enabled: !!positionId,
+      },
+    );
+
+  const {
+    shares,
+    suppliedLiquidity,
+    token: tokenAddress,
+  } = positionMetadata || {};
+
+  const token =
+    chainId && tokenAddress
+      ? tokens.find(tokenObj => {
+          return (
+            tokenObj[Number.parseInt(chainId)].address.toLowerCase() ===
+            tokenAddress.toLowerCase()
+          );
+        })
+      : null;
+
+  const tokenDecimals =
+    chainId && token ? token[Number.parseInt(chainId)].decimal : null;
+
+  const { data: totalLiquidity } = useQuery(
+    ['totalLiquidity', tokenAddress],
+    () => getTotalLiquidity(tokenAddress),
+    {
+      // Execute only when metadata is available.
+      enabled: !!positionMetadata,
+    },
+  );
+
+  const { data: tokenTotalCap } = useQuery(
+    ['tokenTotalCap', tokenAddress],
+    () => getTokenTotalCap(tokenAddress),
+    {
+      // Execute only when accounts are available.
+      enabled: !!tokenAddress,
+    },
+  );
+
+  const formattedTotalLiquidity =
+    totalLiquidity && tokenDecimals
+      ? totalLiquidity / 10 ** tokenDecimals
+      : totalLiquidity;
+
+  const formattedTokenTotalCap =
+    tokenTotalCap && tokenDecimals
+      ? tokenTotalCap / 10 ** tokenDecimals
+      : tokenTotalCap;
 
   function handleSliderChange(value: number) {
     console.log(value);
@@ -31,22 +99,23 @@ function IncreaseLiquidity() {
         </div>
       </header>
 
-      {/* <AssetOverview
-        apy={91.91}
-        tokenSymbol="USDC"
-        tokenSupplied={459.64}
-        chainId={43114}
-        poolShare={0.03}
-        unclaimedFees={154}
-      /> */}
+      <AssetOverview positionId={BigNumber.from(positionId)} />
 
       <section className="mt-8 grid grid-cols-2">
         <div className="max-h-84 h-84 border-r pr-12.5 pt-9">
           <div className="mb-9">
-            <ProgressBar currentProgress={25} totalProgress={100} />
+            <ProgressBar
+              currentProgress={formattedTotalLiquidity}
+              totalProgress={formattedTokenTotalCap}
+            />
             <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
-              <span>19.8 ETH / 100 ETH</span>
+              <span>
+                {makeNumberCompact(formattedTotalLiquidity) || '...'}{' '}
+                {token?.symbol} /{' '}
+                {makeNumberCompact(formattedTokenTotalCap) || '...'}{' '}
+                {token?.symbol}
+              </span>
             </div>
           </div>
 

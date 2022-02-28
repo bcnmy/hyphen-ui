@@ -7,7 +7,7 @@ import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import LiquidityInfo from '../LiquidityInfo';
 import { BigNumber, ethers } from 'ethers';
 import { useMutation, useQuery } from 'react-query';
-import useLPTokenContract from 'hooks/useLPToken';
+import useLPToken from 'hooks/useLPToken';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 import tokens from 'config/tokens';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
@@ -19,10 +19,10 @@ import { useNotifications } from 'context/Notifications';
 
 function ManagePosition() {
   const navigate = useNavigate();
+  const { chainId, positionId } = useParams();
   const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
-  const { chainId, positionId } = useParams();
-  const { getPositionMetadata } = useLPTokenContract();
+  const { getPositionMetadata } = useLPToken();
   const { claimFee, getTokenAmount, getTotalLiquidity, removeLiquidity } =
     useLiquidityProviders();
   const { getTokenTotalCap } = useWhitelistPeriodManager();
@@ -136,12 +136,12 @@ function ManagePosition() {
     tokenAmount && tokenDecimals ? tokenAmount / 10 ** tokenDecimals : null;
 
   const formattedTotalLiquidity =
-    tokenDecimals && totalLiquidity
+    totalLiquidity && tokenDecimals
       ? totalLiquidity / 10 ** tokenDecimals
       : totalLiquidity;
 
   const formattedTokenTotalCap =
-    tokenDecimals && tokenTotalCap
+    tokenTotalCap && tokenDecimals
       ? tokenTotalCap / 10 ** tokenDecimals
       : tokenTotalCap;
 
@@ -151,7 +151,7 @@ function ManagePosition() {
       : 0;
 
   function handleIncreaseLiquidity() {
-    navigate('../increase-liquidity');
+    navigate(`../increase-liquidity/${chainId}/${positionId}`);
   }
 
   async function handleLiquidityAmountChange(

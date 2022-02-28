@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import tokens from 'config/tokens';
 import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
-import useLPTokenContract from 'hooks/useLPToken';
+import useLPToken from 'hooks/useLPToken';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 
 interface IAssetOverview {
@@ -18,7 +18,7 @@ function AssetOverview({
 }: IAssetOverview) {
   const navigate = useNavigate();
   const { currentChainId } = useWalletProvider()!;
-  const { getPositionMetadata } = useLPTokenContract();
+  const { getPositionMetadata } = useLPToken();
   const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders();
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(['positionMetadata', positionId], () =>

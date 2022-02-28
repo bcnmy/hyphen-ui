@@ -4,11 +4,11 @@ import { useQuery } from 'react-query';
 import Skeleton from 'react-loading-skeleton';
 import AssetOverview from '../../AssetOverview';
 import { useWalletProvider } from 'context/WalletProvider';
-import useLPTokenContract from 'hooks/useLPToken';
+import useLPToken from 'hooks/useLPToken';
 
 function YourPositions() {
   const { accounts } = useWalletProvider()!;
-  const { getUserPositions } = useLPTokenContract();
+  const { getUserPositions } = useLPToken();
 
   const {
     isLoading,

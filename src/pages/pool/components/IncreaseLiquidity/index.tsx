@@ -30,6 +30,7 @@ function IncreaseLiquidity() {
   const [liquidityIncreaseAmount, setLiquidityIncreaseAmount] =
     useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
+  const [poolShare, setPoolShare] = useState<number>();
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(
@@ -109,6 +110,22 @@ function IncreaseLiquidity() {
       ? tokenTotalCap / 10 ** tokenDecimals
       : tokenTotalCap;
 
+  const formattedSuppliedLiquidity = tokenDecimals
+    ? suppliedLiquidity / 10 ** tokenDecimals
+    : suppliedLiquidity;
+
+  useEffect(() => {
+    if (formattedSuppliedLiquidity && formattedTotalLiquidity) {
+      console.log({ formattedSuppliedLiquidity, formattedTotalLiquidity });
+      const initialPoolShare =
+        Math.round(
+          (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
+        ) / 100;
+
+      setPoolShare(initialPoolShare);
+    }
+  }, [formattedSuppliedLiquidity, formattedTotalLiquidity]);
+
   async function handleLiquidityAmountChange(
     e: React.ChangeEvent<HTMLInputElement>,
   ) {
@@ -117,7 +134,11 @@ function IncreaseLiquidity() {
     const isInputValid = regExp.test(newLiquidityIncreaseAmount);
 
     if (isInputValid) {
+      const newLiquidityAmount =
+        Number.parseFloat(newLiquidityIncreaseAmount) +
+        formattedSuppliedLiquidity;
       setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
+      updatePoolShare(newLiquidityAmount);
     }
   }
 
@@ -126,12 +147,17 @@ function IncreaseLiquidity() {
 
     if (value === 0) {
       setLiquidityIncreaseAmount('');
+      updatePoolShare('0');
     } else if (walletBalance) {
-      const newLiquidityRemovalAmount = (
+      const newLiquidityIncreaseAmount = (
         Math.trunc(Number.parseFloat(walletBalance) * (value / 100) * 1000) /
         1000
       ).toString();
-      setLiquidityIncreaseAmount(newLiquidityRemovalAmount);
+      const newLiquidityAmount =
+        Number.parseFloat(newLiquidityIncreaseAmount) +
+        formattedSuppliedLiquidity;
+      setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
+      updatePoolShare(newLiquidityAmount);
     }
   }
 
@@ -142,6 +168,21 @@ function IncreaseLiquidity() {
         (Math.trunc(Number.parseFloat(walletBalance) * 1000) / 1000).toString(),
       );
     }
+  }
+
+  function updatePoolShare(newLiquidityAmount: string) {
+    const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
+
+    const newPoolShare =
+      liquidityAmountInFloat > 0
+        ? (liquidityAmountInFloat /
+            (liquidityAmountInFloat + formattedTotalLiquidity)) *
+          100
+        : Math.round(
+            (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
+          ) / 100;
+
+    setPoolShare(Math.round(newPoolShare * 100) / 100);
   }
 
   return (
@@ -226,7 +267,7 @@ function IncreaseLiquidity() {
                 Updated pool share
               </span>
               <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                0.07%
+                {poolShare || '...'}%
               </div>
             </div>
           </div>

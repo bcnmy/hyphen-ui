@@ -5,23 +5,25 @@ import AssetOverview from '../AssetOverview';
 import StepSlider from '../StepSlider';
 import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import LiquidityInfo from '../LiquidityInfo';
-import { BigNumber } from 'ethers';
-import { useQuery } from 'react-query';
+import { BigNumber, ethers } from 'ethers';
+import { useMutation, useQuery } from 'react-query';
 import useLPTokenContract from 'hooks/useLPToken';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 import tokens from 'config/tokens';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
 import { useState } from 'react';
+import { useChains } from 'context/Chains';
+import { useNotifications } from 'context/Notifications';
 
 function ManagePosition() {
   const navigate = useNavigate();
-  const { accounts } = useWalletProvider()!;
+  const { fromChain } = useChains()!;
+  const { addTxNotification } = useNotifications()!;
   const { chainId, positionId } = useParams();
   const { getPositionMetadata } = useLPTokenContract();
-  const { getTotalLiquidity } = useLiquidityProviders();
+  const { getTotalLiquidity, removeLiquidity } = useLiquidityProviders();
   const { getTokenTotalCap } = useWhitelistPeriodManager();
   const [liquidityRemovalAmount, setLiquidityRemovalAmount] =
     useState<string>('');
@@ -93,6 +95,28 @@ function ManagePosition() {
       ? tokenTotalCap / 10 ** tokenDecimals
       : tokenTotalCap;
 
+  const {
+    isLoading: removeLiquidityLoading,
+    isSuccess: removeLiquiditySuccess,
+    mutate: removeLiquidityMutation,
+  } = useMutation(
+    async ({
+      positionId,
+      amount,
+    }: {
+      positionId: BigNumber;
+      amount: BigNumber;
+    }) => {
+      const removeLiquidityTx = await removeLiquidity(positionId, amount);
+      addTxNotification(
+        removeLiquidityTx,
+        'Remove liquidity',
+        `${fromChain?.explorerUrl}/tx/${removeLiquidityTx.hash}`,
+      );
+      return await removeLiquidityTx.wait(1);
+    },
+  );
+
   function handleIncreaseLiquidity() {
     navigate('../increase-liquidity');
   }
@@ -129,6 +153,27 @@ function ManagePosition() {
         (Math.trunc(formattedSuppliedLiquidity * 1000) / 1000).toString(),
       );
     }
+  }
+
+  function handleConfirmRemovalClick() {
+    if (liquidityRemovalAmount && tokenDecimals) {
+      removeLiquidityMutation(
+        {
+          positionId: BigNumber.from(positionId),
+          amount: ethers.utils.parseUnits(
+            liquidityRemovalAmount,
+            tokenDecimals,
+          ),
+        },
+        {
+          onSuccess: onRemoveLiquiditySuccess,
+        },
+      );
+    }
+  }
+
+  function onRemoveLiquiditySuccess() {
+    navigate('/pool');
   }
 
   if (isPositionMetadataLoading) return null;
@@ -204,7 +249,10 @@ function ManagePosition() {
             value={sliderValue}
           />
 
-          <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
+          <button
+            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+            onClick={handleConfirmRemovalClick}
+          >
             Confirm Removal
           </button>
           <button

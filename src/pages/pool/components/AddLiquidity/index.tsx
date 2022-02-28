@@ -171,7 +171,7 @@ function AddLiquidity() {
       const addTokenLiquidityTx = await addTokenLiquidity(tokenAddress, amount);
       addTxNotification(
         addTokenLiquidityTx,
-        'Approval',
+        'Add liquidity',
         `${fromChain?.explorerUrl}/tx/${addTokenLiquidityTx.hash}`,
       );
       return await addTokenLiquidityTx.wait(1);
@@ -345,7 +345,7 @@ function AddLiquidity() {
       );
       addTxNotification(
         tokenApproveTx,
-        'Approval',
+        'Token approval',
         `${fromChain?.explorerUrl}/tx/${tokenApproveTx.hash}`,
       );
       return await tokenApproveTx.wait(1);

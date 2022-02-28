@@ -63,6 +63,16 @@ function useLiquidityProviders() {
     [liquidityProvidersContract],
   );
 
+  const removeLiquidity = useCallback(
+    (positionId: BigNumber, amount: BigNumber) => {
+      return liquidityProvidersContractSigner.removeLiquidity(
+        positionId,
+        amount,
+      );
+    },
+    [liquidityProvidersContractSigner],
+  );
+
   return {
     liquidityProvidersContract,
     liquidityProvidersContractSigner,
@@ -71,6 +81,7 @@ function useLiquidityProviders() {
     getTokenPriceInLPShares,
     getTotalLiquidity,
     getTotalSharesMinted,
+    removeLiquidity,
   };
 }
 

@@ -97,10 +97,6 @@ function AddLiquidity() {
       enabled: !!selectedTokenAddress,
     },
   );
-  const formattedTotalLiquidity =
-    tokenDecimals && totalLiquidity
-      ? totalLiquidity / 10 ** tokenDecimals
-      : totalLiquidity;
 
   const { data: tokenTotalCap } = useQuery(
     ['tokenTotalCap', selectedTokenAddress],
@@ -110,10 +106,6 @@ function AddLiquidity() {
       enabled: !!selectedTokenAddress,
     },
   );
-  const formattedTokenTotalCap =
-    tokenDecimals && tokenTotalCap
-      ? tokenTotalCap / 10 ** tokenDecimals
-      : tokenTotalCap;
 
   const { data: tokenWalletCap } = useQuery(
     ['tokenWalletCap', selectedTokenAddress],
@@ -123,20 +115,6 @@ function AddLiquidity() {
       enabled: !!selectedTokenAddress,
     },
   );
-
-  // TODO: Will be taken care by SDK.
-  // const { data: totalLiquidityByLP } = useQuery(
-  //   ['totalLiquidityByLP', selectedTokenAddress],
-  //   () => getTotalLiquidityByLP(selectedTokenAddress),
-  //   {
-  //     // Execute only when selectedTokenAddress is available.
-  //     enabled: !!selectedTokenAddress,
-  //   },
-  // );
-
-  // if (totalLiquidityByLP) {
-  //   console.log(totalLiquidityByLP.toString());
-  // }
 
   const {
     isLoading: approveTokenLoading,
@@ -152,8 +130,6 @@ function AddLiquidity() {
       tokenAmount: number;
     }) => approveToken(isInfiniteApproval, tokenAmount),
   );
-
-  // console.log({ approveTokenLoading, approveTokenSuccess, approveTokenTx });
 
   const {
     isLoading: addTokenLiquidityLoading,
@@ -177,6 +153,30 @@ function AddLiquidity() {
       return await addTokenLiquidityTx.wait(1);
     },
   );
+
+  // TODO: Will be taken care by SDK.
+  // const { data: totalLiquidityByLP } = useQuery(
+  //   ['totalLiquidityByLP', selectedTokenAddress],
+  //   () => getTotalLiquidityByLP(selectedTokenAddress),
+  //   {
+  //     // Execute only when selectedTokenAddress is available.
+  //     enabled: !!selectedTokenAddress,
+  //   },
+  // );
+
+  // if (totalLiquidityByLP) {
+  //   console.log(totalLiquidityByLP.toString());
+  // }
+
+  const formattedTotalLiquidity =
+    totalLiquidity && tokenDecimals
+      ? totalLiquidity / 10 ** tokenDecimals
+      : totalLiquidity;
+
+  const formattedTokenTotalCap =
+    tokenTotalCap && tokenDecimals
+      ? tokenTotalCap / 10 ** tokenDecimals
+      : tokenTotalCap;
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {

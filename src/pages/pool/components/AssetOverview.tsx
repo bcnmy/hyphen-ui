@@ -5,7 +5,7 @@ import tokens from 'config/tokens';
 import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
 import useLPTokenContract from 'hooks/useLPToken';
-import useLPContract from 'hooks/useLiquidityProviders';
+import useLiquidityProviders from 'hooks/useLiquidityProviders';
 
 interface IAssetOverview {
   positionId: BigNumber;
@@ -19,7 +19,7 @@ function AssetOverview({
   const navigate = useNavigate();
   const { currentChainId } = useWalletProvider()!;
   const { getPositionMetadata } = useLPTokenContract();
-  const { getTokenAmount, getTotalLiquidity } = useLPContract();
+  const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders();
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(['positionMetadata', positionId], () =>
       getPositionMetadata(positionId),

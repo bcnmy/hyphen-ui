@@ -23,7 +23,8 @@ function ManagePosition() {
   const { addTxNotification } = useNotifications()!;
   const { chainId, positionId } = useParams();
   const { getPositionMetadata } = useLPTokenContract();
-  const { getTotalLiquidity, removeLiquidity } = useLiquidityProviders();
+  const { claimFee, getTokenAmount, getTotalLiquidity, removeLiquidity } =
+    useLiquidityProviders();
   const { getTokenTotalCap } = useWhitelistPeriodManager();
   const [liquidityRemovalAmount, setLiquidityRemovalAmount] =
     useState<string>('');
@@ -63,10 +64,6 @@ function ManagePosition() {
   const tokenDecimals =
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;
 
-  const formattedSuppliedLiquidity = tokenDecimals
-    ? suppliedLiquidity / 10 ** tokenDecimals
-    : null;
-
   const { data: totalLiquidity } = useQuery(
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
@@ -76,10 +73,14 @@ function ManagePosition() {
     },
   );
 
-  const formattedTotalLiquidity =
-    tokenDecimals && totalLiquidity
-      ? totalLiquidity / 10 ** tokenDecimals
-      : totalLiquidity;
+  const { data: tokenAmount } = useQuery(
+    ['tokenAmount', { shares, tokenAddress }],
+    () => getTokenAmount(shares, tokenAddress),
+    {
+      // Execute only when metadata is available.
+      enabled: !!positionMetadata,
+    },
+  );
 
   const { data: tokenTotalCap } = useQuery(
     ['tokenTotalCap', tokenAddress],
@@ -89,11 +90,6 @@ function ManagePosition() {
       enabled: !!tokenAddress,
     },
   );
-
-  const formattedTokenTotalCap =
-    tokenDecimals && tokenTotalCap
-      ? tokenTotalCap / 10 ** tokenDecimals
-      : tokenTotalCap;
 
   const {
     isLoading: removeLiquidityLoading,
@@ -116,6 +112,43 @@ function ManagePosition() {
       return await removeLiquidityTx.wait(1);
     },
   );
+
+  const {
+    isLoading: claimFeeLoading,
+    isSuccess: claimFeeSuccess,
+    mutate: claimFeeMutation,
+  } = useMutation(async ({ positionId }: { positionId: BigNumber }) => {
+    const claimFeeTx = await claimFee(positionId);
+    addTxNotification(
+      claimFeeTx,
+      'Claim fee',
+      `${fromChain?.explorerUrl}/tx/${claimFeeTx.hash}`,
+    );
+    return await claimFeeTx.wait(1);
+  });
+
+  const formattedSuppliedLiquidity =
+    suppliedLiquidity && tokenDecimals
+      ? suppliedLiquidity / 10 ** tokenDecimals
+      : null;
+
+  const formattedTokenAmount =
+    tokenAmount && tokenDecimals ? tokenAmount / 10 ** tokenDecimals : null;
+
+  const formattedTotalLiquidity =
+    tokenDecimals && totalLiquidity
+      ? totalLiquidity / 10 ** tokenDecimals
+      : totalLiquidity;
+
+  const formattedTokenTotalCap =
+    tokenDecimals && tokenTotalCap
+      ? tokenTotalCap / 10 ** tokenDecimals
+      : tokenTotalCap;
+
+  const unclaimedFees =
+    formattedSuppliedLiquidity && formattedTokenAmount
+      ? formattedSuppliedLiquidity - formattedTokenAmount
+      : 0;
 
   function handleIncreaseLiquidity() {
     navigate('../increase-liquidity');
@@ -164,6 +197,19 @@ function ManagePosition() {
             liquidityRemovalAmount,
             tokenDecimals,
           ),
+        },
+        {
+          onSuccess: onRemoveLiquiditySuccess,
+        },
+      );
+    }
+  }
+
+  function handleClaimFeeClick() {
+    if (unclaimedFees) {
+      claimFeeMutation(
+        {
+          positionId: BigNumber.from(positionId),
         },
         {
           onSuccess: onRemoveLiquiditySuccess,
@@ -269,16 +315,27 @@ function ManagePosition() {
           >
             Unclaimed Fees
           </label>
-          <input
-            id="unclaimedFees"
-            placeholder="0.000"
-            type="text"
-            className="mt-2 mb-10 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
-          />
+          <div className="mt-2 mb-10 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+            {unclaimedFees}
+          </div>
 
-          <button className="mb-11 flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white">
-            <img src={collectFeesIcon} alt="Collect fees" className="mr-1" />
-            Collect Fees
+          <button
+            className="mb-11 flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+            disabled={unclaimedFees === 0}
+            onClick={handleClaimFeeClick}
+          >
+            {unclaimedFees === 0 ? (
+              'No fees to collect'
+            ) : (
+              <>
+                <img
+                  src={collectFeesIcon}
+                  alt="Collect fees"
+                  className="mr-1"
+                />
+                `Collect Fees`
+              </>
+            )}
           </button>
 
           <LiquidityInfo />

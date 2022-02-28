@@ -32,6 +32,13 @@ function useLiquidityProviders() {
     [liquidityProvidersContractSigner],
   );
 
+  const claimFee = useCallback(
+    (positionId: BigNumber) => {
+      return liquidityProvidersContractSigner.claimFee(positionId);
+    },
+    [liquidityProvidersContractSigner],
+  );
+
   const getTokenAmount = useCallback(
     (shares: BigNumber, tokenAddress: string) => {
       return liquidityProvidersContract.sharesToTokenAmount(
@@ -77,6 +84,7 @@ function useLiquidityProviders() {
     liquidityProvidersContract,
     liquidityProvidersContractSigner,
     addTokenLiquidity,
+    claimFee,
     getTokenAmount,
     getTokenPriceInLPShares,
     getTotalLiquidity,

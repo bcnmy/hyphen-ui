@@ -39,7 +39,8 @@ function AddLiquidity() {
   const { accounts, currentChainId, walletProvider } = useWalletProvider()!;
   const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
-  const { addTokenLiquidity, getTotalLiquidity } = useLiquidityProviders();
+  const { addLiquidity, addNativeLiquidity, getTotalLiquidity } =
+    useLiquidityProviders();
   const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLP } =
     useWhitelistPeriodManager();
 
@@ -132,10 +133,9 @@ function AddLiquidity() {
   );
 
   const {
-    isLoading: addTokenLiquidityLoading,
-    isSuccess: addTokenLiquiditySuccess,
-    data: addTokenLiquidityTx,
-    mutate: addTokenLiquidityMutation,
+    isLoading: addLiquidityLoading,
+    isSuccess: addLiquiditySuccess,
+    mutate: addLiquidityMutation,
   } = useMutation(
     async ({
       tokenAddress,
@@ -144,15 +144,29 @@ function AddLiquidity() {
       tokenAddress: string;
       amount: BigNumber;
     }) => {
-      const addTokenLiquidityTx = await addTokenLiquidity(tokenAddress, amount);
+      const addLiquidityTx = await addLiquidity(tokenAddress, amount);
       addTxNotification(
-        addTokenLiquidityTx,
+        addLiquidityTx,
         'Add liquidity',
-        `${fromChain?.explorerUrl}/tx/${addTokenLiquidityTx.hash}`,
+        `${fromChain?.explorerUrl}/tx/${addLiquidityTx.hash}`,
       );
-      return await addTokenLiquidityTx.wait(1);
+      return await addLiquidityTx.wait(1);
     },
   );
+
+  // const {
+  //   isLoading: addNativeLiquidityLoading,
+  //   isSuccess: addNativeLiquiditySuccess,
+  //   mutate: addNativeLiquidityMutation,
+  // } = useMutation(async () => {
+  //   const addNativeLiquidityTx = await addNativeLiquidity();
+  //   addTxNotification(
+  //     addNativeLiquidityTx,
+  //     'Add native liquidity',
+  //     `${fromChain?.explorerUrl}/tx/${addNativeLiquidityTx.hash}`,
+  //   );
+  //   return await addNativeLiquidityTx.wait(1);
+  // });
 
   // TODO: Will be taken care by SDK.
   // const { data: totalLiquidityByLP } = useQuery(
@@ -365,17 +379,19 @@ function AddLiquidity() {
   }
 
   function handleConfirmSupplyClick() {
-    if (selectedTokenAddress && liquidityAmount && tokenDecimals) {
-      addTokenLiquidityMutation(
-        {
-          tokenAddress: selectedTokenAddress,
-          amount: ethers.utils.parseUnits(liquidityAmount, tokenDecimals),
-        },
-        {
-          onSuccess: onAddTokenLiquiditySuccess,
-        },
-      );
+    if (!selectedTokenAddress || !liquidityAmount || !tokenDecimals) {
+      return;
     }
+
+    addLiquidityMutation(
+      {
+        tokenAddress: selectedTokenAddress,
+        amount: ethers.utils.parseUnits(liquidityAmount, tokenDecimals),
+      },
+      {
+        onSuccess: onAddTokenLiquiditySuccess,
+      },
+    );
   }
 
   function onAddTokenLiquiditySuccess() {
@@ -462,13 +478,11 @@ function AddLiquidity() {
               value={liquidityAmount}
               onChange={handleLiquidityAmountChange}
               disabled={
-                !totalLiquidity ||
-                approveTokenLoading ||
-                addTokenLiquidityLoading
+                !totalLiquidity || approveTokenLoading || addLiquidityLoading
               }
             />
             <StepSlider
-              disabled={approveTokenLoading || addTokenLiquidityLoading}
+              disabled={approveTokenLoading || addLiquidityLoading}
               dots
               onChange={handleSliderChange}
               step={25}
@@ -480,7 +494,7 @@ function AddLiquidity() {
                 isSelectedTokenApproved ||
                 isSelectedTokenApproved === undefined ||
                 approveTokenLoading ||
-                addTokenLiquidityLoading
+                addLiquidityLoading
               }
               onClick={showApprovalModal}
             >
@@ -498,12 +512,10 @@ function AddLiquidity() {
               disabled={
                 liquidityAmount === '' ||
                 !isSelectedTokenApproved ||
-                addTokenLiquidityLoading
+                addLiquidityLoading
               }
             >
-              {addTokenLiquidityLoading
-                ? 'Adding Liquidity...'
-                : 'Confirm Supply'}
+              {addLiquidityLoading ? 'Adding Liquidity...' : 'Confirm Supply'}
             </button>
           </div>
           <div className="max-h-100 h-100 pl-12.5">

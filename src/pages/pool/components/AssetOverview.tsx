@@ -6,6 +6,7 @@ import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
 import useLPToken from 'hooks/useLPToken';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
+import Skeleton from 'react-loading-skeleton';
 
 interface IAssetOverview {
   positionId: BigNumber;
@@ -46,7 +47,16 @@ function AssetOverview({
     },
   );
 
-  if (isPositionMetadataLoading || !currentChainId) return null;
+  if (isPositionMetadataLoading || !currentChainId)
+    return (
+      <Skeleton
+        baseColor="#615ccd20"
+        enableAnimation
+        highlightColor="#615ccd05"
+        className="!h-37.5 !rounded-7.5"
+        containerClassName="block leading-none"
+      />
+    );
 
   const chain = chains.find(chain => chain.chainId === currentChainId)!;
   const token = tokens.find(token => {

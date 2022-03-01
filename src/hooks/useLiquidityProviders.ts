@@ -22,12 +22,21 @@ function useLiquidityProviders() {
     );
   }, [signer]);
 
-  const addTokenLiquidity = useCallback(
+  const addLiquidity = useCallback(
     (tokenAddress: string, amount: BigNumber) => {
       return liquidityProvidersContractSigner.addTokenLiquidity(
         tokenAddress,
         amount,
       );
+    },
+    [liquidityProvidersContractSigner],
+  );
+
+  const addNativeLiquidity = useCallback(
+    (amount: BigNumber) => {
+      return liquidityProvidersContractSigner.addNativeLiquidity({
+        value: amount,
+      });
     },
     [liquidityProvidersContractSigner],
   );
@@ -81,9 +90,12 @@ function useLiquidityProviders() {
   );
 
   const increaseNativeLiquidity = useCallback(
-    (positionId: BigNumber) => {
+    (positionId: BigNumber, amount: BigNumber) => {
       return liquidityProvidersContractSigner.increaseNativeLiquidity(
         positionId,
+        {
+          value: amount,
+        },
       );
     },
     [liquidityProvidersContractSigner],
@@ -102,7 +114,8 @@ function useLiquidityProviders() {
   return {
     liquidityProvidersContract,
     liquidityProvidersContractSigner,
-    addTokenLiquidity,
+    addLiquidity,
+    addNativeLiquidity,
     claimFee,
     getTokenAmount,
     getTokenPriceInLPShares,

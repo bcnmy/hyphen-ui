@@ -4,7 +4,7 @@ import { NATIVE_ADDRESS } from 'config/constants';
 import tokens from 'config/tokens';
 import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 import useLPToken from 'hooks/useLPToken';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
@@ -38,14 +38,13 @@ function IncreaseLiquidity() {
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [poolShare, setPoolShare] = useState<number>();
 
-  const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
-    useQuery(
-      ['positionMetadata', positionId],
-      () => getPositionMetadata(BigNumber.from(positionId)),
-      {
-        enabled: !!positionId,
-      },
-    );
+  const { data: positionMetadata } = useQuery(
+    ['positionMetadata', positionId],
+    () => getPositionMetadata(BigNumber.from(positionId)),
+    {
+      enabled: !!positionId,
+    },
+  );
 
   const {
     shares,
@@ -102,7 +101,14 @@ function IncreaseLiquidity() {
       positionId: BigNumber;
       amount: BigNumber;
     }) => {
-      const increaseLiquidityTx = await increaseLiquidity(positionId, amount);
+      if (!token || !chain) {
+        return;
+      }
+
+      const increaseLiquidityTx =
+        token[chain.chainId].address === NATIVE_ADDRESS
+          ? await increaseNativeLiquidity(positionId, amount)
+          : await increaseLiquidity(positionId, amount);
       addTxNotification(
         increaseLiquidityTx,
         'Increase liquidity',
@@ -111,20 +117,6 @@ function IncreaseLiquidity() {
       return await increaseLiquidityTx.wait(1);
     },
   );
-
-  const {
-    isLoading: increaseNativeLiquidityLoading,
-    isSuccess: increaseNativeLiquiditySuccess,
-    mutate: increaseNativeLiquidityMutation,
-  } = useMutation(async ({ positionId }: { positionId: BigNumber }) => {
-    const increaseNativeLiquidityTx = await increaseNativeLiquidity(positionId);
-    addTxNotification(
-      increaseNativeLiquidityTx,
-      'Increase native liquidity',
-      `${chain?.explorerUrl}/tx/${increaseNativeLiquidityTx.hash}`,
-    );
-    return await increaseNativeLiquidityTx.wait(1);
-  });
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
@@ -140,10 +132,7 @@ function IncreaseLiquidity() {
     ? suppliedLiquidity / 10 ** tokenDecimals
     : suppliedLiquidity;
 
-  const canUserInteract =
-    !!walletBalance &&
-    !increaseLiquidityLoading &&
-    !increaseNativeLiquidityLoading;
+  const canUserInteract = !!walletBalance && !increaseLiquidityLoading;
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
@@ -161,6 +150,7 @@ function IncreaseLiquidity() {
     getWalletBalance();
   }, [accounts, chain, token]);
 
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     if (formattedSuppliedLiquidity && formattedTotalLiquidity) {
       const initialPoolShare =
@@ -180,11 +170,8 @@ function IncreaseLiquidity() {
     const isInputValid = regExp.test(newLiquidityIncreaseAmount);
 
     if (isInputValid) {
-      const newLiquidityAmount =
-        Number.parseFloat(newLiquidityIncreaseAmount) +
-        formattedSuppliedLiquidity;
       setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
-      updatePoolShare(newLiquidityAmount);
+      updatePoolShare(newLiquidityIncreaseAmount);
     }
   }
 
@@ -199,11 +186,8 @@ function IncreaseLiquidity() {
         Math.trunc(Number.parseFloat(walletBalance) * (value / 100) * 1000) /
         1000
       ).toString();
-      const newLiquidityAmount =
-        Number.parseFloat(newLiquidityIncreaseAmount) +
-        formattedSuppliedLiquidity;
       setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
-      updatePoolShare(newLiquidityAmount);
+      updatePoolShare(newLiquidityIncreaseAmount);
     }
   }
 
@@ -216,50 +200,55 @@ function IncreaseLiquidity() {
     }
   }
 
-  function updatePoolShare(newLiquidityAmount: string) {
-    const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
+  function updatePoolShare(increaseInLiquidity: string) {
+    if (!formattedSuppliedLiquidity) {
+      return;
+    }
 
+    const increaseInLiquidityInFloat = Number.parseFloat(increaseInLiquidity);
     const newPoolShare =
-      liquidityAmountInFloat > 0
-        ? (liquidityAmountInFloat /
-            (liquidityAmountInFloat + formattedTotalLiquidity)) *
+      increaseInLiquidityInFloat > 0
+        ? ((formattedSuppliedLiquidity + increaseInLiquidityInFloat) /
+            (formattedTotalLiquidity + increaseInLiquidityInFloat)) *
           100
-        : Math.round(
-            (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
-          ) / 100;
+        : (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100;
 
     setPoolShare(Math.round(newPoolShare * 100) / 100);
   }
 
+  // function updatePoolShare(newLiquidityAmount: string) {
+  //   const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
+
+  //   const newPoolShare =
+  //     liquidityAmountInFloat > 0
+  //       ? (liquidityAmountInFloat /
+  //           (liquidityAmountInFloat + formattedTotalLiquidity)) *
+  //         100
+  //       : Math.round(
+  //           (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
+  //         ) / 100;
+
+  //   setPoolShare(Math.round(newPoolShare * 100) / 100);
+  // }
+
   function handleConfirmSupplyClick() {
-    if (!token || !chain) {
+    if (!token || !chain || !tokenDecimals) {
       return;
     }
 
-    if (token[chain.chainId].address === NATIVE_ADDRESS) {
-      increaseNativeLiquidityMutation(
-        {
-          positionId: BigNumber.from(positionId),
-        },
-        {
-          onSuccess: onIncreaseLiquiditySuccess,
-        },
-      );
-    } else {
-      increaseLiquidityMutation(
-        {
-          positionId: BigNumber.from(positionId),
-          amount: BigNumber.from(liquidityIncreaseAmount),
-        },
-        {
-          onSuccess: onIncreaseLiquiditySuccess,
-        },
-      );
-    }
+    increaseLiquidityMutation(
+      {
+        positionId: BigNumber.from(positionId),
+        amount: ethers.utils.parseUnits(liquidityIncreaseAmount, tokenDecimals),
+      },
+      {
+        onSuccess: onIncreaseLiquiditySuccess,
+      },
+    );
   }
 
   function onIncreaseLiquiditySuccess() {
-    console.log('onIncreaseLiquiditySuccess');
+    setLiquidityIncreaseAmount('');
   }
 
   return (
@@ -355,7 +344,7 @@ function IncreaseLiquidity() {
           >
             {!walletBalance
               ? 'Getting Your Balance'
-              : increaseLiquidityLoading || increaseNativeLiquidityLoading
+              : increaseLiquidityLoading
               ? 'Increasing Liquidity'
               : 'Confirm Supply'}
           </button>

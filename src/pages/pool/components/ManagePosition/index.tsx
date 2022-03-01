@@ -39,11 +39,7 @@ function ManagePosition() {
       },
     );
 
-  const {
-    shares,
-    suppliedLiquidity,
-    token: tokenAddress,
-  } = positionMetadata || {};
+  const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
   const chain = chainId
     ? chains.find(chainObj => {
@@ -68,8 +64,8 @@ function ManagePosition() {
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
-      // Execute only when metadata is available.
-      enabled: !!positionMetadata,
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
     },
   );
 
@@ -77,8 +73,8 @@ function ManagePosition() {
     ['tokenAmount', { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
-      // Execute only when metadata is available.
-      enabled: !!positionMetadata,
+      // Execute only when shares & tokenAddress is available.
+      enabled: !!(shares && tokenAddress),
     },
   );
 

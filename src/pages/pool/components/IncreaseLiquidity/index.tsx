@@ -10,7 +10,7 @@ import useLPToken from 'hooks/useLPToken';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
 import { useEffect, useState } from 'react';
 import { HiArrowSmLeft } from 'react-icons/hi';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import getTokenBalance from 'utils/getTokenBalance';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
@@ -18,11 +18,11 @@ import AssetOverview from '../AssetOverview';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
-import CustomTooltip from 'components/CustomTooltip';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
+  const queryClient = useQueryClient();
 
   const { accounts } = useWalletProvider()!;
   const { addTxNotification } = useNotifications()!;
@@ -46,11 +46,7 @@ function IncreaseLiquidity() {
     },
   );
 
-  const {
-    shares,
-    suppliedLiquidity,
-    token: tokenAddress,
-  } = positionMetadata || {};
+  const [tokenAddress, suppliedLiquidity] = positionMetadata || [];
 
   const chain = chainId
     ? chains.find(chainObj => {
@@ -75,8 +71,8 @@ function IncreaseLiquidity() {
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
-      // Execute only when metadata is available.
-      enabled: !!positionMetadata,
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
     },
   );
 
@@ -162,6 +158,11 @@ function IncreaseLiquidity() {
     }
   }, [formattedSuppliedLiquidity, formattedTotalLiquidity]);
 
+  function reset() {
+    setLiquidityIncreaseAmount('');
+    setSliderValue(0);
+  }
+
   async function handleLiquidityAmountChange(
     e: React.ChangeEvent<HTMLInputElement>,
   ) {
@@ -216,21 +217,6 @@ function IncreaseLiquidity() {
     setPoolShare(Math.round(newPoolShare * 100) / 100);
   }
 
-  // function updatePoolShare(newLiquidityAmount: string) {
-  //   const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
-
-  //   const newPoolShare =
-  //     liquidityAmountInFloat > 0
-  //       ? (liquidityAmountInFloat /
-  //           (liquidityAmountInFloat + formattedTotalLiquidity)) *
-  //         100
-  //       : Math.round(
-  //           (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
-  //         ) / 100;
-
-  //   setPoolShare(Math.round(newPoolShare * 100) / 100);
-  // }
-
   function handleConfirmSupplyClick() {
     if (!token || !chain || !tokenDecimals) {
       return;
@@ -248,7 +234,14 @@ function IncreaseLiquidity() {
   }
 
   function onIncreaseLiquiditySuccess() {
-    setLiquidityIncreaseAmount('');
+    queryClient.invalidateQueries();
+
+    const updatedWalletBalance = walletBalance
+      ? Number.parseFloat(walletBalance) -
+        Number.parseFloat(liquidityIncreaseAmount)
+      : undefined;
+    setWalletBalance(updatedWalletBalance?.toString());
+    reset();
   }
 
   return (

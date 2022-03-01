@@ -18,36 +18,54 @@ function AssetOverview({
   redirectToManageLiquidity,
 }: IAssetOverview) {
   const navigate = useNavigate();
+
   const { currentChainId } = useWalletProvider()!;
+
   const { getPositionMetadata } = useLPToken();
   const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders();
+
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(['positionMetadata', positionId], () =>
       getPositionMetadata(positionId),
     );
-  const {
-    shares,
-    suppliedLiquidity,
-    token: tokenAddress,
-  } = positionMetadata || {};
+
+  const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
+
   const { data: totalLiquidity } = useQuery(
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
-      // Execute only when metadata is available.
-      enabled: !!positionMetadata,
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
     },
   );
+
   const { data: tokenAmount } = useQuery(
     ['tokenAmount', { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
-      // Execute only when metadata is available.
-      enabled: !!positionMetadata,
+      // Execute only when shares & tokenAddress is available.
+      enabled: !!(shares && tokenAddress),
     },
   );
 
-  if (isPositionMetadataLoading || !currentChainId)
+  const chain = currentChainId
+    ? chains.find(chainObj => {
+        return chainObj.chainId === currentChainId;
+      })
+    : null;
+
+  const token =
+    currentChainId && tokenAddress
+      ? tokens.find(tokenObj => {
+          return (
+            tokenObj[currentChainId].address.toLowerCase() ===
+            tokenAddress.toLowerCase()
+          );
+        })
+      : null;
+
+  if (isPositionMetadataLoading || !token || !chain || !currentChainId) {
     return (
       <Skeleton
         baseColor="#615ccd20"
@@ -57,23 +75,32 @@ function AssetOverview({
         containerClassName="block leading-none"
       />
     );
+  }
 
-  const chain = chains.find(chain => chain.chainId === currentChainId)!;
-  const token = tokens.find(token => {
-    const { address } = token[currentChainId];
-    return address.toLowerCase() === tokenAddress.toLowerCase();
-  })!;
-  const tokenDecimals = token[currentChainId].decimal;
-  const formattedTotalLiquidity = totalLiquidity / 10 ** tokenDecimals;
-  const formattedSuppliedLiquidity = suppliedLiquidity / 10 ** tokenDecimals;
-  const formattedTokenAmount = tokenAmount / 10 ** tokenDecimals;
+  const tokenDecimals =
+    currentChainId && token ? token[currentChainId].decimal : null;
 
-  const { name: chainName } = chain!;
+  const formattedTotalLiquidity =
+    totalLiquidity && tokenDecimals
+      ? totalLiquidity / 10 ** tokenDecimals
+      : totalLiquidity;
+
+  const formattedSuppliedLiquidity =
+    suppliedLiquidity && tokenDecimals
+      ? suppliedLiquidity / 10 ** tokenDecimals
+      : suppliedLiquidity;
+
+  const formattedTokenAmount =
+    tokenAmount && tokenDecimals
+      ? tokenAmount / 10 ** tokenDecimals
+      : tokenAmount;
+
+  const { name: chainName } = chain;
   const {
     image: tokenImage,
     symbol: tokenSymbol,
     [currentChainId]: { chainColor },
-  } = token!;
+  } = token;
   const poolShare =
     suppliedLiquidity && totalLiquidity
       ? Math.round(

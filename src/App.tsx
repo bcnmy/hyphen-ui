@@ -5,7 +5,7 @@ import Layout from '../src/components/Layout';
 
 // Refetch the data after 1 hour.
 const oneHourInMs = 60 * 60 * 1000;
-const queryClient = new QueryClient({
+const queryClientOptions = {
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
@@ -15,7 +15,8 @@ const queryClient = new QueryClient({
       staleTime: oneHourInMs,
     },
   },
-});
+};
+const queryClient = new QueryClient(queryClientOptions);
 
 const App: React.FC = () => {
   return (

@@ -9,7 +9,7 @@ function LiquidityInfo() {
           Top pools
         </span>
         <a
-          className="mt-2 flex h-32.5 flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple"
+          className="mt-2 flex h-32.5 flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple hover:bg-gray-50"
           href="https://hyphen-info.biconomy.io/"
           target="_blank"
           rel="noreferrer"
@@ -23,7 +23,7 @@ function LiquidityInfo() {
           Learn more
         </span>
         <a
-          className="mt-2 flex h-32.5 flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple"
+          className="mt-2 flex h-32.5 flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple hover:bg-gray-50"
           href="https://hyphen-info.biconomy.io/"
           target="_blank"
           rel="noreferrer"

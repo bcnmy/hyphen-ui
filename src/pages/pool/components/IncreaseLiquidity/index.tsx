@@ -1,6 +1,8 @@
 import ProgressBar from 'components/ProgressBar';
 import { chains } from 'config/chains';
+import { NATIVE_ADDRESS } from 'config/constants';
 import tokens from 'config/tokens';
+import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
 import { BigNumber } from 'ethers';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
@@ -8,22 +10,26 @@ import useLPToken from 'hooks/useLPToken';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
 import { useEffect, useState } from 'react';
 import { HiArrowSmLeft } from 'react-icons/hi';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import getTokenBalance from 'utils/getTokenBalance';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import AssetOverview from '../AssetOverview';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
+import Skeleton from 'react-loading-skeleton';
+import CustomTooltip from 'components/CustomTooltip';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
 
   const { accounts } = useWalletProvider()!;
+  const { addTxNotification } = useNotifications()!;
 
   const { getPositionMetadata } = useLPToken();
-  const { getTotalLiquidity } = useLiquidityProviders();
+  const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
+    useLiquidityProviders();
   const { getTokenTotalCap } = useWhitelistPeriodManager();
 
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
@@ -84,6 +90,61 @@ function IncreaseLiquidity() {
     },
   );
 
+  const {
+    isLoading: increaseLiquidityLoading,
+    isSuccess: increaseLiquiditySuccess,
+    mutate: increaseLiquidityMutation,
+  } = useMutation(
+    async ({
+      positionId,
+      amount,
+    }: {
+      positionId: BigNumber;
+      amount: BigNumber;
+    }) => {
+      const increaseLiquidityTx = await increaseLiquidity(positionId, amount);
+      addTxNotification(
+        increaseLiquidityTx,
+        'Increase liquidity',
+        `${chain?.explorerUrl}/tx/${increaseLiquidityTx.hash}`,
+      );
+      return await increaseLiquidityTx.wait(1);
+    },
+  );
+
+  const {
+    isLoading: increaseNativeLiquidityLoading,
+    isSuccess: increaseNativeLiquiditySuccess,
+    mutate: increaseNativeLiquidityMutation,
+  } = useMutation(async ({ positionId }: { positionId: BigNumber }) => {
+    const increaseNativeLiquidityTx = await increaseNativeLiquidity(positionId);
+    addTxNotification(
+      increaseNativeLiquidityTx,
+      'Increase native liquidity',
+      `${chain?.explorerUrl}/tx/${increaseNativeLiquidityTx.hash}`,
+    );
+    return await increaseNativeLiquidityTx.wait(1);
+  });
+
+  const formattedTotalLiquidity =
+    totalLiquidity && tokenDecimals
+      ? totalLiquidity / 10 ** tokenDecimals
+      : totalLiquidity;
+
+  const formattedTokenTotalCap =
+    tokenTotalCap && tokenDecimals
+      ? tokenTotalCap / 10 ** tokenDecimals
+      : tokenTotalCap;
+
+  const formattedSuppliedLiquidity = tokenDecimals
+    ? suppliedLiquidity / 10 ** tokenDecimals
+    : suppliedLiquidity;
+
+  const canUserInteract =
+    !!walletBalance &&
+    !increaseLiquidityLoading &&
+    !increaseNativeLiquidityLoading;
+
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function getWalletBalance() {
@@ -100,23 +161,8 @@ function IncreaseLiquidity() {
     getWalletBalance();
   }, [accounts, chain, token]);
 
-  const formattedTotalLiquidity =
-    totalLiquidity && tokenDecimals
-      ? totalLiquidity / 10 ** tokenDecimals
-      : totalLiquidity;
-
-  const formattedTokenTotalCap =
-    tokenTotalCap && tokenDecimals
-      ? tokenTotalCap / 10 ** tokenDecimals
-      : tokenTotalCap;
-
-  const formattedSuppliedLiquidity = tokenDecimals
-    ? suppliedLiquidity / 10 ** tokenDecimals
-    : suppliedLiquidity;
-
   useEffect(() => {
     if (formattedSuppliedLiquidity && formattedTotalLiquidity) {
-      console.log({ formattedSuppliedLiquidity, formattedTotalLiquidity });
       const initialPoolShare =
         Math.round(
           (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
@@ -185,6 +231,37 @@ function IncreaseLiquidity() {
     setPoolShare(Math.round(newPoolShare * 100) / 100);
   }
 
+  function handleConfirmSupplyClick() {
+    if (!token || !chain) {
+      return;
+    }
+
+    if (token[chain.chainId].address === NATIVE_ADDRESS) {
+      increaseNativeLiquidityMutation(
+        {
+          positionId: BigNumber.from(positionId),
+        },
+        {
+          onSuccess: onIncreaseLiquiditySuccess,
+        },
+      );
+    } else {
+      increaseLiquidityMutation(
+        {
+          positionId: BigNumber.from(positionId),
+          amount: BigNumber.from(liquidityIncreaseAmount),
+        },
+        {
+          onSuccess: onIncreaseLiquiditySuccess,
+        },
+      );
+    }
+  }
+
+  function onIncreaseLiquiditySuccess() {
+    console.log('onIncreaseLiquiditySuccess');
+  }
+
   return (
     <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
       <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
@@ -230,34 +307,57 @@ function IncreaseLiquidity() {
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
-              Balance: {walletBalance || '...'} {token?.symbol}
+              Balance:{' '}
+              {walletBalance ? (
+                walletBalance
+              ) : (
+                <Skeleton
+                  baseColor="#615ccd20"
+                  enableAnimation={!!walletBalance}
+                  highlightColor="#615ccd05"
+                  className="!mx-1 !w-11"
+                />
+              )}{' '}
+              {token?.symbol}
               <button
                 className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}
+                disabled={!canUserInteract}
               >
                 MAX
               </button>
             </span>
           </label>
+
           <input
             id="liquidityIncreaseAmount"
             placeholder="0.000"
             type="number"
             inputMode="decimal"
-            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
             value={liquidityIncreaseAmount}
             onChange={handleLiquidityAmountChange}
+            disabled={!canUserInteract}
           />
 
           <StepSlider
+            disabled={!canUserInteract}
             dots
             onChange={handleSliderChange}
             step={25}
             value={sliderValue}
           />
 
-          <button className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white">
-            Confirm Supply
+          <button
+            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+            disabled={!canUserInteract}
+            onClick={handleConfirmSupplyClick}
+          >
+            {!walletBalance
+              ? 'Getting Your Balance'
+              : increaseLiquidityLoading || increaseNativeLiquidityLoading
+              ? 'Increasing Liquidity'
+              : 'Confirm Supply'}
           </button>
         </div>
         <div className="max-h-84 flex h-84 flex-col justify-between pl-12.5 pt-3">

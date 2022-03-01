@@ -30,8 +30,11 @@ function IncreaseLiquidity() {
   const { getPositionMetadata } = useLPToken();
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
     useLiquidityProviders();
-  const { getTokenTotalCap } = useWhitelistPeriodManager();
+  const { getTokenTotalCap, getTokenWalletCap } = useWhitelistPeriodManager();
 
+  const [liquidityBalance, setLiquidityBalance] = useState<
+    string | undefined
+  >();
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
   const [liquidityIncreaseAmount, setLiquidityIncreaseAmount] =
     useState<string>('');
@@ -80,7 +83,16 @@ function IncreaseLiquidity() {
     ['tokenTotalCap', tokenAddress],
     () => getTokenTotalCap(tokenAddress),
     {
-      // Execute only when accounts are available.
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
+    },
+  );
+
+  const { data: tokenWalletCap } = useQuery(
+    ['tokenWalletCap', tokenAddress],
+    () => getTokenWalletCap(tokenAddress),
+    {
+      // Execute only when tokenAddress is available.
       enabled: !!tokenAddress,
     },
   );
@@ -128,13 +140,35 @@ function IncreaseLiquidity() {
     ? suppliedLiquidity / 10 ** tokenDecimals
     : suppliedLiquidity;
 
-  const canUserInteract = !!walletBalance && !increaseLiquidityLoading;
+  const isDataLoading = !liquidityBalance || increaseLiquidityLoading;
+
+  const isLiquidityAmountGtWalletBalance =
+    liquidityIncreaseAmount && walletBalance
+      ? Number.parseFloat(liquidityIncreaseAmount) >
+        Number.parseFloat(walletBalance)
+      : false;
+
+  const isLiquidityAmountGtLiquidityBalance =
+    liquidityIncreaseAmount && liquidityBalance
+      ? Number.parseFloat(liquidityIncreaseAmount) >
+        Number.parseFloat(liquidityBalance)
+      : false;
+
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  useEffect(() => {
+    if (tokenWalletCap && suppliedLiquidity && tokenDecimals) {
+      const balance = ethers.utils.formatUnits(
+        tokenWalletCap.sub(suppliedLiquidity),
+        tokenDecimals,
+      );
+      setLiquidityBalance(balance);
+    }
+  }, [suppliedLiquidity, tokenDecimals, tokenWalletCap]);
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function getWalletBalance() {
       if (!accounts || !chain || !token) return;
-
       const { displayBalance } = await getTokenBalance(
         accounts[0],
         chain,
@@ -142,7 +176,6 @@ function IncreaseLiquidity() {
       );
       setWalletBalance(displayBalance);
     }
-
     getWalletBalance();
   }, [accounts, chain, token]);
 
@@ -161,6 +194,7 @@ function IncreaseLiquidity() {
   function reset() {
     setLiquidityIncreaseAmount('');
     setSliderValue(0);
+    updatePoolShare('0');
   }
 
   async function handleLiquidityAmountChange(
@@ -182,9 +216,9 @@ function IncreaseLiquidity() {
     if (value === 0) {
       setLiquidityIncreaseAmount('');
       updatePoolShare('0');
-    } else if (walletBalance) {
+    } else if (liquidityBalance) {
       const newLiquidityIncreaseAmount = (
-        Math.trunc(Number.parseFloat(walletBalance) * (value / 100) * 1000) /
+        Math.trunc(Number.parseFloat(liquidityBalance) * (value / 100) * 1000) /
         1000
       ).toString();
       setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
@@ -193,10 +227,12 @@ function IncreaseLiquidity() {
   }
 
   function handleMaxButtonClick() {
-    if (walletBalance) {
+    if (liquidityBalance) {
       setSliderValue(100);
       setLiquidityIncreaseAmount(
-        (Math.trunc(Number.parseFloat(walletBalance) * 1000) / 1000).toString(),
+        (
+          Math.trunc(Number.parseFloat(liquidityBalance) * 1000) / 1000
+        ).toString(),
       );
     }
   }
@@ -236,11 +272,11 @@ function IncreaseLiquidity() {
   function onIncreaseLiquiditySuccess() {
     queryClient.invalidateQueries();
 
-    const updatedWalletBalance = walletBalance
-      ? Number.parseFloat(walletBalance) -
+    const updatedWalletBalance = liquidityBalance
+      ? Number.parseFloat(liquidityBalance) -
         Number.parseFloat(liquidityIncreaseAmount)
       : undefined;
-    setWalletBalance(updatedWalletBalance?.toString());
+    setLiquidityBalance(updatedWalletBalance?.toString());
     reset();
   }
 
@@ -259,7 +295,9 @@ function IncreaseLiquidity() {
         <h2 className="text-xl text-hyphen-purple">Increase Liquidity</h2>
 
         <div className="absolute right-0 flex">
-          <button className="mr-4 text-xs text-hyphen-purple">Clear All</button>
+          <button className="mr-4 text-xs text-hyphen-purple" onClick={reset}>
+            Clear All
+          </button>
         </div>
       </header>
 
@@ -290,12 +328,12 @@ function IncreaseLiquidity() {
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
               Balance:{' '}
-              {walletBalance ? (
-                walletBalance
+              {liquidityBalance ? (
+                makeNumberCompact(Number.parseFloat(liquidityBalance))
               ) : (
                 <Skeleton
                   baseColor="#615ccd20"
-                  enableAnimation={!!walletBalance}
+                  enableAnimation={!!liquidityBalance}
                   highlightColor="#615ccd05"
                   className="!mx-1 !w-11"
                 />
@@ -304,7 +342,7 @@ function IncreaseLiquidity() {
               <button
                 className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}
-                disabled={!canUserInteract}
+                disabled={isDataLoading}
               >
                 MAX
               </button>
@@ -319,11 +357,11 @@ function IncreaseLiquidity() {
             className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
             value={liquidityIncreaseAmount}
             onChange={handleLiquidityAmountChange}
-            disabled={!canUserInteract}
+            disabled={isDataLoading}
           />
 
           <StepSlider
-            disabled={!canUserInteract}
+            disabled={isDataLoading}
             dots
             onChange={handleSliderChange}
             step={25}
@@ -332,11 +370,22 @@ function IncreaseLiquidity() {
 
           <button
             className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-            disabled={!canUserInteract}
+            disabled={
+              isDataLoading ||
+              liquidityIncreaseAmount === '' ||
+              isLiquidityAmountGtWalletBalance ||
+              isLiquidityAmountGtLiquidityBalance
+            }
             onClick={handleConfirmSupplyClick}
           >
-            {!walletBalance
+            {!liquidityBalance
               ? 'Getting Your Balance'
+              : liquidityIncreaseAmount === ''
+              ? 'Enter Amount'
+              : isLiquidityAmountGtWalletBalance
+              ? 'Insufficient Wallet Balance'
+              : isLiquidityAmountGtLiquidityBalance
+              ? 'You cannot add more liquidity'
               : increaseLiquidityLoading
               ? 'Increasing Liquidity'
               : 'Confirm Supply'}

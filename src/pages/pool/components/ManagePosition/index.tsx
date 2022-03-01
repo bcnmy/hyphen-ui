@@ -6,7 +6,7 @@ import StepSlider from '../StepSlider';
 import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import LiquidityInfo from '../LiquidityInfo';
 import { BigNumber, ethers } from 'ethers';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useLPToken from 'hooks/useLPToken';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 import tokens from 'config/tokens';
@@ -20,6 +20,8 @@ import { useNotifications } from 'context/Notifications';
 function ManagePosition() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
+  const queryClient = useQueryClient();
+
   const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
   const { getPositionMetadata } = useLPToken();
@@ -125,26 +127,44 @@ function ManagePosition() {
 
   const formattedSuppliedLiquidity =
     suppliedLiquidity && tokenDecimals
-      ? suppliedLiquidity / 10 ** tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
+        )
       : null;
 
   const formattedTokenAmount =
-    tokenAmount && tokenDecimals ? tokenAmount / 10 ** tokenDecimals : null;
+    tokenAmount && tokenDecimals
+      ? Number.parseFloat(ethers.utils.formatUnits(tokenAmount, tokenDecimals))
+      : null;
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
-      ? totalLiquidity / 10 ** tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
+        )
       : totalLiquidity;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
-      ? tokenTotalCap / 10 ** tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
+        )
       : tokenTotalCap;
 
   const unclaimedFees =
     formattedSuppliedLiquidity && formattedTokenAmount
       ? formattedSuppliedLiquidity - formattedTokenAmount
       : 0;
+
+  const isRemovalAmountGtSuppliedLiquidity =
+    liquidityRemovalAmount && formattedSuppliedLiquidity
+      ? Number.parseFloat(liquidityRemovalAmount) > formattedSuppliedLiquidity
+      : false;
+
+  function reset() {
+    setLiquidityRemovalAmount('');
+    setSliderValue(0);
+  }
 
   function handleIncreaseLiquidity() {
     navigate(`../increase-liquidity/${chainId}/${positionId}`);
@@ -215,7 +235,8 @@ function ManagePosition() {
   }
 
   function onRemoveLiquiditySuccess() {
-    navigate('/pool');
+    queryClient.invalidateQueries();
+    reset();
   }
 
   if (isPositionMetadataLoading) return null;
@@ -235,7 +256,9 @@ function ManagePosition() {
         <h2 className="text-xl text-hyphen-purple">Manage Position</h2>
 
         <div className="absolute right-0 flex">
-          <button className="mr-4 text-xs text-hyphen-purple">Clear All</button>
+          <button className="mr-4 text-xs text-hyphen-purple" onClick={reset}>
+            Clear All
+          </button>
         </div>
       </header>
 
@@ -269,6 +292,7 @@ function ManagePosition() {
               <button
                 className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}
+                disabled={removeLiquidityLoading}
               >
                 MAX
               </button>
@@ -279,9 +303,10 @@ function ManagePosition() {
             placeholder="0.000"
             type="number"
             inputMode="decimal"
-            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none"
+            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
             value={liquidityRemovalAmount}
             onChange={handleLiquidityAmountChange}
+            disabled={removeLiquidityLoading}
           />
 
           <StepSlider
@@ -289,17 +314,26 @@ function ManagePosition() {
             onChange={handleSliderChange}
             step={25}
             value={sliderValue}
+            disabled={removeLiquidityLoading}
           />
 
           <button
-            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+            disabled={
+              isRemovalAmountGtSuppliedLiquidity || removeLiquidityLoading
+            }
             onClick={handleConfirmRemovalClick}
           >
-            Confirm Removal
+            {isRemovalAmountGtSuppliedLiquidity
+              ? 'Amount more than supplied liquidity'
+              : removeLiquidityLoading
+              ? 'Removing Liquidity'
+              : 'Confirm Removal'}
           </button>
           <button
-            className="h-15 w-full rounded-2.5 border-2 border-hyphen-purple font-semibold text-hyphen-purple"
+            className="h-15 w-full rounded-2.5 border-2 border-hyphen-purple font-semibold text-hyphen-purple hover:bg-hyphen-purple hover:text-white"
             onClick={handleIncreaseLiquidity}
+            disabled={removeLiquidityLoading}
           >
             + Increase Liquidity
           </button>
@@ -321,7 +355,7 @@ function ManagePosition() {
             onClick={handleClaimFeeClick}
           >
             {unclaimedFees === 0 ? (
-              'No fees to collect'
+              'No fees to claim'
             ) : (
               <>
                 <img
@@ -329,7 +363,7 @@ function ManagePosition() {
                   alt="Collect fees"
                   className="mr-1"
                 />
-                `Collect Fees`
+                Collect Fees
               </>
             )}
           </button>

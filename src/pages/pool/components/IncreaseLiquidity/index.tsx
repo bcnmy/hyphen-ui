@@ -128,16 +128,22 @@ function IncreaseLiquidity() {
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
-      ? totalLiquidity / 10 ** tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
+        )
       : totalLiquidity;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
-      ? tokenTotalCap / 10 ** tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
+        )
       : tokenTotalCap;
 
   const formattedSuppliedLiquidity = tokenDecimals
-    ? suppliedLiquidity / 10 ** tokenDecimals
+    ? Number.parseFloat(
+        ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
+      )
     : suppliedLiquidity;
 
   const isDataLoading = !liquidityBalance || increaseLiquidityLoading;
@@ -379,11 +385,11 @@ function IncreaseLiquidity() {
             onClick={handleConfirmSupplyClick}
           >
             {!liquidityBalance
-              ? 'Getting Your Balance'
+              ? 'Getting your balance'
               : liquidityIncreaseAmount === ''
               ? 'Enter Amount'
               : isLiquidityAmountGtWalletBalance
-              ? 'Insufficient Wallet Balance'
+              ? 'Insufficient wallet balance'
               : isLiquidityAmountGtLiquidityBalance
               ? 'You cannot add more liquidity'
               : increaseLiquidityLoading

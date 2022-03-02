@@ -98,34 +98,57 @@ const WalletProviderProvider: React.FC = props => {
   useEffect(() => {
     if (!rawEthereumProvider) return;
 
-    // Subscribe to accounts change
-    rawEthereumProvider.on('accountsChanged', (accounts: string[]) => {
-      // console.log(accounts);
+    function handleAccountsChanged(accounts: string[]) {
+      console.log('accountsChanged!');
       setAccounts(accounts.map(a => a.toLowerCase()));
       reinit(rawEthereumProvider);
-    });
+    }
 
-    // Subscribe to chainId change
-    rawEthereumProvider.on('chainChanged', (chainId: number) => {
-      // console.log(chainId);
-      setCurrentChainId(chainId);
+    // Wallet documentation recommends reloading page on chain change.
+    // Ref: https://docs.metamask.io/guide/ethereum-provider.html#events
+    function handleChainChanged(chainId: string | number) {
+      console.log('chainChanged!');
+      if (typeof chainId === 'string') {
+        setCurrentChainId(Number.parseInt(chainId));
+      } else {
+        setCurrentChainId(chainId);
+      }
       reinit(rawEthereumProvider);
-    });
+    }
 
-    // Subscribe to provider connection
-    rawEthereumProvider.on('connect', (info: { chainId: number }) => {
-      // console.log(info);
+    function handleConnect(info: { chainId: number }) {
+      console.log('connect!');
       setCurrentChainId(info.chainId);
       reinit(rawEthereumProvider);
-    });
+    }
+
+    function handleDisconnect(error: { code: number; message: string }) {
+      console.log('disconnect');
+      console.error(error);
+    }
+
+    // Subscribe to accounts change
+    rawEthereumProvider.on('accountsChanged', handleAccountsChanged);
+
+    // Subscribe to network change
+    rawEthereumProvider.on('chainChanged', handleChainChanged);
+
+    // Subscribe to provider connection
+    rawEthereumProvider.on('connect', handleConnect);
 
     // Subscribe to provider disconnection
-    rawEthereumProvider.on(
-      'disconnect',
-      (error: { code: number; message: string }) => {
-        console.error(error);
-      },
-    );
+    rawEthereumProvider.on('disconnect', handleDisconnect);
+
+    // Remove event listeners on unmount!
+    return () => {
+      rawEthereumProvider.removeListener(
+        'accountsChanged',
+        handleAccountsChanged,
+      );
+      rawEthereumProvider.removeListener('chainChanged', handleChainChanged);
+      rawEthereumProvider.removeListener('connect', handleConnect);
+      rawEthereumProvider.removeListener('disconnect', handleDisconnect);
+    };
   }, [rawEthereumProvider]);
 
   const connect = useCallback(async () => {

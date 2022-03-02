@@ -14,7 +14,6 @@ import { PrimaryButtonDark } from 'components/Buttons/PrimaryButtonDark';
 import Spinner from 'components/Buttons/Spinner';
 import AnimateHeight from 'react-animate-height';
 import { useChains } from 'context/Chains';
-import { useHyphen } from 'context/Hyphen';
 import { useToken } from 'context/Token';
 import { HiOutlineArrowSmRight } from 'react-icons/hi';
 import SpinnerDark from 'components/Buttons/SpinnerDark';
@@ -36,12 +35,9 @@ interface Step {
   stepNumber: number;
 }
 
-const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
-  currentStepNumber,
-  stepNumber,
-  onNextStep,
-  onError,
-}) => {
+const PreDepositStep: React.FC<
+  Step & { setModalErrored: (modalErrored: boolean) => void }
+> = ({ currentStepNumber, stepNumber, onNextStep, setModalErrored }) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
@@ -64,8 +60,9 @@ const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
   }, [active, executePreDepositCheck]);
 
   useEffect(() => {
-    if (executed && executePreDepositCheckError && active) onError();
-  }, [executed, executePreDepositCheckError, onError, active]);
+    if (executed && executePreDepositCheckError && active)
+      setModalErrored(true);
+  }, [executed, executePreDepositCheckError, active, setModalErrored]);
 
   useEffect(() => {
     if (executed && executePreDepositCheckStatus === Status.SUCCESS && active) {
@@ -107,14 +104,14 @@ const PreDepositStep: React.FC<Step & { onError: () => void }> = ({
 const DepositStep: React.FC<
   Step & {
     setDepositState: (state: Status) => void;
-    onError: () => void;
+    setModalErrored: (modalErrored: boolean) => void;
   }
 > = ({
   currentStepNumber,
   stepNumber,
   setDepositState,
   onNextStep,
-  onError,
+  setModalErrored,
 }) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
@@ -141,8 +138,8 @@ const DepositStep: React.FC<
   }, [active, executeDeposit, receiverAddress]);
 
   useEffect(() => {
-    if (executed && executeDepositError && active) onError();
-  }, [executed, executeDepositError, onError, active]);
+    if (executed && executeDepositError && active) setModalErrored(true);
+  }, [executed, executeDepositError, setModalErrored, active]);
 
   useEffect(() => {
     if (executed && executeDepositStatus === Status.SUCCESS) {
@@ -200,6 +197,7 @@ const DepositStep: React.FC<
 const ReceivalStep: React.FC<
   Step & {
     // hideManualExit: () => void;
+    setModalErrored: (modalErrored: boolean) => void;
     refreshSelectedTokenBalance: () => void;
     setReceivalState: (state: Status) => void;
     // showManualExit: () => void;
@@ -207,6 +205,7 @@ const ReceivalStep: React.FC<
 > = ({
   currentStepNumber,
   // hideManualExit,
+  setModalErrored,
   onNextStep,
   refreshSelectedTokenBalance,
   setReceivalState,
@@ -247,33 +246,45 @@ const ReceivalStep: React.FC<
           }
         } catch (e) {
           setReceivalError(e);
+          setModalErrored(true);
         }
       }, 5000);
     }
     // Note: Remember to update the dependency array if adding manual exit.
-  }, [active, checkReceival, refreshSelectedTokenBalance, setExitHash]);
+  }, [
+    active,
+    checkReceival,
+    refreshSelectedTokenBalance,
+    setExitHash,
+    setModalErrored,
+  ]);
 
   useEffect(() => {
-    if (!toChainRpcUrlProvider) {
-      console.error('Something has gone horribly wrong');
-      setReceivalError('Unrecoverable application error. Contact us.');
-      throw new Error('Something has gone horribly wrong');
-    }
-    if (exitHash && executed && active) {
-      setReceivalState(Status.PENDING);
-      (async () => {
-        let tx = await toChainRpcUrlProvider.getTransaction(exitHash);
-        setExecuted(false);
-        await tx?.wait(1);
-        setReceivalState(Status.SUCCESS);
-        onNextStep();
-      })();
+    try {
+      if (!toChainRpcUrlProvider) {
+        console.error('Something has gone horribly wrong');
+        setReceivalError('Unrecoverable application error. Contact us.');
+        throw new Error('Something has gone horribly wrong');
+      } else if (exitHash && executed && active) {
+        setReceivalState(Status.PENDING);
+        (async () => {
+          let tx = await toChainRpcUrlProvider.getTransaction(exitHash);
+          setExecuted(false);
+          await tx?.wait(1);
+          setReceivalState(Status.SUCCESS);
+          onNextStep();
+        })();
+      }
+    } catch (e) {
+      setReceivalError(e);
+      setModalErrored(true);
     }
   }, [
     active,
     executed,
     exitHash,
     onNextStep,
+    setModalErrored,
     setReceivalState,
     toChainRpcUrlProvider,
   ]);
@@ -320,7 +331,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   const { transferAmount, executeDepositValue, exitHash, transactionFee } =
     useTransaction()!;
   const { fromChain, toChain } = useChains()!;
-  const { hyphen } = useHyphen()!;
+  // const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
 
@@ -336,7 +347,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   // const [canManualExit, setCanManualExit] = useState(false);
   // const [isManualExitDisabled, setIsManualExitDisabled] = useState(false);
   const nextStep = useCallback(
-    () => setActiveStep((i) => i + 1),
+    () => setActiveStep(i => i + 1),
     [setActiveStep],
   );
 
@@ -488,18 +499,19 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 currentStepNumber={activeStep}
                 stepNumber={1}
                 onNextStep={nextStep}
-                onError={() => setModalErrored(true)}
+                setModalErrored={setModalErrored}
               />
               <DepositStep
                 currentStepNumber={activeStep}
                 stepNumber={2}
                 onNextStep={nextStep}
-                onError={() => setModalErrored(true)}
+                setModalErrored={setModalErrored}
                 setDepositState={setDepositState}
               />
               <ReceivalStep
                 currentStepNumber={activeStep}
                 // hideManualExit={hideManualExit}
+                setModalErrored={setModalErrored}
                 onNextStep={nextStep}
                 refreshSelectedTokenBalance={refreshSelectedTokenBalance}
                 setReceivalState={setReceivalState}
@@ -543,7 +555,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
           </div>
         </div>
         <TransitionReact in={isBottomTrayOpen} timeout={300}>
-          {(state) => (
+          {state => (
             <div
               className={twMerge(
                 'transform-gpu transition-transform',

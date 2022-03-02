@@ -29,9 +29,7 @@ import toFixed from 'utils/toFixed';
 import formatRawEthValue from 'utils/formatRawEthValue';
 import useAsync, { Status } from 'hooks/useLoading';
 import { useWalletProvider } from './WalletProvider';
-import { IoMdReturnLeft } from 'react-icons/io';
 import { useBiconomy } from './Biconomy';
-import { exit } from 'process';
 import { useNotifications } from './Notifications';
 
 export enum ValidationErrors {
@@ -103,15 +101,8 @@ const TransactionProvider: React.FC = props => {
   // exit hash for last transaction
   const [exitHash, setExitHash] = useState<string>();
 
-  const {
-    executeApproveToken,
-    executeApproveTokenError,
-    executeApproveTokenStatus,
-    fetchSelectedTokenApproval,
-    fetchSelectedTokenApprovalError,
-    fetchSelectedTokenApprovalStatus,
-    fetchSelectedTokenApprovalValue,
-  } = useTokenApproval()!;
+  const { executeApproveTokenStatus, fetchSelectedTokenApproval } =
+    useTokenApproval()!;
 
   const [errors, setErrors] = useState<ValidationErrors[]>([]);
 
@@ -360,8 +351,12 @@ const TransactionProvider: React.FC = props => {
     if (!transferAmount || errors.length > 0) {
       throw new Error('Invalid transfer amount');
     }
-    if (!fromChain || !toChain || !selectedToken)
+    if (!fromChain || !toChain || !selectedToken) {
       throw new Error('Prerequisites missing');
+    }
+    if (fromChain.chainId === toChain.chainId) {
+      throw new Error('Same chain transfers are not allowed, please refresh.');
+    }
 
     if (!accounts || !accounts[0]) throw new Error('Wallet not connected');
     if (!hyphen) throw new Error('Hyphen not initialized');
@@ -440,6 +435,11 @@ const TransactionProvider: React.FC = props => {
         throw new Error('Pre deposit check not completed');
       if (!fromChain || !toChain || !accounts?.[0] || !selectedToken)
         throw new Error('Prerequisites missing from chain');
+      if (fromChain.chainId === toChain.chainId) {
+        throw new Error(
+          'Same chain transfers are not allowed, please refresh.',
+        );
+      }
 
       let tokenDecimals;
 
@@ -462,7 +462,7 @@ const TransactionProvider: React.FC = props => {
         fromChainId: fromChain.chainId,
         toChainId: toChain.chainId,
         useBiconomy: isBiconomyEnabled,
-        tag: config.constants.DEPOSIT_TAG
+        tag: config.constants.DEPOSIT_TAG,
       });
 
       addTxNotification(

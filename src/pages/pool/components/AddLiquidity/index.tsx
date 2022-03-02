@@ -158,16 +158,14 @@ function AddLiquidity() {
     },
   );
 
-  // const { data: totalLiquidityByLP } = useQuery(
-  //   ['totalLiquidityByLP', selectedTokenAddress],
-  //   () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
-  //   {
-  //     // Execute only when selectedTokenAddress is available.
-  //     enabled: !!(selectedTokenAddress && accounts),
-  //   },
-  // );
-
-  const totalLiquidityByLP = 0;
+  const { data: totalLiquidityByLP } = useQuery(
+    ['totalLiquidityByLP', selectedTokenAddress],
+    () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
+    {
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!(selectedTokenAddress && accounts),
+    },
+  );
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
@@ -182,6 +180,19 @@ function AddLiquidity() {
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
       : tokenTotalCap;
+
+  const isDataLoading =
+    !liquidityBalance || approveTokenLoading || addLiquidityLoading;
+
+  const isLiquidityAmountGtWalletBalance =
+    liquidityAmount && walletBalance
+      ? Number.parseFloat(liquidityAmount) > Number.parseFloat(walletBalance)
+      : false;
+
+  const isLiquidityAmountGtLiquidityBalance =
+    liquidityAmount && liquidityBalance
+      ? Number.parseFloat(liquidityAmount) > Number.parseFloat(liquidityBalance)
+      : false;
 
   useEffect(() => {
     if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
@@ -233,16 +244,17 @@ function AddLiquidity() {
       setWalletBalance(displayBalance);
     }
 
-    setWalletBalance(undefined);
-    setSelectedTokenAddress(undefined);
-    setSelectedTokenAllowance(undefined);
-    setIsSelectedTokenApproved(undefined);
     handleTokenChange();
   }, [accounts, currentChainId, selectedToken]);
 
   function reset() {
     setLiquidityAmount('');
+    setLiquidityBalance(undefined);
+    setSelectedTokenAddress(undefined);
+    setSelectedTokenAllowance(undefined);
+    setIsSelectedTokenApproved(undefined);
     setSliderValue(0);
+    setWalletBalance(undefined);
     updatePoolShare('0');
   }
 
@@ -445,15 +457,17 @@ function AddLiquidity() {
                 selected={selectedToken}
                 setSelected={tokenOption => {
                   setSelectedToken(tokenOption);
+                  reset();
                 }}
                 label={'asset'}
               />
               <Select
                 options={networkOptions}
                 selected={selectedNetwork}
-                setSelected={networkOption =>
-                  handleNetworkChange(networkOption)
-                }
+                setSelected={networkOption => {
+                  handleNetworkChange(networkOption);
+                  reset();
+                }}
                 label={'network'}
               />
             </div>
@@ -464,12 +478,12 @@ function AddLiquidity() {
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex text-hyphen-gray-300">
                 Your Address Limit:{' '}
-                {walletBalance ? (
-                  walletBalance
+                {liquidityBalance ? (
+                  liquidityBalance
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
-                    enableAnimation={!!walletBalance}
+                    enableAnimation={!!liquidityBalance}
                     highlightColor="#615ccd05"
                     className="!mx-1 !w-11"
                   />
@@ -485,12 +499,10 @@ function AddLiquidity() {
               className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
               value={liquidityAmount}
               onChange={handleLiquidityAmountChange}
-              disabled={
-                !totalLiquidity || approveTokenLoading || addLiquidityLoading
-              }
+              disabled={isDataLoading || !totalLiquidity}
             />
             <StepSlider
-              disabled={approveTokenLoading || addLiquidityLoading}
+              disabled={isDataLoading}
               dots
               onChange={handleSliderChange}
               step={25}
@@ -499,10 +511,9 @@ function AddLiquidity() {
             <button
               className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
               disabled={
+                isDataLoading ||
                 isSelectedTokenApproved ||
-                isSelectedTokenApproved === undefined ||
-                approveTokenLoading ||
-                addLiquidityLoading
+                isSelectedTokenApproved === undefined
               }
               onClick={showApprovalModal}
             >
@@ -518,12 +529,24 @@ function AddLiquidity() {
               className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
               onClick={handleConfirmSupplyClick}
               disabled={
+                isDataLoading ||
                 liquidityAmount === '' ||
                 !isSelectedTokenApproved ||
-                addLiquidityLoading
+                isLiquidityAmountGtWalletBalance ||
+                isLiquidityAmountGtLiquidityBalance
               }
             >
-              {addLiquidityLoading ? 'Adding Liquidity...' : 'Confirm Supply'}
+              {!liquidityBalance
+                ? 'Getting your balance'
+                : liquidityAmount === ''
+                ? 'Enter Amount'
+                : isLiquidityAmountGtWalletBalance
+                ? 'Insufficient wallet balance'
+                : isLiquidityAmountGtLiquidityBalance
+                ? 'This amount exceeds your wallet cap'
+                : addLiquidityLoading
+                ? 'Adding Liquidity'
+                : 'Confirm Supply'}
             </button>
           </div>
           <div className="max-h-100 h-100 pl-12.5">

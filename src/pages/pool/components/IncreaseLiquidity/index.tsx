@@ -401,7 +401,7 @@ function IncreaseLiquidity() {
               : isLiquidityAmountGtWalletBalance
               ? 'Insufficient wallet balance'
               : isLiquidityAmountGtLiquidityBalance
-              ? 'You cannot add more liquidity'
+              ? 'This amount exceeds your wallet cap'
               : increaseLiquidityLoading
               ? 'Increasing Liquidity'
               : 'Confirm Supply'}

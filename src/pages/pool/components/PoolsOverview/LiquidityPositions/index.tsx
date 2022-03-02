@@ -5,10 +5,12 @@ import AssetOverview from '../../AssetOverview';
 import { useWalletProvider } from 'context/WalletProvider';
 import useLPToken from 'hooks/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
+import { useState } from 'react';
 
 function LiquidityPositions() {
   const { accounts } = useWalletProvider()!;
   const { getUserPositions } = useLPToken();
+  const [hideClosedPositions, setHideClosedPositions] = useState(true);
 
   const {
     isLoading,
@@ -23,10 +25,24 @@ function LiquidityPositions() {
     <article className="mb-2.5 rounded-10 bg-white p-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
         <div className="absolute left-10">
-          <button className="mr-7 text-xs text-hyphen-purple">
-            Active Position (2)
+          <button
+            className={`mr-7 text-xs  ${
+              hideClosedPositions
+                ? 'text-hyphen-purple'
+                : 'text-hyphen-gray-400'
+            }`}
+            onClick={() => setHideClosedPositions(true)}
+          >
+            Active Position
           </button>
-          <button className="text-xs text-hyphen-gray-400">
+          <button
+            className={`text-xs  ${
+              !hideClosedPositions
+                ? 'text-hyphen-purple'
+                : 'text-hyphen-gray-400'
+            }`}
+            onClick={() => setHideClosedPositions(false)}
+          >
             Show Closed Positions
           </button>
         </div>
@@ -49,7 +65,7 @@ function LiquidityPositions() {
                 <AssetOverview
                   key={userPositionId.toNumber()}
                   positionId={userPositionId}
-                  redirectToManageLiquidity
+                  hideClosedPositions={hideClosedPositions}
                 />
               );
             })}

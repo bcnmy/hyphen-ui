@@ -171,14 +171,16 @@ function AddLiquidity() {
   //   return await addNativeLiquidityTx.wait(1);
   // });
 
-  const { data: totalLiquidityByLP } = useQuery(
-    ['totalLiquidityByLP', selectedTokenAddress],
-    () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
-    {
-      // Execute only when selectedTokenAddress is available.
-      enabled: !!(selectedTokenAddress && accounts),
-    },
-  );
+  // const { data: totalLiquidityByLP } = useQuery(
+  //   ['totalLiquidityByLP', selectedTokenAddress],
+  //   () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
+  //   {
+  //     // Execute only when selectedTokenAddress is available.
+  //     enabled: !!(selectedTokenAddress && accounts),
+  //   },
+  // );
+
+  const totalLiquidityByLP = 0;
 
   // if (totalLiquidityByLP) {
   //   console.log(totalLiquidityByLP.toString());
@@ -186,12 +188,16 @@ function AddLiquidity() {
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
-      ? ethers.utils.formatUnits(totalLiquidity, tokenDecimals)
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
+        )
       : totalLiquidity;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
-      ? ethers.utils.formatUnits(tokenTotalCap, tokenDecimals)
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
+        )
       : tokenTotalCap;
 
   useEffect(() => {
@@ -475,12 +481,12 @@ function AddLiquidity() {
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex text-hyphen-gray-300">
                 Your Address Limit:{' '}
-                {liquidityBalance ? (
-                  makeNumberCompact(Number.parseFloat(liquidityBalance))
+                {walletBalance ? (
+                  makeNumberCompact(Number.parseFloat(walletBalance))
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
-                    enableAnimation={!!liquidityBalance}
+                    enableAnimation={!!walletBalance}
                     highlightColor="#615ccd05"
                     className="!mx-1 !w-11"
                   />

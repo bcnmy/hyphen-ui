@@ -1,5 +1,5 @@
 import { BigNumber, ethers } from 'ethers';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import tokens from 'config/tokens';
 import { useWalletProvider } from 'context/WalletProvider';
@@ -10,13 +10,11 @@ import Skeleton from 'react-loading-skeleton';
 
 interface IAssetOverview {
   positionId: BigNumber;
-  redirectToManageLiquidity?: boolean | false;
+  hideClosedPositions?: boolean | false;
 }
 
-function AssetOverview({
-  positionId,
-  redirectToManageLiquidity,
-}: IAssetOverview) {
+function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
+  const location = useLocation();
   const navigate = useNavigate();
 
   const { currentChainId } = useWalletProvider()!;
@@ -77,6 +75,8 @@ function AssetOverview({
     );
   }
 
+  const isUserOnPool = location.pathname === '/pool';
+
   const tokenDecimals =
     currentChainId && token ? token[currentChainId].decimal : null;
 
@@ -119,15 +119,19 @@ function AssetOverview({
       : 0;
 
   function handleAssetOverviewClick() {
-    if (redirectToManageLiquidity) {
+    if (poolShare > 0 && isUserOnPool) {
       navigate(`manage-position/${currentChainId}/${positionId}`);
     }
   }
 
+  if (hideClosedPositions && poolShare === 0 && isUserOnPool) return null;
+
+  if (!hideClosedPositions && poolShare > 0 && isUserOnPool) return null;
+
   return (
     <section
       className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
-        redirectToManageLiquidity ? 'cursor-pointer' : ''
+        poolShare > 0 && isUserOnPool ? 'cursor-pointer' : 'cursor-not-allowed'
       }`}
       onClick={handleAssetOverviewClick}
       style={{ backgroundColor: chainColor }}

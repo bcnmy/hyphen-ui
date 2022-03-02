@@ -41,7 +41,7 @@ function AddLiquidity() {
   const { addTxNotification } = useNotifications()!;
   const { addLiquidity, addNativeLiquidity, getTotalLiquidity } =
     useLiquidityProviders();
-  const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLP } =
+  const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
     useWhitelistPeriodManager();
 
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
@@ -59,6 +59,9 @@ function AddLiquidity() {
     string | undefined
   >();
   const [selectedNetwork, setSelectedNetwork] = useState<Option | undefined>();
+  const [liquidityBalance, setLiquidityBalance] = useState<
+    string | undefined
+  >();
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
   const [liquidityAmount, setLiquidityAmount] = useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
@@ -168,15 +171,14 @@ function AddLiquidity() {
   //   return await addNativeLiquidityTx.wait(1);
   // });
 
-  // TODO: Will be taken care by SDK.
-  // const { data: totalLiquidityByLP } = useQuery(
-  //   ['totalLiquidityByLP', selectedTokenAddress],
-  //   () => getTotalLiquidityByLP(selectedTokenAddress),
-  //   {
-  //     // Execute only when selectedTokenAddress is available.
-  //     enabled: !!selectedTokenAddress,
-  //   },
-  // );
+  const { data: totalLiquidityByLP } = useQuery(
+    ['totalLiquidityByLP', selectedTokenAddress],
+    () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
+    {
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!(selectedTokenAddress && accounts),
+    },
+  );
 
   // if (totalLiquidityByLP) {
   //   console.log(totalLiquidityByLP.toString());
@@ -184,13 +186,23 @@ function AddLiquidity() {
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
-      ? totalLiquidity / 10 ** tokenDecimals
+      ? ethers.utils.formatUnits(totalLiquidity, tokenDecimals)
       : totalLiquidity;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
-      ? tokenTotalCap / 10 ** tokenDecimals
+      ? ethers.utils.formatUnits(tokenTotalCap, tokenDecimals)
       : tokenTotalCap;
+
+  useEffect(() => {
+    if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
+      const balance = ethers.utils.formatUnits(
+        tokenWalletCap.sub(totalLiquidityByLP),
+        tokenDecimals,
+      );
+      setLiquidityBalance(balance);
+    }
+  }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
@@ -238,6 +250,12 @@ function AddLiquidity() {
     setIsSelectedTokenApproved(undefined);
     handleTokenChange();
   }, [accounts, currentChainId, selectedToken]);
+
+  function reset() {
+    setLiquidityAmount('');
+    setSliderValue(0);
+    updatePoolShare('0');
+  }
 
   async function handleNetworkChange(selectedNetwork: Option) {
     const network = chains.find(chain => chain.chainId === selectedNetwork.id);
@@ -424,7 +442,7 @@ function AddLiquidity() {
           <h2 className="text-xl text-hyphen-purple">Add Liquidity</h2>
 
           <div className="absolute right-0 flex">
-            <button className="mr-4 text-xs text-hyphen-purple">
+            <button className="mr-4 text-xs text-hyphen-purple" onClick={reset}>
               Clear All
             </button>
           </div>
@@ -456,17 +474,18 @@ function AddLiquidity() {
             >
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex text-hyphen-gray-300">
-                Your address limit:{' '}
-                {walletBalance ? (
-                  walletBalance
+                Your Address Limit:{' '}
+                {liquidityBalance ? (
+                  makeNumberCompact(Number.parseFloat(liquidityBalance))
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
-                    enableAnimation={!!selectedToken}
+                    enableAnimation={!!liquidityBalance}
                     highlightColor="#615ccd05"
-                    className="!ml-1 !w-11"
+                    className="!mx-1 !w-11"
                   />
-                )}
+                )}{' '}
+                {selectedToken?.id}
               </span>
             </label>
             <input

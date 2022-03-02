@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import tokens from 'config/tokens';
@@ -82,17 +82,21 @@ function AssetOverview({
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
-      ? totalLiquidity / 10 ** tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
+        )
       : totalLiquidity;
 
   const formattedSuppliedLiquidity =
     suppliedLiquidity && tokenDecimals
-      ? suppliedLiquidity / 10 ** tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
+        )
       : suppliedLiquidity;
 
   const formattedTokenAmount =
     tokenAmount && tokenDecimals
-      ? tokenAmount / 10 ** tokenDecimals
+      ? Number.parseFloat(ethers.utils.formatUnits(tokenAmount, tokenDecimals))
       : tokenAmount;
 
   const { name: chainName } = chain;

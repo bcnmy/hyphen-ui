@@ -1,15 +1,18 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useWalletProvider } from 'context/WalletProvider';
 import { HiOutlineArrowSmRight } from 'react-icons/hi';
 import NetworkSelector from './NetworkSelector';
 
-interface INavbarProps {
+interface IHeaderProps {
   showUserInfoModal: () => void;
 }
 
-function Navbar({ showUserInfoModal }: INavbarProps) {
+function Header({ showUserInfoModal }: IHeaderProps) {
+  const location = useLocation();
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const userAddress = accounts?.[0];
+
+  const showNetworkSelector = !['/bridge', '/pool'].includes(location.pathname);
 
   return (
     <header className="relative z-20 flex w-full items-center justify-center bg-black bg-opacity-30 text-white shadow-sm backdrop-blur-sm">
@@ -77,7 +80,7 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
         </a>
       </nav>
       <div className="absolute right-6 flex items-center">
-        <NetworkSelector />
+        {showNetworkSelector ? <NetworkSelector /> : null}
         <button
           className="font-base ml-2.5 cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 px-4 py-1 font-mono text-white"
           onClick={isLoggedIn ? showUserInfoModal : connect}
@@ -91,4 +94,4 @@ function Navbar({ showUserInfoModal }: INavbarProps) {
   );
 }
 
-export default Navbar;
+export default Header;

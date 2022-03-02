@@ -30,7 +30,8 @@ function IncreaseLiquidity() {
   const { getPositionMetadata } = useLPToken();
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
     useLiquidityProviders();
-  const { getTokenTotalCap, getTokenWalletCap } = useWhitelistPeriodManager();
+  const { getTokenTotalCap, getTotalLiquidityByLp, getTokenWalletCap } =
+    useWhitelistPeriodManager();
 
   const [liquidityBalance, setLiquidityBalance] = useState<
     string | undefined
@@ -94,6 +95,15 @@ function IncreaseLiquidity() {
     {
       // Execute only when tokenAddress is available.
       enabled: !!tokenAddress,
+    },
+  );
+
+  const { data: totalLiquidityByLP } = useQuery(
+    ['totalLiquidityByLP', tokenAddress],
+    () => getTotalLiquidityByLp(tokenAddress, accounts),
+    {
+      // Execute only when tokenAddress is available.
+      enabled: !!(tokenAddress && accounts),
     },
   );
 
@@ -162,14 +172,14 @@ function IncreaseLiquidity() {
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
-    if (tokenWalletCap && suppliedLiquidity && tokenDecimals) {
+    if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
       const balance = ethers.utils.formatUnits(
-        tokenWalletCap.sub(suppliedLiquidity),
+        tokenWalletCap.sub(totalLiquidityByLP),
         tokenDecimals,
       );
       setLiquidityBalance(balance);
     }
-  }, [suppliedLiquidity, tokenDecimals, tokenWalletCap]);
+  }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {

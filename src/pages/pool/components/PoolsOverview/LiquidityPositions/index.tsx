@@ -74,7 +74,7 @@ function LiquidityPositions() {
           <section className="flex h-40 items-start justify-center pt-12">
             <img src={emptyPositionsIcon} alt="No positions" className="mr-4" />
             <span className="text-hyphen-gray-400">
-              Your active Hyphen liquidity positions will appear here.
+              Your Hyphen liquidity positions will appear here.
             </span>
           </section>
         )

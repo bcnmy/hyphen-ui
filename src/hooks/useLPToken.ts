@@ -5,7 +5,7 @@ import lpTokenABI from 'abis/LPToken.abi.json';
 function useLPToken() {
   const lpTokenContract = useMemo(() => {
     return new ethers.Contract(
-      '0xF9e13773D10C0ec25369CC4C0fAEef05eC00B18b',
+      '0x14aC2F6eeAC5ED94667Ca9f4f3c5f449b733325f',
       lpTokenABI,
       new ethers.providers.Web3Provider(window.ethereum),
     );

@@ -11,7 +11,7 @@ import switchNetwork from 'utils/switchNetwork';
 import getTokenBalance from 'utils/getTokenBalance';
 import { BigNumber, ethers } from 'ethers';
 import Skeleton from 'react-loading-skeleton';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/useWhitelistPeriodManager';
 import { NATIVE_ADDRESS } from 'config/constants';
@@ -26,9 +26,11 @@ import tokens from 'config/tokens';
 
 function AddLiquidity() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { accounts, currentChainId, walletProvider } = useWalletProvider()!;
   const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
+
   const { addLiquidity, addNativeLiquidity, getTotalLiquidity } =
     useLiquidityProviders();
   const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
@@ -233,7 +235,7 @@ function AddLiquidity() {
       if (token[currentChainId].address !== NATIVE_ADDRESS) {
         const tokenAllowance = await getTokenAllowance(
           accounts[0],
-          '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+          '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
           token[currentChainId].address,
         );
         setSelectedTokenAllowance(tokenAllowance);
@@ -372,7 +374,7 @@ function AddLiquidity() {
 
     if (selectedTokenAddress) {
       const tokenApproveTx = await setTokenAllowance(
-        '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+        '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
         selectedTokenAddress,
         rawTokenAmount,
       );
@@ -389,7 +391,7 @@ function AddLiquidity() {
     if (accounts && selectedTokenAddress) {
       const tokenAllowance = await getTokenAllowance(
         accounts[0],
-        '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+        '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
         selectedTokenAddress,
       );
       setSelectedTokenAllowance(tokenAllowance);
@@ -414,6 +416,7 @@ function AddLiquidity() {
   }
 
   function onAddTokenLiquiditySuccess() {
+    queryClient.invalidateQueries();
     navigate('/pool');
   }
 

@@ -8,7 +8,7 @@ function useLiquidityProviders() {
 
   const liquidityProvidersContract = useMemo(() => {
     return new ethers.Contract(
-      '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+      '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
       liquidityProvidersABI,
       new ethers.providers.Web3Provider(window.ethereum),
     );
@@ -16,7 +16,7 @@ function useLiquidityProviders() {
 
   const liquidityProvidersContractSigner = useMemo(() => {
     return new ethers.Contract(
-      '0xB4E58e519DEDb0c436f199cA5Ab3b089F8C418cC',
+      '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
       liquidityProvidersABI,
       signer,
     );

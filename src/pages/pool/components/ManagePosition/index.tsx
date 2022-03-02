@@ -16,18 +16,22 @@ import { chains } from 'config/chains';
 import { useState } from 'react';
 import { useChains } from 'context/Chains';
 import { useNotifications } from 'context/Notifications';
+import { useWalletProvider } from 'context/WalletProvider';
 
 function ManagePosition() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
+  const { isLoggedIn } = useWalletProvider()!;
   const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
+
   const { getPositionMetadata } = useLPToken();
   const { claimFee, getTokenAmount, getTotalLiquidity, removeLiquidity } =
     useLiquidityProviders();
   const { getTokenTotalCap } = useWhitelistPeriodManager();
+
   const [liquidityRemovalAmount, setLiquidityRemovalAmount] =
     useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
@@ -37,7 +41,7 @@ function ManagePosition() {
       ['positionMetadata', positionId],
       () => getPositionMetadata(BigNumber.from(positionId)),
       {
-        enabled: !!positionId,
+        enabled: !!(isLoggedIn && positionId),
       },
     );
 
@@ -67,7 +71,7 @@ function ManagePosition() {
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!tokenAddress,
+      enabled: !!(isLoggedIn && tokenAddress),
     },
   );
 
@@ -76,7 +80,7 @@ function ManagePosition() {
     () => getTokenAmount(shares, tokenAddress),
     {
       // Execute only when shares & tokenAddress is available.
-      enabled: !!(shares && tokenAddress),
+      enabled: !!(isLoggedIn && shares && tokenAddress),
     },
   );
 
@@ -85,7 +89,7 @@ function ManagePosition() {
     () => getTokenTotalCap(tokenAddress),
     {
       // Execute only when accounts are available.
-      enabled: !!tokenAddress,
+      enabled: !!(isLoggedIn && tokenAddress),
     },
   );
 

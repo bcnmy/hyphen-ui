@@ -24,7 +24,7 @@ function IncreaseLiquidity() {
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { accounts } = useWalletProvider()!;
+  const { accounts, isLoggedIn } = useWalletProvider()!;
   const { addTxNotification } = useNotifications()!;
 
   const { getPositionMetadata } = useLPToken();
@@ -46,7 +46,7 @@ function IncreaseLiquidity() {
     ['positionMetadata', positionId],
     () => getPositionMetadata(BigNumber.from(positionId)),
     {
-      enabled: !!positionId,
+      enabled: !!(isLoggedIn && positionId),
     },
   );
 
@@ -76,7 +76,7 @@ function IncreaseLiquidity() {
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!tokenAddress,
+      enabled: !!(isLoggedIn && tokenAddress),
     },
   );
 
@@ -85,7 +85,7 @@ function IncreaseLiquidity() {
     () => getTokenTotalCap(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!tokenAddress,
+      enabled: !!(isLoggedIn && tokenAddress),
     },
   );
 
@@ -94,7 +94,7 @@ function IncreaseLiquidity() {
     () => getTokenWalletCap(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!tokenAddress,
+      enabled: !!(isLoggedIn && tokenAddress),
     },
   );
 
@@ -103,7 +103,7 @@ function IncreaseLiquidity() {
     () => getTotalLiquidityByLp(tokenAddress, accounts),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!(tokenAddress && accounts),
+      enabled: !!(isLoggedIn && tokenAddress && accounts),
     },
   );
 

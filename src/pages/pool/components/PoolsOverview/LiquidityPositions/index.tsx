@@ -8,7 +8,7 @@ import emptyPositionsIcon from '../../../../../assets/images/empty-positions-ico
 import { useState } from 'react';
 
 function LiquidityPositions() {
-  const { accounts } = useWalletProvider()!;
+  const { accounts, isLoggedIn } = useWalletProvider()!;
   const { getUserPositions } = useLPToken();
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
 
@@ -16,10 +16,18 @@ function LiquidityPositions() {
     isLoading,
     isError,
     data: userPositions,
-  } = useQuery(['userPositions', accounts], () => getUserPositions(accounts), {
-    // Execute only when accounts are available.
-    enabled: !!accounts,
-  });
+  } = useQuery(
+    ['userPositions', accounts],
+    () => {
+      if (!accounts) return;
+
+      return getUserPositions(accounts);
+    },
+    {
+      // Execute only when accounts are available.
+      enabled: !!isLoggedIn,
+    },
+  );
 
   return (
     <article className="mb-2.5 rounded-10 bg-white p-2.5">

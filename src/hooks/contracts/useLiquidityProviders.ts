@@ -6,27 +6,27 @@ import { useChains } from 'context/Chains';
 import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 
 function useLiquidityProviders() {
-  const { signer } = useWalletProvider()!;
+  const { isLoggedIn, signer } = useWalletProvider()!;
   const { fromChain } = useChains()!;
   const contractAddress = fromChain
     ? LiquidityProviders[fromChain.chainId].address
     : undefined;
 
   const liquidityProvidersContract = useMemo(() => {
-    if (!contractAddress) return;
+    if (!contractAddress || !isLoggedIn) return;
 
     return new ethers.Contract(
       contractAddress,
       liquidityProvidersABI,
       new ethers.providers.Web3Provider(window.ethereum),
     );
-  }, [contractAddress]);
+  }, [contractAddress, isLoggedIn]);
 
   const liquidityProvidersContractSigner = useMemo(() => {
-    if (!contractAddress) return;
+    if (!contractAddress || !isLoggedIn) return;
 
     return new ethers.Contract(contractAddress, liquidityProvidersABI, signer);
-  }, [contractAddress, signer]);
+  }, [contractAddress, isLoggedIn, signer]);
 
   const addLiquidity = useCallback(
     (tokenAddress: string, amount: BigNumber) => {

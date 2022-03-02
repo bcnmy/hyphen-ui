@@ -7,6 +7,7 @@ import { chains } from 'config/chains';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
+import { useChains } from 'context/Chains';
 
 interface IAssetOverview {
   positionId: BigNumber;
@@ -17,14 +18,19 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { currentChainId } = useWalletProvider()!;
+  const { currentChainId, isLoggedIn } = useWalletProvider()!;
+  const { fromChain } = useChains()!;
 
   const { getPositionMetadata } = useLPToken();
   const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders();
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
-    useQuery(['positionMetadata', positionId], () =>
-      getPositionMetadata(positionId),
+    useQuery(
+      ['positionMetadata', positionId],
+      () => getPositionMetadata(positionId),
+      {
+        enabled: !!isLoggedIn,
+      },
     );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
@@ -34,7 +40,7 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!tokenAddress,
+      enabled: !!(isLoggedIn && tokenAddress),
     },
   );
 
@@ -43,7 +49,7 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
     () => getTokenAmount(shares, tokenAddress),
     {
       // Execute only when shares & tokenAddress is available.
-      enabled: !!(shares && tokenAddress),
+      enabled: !!(isLoggedIn && shares && tokenAddress),
     },
   );
 

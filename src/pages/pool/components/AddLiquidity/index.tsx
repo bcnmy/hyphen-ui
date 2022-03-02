@@ -23,11 +23,13 @@ import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
+import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 
 function AddLiquidity() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { accounts, currentChainId, walletProvider } = useWalletProvider()!;
+  const { accounts, currentChainId, isLoggedIn, walletProvider } =
+    useWalletProvider()!;
   const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
@@ -35,6 +37,9 @@ function AddLiquidity() {
     useLiquidityProviders();
   const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
     useWhitelistPeriodManager();
+  const liquidityProvidersAddress = fromChain
+    ? LiquidityProviders[fromChain.chainId].address
+    : undefined;
 
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
   const tokenDecimals = useMemo(() => {
@@ -90,7 +95,7 @@ function AddLiquidity() {
     () => getTotalLiquidity(selectedTokenAddress),
     {
       // Execute only when selectedTokenAddress is available.
-      enabled: !!selectedTokenAddress,
+      enabled: !!(isLoggedIn && selectedTokenAddress),
     },
   );
 
@@ -99,7 +104,7 @@ function AddLiquidity() {
     () => getTokenTotalCap(selectedTokenAddress),
     {
       // Execute only when accounts are available.
-      enabled: !!selectedTokenAddress,
+      enabled: !!(isLoggedIn && selectedTokenAddress),
     },
   );
 
@@ -108,7 +113,7 @@ function AddLiquidity() {
     () => getTokenWalletCap(selectedTokenAddress),
     {
       // Execute only when accounts are available.
-      enabled: !!selectedTokenAddress,
+      enabled: !!(isLoggedIn && selectedTokenAddress),
     },
   );
 
@@ -165,7 +170,7 @@ function AddLiquidity() {
     () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
     {
       // Execute only when selectedTokenAddress is available.
-      enabled: !!(selectedTokenAddress && accounts),
+      enabled: !!(isLoggedIn && selectedTokenAddress && accounts),
     },
   );
 
@@ -217,7 +222,12 @@ function AddLiquidity() {
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function handleTokenChange() {
-      if (!accounts || !currentChainId || !selectedToken) {
+      if (
+        !accounts ||
+        !currentChainId ||
+        !selectedToken ||
+        !liquidityProvidersAddress
+      ) {
         return null;
       }
 
@@ -235,7 +245,7 @@ function AddLiquidity() {
       if (token[currentChainId].address !== NATIVE_ADDRESS) {
         const tokenAllowance = await getTokenAllowance(
           accounts[0],
-          '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
+          liquidityProvidersAddress,
           token[currentChainId].address,
         );
         setSelectedTokenAllowance(tokenAllowance);
@@ -247,7 +257,7 @@ function AddLiquidity() {
     }
 
     handleTokenChange();
-  }, [accounts, currentChainId, selectedToken]);
+  }, [accounts, currentChainId, liquidityProvidersAddress, selectedToken]);
 
   function reset() {
     setLiquidityAmount('');
@@ -368,35 +378,39 @@ function AddLiquidity() {
     isInfiniteApproval: boolean,
     tokenAmount: number,
   ) {
+    if (!selectedTokenAddress || !liquidityProvidersAddress) {
+      return;
+    }
+
     const rawTokenAmount = isInfiniteApproval
       ? ethers.constants.MaxUint256
       : ethers.utils.parseUnits(tokenAmount.toString(), tokenDecimals);
 
-    if (selectedTokenAddress) {
-      const tokenApproveTx = await setTokenAllowance(
-        '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
-        selectedTokenAddress,
-        rawTokenAmount,
-      );
-      addTxNotification(
-        tokenApproveTx,
-        'Token approval',
-        `${fromChain?.explorerUrl}/tx/${tokenApproveTx.hash}`,
-      );
-      return await tokenApproveTx.wait(1);
-    }
+    const tokenApproveTx = await setTokenAllowance(
+      liquidityProvidersAddress,
+      selectedTokenAddress,
+      rawTokenAmount,
+    );
+    addTxNotification(
+      tokenApproveTx,
+      'Token approval',
+      `${fromChain?.explorerUrl}/tx/${tokenApproveTx.hash}`,
+    );
+    return await tokenApproveTx.wait(1);
   }
 
   async function onTokenApprovalSuccess() {
-    if (accounts && selectedTokenAddress) {
-      const tokenAllowance = await getTokenAllowance(
-        accounts[0],
-        '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
-        selectedTokenAddress,
-      );
-      setSelectedTokenAllowance(tokenAllowance);
-      setIsSelectedTokenApproved(true);
+    if (!accounts || !selectedTokenAddress || !liquidityProvidersAddress) {
+      return;
     }
+
+    const tokenAllowance = await getTokenAllowance(
+      accounts[0],
+      liquidityProvidersAddress,
+      selectedTokenAddress,
+    );
+    setSelectedTokenAllowance(tokenAllowance);
+    setIsSelectedTokenApproved(true);
   }
 
   function handleConfirmSupplyClick() {

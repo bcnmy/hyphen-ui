@@ -3,22 +3,24 @@ import { ethers } from 'ethers';
 import whitelistPeriodManagerABI from 'abis/WhitelistPeriodManager.abi.json';
 import { useChains } from 'context/Chains';
 import { WhitelistPeriodManager } from 'config/liquidityContracts/WhitelistPeriodManager';
+import { useWalletProvider } from 'context/WalletProvider';
 
 function useWhitelistPeriodManager() {
+  const { isLoggedIn } = useWalletProvider()!;
   const { fromChain } = useChains()!;
   const contractAddress = fromChain
     ? WhitelistPeriodManager[fromChain.chainId].address
     : undefined;
 
   const whitelistPeriodManagerContract = useMemo(() => {
-    if (!contractAddress) return;
+    if (!contractAddress || !isLoggedIn) return;
 
     return new ethers.Contract(
       contractAddress,
       whitelistPeriodManagerABI,
       new ethers.providers.Web3Provider(window.ethereum),
     );
-  }, [contractAddress]);
+  }, [contractAddress, isLoggedIn]);
 
   const getTokenTotalCap = useCallback(
     (tokenAddress: string | undefined) => {

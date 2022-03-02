@@ -1,4 +1,4 @@
-import { LiquidityPool } from './liquidityPool';
+import { LiquidityPool } from './LiquidityPool';
 import { LiquidityProvider } from './LiquidityProvider';
 import { LPToken } from './LPToken';
 import { WhitelistPeriodManager } from './WhitelistPeriodManager';

@@ -15,7 +15,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
   const showNetworkSelector = !['/bridge', '/pool'].includes(location.pathname);
 
   return (
-    <header className="relative z-20 flex w-full items-center justify-center bg-black bg-opacity-30 text-white shadow-sm backdrop-blur-sm">
+    <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">
       <Link to="/bridge" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}

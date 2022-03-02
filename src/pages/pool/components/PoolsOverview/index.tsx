@@ -1,10 +1,10 @@
 import Pools from './Pools';
-import YourPositions from './YourPositions';
+import LiquidityPositions from './LiquidityPositions';
 
 function PoolsOverview() {
   return (
     <article className="my-24">
-      <YourPositions />
+      <LiquidityPositions />
       <Pools />
     </article>
   );

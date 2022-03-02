@@ -6,7 +6,7 @@ import { useWalletProvider } from 'context/WalletProvider';
 import useLPToken from 'hooks/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
 
-function YourPositions() {
+function LiquidityPositions() {
   const { accounts } = useWalletProvider()!;
   const { getUserPositions } = useLPToken();
 
@@ -89,4 +89,4 @@ function YourPositions() {
   );
 }
 
-export default YourPositions;
+export default LiquidityPositions;

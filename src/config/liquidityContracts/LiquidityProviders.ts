@@ -3,8 +3,8 @@ import { GOERLI } from 'config/chains/constants/Goerli';
 import { MUMBAI } from 'config/chains/constants/Mumbai';
 import { LiquidityContractConfig } from '.';
 
-export const LiquidityProvider: LiquidityContractConfig = {
-  name: 'LiquidityProvider',
+export const LiquidityProviders: LiquidityContractConfig = {
+  name: 'LiquidityProviders',
   [MUMBAI.chainId]: {
     address: '0xf6C7A17d6C2b825b0C0A7E4B0d41eF749243F960',
   },

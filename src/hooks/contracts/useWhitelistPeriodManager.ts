@@ -1,18 +1,29 @@
 import { useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
 import whitelistPeriodManagerABI from 'abis/WhitelistPeriodManager.abi.json';
+import { useChains } from 'context/Chains';
+import { WhitelistPeriodManager } from 'config/liquidityContracts/WhitelistPeriodManager';
 
 function useWhitelistPeriodManager() {
+  const { fromChain } = useChains()!;
+  const contractAddress = fromChain
+    ? WhitelistPeriodManager[fromChain.chainId].address
+    : undefined;
+
   const whitelistPeriodManagerContract = useMemo(() => {
+    if (!contractAddress) return;
+
     return new ethers.Contract(
-      '0x6fa46880fC890EBa8c87A7DfBB5c5854771E3B69',
+      contractAddress,
       whitelistPeriodManagerABI,
       new ethers.providers.Web3Provider(window.ethereum),
     );
-  }, []);
+  }, [contractAddress]);
 
   const getTokenTotalCap = useCallback(
     (tokenAddress: string | undefined) => {
+      if (!whitelistPeriodManagerContract) return;
+
       return whitelistPeriodManagerContract.perTokenTotalCap(tokenAddress);
     },
     [whitelistPeriodManagerContract],
@@ -20,6 +31,8 @@ function useWhitelistPeriodManager() {
 
   const getTokenWalletCap = useCallback(
     (tokenAddress: string | undefined) => {
+      if (!whitelistPeriodManagerContract) return;
+
       return whitelistPeriodManagerContract.perTokenWalletCap(tokenAddress);
     },
     [whitelistPeriodManagerContract],
@@ -27,6 +40,8 @@ function useWhitelistPeriodManager() {
 
   const getTotalLiquidityByLp = useCallback(
     (tokenAddress: string | undefined, accounts: string[] | undefined) => {
+      if (!whitelistPeriodManagerContract) return;
+
       return whitelistPeriodManagerContract.totalLiquidityByLp(
         tokenAddress,
         accounts?.[0],
@@ -36,7 +51,6 @@ function useWhitelistPeriodManager() {
   );
 
   return {
-    whitelistPeriodManagerContract,
     getTokenTotalCap,
     getTokenWalletCap,
     getTotalLiquidityByLp,

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import AssetOverview from '../../AssetOverview';
 import { useWalletProvider } from 'context/WalletProvider';
-import useLPToken from 'hooks/useLPToken';
+import useLPToken from 'hooks/contracts/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
 import { useState } from 'react';
 

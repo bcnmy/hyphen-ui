@@ -4,8 +4,8 @@ import { useQuery } from 'react-query';
 import tokens from 'config/tokens';
 import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
-import useLPToken from 'hooks/useLPToken';
-import useLiquidityProviders from 'hooks/useLiquidityProviders';
+import useLPToken from 'hooks/contracts/useLPToken';
+import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
 
 interface IAssetOverview {

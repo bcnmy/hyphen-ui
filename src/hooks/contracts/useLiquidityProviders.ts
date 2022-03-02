@@ -2,28 +2,36 @@ import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityProvidersABI from 'abis/LiquidityProviders.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
+import { useChains } from 'context/Chains';
+import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 
 function useLiquidityProviders() {
   const { signer } = useWalletProvider()!;
+  const { fromChain } = useChains()!;
+  const contractAddress = fromChain
+    ? LiquidityProviders[fromChain.chainId].address
+    : undefined;
 
   const liquidityProvidersContract = useMemo(() => {
+    if (!contractAddress) return;
+
     return new ethers.Contract(
-      '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
+      contractAddress,
       liquidityProvidersABI,
       new ethers.providers.Web3Provider(window.ethereum),
     );
-  }, []);
+  }, [contractAddress]);
 
   const liquidityProvidersContractSigner = useMemo(() => {
-    return new ethers.Contract(
-      '0xe66e281425B7aA07F7c9f53EdD79302615b39B32',
-      liquidityProvidersABI,
-      signer,
-    );
-  }, [signer]);
+    if (!contractAddress) return;
+
+    return new ethers.Contract(contractAddress, liquidityProvidersABI, signer);
+  }, [contractAddress, signer]);
 
   const addLiquidity = useCallback(
     (tokenAddress: string, amount: BigNumber) => {
+      if (!liquidityProvidersContractSigner) return;
+
       return liquidityProvidersContractSigner.addTokenLiquidity(
         tokenAddress,
         amount,
@@ -34,6 +42,8 @@ function useLiquidityProviders() {
 
   const addNativeLiquidity = useCallback(
     (amount: BigNumber) => {
+      if (!liquidityProvidersContractSigner) return;
+
       return liquidityProvidersContractSigner.addNativeLiquidity({
         value: amount,
       });
@@ -43,6 +53,8 @@ function useLiquidityProviders() {
 
   const claimFee = useCallback(
     (positionId: BigNumber) => {
+      if (!liquidityProvidersContractSigner) return;
+
       return liquidityProvidersContractSigner.claimFee(positionId);
     },
     [liquidityProvidersContractSigner],
@@ -50,6 +62,8 @@ function useLiquidityProviders() {
 
   const getTokenAmount = useCallback(
     (shares: BigNumber, tokenAddress: string) => {
+      if (!liquidityProvidersContract) return;
+
       return liquidityProvidersContract.sharesToTokenAmount(
         shares,
         tokenAddress,
@@ -60,6 +74,8 @@ function useLiquidityProviders() {
 
   const getTokenPriceInLPShares = useCallback(
     (tokenAddress: string | undefined) => {
+      if (!liquidityProvidersContract) return;
+
       return liquidityProvidersContract.getTokenPriceInLPShares(tokenAddress);
     },
     [liquidityProvidersContract],
@@ -67,6 +83,8 @@ function useLiquidityProviders() {
 
   const getTotalLiquidity = useCallback(
     (tokenAddress: string | undefined) => {
+      if (!liquidityProvidersContract) return;
+
       return liquidityProvidersContract.totalReserve(tokenAddress);
     },
     [liquidityProvidersContract],
@@ -74,6 +92,8 @@ function useLiquidityProviders() {
 
   const getTotalSharesMinted = useCallback(
     (tokenAddress: string | undefined) => {
+      if (!liquidityProvidersContract) return;
+
       return liquidityProvidersContract.totalSharesMinted(tokenAddress);
     },
     [liquidityProvidersContract],
@@ -81,6 +101,8 @@ function useLiquidityProviders() {
 
   const increaseLiquidity = useCallback(
     (positionId: BigNumber, amount: BigNumber) => {
+      if (!liquidityProvidersContractSigner) return;
+
       return liquidityProvidersContractSigner.increaseTokenLiquidity(
         positionId,
         amount,
@@ -91,6 +113,8 @@ function useLiquidityProviders() {
 
   const increaseNativeLiquidity = useCallback(
     (positionId: BigNumber, amount: BigNumber) => {
+      if (!liquidityProvidersContractSigner) return;
+
       return liquidityProvidersContractSigner.increaseNativeLiquidity(
         positionId,
         {
@@ -103,6 +127,8 @@ function useLiquidityProviders() {
 
   const removeLiquidity = useCallback(
     (positionId: BigNumber, amount: BigNumber) => {
+      if (!liquidityProvidersContractSigner) return;
+
       return liquidityProvidersContractSigner.removeLiquidity(
         positionId,
         amount,
@@ -112,8 +138,6 @@ function useLiquidityProviders() {
   );
 
   return {
-    liquidityProvidersContract,
-    liquidityProvidersContractSigner,
     addLiquidity,
     addNativeLiquidity,
     claimFee,

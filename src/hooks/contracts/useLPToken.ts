@@ -1,18 +1,29 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import lpTokenABI from 'abis/LPToken.abi.json';
+import { useChains } from 'context/Chains';
+import { LPToken } from 'config/liquidityContracts/LPToken';
 
 function useLPToken() {
+  const { fromChain } = useChains()!;
+  const contractAddress = fromChain
+    ? LPToken[fromChain.chainId].address
+    : undefined;
+
   const lpTokenContract = useMemo(() => {
+    if (!contractAddress) return;
+
     return new ethers.Contract(
-      '0x14aC2F6eeAC5ED94667Ca9f4f3c5f449b733325f',
+      contractAddress,
       lpTokenABI,
       new ethers.providers.Web3Provider(window.ethereum),
     );
-  }, []);
+  }, [contractAddress]);
 
   const getPositionMetadata = useCallback(
     (positionId: BigNumber) => {
+      if (!lpTokenContract) return;
+
       return lpTokenContract.tokenMetadata(positionId);
     },
     [lpTokenContract],
@@ -20,6 +31,8 @@ function useLPToken() {
 
   const getUserPositions = useCallback(
     (accounts: string[] | undefined) => {
+      if (!lpTokenContract) return;
+
       return accounts
         ? lpTokenContract
             .getAllNftIdsByUser(accounts[0])
@@ -29,7 +42,7 @@ function useLPToken() {
     [lpTokenContract],
   );
 
-  return { lpTokenContract, getPositionMetadata, getUserPositions };
+  return { getPositionMetadata, getUserPositions };
 }
 
 export default useLPToken;

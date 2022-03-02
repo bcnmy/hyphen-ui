@@ -118,7 +118,12 @@ const WalletProviderProvider: React.FC = props => {
 
     function handleConnect(info: { chainId: number }) {
       console.log('connect!');
-      setCurrentChainId(info.chainId);
+      const { chainId } = info;
+      if (typeof chainId === 'string') {
+        setCurrentChainId(Number.parseInt(chainId));
+      } else {
+        setCurrentChainId(chainId);
+      }
       reinit(rawEthereumProvider);
     }
 

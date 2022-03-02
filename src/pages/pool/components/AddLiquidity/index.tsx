@@ -1,17 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiAdjustments, HiArrowSmLeft } from 'react-icons/hi';
+import { HiArrowSmLeft } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
 import Select, { Option } from 'components/Select';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
-import { useToken } from 'context/Token';
 import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
 import getTokenBalance from 'utils/getTokenBalance';
 import { BigNumber, ethers } from 'ethers';
-import erc20ABI from 'abis/erc20.abi.json';
 import Skeleton from 'react-loading-skeleton';
 import { useMutation, useQuery } from 'react-query';
 import useLiquidityProviders from 'hooks/useLiquidityProviders';
@@ -25,14 +23,6 @@ import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
-
-interface IAddLiquidity {
-  apy: number;
-  currentLiquidity: number;
-  network: string;
-  tokenSymbol: string;
-  totalLiquidity: number;
-}
 
 function AddLiquidity() {
   const navigate = useNavigate();
@@ -475,7 +465,7 @@ function AddLiquidity() {
               <span className="flex text-hyphen-gray-300">
                 Your Address Limit:{' '}
                 {walletBalance ? (
-                  makeNumberCompact(Number.parseFloat(walletBalance))
+                  walletBalance
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"

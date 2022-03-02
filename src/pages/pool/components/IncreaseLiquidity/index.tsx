@@ -345,7 +345,7 @@ function IncreaseLiquidity() {
             <span className="flex items-center text-hyphen-gray-300">
               Balance:{' '}
               {liquidityBalance ? (
-                makeNumberCompact(Number.parseFloat(liquidityBalance))
+                liquidityBalance
               ) : (
                 <Skeleton
                   baseColor="#615ccd20"

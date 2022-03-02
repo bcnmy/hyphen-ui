@@ -8,10 +8,6 @@ const oneHourInMs = 60 * 60 * 1000;
 const queryClientOptions = {
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchOnReconnect: false,
-      retry: false,
       staleTime: oneHourInMs,
     },
   },

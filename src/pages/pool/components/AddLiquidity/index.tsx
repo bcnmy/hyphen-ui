@@ -430,7 +430,7 @@ function AddLiquidity() {
   }
 
   function onAddTokenLiquiditySuccess() {
-    queryClient.invalidateQueries();
+    queryClient.invalidateQueries('userPositions');
     navigate('/pool');
   }
 

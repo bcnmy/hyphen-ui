@@ -24,7 +24,6 @@ function LiquidityPositions() {
       return getUserPositions(accounts);
     },
     {
-      // Execute only when accounts are available.
       enabled: !!isLoggedIn,
     },
   );

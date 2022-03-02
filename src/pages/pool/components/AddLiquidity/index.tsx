@@ -141,13 +141,24 @@ function AddLiquidity() {
     mutate: addLiquidityMutation,
   } = useMutation(
     async ({
-      tokenAddress,
       amount,
+      tokenAddress,
     }: {
-      tokenAddress: string;
       amount: BigNumber;
+      tokenAddress: string | '';
     }) => {
-      const addLiquidityTx = await addLiquidity(tokenAddress, amount);
+      if (!selectedToken || !currentChainId) {
+        return;
+      }
+
+      const token = tokens.find(
+        tokenObj => tokenObj.symbol === selectedToken.id,
+      )!;
+
+      const addLiquidityTx =
+        token[currentChainId].address === NATIVE_ADDRESS
+          ? await addNativeLiquidity(amount)
+          : await addLiquidity(tokenAddress, amount);
       addTxNotification(
         addLiquidityTx,
         'Add liquidity',
@@ -156,20 +167,6 @@ function AddLiquidity() {
       return await addLiquidityTx.wait(1);
     },
   );
-
-  // const {
-  //   isLoading: addNativeLiquidityLoading,
-  //   isSuccess: addNativeLiquiditySuccess,
-  //   mutate: addNativeLiquidityMutation,
-  // } = useMutation(async () => {
-  //   const addNativeLiquidityTx = await addNativeLiquidity();
-  //   addTxNotification(
-  //     addNativeLiquidityTx,
-  //     'Add native liquidity',
-  //     `${fromChain?.explorerUrl}/tx/${addNativeLiquidityTx.hash}`,
-  //   );
-  //   return await addNativeLiquidityTx.wait(1);
-  // });
 
   // const { data: totalLiquidityByLP } = useQuery(
   //   ['totalLiquidityByLP', selectedTokenAddress],
@@ -181,10 +178,6 @@ function AddLiquidity() {
   // );
 
   const totalLiquidityByLP = 0;
-
-  // if (totalLiquidityByLP) {
-  //   console.log(totalLiquidityByLP.toString());
-  // }
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
@@ -409,8 +402,8 @@ function AddLiquidity() {
 
     addLiquidityMutation(
       {
-        tokenAddress: selectedTokenAddress,
         amount: ethers.utils.parseUnits(liquidityAmount, tokenDecimals),
+        tokenAddress: selectedTokenAddress,
       },
       {
         onSuccess: onAddTokenLiquiditySuccess,

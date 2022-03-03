@@ -291,7 +291,6 @@ function AddLiquidity() {
       chainObj => chainObj.chainId === selectedChain.id,
     )!;
     setChain(selectedChain);
-    changeSelectedNetwork(newChain);
 
     if (walletProvider) {
       const res = switchNetwork(walletProvider, newChain);
@@ -460,7 +459,7 @@ function AddLiquidity() {
   }
 
   function onAddTokenLiquiditySuccess() {
-    queryClient.invalidateQueries('userPositions');
+    queryClient.invalidateQueries();
     navigate('/pool');
   }
 

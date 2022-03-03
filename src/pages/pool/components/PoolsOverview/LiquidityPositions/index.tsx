@@ -11,6 +11,7 @@ import { useChains } from 'context/Chains';
 function LiquidityPositions() {
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const { selectedNetwork } = useChains()!;
+
   const { getUserPositions } = useLPToken(selectedNetwork);
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
 

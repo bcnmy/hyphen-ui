@@ -11,8 +11,6 @@ function NetworkSelector() {
   const { selectedNetwork, changeSelectedNetwork } = useChains()!;
 
   function handleNetworkChange(selectedNetwork: ChainConfig) {
-    changeSelectedNetwork(selectedNetwork);
-
     if (walletProvider) {
       const res = switchNetwork(walletProvider, selectedNetwork);
       if (res === null) {

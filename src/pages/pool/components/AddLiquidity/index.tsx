@@ -635,11 +635,12 @@ function AddLiquidity() {
               <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
                 <span>Pool cap</span>
                 <span className="flex">
-                  {formattedTotalLiquidity && formattedTokenTotalCap ? (
+                  {formattedTotalLiquidity >= 0 &&
+                  formattedTokenTotalCap >= 0 ? (
                     <>
-                      {makeNumberCompact(formattedTotalLiquidity)}
+                      {makeNumberCompact(formattedTotalLiquidity)}{' '}
                       {selectedToken?.name} /{' '}
-                      {makeNumberCompact(formattedTokenTotalCap)}
+                      {makeNumberCompact(formattedTokenTotalCap)}{' '}
                       {selectedToken?.name}
                     </>
                   ) : (

@@ -282,11 +282,10 @@ function ManagePosition() {
             <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
               <span className="flex">
-                {formattedTotalLiquidity && formattedTokenTotalCap ? (
+                {formattedTotalLiquidity >= 0 && formattedTokenTotalCap >= 0 ? (
                   <>
-                    {makeNumberCompact(formattedTotalLiquidity)}
-                    {token?.symbol} /{' '}
-                    {makeNumberCompact(formattedTokenTotalCap)}
+                    {makeNumberCompact(formattedTotalLiquidity)} {token?.symbol}{' '}
+                    / {makeNumberCompact(formattedTokenTotalCap)}{' '}
                     {token?.symbol}
                   </>
                 ) : (

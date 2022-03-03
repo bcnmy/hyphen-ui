@@ -3,12 +3,24 @@ import { Listbox, Transition } from '@headlessui/react';
 import { HiOutlineChevronDown } from 'react-icons/hi';
 import { ChainConfig, chains } from 'config/chains';
 import { useChains } from 'context/Chains';
+import { useWalletProvider } from 'context/WalletProvider';
+import switchNetwork from 'utils/switchNetwork';
 
 function NetworkSelector() {
+  const { walletProvider } = useWalletProvider()!;
   const { selectedNetwork, changeSelectedNetwork } = useChains()!;
 
   function handleNetworkChange(selectedNetwork: ChainConfig) {
     changeSelectedNetwork(selectedNetwork);
+
+    if (walletProvider) {
+      const res = switchNetwork(walletProvider, selectedNetwork);
+      if (res === null) {
+        changeSelectedNetwork(selectedNetwork);
+      }
+    } else {
+      changeSelectedNetwork(selectedNetwork);
+    }
   }
 
   if (!selectedNetwork) return null;

@@ -8,7 +8,7 @@ import {
 } from "react";
 
 // @ts-ignore
-import { Hyphen, RESPONSE_CODES, SIGNATURE_TYPES } from "@biconomy/hyphen";
+import { Hyphen, RESPONSE_CODES, SIGNATURE_TYPES } from "@biconomy/hyphen-staging";
 
 import { useWalletProvider } from "context/WalletProvider";
 import { useChains } from "context/Chains";

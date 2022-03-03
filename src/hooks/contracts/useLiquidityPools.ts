@@ -28,9 +28,9 @@ function useLiquidityPools(chain: ChainConfig | undefined) {
   }, [contractAddress, isLoggedIn, signer]);
 
   const getTransferFee = useCallback(
-    (tokenAddress: string, rawTransferAmount: string) => {
+    async (tokenAddress: string, rawTransferAmount: string) => {
       if (!liquidityPoolsContract) return;
-      return liquidityPoolsContract.getTransferFee(
+      return await liquidityPoolsContract.getTransferFee(
         tokenAddress,
         rawTransferAmount,
       );

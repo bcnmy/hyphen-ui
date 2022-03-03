@@ -14,7 +14,7 @@ import {
 import lpmanagerABI from 'abis/LiquidityPools.abi.json';
 
 // @ts-ignore
-import { RESPONSE_CODES } from '@biconomy/hyphen';
+import { RESPONSE_CODES } from '@biconomy/hyphen-staging';
 
 import {
   BASE_DIVISOR,
@@ -169,17 +169,16 @@ const TransactionProvider: React.FC = props => {
   //   fetchSelectedTokenApprovalError,
   // ]);
 
-  let { data: transferFee } = useQuery(
+  let { data: transferFee, isLoading: isTransferFeeLoading } = useQuery(
     ['transferFeeByToken', selectedToken, toChain, transferAmount],
-    () => {
+    async () => {
       if (!selectedToken || !toChain || !transferAmount) {
         return;
       }
       let tokenAddress = selectedToken[toChain.chainId].address;
       let tokenDecimal = selectedToken[toChain.chainId].decimal;
-
       let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
-      return getTransferFee(tokenAddress, rawTransferAmount.toString());
+      return await getTransferFee(tokenAddress, rawTransferAmount.toString());
     },
     {
       // Execute only when tokenAddress is available.
@@ -238,7 +237,14 @@ const TransactionProvider: React.FC = props => {
       let fixedDecimalPoint =
         selectedToken[fromChain.chainId].fixedDecimalPoint ||
         DEFAULT_FIXED_DECIMAL_POINT;
+      if (!selectedToken || !toChain || !transferAmount) {
+        return;
+      }
+      let tokenAddress = selectedToken[toChain.chainId].address;
+      let tokenDecimal = selectedToken[toChain.chainId].decimal;
+      let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
 
+      let transferFee = await getTransferFee(tokenAddress, rawTransferAmount.toString());
       let transferFeePerc = transferFee / BASE_DIVISOR;
 
       let lpFeeAmountRaw = (transferFeePerc * transferAmount) / 100;
@@ -288,6 +294,10 @@ const TransactionProvider: React.FC = props => {
       let decimal = selectedToken[fromChain.chainId].decimal;
 
       let rewardAmountString;
+      let tokenAddressFromChain = selectedToken[fromChain.chainId].address;
+
+      let rewardAmount = await getRewardAmount(tokenAddressFromChain, rawTransferAmount.toString());
+
       console.log('************** REWARD AMOUNT  *********', rewardAmount);
       if (rewardAmount != undefined && rewardAmount.gt && rewardAmount.gt(0)) {
         rewardAmount = formatRawEthValue(rewardAmount.toString(), decimal);

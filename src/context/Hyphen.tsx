@@ -8,7 +8,7 @@ import {
 } from "react";
 
 // @ts-ignore
-import { Hyphen, RESPONSE_CODES, SIGNATURE_TYPES } from "@biconomy/hyphen";
+import { Hyphen, RESPONSE_CODES, SIGNATURE_TYPES } from "@biconomy/hyphen-staging";
 
 import { useWalletProvider } from "./WalletProvider";
 import { useChains } from "./Chains";
@@ -56,7 +56,7 @@ const HyphenProvider: React.FC = (props) => {
           [ENV.test]: "test",
           [ENV.staging]: "staging",
           local: "",
-        }[ENV.test],
+        }[ENV.staging],
         biconomy: {
           enable: isBiconomyEnabled,
           apiKey: fromChain?.biconomy.apiKey,
@@ -73,7 +73,7 @@ const HyphenProvider: React.FC = (props) => {
           [ENV.test]: "test",
           [ENV.staging]: "staging",
           local: "",
-        }[ENV.test],
+        }[ENV.staging],
         signatureType: SIGNATURE_TYPES.EIP712,
       });
     }

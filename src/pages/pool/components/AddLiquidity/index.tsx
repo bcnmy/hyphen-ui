@@ -558,7 +558,7 @@ function AddLiquidity() {
             {isLoggedIn ? (
               <>
                 <button
-                  className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                  className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
                   disabled={
                     isDataLoading ||
                     isSelectedTokenApproved ||
@@ -608,7 +608,7 @@ function AddLiquidity() {
             )}
           </div>
           <div className="max-h-100 h-100 pl-12.5">
-            <div className="mb-14 grid grid-cols-2 gap-2.5">
+            <div className="mb-12 grid grid-cols-2 gap-2.5">
               <div className="flex flex-col">
                 <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
                   APY
@@ -627,7 +627,7 @@ function AddLiquidity() {
               </div>
             </div>
 
-            <div className="mb-16">
+            <div className="mb-[4.375rem]">
               <ProgressBar
                 currentProgress={formattedTotalLiquidity}
                 totalProgress={formattedTokenTotalCap}

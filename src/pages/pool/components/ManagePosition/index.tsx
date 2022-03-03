@@ -338,7 +338,7 @@ function ManagePosition() {
 
           {isLoggedIn ? (
             <button
-              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
               disabled={isDataLoading || isRemovalAmountGtSuppliedLiquidity}
               onClick={handleConfirmRemovalClick}
             >
@@ -350,7 +350,7 @@ function ManagePosition() {
             </button>
           ) : (
             <button
-              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
               onClick={connect}
             >
               Connect Your Wallet
@@ -371,12 +371,12 @@ function ManagePosition() {
           >
             Unclaimed Fees
           </label>
-          <div className="mt-2 mb-10 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+          <div className="mt-2 mb-8 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
             {unclaimedFees}
           </div>
 
           <button
-            className="mb-11 flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+            className="mb-[3.125rem] flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
             disabled={unclaimedFees === 0}
             onClick={handleClaimFeeClick}
           >

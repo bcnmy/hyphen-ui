@@ -400,7 +400,7 @@ function IncreaseLiquidity() {
 
           {isLoggedIn ? (
             <button
-              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
               disabled={
                 isDataLoading ||
                 liquidityIncreaseAmount === '' ||

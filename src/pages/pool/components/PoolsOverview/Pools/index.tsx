@@ -1,6 +1,15 @@
+import { useQuery } from 'react-query';
 import PoolOverview from './PoolOverview';
 
 function Pools() {
+  const { data: tokens } = useQuery('tokens', () =>
+    fetch('http://3.83.11.76:3000/api/v1/configuration/tokens').then(res =>
+      res.json(),
+    ),
+  );
+
+  console.log(tokens);
+
   return (
     <article className="rounded-10 bg-white pt-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">

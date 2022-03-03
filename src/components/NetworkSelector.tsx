@@ -1,86 +1,38 @@
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiOutlineChevronDown } from 'react-icons/hi';
-import { useChains } from 'context/Chains';
-import switchNetwork from 'utils/switchNetwork';
 import { useWalletProvider } from 'context/WalletProvider';
-import avaxIcon from '../assets/images/networks/avax-network-icon.svg';
-import ethIcon from '../assets/images/networks/eth-network-icon.svg';
-import maticIcon from '../assets/images/networks/matic-network-icon.svg';
-
-export interface INetwork {
-  id: number;
-  name: string;
-  image: string;
-  symbol: string;
-}
-
-interface INetworkImages {
-  [key: string]: string;
-}
-
-const networkImages: INetworkImages = {
-  ETH: ethIcon,
-  GETH: ethIcon,
-  RETH: ethIcon,
-  AVAX: avaxIcon,
-  MATIC: maticIcon,
-};
+import { ChainConfig, chains } from 'config/chains';
+import { useChains } from 'context/Chains';
 
 function NetworkSelector() {
-  const { chainsList } = useChains()!;
-  const { currentChainId, walletProvider } = useWalletProvider()!;
-  const networks = useMemo(
-    () =>
-      chainsList.map(
-        chain =>
-          ({
-            id: chain.chainId,
-            name: chain.name,
-            image: chain.image,
-            symbol: chain.currency,
-          } as INetwork),
-      ),
-    [chainsList],
-  );
-
-  const [selected, setSelected] = useState<INetwork>();
+  const { currentChainId } = useWalletProvider()!;
+  const { selectedNetwork, changeSelectedNetwork } = useChains()!;
 
   useEffect(() => {
-    const network = networks.find(network => network.id === currentChainId)!;
+    const network = chains.find(
+      chainObj => chainObj.chainId === currentChainId,
+    )!;
     if (network) {
-      setSelected(network);
+      changeSelectedNetwork(network);
     } else {
-      setSelected(networks[0]);
+      changeSelectedNetwork(chains[0]);
     }
-  }, [currentChainId, networks]);
+  }, [changeSelectedNetwork, currentChainId]);
 
-  function handleNetworkChange(selectedNetwork: INetwork) {
-    const network = chainsList.find(
-      chain => chain.chainId === selectedNetwork.id,
-    );
-    if (walletProvider && network) {
-      const res = switchNetwork(walletProvider, network);
-      if (res === null) {
-        setSelected(selectedNetwork);
-      }
-    }
+  function handleNetworkChange(selectedNetwork: ChainConfig) {
+    changeSelectedNetwork(selectedNetwork);
   }
 
-  if (!selected) return null;
+  if (!selectedNetwork) return null;
 
   return (
     <div className="w-[146px]">
-      <Listbox value={selected} onChange={handleNetworkChange}>
+      <Listbox value={selectedNetwork} onChange={handleNetworkChange}>
         <div className="relative">
           <Listbox.Button className="relative h-8 w-full cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 pl-3 pr-10 text-left focus:outline-none sm:text-sm">
             <span className="flex items-center truncate">
-              <img
-                src={networkImages[selected.symbol]}
-                alt={selected.name}
-                className="mr-2 h-4 w-auto"
-              />
-              {selected.name}
+              {selectedNetwork.name}
             </span>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
               <HiOutlineChevronDown
@@ -96,27 +48,20 @@ function NetworkSelector() {
             leaveTo="opacity-0"
           >
             <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-xl bg-hyphen-purple py-1 text-base focus:outline-none sm:text-sm">
-              {networks.map(network => (
+              {chains.map(network => (
                 <Listbox.Option
-                  key={network.id}
+                  key={network.chainId}
                   className="relative flex cursor-pointer select-none items-center py-2 pl-3 pr-4 text-white hover:bg-hyphen-purple-dark hover:bg-opacity-50"
                   value={network}
                 >
                   {({ selected, active }) => (
-                    <>
-                      <img
-                        src={networkImages[network.symbol]}
-                        alt={network.name}
-                        className="mr-2 h-4 w-auto"
-                      />
-                      <span
-                        className={`${
-                          selected ? 'font-medium' : 'font-normal'
-                        } block truncate`}
-                      >
-                        {network.name}
-                      </span>
-                    </>
+                    <span
+                      className={`${
+                        selected ? 'font-medium' : 'font-normal'
+                      } block truncate`}
+                    >
+                      {network.name}
+                    </span>
                   )}
                 </Listbox.Option>
               ))}

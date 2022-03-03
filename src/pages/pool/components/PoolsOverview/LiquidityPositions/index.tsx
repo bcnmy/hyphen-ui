@@ -96,7 +96,7 @@ function LiquidityPositions() {
                 className="mb-8 h-15 w-[400px] rounded-2.5 bg-hyphen-purple font-semibold text-white"
                 onClick={connect}
               >
-                Connect Wallet
+                Connect Your Wallet
               </button>
             ) : null}
           </section>

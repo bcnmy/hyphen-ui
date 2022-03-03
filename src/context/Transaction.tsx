@@ -33,7 +33,7 @@ import useAsync, { Status } from 'hooks/useLoading';
 import { useWalletProvider } from './WalletProvider';
 import { useBiconomy } from './Biconomy';
 import { useNotifications } from './Notifications';
-import useLiquidityPools from 'hooks/useLiquidityPools';
+import useLiquidityPools from 'hooks/contracts/useLiquidityPools';
 
 export enum ValidationErrors {
   INVALID_AMOUNT,
@@ -172,11 +172,11 @@ const TransactionProvider: React.FC = props => {
   let { data: transferFee } = useQuery(
     ['transferFeeByToken', selectedToken, toChain, transferAmount],
     () => {
-      if(!selectedToken || !toChain || !transferAmount) {
+      if (!selectedToken || !toChain || !transferAmount) {
         return;
       }
       let tokenAddress = selectedToken[toChain.chainId].address;
-      let tokenDecimal = selectedToken[toChain.chainId].decimal
+      let tokenDecimal = selectedToken[toChain.chainId].decimal;
 
       let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
       return getTransferFee(tokenAddress, rawTransferAmount.toString());
@@ -187,22 +187,22 @@ const TransactionProvider: React.FC = props => {
     },
   );
 
-  let {data: rewardAmount} = useQuery(
+  let { data: rewardAmount } = useQuery(
     ['rewardAmountByToken', selectedToken, fromChain, transferAmount],
     () => {
-      if(!selectedToken || !fromChain || !transferAmount) {
+      if (!selectedToken || !fromChain || !transferAmount) {
         return;
       }
       let tokenAddress = selectedToken[fromChain.chainId].address;
-      let tokenDecimal = selectedToken[fromChain.chainId].decimal
+      let tokenDecimal = selectedToken[fromChain.chainId].decimal;
 
       let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
-      return getRewardAmount(tokenAddress, rawTransferAmount.toString());;
+      return getRewardAmount(tokenAddress, rawTransferAmount.toString());
     },
     {
       // Execute only when tokenAddress is available.
       enabled: !!(selectedToken && fromChain && transferAmount),
-    }
+    },
   );
 
   const changeTransferAmountInputValue = (amount: string) => {
@@ -221,109 +221,103 @@ const TransactionProvider: React.FC = props => {
   };
 
   const calculateTransactionFee = useCallback(async () => {
-    try{
-
+    try {
       const fetchOptions = {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json;charset=utf-8',
         },
       };
-  
+
       if (!fromChain || !selectedToken || !toChain || !transferAmount)
         throw new Error('App not initialised');
-  
+
       if (isNaN(transferAmount)) throw new Error('Transfer amount is invalid');
       console.log('calculate fee for amount', transferAmount);
-  
-  
-  
+
       let fixedDecimalPoint =
         selectedToken[fromChain.chainId].fixedDecimalPoint ||
         DEFAULT_FIXED_DECIMAL_POINT;
-      
-      let transferFeePerc = transferFee/BASE_DIVISOR;
-  
+
+      let transferFeePerc = transferFee / BASE_DIVISOR;
+
       let lpFeeAmountRaw = (transferFeePerc * transferAmount) / 100;
       let lpFeeProcessedString;
-  
+
       lpFeeProcessedString = lpFeeAmountRaw.toFixed(fixedDecimalPoint);
-  
+
       let fetchResponse = await getTokenGasPriceDebounced(
         selectedToken[toChain.chainId].address,
         toChain.chainId,
         fetchOptions,
       );
-  
+
       // Check the balance again using tokenAmount
       // let userBalanceCheck = await checkUserBalance(amount);
-  
+
       // if (!userBalanceCheck) return;
       // if (!config.isNativeAddress(selectedToken.address)) {
       //   await checkTokenApproval(amount);
       // }
-  
+
       if (!fetchResponse || !fetchResponse.json) {
         throw new Error(`Invalid response`);
       }
-  
+
       let response = await fetchResponse.json();
-  
+
       if (!response || !response.tokenGasPrice) {
         throw new Error(
           `Unable to get token gas price for ${selectedToken.symbol}`,
         );
       }
-  
+
       console.log(
         `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
       );
-  
+
       let tokenGasPrice = response.tokenGasPrice;
-  
+
       if (!tokenGasPrice) {
         throw new Error(
           'Error while getting selectedTokenConfig and tokenGasPrice from hyphen API',
         );
       }
-  
+
       let overhead = selectedToken[fromChain.chainId].transferOverhead;
       let decimal = selectedToken[fromChain.chainId].decimal;
-  
+
       let rewardAmountString;
-      console.log("************** REWARD AMOUNT  *********", rewardAmount);
-      if(rewardAmount != undefined && rewardAmount.gt && rewardAmount.gt(0)) {
+      console.log('************** REWARD AMOUNT  *********', rewardAmount);
+      if (rewardAmount != undefined && rewardAmount.gt && rewardAmount.gt(0)) {
         rewardAmount = formatRawEthValue(rewardAmount.toString(), decimal);
-        rewardAmountString = toFixed(
-          rewardAmount,
-          fixedDecimalPoint,
-        );
+        rewardAmountString = toFixed(rewardAmount, fixedDecimalPoint);
       }
-  
+
       if (!overhead || !decimal) {
         throw new Error(
           'Error while getting token overhead gas and decimal from config',
         );
       }
-  
+
       let transactionFeeRaw = BigNumber.from(overhead).mul(tokenGasPrice);
-  
+
       let transactionFee = formatRawEthValue(
         transactionFeeRaw.toString(),
         decimal,
       );
-  
+
       let transactionFeeProcessedString = toFixed(
         transactionFee,
         fixedDecimalPoint,
       );
-  
+
       let amountToGet =
         transferAmount -
         parseFloat(transactionFee) -
         parseFloat(lpFeeProcessedString);
-  
-      if(rewardAmount) {
+
+      if (rewardAmount) {
         amountToGet += parseFloat(rewardAmount);
       }
 
@@ -331,16 +325,16 @@ const TransactionProvider: React.FC = props => {
         amountToGet.toString(),
         fixedDecimalPoint,
       );
-  
+
       if (amountToGet <= 0) throw new Error('Amount too low');
-  
+
       return {
         rewardAmountString,
         lpFeeProcessedString,
         transactionFeeProcessedString,
         amountToGetProcessedString,
       };
-    } catch(error) {
+    } catch (error) {
       console.log(error);
     }
   }, [fromChain, toChain, selectedToken, transferAmount]);
@@ -408,10 +402,10 @@ const TransactionProvider: React.FC = props => {
   }, [poolInfo, selectedTokenBalance, transferAmount, validateTransferAmount]);
 
   useEffect(() => {
-    if (errors.length === 0) {
+    if (errors.length === 0 && transferAmount) {
       fetchTransactionFee();
     }
-  }, [errors, fetchTransactionFee]);
+  }, [errors, fetchTransactionFee, transferAmount]);
 
   const preDepositCheck = useCallback(async () => {
     if (!transferAmount || errors.length > 0) {
@@ -601,7 +595,6 @@ const TransactionProvider: React.FC = props => {
         receiptLog => receiptLog.topics[0] === toChain.assetSentTopicId,
       );
       try {
-
         if (!tokenReceipt) {
           throw new Error('No valid receipt log data');
         }
@@ -618,7 +611,7 @@ const TransactionProvider: React.FC = props => {
             DEFAULT_FIXED_DECIMAL_POINT,
         );
         return processedAmount;
-      } catch(error) {
+      } catch (error) {
         console.log(error);
         throw new Error('Error while filtering and parsing logs');
       }

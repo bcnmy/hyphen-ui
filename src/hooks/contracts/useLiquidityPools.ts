@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { BigNumber, ethers } from 'ethers';
+import { ethers } from 'ethers';
 import liquidityPoolABI from 'abis/LiquidityPools.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
 import { ChainConfig } from 'config/chains';
@@ -17,9 +17,9 @@ function useLiquidityPools(chain: ChainConfig | undefined) {
     return new ethers.Contract(
       contractAddress,
       liquidityPoolABI,
-      new ethers.providers.JsonRpcProvider(chain?.rpcUrl),
+      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
     );
-  }, [contractAddress, isLoggedIn]);
+  }, [chain, contractAddress, isLoggedIn]);
 
   const liquidityPoolsContractSigner = useMemo(() => {
     if (!contractAddress || !isLoggedIn) return;
@@ -29,18 +29,24 @@ function useLiquidityPools(chain: ChainConfig | undefined) {
 
   const getTransferFee = useCallback(
     (tokenAddress: string, rawTransferAmount: string) => {
-        if(!liquidityPoolsContract) return;
-        return liquidityPoolsContract.getTransferFee(tokenAddress, rawTransferAmount);
+      if (!liquidityPoolsContract) return;
+      return liquidityPoolsContract.getTransferFee(
+        tokenAddress,
+        rawTransferAmount,
+      );
     },
-    [liquidityPoolsContract]
+    [liquidityPoolsContract],
   );
 
   const getRewardAmount = useCallback(
     (tokenAddress: string, rawDepositAmount: string) => {
-      if(!liquidityPoolsContract) return;
-      return liquidityPoolsContract.getRewardAmount(rawDepositAmount, tokenAddress);
+      if (!liquidityPoolsContract) return;
+      return liquidityPoolsContract.getRewardAmount(
+        rawDepositAmount,
+        tokenAddress,
+      );
     },
-    [liquidityPoolsContract]
+    [liquidityPoolsContract],
   );
 
   // const addLiquidity = useCallback(
@@ -136,7 +142,7 @@ function useLiquidityPools(chain: ChainConfig | undefined) {
     liquidityProvidersContract: liquidityPoolsContract,
     liquidityProvidersContractSigner: liquidityPoolsContractSigner,
     getTransferFee,
-    getRewardAmount
+    getRewardAmount,
     // addLiquidity,
     // addNativeLiquidity,
     // claimFee,

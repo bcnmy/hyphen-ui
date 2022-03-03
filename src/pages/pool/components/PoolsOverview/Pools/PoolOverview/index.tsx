@@ -1,8 +1,14 @@
-import ProgressBar from 'components/ProgressBar';
+import { ethers } from 'ethers';
+import { useQuery } from 'react-query';
+import Skeleton from 'react-loading-skeleton';
+import { HiInformationCircle } from 'react-icons/hi';
 import { ChainConfig, chains } from 'config/chains';
 import tokens, { TokenConfig } from 'config/tokens';
 import CustomTooltip from 'components/CustomTooltip';
-import { HiInformationCircle } from 'react-icons/hi';
+import ProgressBar from 'components/ProgressBar';
+import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
+import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
+import { makeNumberCompact } from 'utils/makeNumberCompact';
 
 interface IPoolOverview {
   apy: number;
@@ -10,18 +16,41 @@ interface IPoolOverview {
   feeApy: number;
   rewardApy: number;
   token: any;
-  totalLiquidity: number;
 }
 
-function PoolOverview({
-  apy,
-  chain,
-  feeApy,
-  rewardApy,
-  token,
-  totalLiquidity,
-}: IPoolOverview) {
-  const { chainColor, symbol, tokenImage } = token;
+function PoolOverview({ apy, chain, feeApy, rewardApy, token }: IPoolOverview) {
+  const { address, chainColor, decimal, symbol, tokenImage } = token;
+
+  const { getTotalLiquidity } = useLiquidityProviders(chain);
+  const { getTokenTotalCap } = useWhitelistPeriodManager(chain);
+
+  const { data: totalLiquidity } = useQuery(
+    ['totalLiquidity', address],
+    () => getTotalLiquidity(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
+
+  const { data: tokenTotalCap } = useQuery(
+    ['tokenTotalCap', address],
+    () => getTokenTotalCap(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
+
+  const formattedTotalLiquidity =
+    totalLiquidity && decimal
+      ? Number.parseFloat(ethers.utils.formatUnits(totalLiquidity, decimal))
+      : totalLiquidity;
+
+  const formattedTokenTotalCap =
+    tokenTotalCap && decimal
+      ? Number.parseFloat(ethers.utils.formatUnits(tokenTotalCap, decimal))
+      : tokenTotalCap;
 
   return (
     <section
@@ -55,11 +84,27 @@ function PoolOverview({
         </span>
       </div>
       <div className="absolute right-12.5 flex h-12 w-[250px] flex-col justify-end">
-        <ProgressBar currentProgress={25} totalProgress={100} />
+        <ProgressBar
+          currentProgress={formattedTotalLiquidity}
+          minProgressWidth={4}
+          totalProgress={formattedTokenTotalCap}
+        />
         <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
           <span>Pool cap</span>
-          <span>
-            {1000} {symbol} / {totalLiquidity} {symbol}
+          <span className="flex">
+            {formattedTotalLiquidity >= 0 && formattedTokenTotalCap >= 0 ? (
+              <>
+                {makeNumberCompact(formattedTotalLiquidity)} {symbol} /{' '}
+                {makeNumberCompact(formattedTokenTotalCap)} {symbol}
+              </>
+            ) : (
+              <Skeleton
+                baseColor="#615ccd20"
+                enableAnimation
+                highlightColor="#615ccd05"
+                className="!mx-1 !w-20"
+              />
+            )}
           </span>
         </div>
       </div>

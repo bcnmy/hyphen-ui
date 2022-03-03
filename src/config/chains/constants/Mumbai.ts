@@ -8,7 +8,7 @@ export const MUMBAI: ChainConfig = {
   subText: 'Polygon testnet',
   chainId: 80001,
   chainColor: '#8247E51A',
-  rpcUrl: 'https://rpc-mumbai.maticvigil.com',
+  rpcUrl: 'https://rpc-mumbai.matic.today',
   currency: 'MATIC',
   // currency: "Test MATIC",
   nativeToken: NATIVE_ADDRESS,
@@ -19,7 +19,7 @@ export const MUMBAI: ChainConfig = {
     apiKey: 'r8N3i0Ukw.bb5dd97d-af25-47cb-9281-2069f1b95ade',
   },
   assetSentTopicId:
-    "0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c",
+    '0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c',
   networkAgnosticTransfer: true, // Set this to enable network agnostic gasless transactions
   graphURL: 'https://api.thegraph.com/subgraphs/name/divyan73/lpmanagermumbai',
   explorerUrl: 'https://mumbai.polygonscan.com',

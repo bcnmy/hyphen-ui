@@ -1,14 +1,20 @@
+import { chains } from 'config/chains';
+import tokens from 'config/tokens';
 import { useQuery } from 'react-query';
 import PoolOverview from './PoolOverview';
 
 function Pools() {
-  const { data: tokens } = useQuery('tokens', () =>
-    fetch('http://3.83.11.76:3000/api/v1/configuration/tokens').then(res =>
-      res.json(),
-    ),
+  const { data } = useQuery(
+    'tokens',
+    () =>
+      fetch('http://3.83.11.76:3000/api/v1/configuration/tokens').then(res =>
+        res.json(),
+      ),
+    {
+      enabled: !!chains,
+    },
   );
-
-  console.log(tokens);
+  const { message: tokensObject } = data || {};
 
   return (
     <article className="rounded-10 bg-white pt-2.5">
@@ -17,33 +23,33 @@ function Pools() {
       </header>
 
       <section className="grid grid-cols-1 gap-1">
-        <PoolOverview
-          apy={97.22}
-          chainId={4}
-          currentLiquidity={19.8}
-          feeApy={4.04}
-          rewardApy={95.18}
-          tokenSymbol="ETH"
-          totalLiquidity={100}
-        />
-        <PoolOverview
-          apy={97.22}
-          chainId={4}
-          currentLiquidity={19.8}
-          feeApy={4.04}
-          rewardApy={95.18}
-          tokenSymbol="USDT"
-          totalLiquidity={100}
-        />
-        <PoolOverview
-          apy={97.22}
-          chainId={80001}
-          currentLiquidity={19.8}
-          feeApy={4.04}
-          rewardApy={95.18}
-          tokenSymbol="USDC"
-          totalLiquidity={100}
-        />
+        {chains && tokensObject
+          ? chains.map(chainObj => {
+              return Object.keys(tokensObject).map((tokenSymbol: any) => {
+                const token = tokens.find(
+                  tokenObj => tokenObj.symbol === tokenSymbol,
+                )!;
+                const tokenObj = token[chainObj.chainId]
+                  ? {
+                      tokenImage: token.image,
+                      ...token[chainObj.chainId],
+                    }
+                  : null;
+
+                return tokenObj ? (
+                  <PoolOverview
+                    apy={83}
+                    chain={chainObj}
+                    feeApy={20}
+                    rewardApy={63}
+                    token={tokenObj}
+                    totalLiquidity={200000}
+                    key={`${chainObj.chainId}-${tokenSymbol}`}
+                  />
+                ) : null;
+              });
+            })
+          : null}
       </section>
     </article>
   );

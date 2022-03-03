@@ -1,35 +1,27 @@
 import ProgressBar from 'components/ProgressBar';
-import { chains } from 'config/chains';
-import tokens from 'config/tokens';
+import { ChainConfig, chains } from 'config/chains';
+import tokens, { TokenConfig } from 'config/tokens';
 import CustomTooltip from 'components/CustomTooltip';
 import { HiInformationCircle } from 'react-icons/hi';
 
 interface IPoolOverview {
   apy: number;
-  chainId: number;
-  currentLiquidity: number;
+  chain: ChainConfig;
   feeApy: number;
   rewardApy: number;
-  tokenSymbol: string;
+  token: any;
   totalLiquidity: number;
 }
 
 function PoolOverview({
   apy,
-  chainId,
-  currentLiquidity,
+  chain,
   feeApy,
   rewardApy,
-  tokenSymbol,
+  token,
   totalLiquidity,
 }: IPoolOverview) {
-  const token = tokens.find(token => token.symbol === tokenSymbol)!;
-  const {
-    image: tokenImage,
-    [chainId]: { chainColor },
-  } = token;
-  const chain = chains.find(chain => chain.chainId === chainId)!;
-  const { name: chainName } = chain;
+  const { chainColor, symbol, tokenImage } = token;
 
   return (
     <section
@@ -37,15 +29,14 @@ function PoolOverview({
       style={{ backgroundColor: chainColor }}
     >
       <div className="absolute left-12.5 flex items-center">
-        <img src={tokenImage} alt={tokenSymbol} className="mr-2 h-8 w-8" />
+        <img src={tokenImage} alt={symbol} className="mr-2 h-8 w-8" />
         <div className="flex flex-col">
-          <span className="font-mono text-2xl">{tokenSymbol}</span>
+          <span className="font-mono text-2xl">{symbol}</span>
           <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
-            {chainName}
+            {chain.name}
           </span>
         </div>
       </div>
-
       <div className="flex flex-col">
         <div className="flex items-center">
           <span className="font-mono text-2xl">{apy}%</span>
@@ -56,20 +47,19 @@ function PoolOverview({
           />
           <CustomTooltip id="apy">
             <p>Reward APY: {rewardApy}%</p>
-            <p>Fee APY: {feeApy}</p>
+            <p>Fee APY: {feeApy}%</p>
           </CustomTooltip>
         </div>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
           Annualized
         </span>
       </div>
-
       <div className="absolute right-12.5 flex h-12 w-[250px] flex-col justify-end">
         <ProgressBar currentProgress={25} totalProgress={100} />
         <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
           <span>Pool cap</span>
           <span>
-            {currentLiquidity} {tokenSymbol} / {totalLiquidity} {tokenSymbol}
+            {1000} {symbol} / {totalLiquidity} {symbol}
           </span>
         </div>
       </div>

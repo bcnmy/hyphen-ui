@@ -108,7 +108,7 @@ function AddLiquidity() {
     () => getTotalLiquidity(selectedTokenAddress),
     {
       // Execute only when selectedTokenAddress is available.
-      enabled: !!(isLoggedIn && selectedTokenAddress),
+      enabled: !!selectedTokenAddress,
     },
   );
 
@@ -116,8 +116,8 @@ function AddLiquidity() {
     ['tokenTotalCap', selectedTokenAddress],
     () => getTokenTotalCap(selectedTokenAddress),
     {
-      // Execute only when accounts are available.
-      enabled: !!(isLoggedIn && selectedTokenAddress),
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!selectedTokenAddress,
     },
   );
 
@@ -125,8 +125,8 @@ function AddLiquidity() {
     ['tokenWalletCap', selectedTokenAddress],
     () => getTokenWalletCap(selectedTokenAddress),
     {
-      // Execute only when accounts are available.
-      enabled: !!(isLoggedIn && selectedTokenAddress),
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!selectedTokenAddress,
     },
   );
 
@@ -182,8 +182,8 @@ function AddLiquidity() {
     ['totalLiquidityByLP', selectedTokenAddress],
     () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
     {
-      // Execute only when selectedTokenAddress is available.
-      enabled: !!(isLoggedIn && selectedTokenAddress && accounts),
+      // Execute only when selectedTokenAddress and accounts are available.
+      enabled: !!(selectedTokenAddress && accounts),
     },
   );
 
@@ -237,38 +237,36 @@ function AddLiquidity() {
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function handleTokenChange() {
-      if (
-        !isLoggedIn ||
-        !accounts ||
-        !selectedNetwork ||
-        !selectedToken ||
-        !liquidityProvidersAddress
-      ) {
+      if (!selectedNetwork || !selectedToken || !liquidityProvidersAddress) {
         return null;
       }
 
       const token = tokens.find(
         tokenObj => tokenObj.symbol === selectedToken.id,
       )!;
-      const { displayBalance } = await getTokenBalance(
-        accounts[0],
-        selectedNetwork,
-        token,
-      );
 
-      if (token[selectedNetwork.chainId].address !== NATIVE_ADDRESS) {
-        const tokenAllowance = await getTokenAllowance(
+      if (isLoggedIn && accounts) {
+        const { displayBalance } = await getTokenBalance(
           accounts[0],
-          new ethers.providers.JsonRpcProvider(selectedNetwork.rpcUrl),
-          liquidityProvidersAddress,
-          token[selectedNetwork.chainId].address,
+          selectedNetwork,
+          token,
         );
-        setSelectedTokenAllowance(tokenAllowance);
-      } else {
-        setIsSelectedTokenApproved(true);
+
+        if (token[selectedNetwork.chainId].address !== NATIVE_ADDRESS) {
+          const tokenAllowance = await getTokenAllowance(
+            accounts[0],
+            new ethers.providers.JsonRpcProvider(selectedNetwork.rpcUrl),
+            liquidityProvidersAddress,
+            token[selectedNetwork.chainId].address,
+          );
+          setSelectedTokenAllowance(tokenAllowance);
+        } else {
+          setIsSelectedTokenApproved(true);
+        }
+        setWalletBalance(displayBalance);
       }
+
       setSelectedTokenAddress(token[selectedNetwork.chainId].address);
-      setWalletBalance(displayBalance);
     }
 
     handleTokenChange();

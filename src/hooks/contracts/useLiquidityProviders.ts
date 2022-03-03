@@ -12,14 +12,14 @@ function useLiquidityProviders(chain: ChainConfig | undefined) {
     : undefined;
 
   const liquidityProvidersContract = useMemo(() => {
-    if (!chain || !contractAddress || !isLoggedIn) return;
+    if (!chain || !contractAddress) return;
 
     return new ethers.Contract(
       contractAddress,
       liquidityProvidersABI,
       new ethers.providers.JsonRpcProvider(chain.rpcUrl),
     );
-  }, [chain, contractAddress, isLoggedIn]);
+  }, [chain, contractAddress]);
 
   const liquidityProvidersContractSigner = useMemo(() => {
     if (!contractAddress || !isLoggedIn) return;

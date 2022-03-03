@@ -8,7 +8,7 @@ import emptyPositionsIcon from '../../../../../assets/images/empty-positions-ico
 import { useState } from 'react';
 
 function LiquidityPositions() {
-  const { accounts, isLoggedIn } = useWalletProvider()!;
+  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const { getUserPositions } = useLPToken();
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
 
@@ -31,28 +31,30 @@ function LiquidityPositions() {
   return (
     <article className="mb-2.5 rounded-10 bg-white p-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
-        <div className="absolute left-10">
-          <button
-            className={`mr-7 text-xs  ${
-              hideClosedPositions
-                ? 'text-hyphen-purple'
-                : 'text-hyphen-gray-400'
-            }`}
-            onClick={() => setHideClosedPositions(true)}
-          >
-            Active Position
-          </button>
-          <button
-            className={`text-xs  ${
-              !hideClosedPositions
-                ? 'text-hyphen-purple'
-                : 'text-hyphen-gray-400'
-            }`}
-            onClick={() => setHideClosedPositions(false)}
-          >
-            Show Closed Positions
-          </button>
-        </div>
+        {isLoggedIn ? (
+          <div className="absolute left-10">
+            <button
+              className={`mr-7 text-xs  ${
+                hideClosedPositions
+                  ? 'text-hyphen-purple'
+                  : 'text-hyphen-gray-400'
+              }`}
+              onClick={() => setHideClosedPositions(true)}
+            >
+              Active Position
+            </button>
+            <button
+              className={`text-xs  ${
+                !hideClosedPositions
+                  ? 'text-hyphen-purple'
+                  : 'text-hyphen-gray-400'
+              }`}
+              onClick={() => setHideClosedPositions(false)}
+            >
+              Show Closed Positions
+            </button>
+          </div>
+        ) : null}
 
         <h2 className="text-xl text-hyphen-purple">Your Positions</h2>
 
@@ -78,11 +80,25 @@ function LiquidityPositions() {
             })}
           </section>
         ) : (
-          <section className="flex h-40 items-start justify-center pt-12">
-            <img src={emptyPositionsIcon} alt="No positions" className="mr-4" />
-            <span className="text-hyphen-gray-400">
-              Your Hyphen liquidity positions will appear here.
-            </span>
+          <section className="flex h-auto flex-col items-center justify-start">
+            <div className="mt-12 mb-16 flex items-center">
+              <img
+                src={emptyPositionsIcon}
+                alt="No positions"
+                className="mr-4"
+              />
+              <span className="text-hyphen-gray-400">
+                Your Hyphen liquidity positions will appear here.
+              </span>
+            </div>
+            {!isLoggedIn ? (
+              <button
+                className="mb-8 h-15 w-[400px] rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                onClick={connect}
+              >
+                Connect Wallet
+              </button>
+            ) : null}
           </section>
         )
       ) : (

@@ -6,10 +6,12 @@ import { useWalletProvider } from 'context/WalletProvider';
 import useLPToken from 'hooks/contracts/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
 import { useState } from 'react';
+import { useChains } from 'context/Chains';
 
 function LiquidityPositions() {
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
-  const { getUserPositions } = useLPToken();
+  const { selectedNetwork } = useChains()!;
+  const { getUserPositions } = useLPToken(selectedNetwork);
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
 
   const {

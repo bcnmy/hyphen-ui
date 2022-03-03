@@ -1,26 +1,23 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import lpTokenABI from 'abis/LPToken.abi.json';
-import { useChains } from 'context/Chains';
 import { LPToken } from 'config/liquidityContracts/LPToken';
 import { useWalletProvider } from 'context/WalletProvider';
+import { ChainConfig } from 'config/chains';
 
-function useLPToken() {
+function useLPToken(chain: ChainConfig | undefined) {
   const { isLoggedIn } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
-  const contractAddress = fromChain
-    ? LPToken[fromChain.chainId].address
-    : undefined;
+  const contractAddress = chain ? LPToken[chain.chainId].address : undefined;
 
   const lpTokenContract = useMemo(() => {
-    if (!contractAddress || !isLoggedIn) return;
+    if (!chain || !contractAddress || !isLoggedIn) return;
 
     return new ethers.Contract(
       contractAddress,
       lpTokenABI,
-      new ethers.providers.Web3Provider(window.ethereum),
+      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
     );
-  }, [contractAddress, isLoggedIn]);
+  }, [chain, contractAddress, isLoggedIn]);
 
   const getPositionMetadata = useCallback(
     (positionId: BigNumber) => {

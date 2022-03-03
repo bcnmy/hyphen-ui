@@ -3,14 +3,11 @@ import erc20ABI from 'abis/erc20.abi.json';
 
 function getTokenAllowance(
   owner: string,
+  provider: ethers.providers.JsonRpcProvider,
   spender: string,
   tokenAddress: string,
 ) {
-  const tokenContract = new ethers.Contract(
-    tokenAddress,
-    erc20ABI,
-    new ethers.providers.Web3Provider(window.ethereum),
-  );
+  const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, provider);
 
   return tokenContract.allowance(owner, spender);
 }

@@ -24,13 +24,13 @@ function ManagePosition() {
   const queryClient = useQueryClient();
 
   const { isLoggedIn } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, selectedNetwork } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
-  const { getPositionMetadata } = useLPToken();
+  const { getPositionMetadata } = useLPToken(selectedNetwork);
   const { claimFee, getTokenAmount, getTotalLiquidity, removeLiquidity } =
-    useLiquidityProviders();
-  const { getTokenTotalCap } = useWhitelistPeriodManager();
+    useLiquidityProviders(selectedNetwork);
+  const { getTokenTotalCap } = useWhitelistPeriodManager(selectedNetwork);
 
   const [liquidityRemovalAmount, setLiquidityRemovalAmount] =
     useState<string>('');

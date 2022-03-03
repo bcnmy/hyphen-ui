@@ -18,6 +18,7 @@ import AssetOverview from '../AssetOverview';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
+import { useChains } from 'context/Chains';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
@@ -25,13 +26,14 @@ function IncreaseLiquidity() {
   const queryClient = useQueryClient();
 
   const { accounts, isLoggedIn } = useWalletProvider()!;
+  const { selectedNetwork } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
-  const { getPositionMetadata } = useLPToken();
+  const { getPositionMetadata } = useLPToken(selectedNetwork);
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
-    useLiquidityProviders();
+    useLiquidityProviders(selectedNetwork);
   const { getTokenTotalCap, getTotalLiquidityByLp, getTokenWalletCap } =
-    useWhitelistPeriodManager();
+    useWhitelistPeriodManager(selectedNetwork);
 
   const [liquidityBalance, setLiquidityBalance] = useState<
     string | undefined

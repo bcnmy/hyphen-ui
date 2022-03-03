@@ -18,7 +18,7 @@ import { NATIVE_ADDRESS } from 'config/constants';
 import getTokenAllowance from 'utils/getTokenAllowance';
 import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
-import setTokenAllowance from 'utils/giveTokenAllowance';
+import giveTokenAllowance from 'utils/giveTokenAllowance';
 import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { chains } from 'config/chains';
@@ -28,17 +28,23 @@ import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders
 function AddLiquidity() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { accounts, currentChainId, isLoggedIn, walletProvider } =
-    useWalletProvider()!;
-  const { fromChain } = useChains()!;
+  const {
+    accounts,
+    connect,
+    currentChainId,
+    isLoggedIn,
+    signer,
+    walletProvider,
+  } = useWalletProvider()!;
+  const { fromChain, selectedNetwork, changeSelectedNetwork } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
   const { addLiquidity, addNativeLiquidity, getTotalLiquidity } =
-    useLiquidityProviders();
+    useLiquidityProviders(selectedNetwork);
   const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
-    useWhitelistPeriodManager();
-  const liquidityProvidersAddress = fromChain
-    ? LiquidityProviders[fromChain.chainId].address
+    useWhitelistPeriodManager(selectedNetwork);
+  const liquidityProvidersAddress = selectedNetwork
+    ? LiquidityProviders[selectedNetwork.chainId].address
     : undefined;
 
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
@@ -55,7 +61,7 @@ function AddLiquidity() {
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<
     string | undefined
   >();
-  const [selectedNetwork, setSelectedNetwork] = useState<Option | undefined>();
+  const [chain, setChain] = useState<Option | undefined>();
   const [liquidityBalance, setLiquidityBalance] = useState<
     string | undefined
   >();
@@ -65,16 +71,22 @@ function AddLiquidity() {
 
   const [poolShare, setPoolShare] = useState<number>(0);
   const tokenOptions = useMemo(() => {
-    if (!currentChainId) return [];
-    return tokens
-      .filter(tokenObj => tokenObj[currentChainId])
-      .map(tokenObj => ({
-        id: tokenObj.symbol,
-        name: tokenObj.symbol,
-        image: tokenObj.image,
-      }));
-  }, [currentChainId]);
-  const networkOptions = useMemo(() => {
+    return selectedNetwork
+      ? tokens
+          .filter(tokenObj => tokenObj[selectedNetwork.chainId])
+          .map(tokenObj => ({
+            id: tokenObj.symbol,
+            name: tokenObj.symbol,
+            image: tokenObj.image,
+          }))
+      : tokens.map(tokenObj => ({
+          id: tokenObj.symbol,
+          name: tokenObj.symbol,
+          image: tokenObj.image,
+        }));
+  }, [selectedNetwork]);
+
+  const chainOptions = useMemo(() => {
     return chains.map(chainObj => {
       return {
         id: chainObj.chainId,
@@ -84,6 +96,7 @@ function AddLiquidity() {
       };
     });
   }, []);
+
   const {
     isVisible: isApprovalModalVisible,
     hideModal: hideApprovalModal,
@@ -213,51 +226,59 @@ function AddLiquidity() {
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
-    setSelectedToken(tokenOptions[0]);
-    setSelectedNetwork(
-      networkOptions.find(network => network.id === currentChainId),
-    );
-  }, [currentChainId, networkOptions, tokenOptions]);
+    if (selectedNetwork && tokenOptions) {
+      setSelectedToken(tokenOptions[0]);
+      setChain(
+        chainOptions.find(network => network.id === selectedNetwork.chainId),
+      );
+    }
+  }, [chainOptions, selectedNetwork, tokenOptions]);
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function handleTokenChange() {
       if (
+        !isLoggedIn ||
         !accounts ||
-        !currentChainId ||
+        !selectedNetwork ||
         !selectedToken ||
         !liquidityProvidersAddress
       ) {
         return null;
       }
 
-      const chain = chains.find(
-        chainObj => chainObj.chainId === currentChainId,
-      )!;
       const token = tokens.find(
         tokenObj => tokenObj.symbol === selectedToken.id,
       )!;
       const { displayBalance } = await getTokenBalance(
         accounts[0],
-        chain,
+        selectedNetwork,
         token,
       );
-      if (token[currentChainId].address !== NATIVE_ADDRESS) {
+
+      if (token[selectedNetwork.chainId].address !== NATIVE_ADDRESS) {
         const tokenAllowance = await getTokenAllowance(
           accounts[0],
+          new ethers.providers.JsonRpcProvider(selectedNetwork.rpcUrl),
           liquidityProvidersAddress,
-          token[currentChainId].address,
+          token[selectedNetwork.chainId].address,
         );
         setSelectedTokenAllowance(tokenAllowance);
       } else {
         setIsSelectedTokenApproved(true);
       }
-      setSelectedTokenAddress(token[currentChainId].address);
+      setSelectedTokenAddress(token[selectedNetwork.chainId].address);
       setWalletBalance(displayBalance);
     }
 
     handleTokenChange();
-  }, [accounts, currentChainId, liquidityProvidersAddress, selectedToken]);
+  }, [
+    accounts,
+    isLoggedIn,
+    liquidityProvidersAddress,
+    selectedNetwork,
+    selectedToken,
+  ]);
 
   function reset() {
     setLiquidityAmount('');
@@ -270,13 +291,20 @@ function AddLiquidity() {
     updatePoolShare('0');
   }
 
-  async function handleNetworkChange(selectedNetwork: Option) {
-    const network = chains.find(chain => chain.chainId === selectedNetwork.id);
-    if (walletProvider && network) {
-      const res = await switchNetwork(walletProvider, network);
+  async function handleChainChange(selectedChain: Option) {
+    const newChain = chains.find(
+      chainObj => chainObj.chainId === selectedChain.id,
+    )!;
+    setChain(selectedChain);
+    changeSelectedNetwork(newChain);
+
+    if (walletProvider) {
+      const res = switchNetwork(walletProvider, newChain);
       if (res === null) {
-        setSelectedNetwork(selectedNetwork);
+        changeSelectedNetwork(newChain);
       }
+    } else {
+      changeSelectedNetwork(newChain);
     }
   }
 
@@ -378,7 +406,7 @@ function AddLiquidity() {
     isInfiniteApproval: boolean,
     tokenAmount: number,
   ) {
-    if (!selectedTokenAddress || !liquidityProvidersAddress) {
+    if (!selectedTokenAddress || !signer || !liquidityProvidersAddress) {
       return;
     }
 
@@ -386,8 +414,9 @@ function AddLiquidity() {
       ? ethers.constants.MaxUint256
       : ethers.utils.parseUnits(tokenAmount.toString(), tokenDecimals);
 
-    const tokenApproveTx = await setTokenAllowance(
+    const tokenApproveTx = await giveTokenAllowance(
       liquidityProvidersAddress,
+      signer,
       selectedTokenAddress,
       rawTokenAmount,
     );
@@ -400,12 +429,18 @@ function AddLiquidity() {
   }
 
   async function onTokenApprovalSuccess() {
-    if (!accounts || !selectedTokenAddress || !liquidityProvidersAddress) {
+    if (
+      !accounts ||
+      !selectedTokenAddress ||
+      !selectedNetwork ||
+      !liquidityProvidersAddress
+    ) {
       return;
     }
 
     const tokenAllowance = await getTokenAllowance(
       accounts[0],
+      new ethers.providers.JsonRpcProvider(selectedNetwork.rpcUrl),
       liquidityProvidersAddress,
       selectedTokenAddress,
     );
@@ -436,12 +471,12 @@ function AddLiquidity() {
 
   return (
     <>
-      {selectedNetwork && selectedToken && liquidityAmount ? (
+      {chain && selectedToken && liquidityAmount ? (
         <ApprovalModal
           executeTokenApproval={executeTokenApproval}
           isVisible={isApprovalModalVisible}
           onClose={hideApprovalModal}
-          selectedChainName={selectedNetwork.name}
+          selectedChainName={chain.name}
           selectedTokenName={selectedToken.name}
           transferAmount={parseFloat(liquidityAmount)}
         />
@@ -479,10 +514,10 @@ function AddLiquidity() {
                 label={'asset'}
               />
               <Select
-                options={networkOptions}
-                selected={selectedNetwork}
-                setSelected={networkOption => {
-                  handleNetworkChange(networkOption);
+                options={chainOptions}
+                selected={chain}
+                setSelected={chainOption => {
+                  handleChainChange(chainOption);
                   reset();
                 }}
                 label={'network'}
@@ -525,46 +560,57 @@ function AddLiquidity() {
               step={25}
               value={sliderValue}
             />
-            <button
-              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-              disabled={
-                isDataLoading ||
-                isSelectedTokenApproved ||
-                isSelectedTokenApproved === undefined
-              }
-              onClick={showApprovalModal}
-            >
-              {liquidityAmount === '' && !isSelectedTokenApproved
-                ? 'Enter amount to see approval'
-                : approveTokenLoading
-                ? 'Approving Token...'
-                : isSelectedTokenApproved
-                ? `${selectedToken?.name} Approved`
-                : `Approve ${selectedToken?.name}`}
-            </button>
-            <button
-              className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-              onClick={handleConfirmSupplyClick}
-              disabled={
-                isDataLoading ||
-                liquidityAmount === '' ||
-                !isSelectedTokenApproved ||
-                isLiquidityAmountGtWalletBalance ||
-                isLiquidityAmountGtLiquidityBalance
-              }
-            >
-              {!liquidityBalance
-                ? 'Getting your balance'
-                : liquidityAmount === ''
-                ? 'Enter Amount'
-                : isLiquidityAmountGtWalletBalance
-                ? 'Insufficient wallet balance'
-                : isLiquidityAmountGtLiquidityBalance
-                ? 'This amount exceeds your wallet cap'
-                : addLiquidityLoading
-                ? 'Adding Liquidity'
-                : 'Confirm Supply'}
-            </button>
+            {isLoggedIn ? (
+              <>
+                <button
+                  className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                  disabled={
+                    isDataLoading ||
+                    isSelectedTokenApproved ||
+                    isSelectedTokenApproved === undefined
+                  }
+                  onClick={showApprovalModal}
+                >
+                  {liquidityAmount === '' && !isSelectedTokenApproved
+                    ? 'Enter amount to see approval'
+                    : approveTokenLoading
+                    ? 'Approving Token...'
+                    : isSelectedTokenApproved
+                    ? `${selectedToken?.name} Approved`
+                    : `Approve ${selectedToken?.name}`}
+                </button>
+                <button
+                  className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                  onClick={handleConfirmSupplyClick}
+                  disabled={
+                    isDataLoading ||
+                    liquidityAmount === '' ||
+                    !isSelectedTokenApproved ||
+                    isLiquidityAmountGtWalletBalance ||
+                    isLiquidityAmountGtLiquidityBalance
+                  }
+                >
+                  {!liquidityBalance
+                    ? 'Getting your balance'
+                    : liquidityAmount === ''
+                    ? 'Enter Amount'
+                    : isLiquidityAmountGtWalletBalance
+                    ? 'Insufficient wallet balance'
+                    : isLiquidityAmountGtLiquidityBalance
+                    ? 'This amount exceeds your wallet cap'
+                    : addLiquidityLoading
+                    ? 'Adding Liquidity'
+                    : 'Confirm Supply'}
+                </button>
+              </>
+            ) : (
+              <button
+                className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                onClick={connect}
+              >
+                Connect Your Wallet
+              </button>
+            )}
           </div>
           <div className="max-h-100 h-100 pl-12.5">
             <div className="mb-14 grid grid-cols-2 gap-2.5">

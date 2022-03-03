@@ -2,25 +2,24 @@ import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityProvidersABI from 'abis/LiquidityProviders.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
-import { useChains } from 'context/Chains';
 import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
+import { ChainConfig } from 'config/chains';
 
-function useLiquidityProviders() {
+function useLiquidityProviders(chain: ChainConfig | undefined) {
   const { isLoggedIn, signer } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
-  const contractAddress = fromChain
-    ? LiquidityProviders[fromChain.chainId].address
+  const contractAddress = chain
+    ? LiquidityProviders[chain.chainId].address
     : undefined;
 
   const liquidityProvidersContract = useMemo(() => {
-    if (!contractAddress || !isLoggedIn) return;
+    if (!chain || !contractAddress || !isLoggedIn) return;
 
     return new ethers.Contract(
       contractAddress,
       liquidityProvidersABI,
-      new ethers.providers.Web3Provider(window.ethereum),
+      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
     );
-  }, [contractAddress, isLoggedIn]);
+  }, [chain, contractAddress, isLoggedIn]);
 
   const liquidityProvidersContractSigner = useMemo(() => {
     if (!contractAddress || !isLoggedIn) return;

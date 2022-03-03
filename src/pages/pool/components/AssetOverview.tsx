@@ -19,10 +19,11 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
   const navigate = useNavigate();
 
   const { currentChainId, isLoggedIn } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, selectedNetwork } = useChains()!;
 
-  const { getPositionMetadata } = useLPToken();
-  const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders();
+  const { getPositionMetadata } = useLPToken(selectedNetwork);
+  const { getTokenAmount, getTotalLiquidity } =
+    useLiquidityProviders(selectedNetwork);
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(

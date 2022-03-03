@@ -1,26 +1,25 @@
 import { useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
 import whitelistPeriodManagerABI from 'abis/WhitelistPeriodManager.abi.json';
-import { useChains } from 'context/Chains';
 import { WhitelistPeriodManager } from 'config/liquidityContracts/WhitelistPeriodManager';
 import { useWalletProvider } from 'context/WalletProvider';
+import { ChainConfig } from 'config/chains';
 
-function useWhitelistPeriodManager() {
+function useWhitelistPeriodManager(chain: ChainConfig | undefined) {
   const { isLoggedIn } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
-  const contractAddress = fromChain
-    ? WhitelistPeriodManager[fromChain.chainId].address
+  const contractAddress = chain
+    ? WhitelistPeriodManager[chain.chainId].address
     : undefined;
 
   const whitelistPeriodManagerContract = useMemo(() => {
-    if (!contractAddress || !isLoggedIn) return;
+    if (!chain || !contractAddress || !isLoggedIn) return;
 
     return new ethers.Contract(
       contractAddress,
       whitelistPeriodManagerABI,
-      new ethers.providers.Web3Provider(window.ethereum),
+      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
     );
-  }, [contractAddress, isLoggedIn]);
+  }, [chain, contractAddress, isLoggedIn]);
 
   const getTokenTotalCap = useCallback(
     (tokenAddress: string | undefined) => {

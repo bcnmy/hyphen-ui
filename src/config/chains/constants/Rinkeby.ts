@@ -7,13 +7,14 @@ export const RINKEBY: ChainConfig = {
   image: ethIcon,
   subText: "Ethereum testnet",
   chainId: 4,
+  chainColor: "#C4C4C41A",
   rpcUrl: "https://rinkeby.infura.io/v3/d126f392798444609246423b06116c77",
   currency: "RETH",
   nativeToken: NATIVE_ADDRESS,
   nativeDecimal: 18,
   nativeFaucetURL: "https://rinkeby-faucet.com/",
   assetSentTopicId:
-    "0xec1dcc5633614eade4a5730f51adc7444a5103a8477965a32f2e886f5b20f694",
+    "0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c",
   biconomy: {
     enable: true,
     apiKey: "Ze_BIjFdZ.e5900961-0c16-4cb1-b4b7-604a5069daa8",

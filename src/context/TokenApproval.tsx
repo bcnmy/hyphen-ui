@@ -72,13 +72,13 @@ const TokenApprovalProvider: React.FC = ({ ...props }) => {
       let tokenDecimals;
 
       try {
-        tokenAllowance = await hyphen.getERC20Allowance(
+        tokenAllowance = await hyphen.tokens.getERC20Allowance(
           selectedToken[fromChain.chainId].address,
           accounts[0],
           poolInfo.fromLPManagerAddress
         );
 
-        tokenDecimals = await hyphen.getERC20TokenDecimals(
+        tokenDecimals = await hyphen.tokens.getERC20TokenDecimals(
           selectedToken[fromChain.chainId].address
         );
       } catch (err) {
@@ -129,7 +129,7 @@ const TokenApprovalProvider: React.FC = ({ ...props }) => {
       }
 
       try {
-        let tokenDecimals = await hyphen.getERC20TokenDecimals(
+        let tokenDecimals = await hyphen.tokens.getERC20TokenDecimals(
           selectedToken[fromChain.chainId].address
         );
 
@@ -140,7 +140,7 @@ const TokenApprovalProvider: React.FC = ({ ...props }) => {
         );
         let rawAmountHexString = rawAmount.toHexString();
 
-        let approveTx = await hyphen.approveERC20(
+        let approveTx = await hyphen.tokens.approveERC20(
           selectedToken[fromChain.chainId].address,
           poolInfo.fromLPManagerAddress,
           rawAmountHexString,

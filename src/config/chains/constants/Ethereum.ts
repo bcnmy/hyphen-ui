@@ -7,13 +7,14 @@ export const ETHEREUM: ChainConfig = {
   image: ethIcon,
   subText: "Ethereum Mainnet",
   chainId: 1,
+  chainColor: "#C4C4C41A",
   rpcUrl: "https://mainnet.infura.io/v3/d126f392798444609246423b06116c77",
   currency: "ETH",
   nativeToken: NATIVE_ADDRESS,
   nativeDecimal: 18,
   nativeFaucetURL: "",
   assetSentTopicId:
-    "0xec1dcc5633614eade4a5730f51adc7444a5103a8477965a32f2e886f5b20f694",
+    "0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c",
   biconomy: {
     enable: false,
     apiKey: "fWz3rAdDl.44d92a99-9ca4-47b1-98ca-aa2bae068e38",

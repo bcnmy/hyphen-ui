@@ -13,23 +13,27 @@ export const DAI: TokenConfig = {
     transferOverhead: 86147,
     decimal: 18,
     symbol: "DAI",
+    chainColor: MUMBAI.chainColor
   },
   [GOERLI.chainId]: {
     address: "0x2686eca13186766760a0347ee8eeb5a88710e11b",
     transferOverhead: 96061,
     decimal: 18,
     symbol: "DAI",
+    chainColor: GOERLI.chainColor
   },
   [POLYGON.chainId]: {
     address: "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
     transferOverhead: 96061,
     decimal: 18,
     symbol: "DAI",
+    chainColor: POLYGON.chainColor
   },
   [ETHEREUM.chainId]: {
     address: "0x6b175474e89094c44da98b954eedeac495271d0f",
     transferOverhead: 96061,
     decimal: 18,
     symbol: "DAI",
+    chainColor: ETHEREUM.chainColor
   },
 };

@@ -18,13 +18,15 @@ export async function switchNetwork(
   };
 
   try {
-    let addReq = await walletProvider.send("wallet_addEthereumChain", [params]);
-    return addReq;
-  } catch (e) {
-    let changeReq = await walletProvider.send("wallet_switchEthereumChain", [
+    const changeReq = await walletProvider.send("wallet_switchEthereumChain", [
       { chainId: params.chainId },
     ]);
     return changeReq;
+  } catch (e: any) {
+    if (e.code === 4902) {
+      let addReq = await walletProvider.send("wallet_addEthereumChain", [params]);
+      return addReq;
+    }
   }
 }
 

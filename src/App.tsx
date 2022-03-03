@@ -1,15 +1,12 @@
-import React from "react";
-import Home from "./pages/home/Home";
-
-import { Routes, Route } from "react-router-dom";
-import { Auth } from "./pages/auth/Auth";
+import React from 'react';
+import { Outlet } from 'react-router-dom';
+import Layout from '../src/components/Layout';
 
 const App: React.FC = () => {
   return (
-    <Routes>
-      <Route path="/login" element={<Auth />} />
-      <Route path="/" element={<Home />} />
-    </Routes>
+    <Layout>
+      <Outlet />
+    </Layout>
   );
 };
 

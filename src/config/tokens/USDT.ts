@@ -16,29 +16,34 @@ export const USDT: TokenConfig = {
     transferOverhead: 130000,
     decimal: 18,
     symbol: "USDT",
+    chainColor: MUMBAI.chainColor
   },
   [GOERLI.chainId]: {
     address: "0x64ef393b6846114bad71e2cb2ccc3e10736b5716",
     transferOverhead: 135000,
     decimal: 18,
     symbol: "USDT",
+    chainColor: GOERLI.chainColor
   },
   [RINKEBY.chainId]: {
     address: "0xfab46e002bbf0b4509813474841e0716e6730136",
     transferOverhead: 135000,
     decimal: 18,
     symbol: "USDT",
+    chainColor: RINKEBY.chainColor
   },
   [POLYGON.chainId]: {
     address: "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
     transferOverhead: 130000,
     decimal: 6,
     symbol: "USDT",
+    chainColor: POLYGON.chainColor
   },
   [ETHEREUM.chainId]: {
     address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
     transferOverhead: 135000,
     decimal: 6,
     symbol: "USDT",
+    chainColor: ETHEREUM.chainColor
   },
 };

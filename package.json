@@ -24,12 +24,14 @@
     "graphql": "^16.2.0",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
+    "rc-slider": "^9.7.5",
     "react": "^17.0.2",
     "react-animate-height": "^2.0.23",
     "react-dom": "^17.0.2",
     "react-icons": "^4.3.1",
     "react-loading-skeleton": "^3.0.1",
     "react-notifications-component": "^3.1.0",
+    "react-query": "^3.34.15",
     "react-router-dom": "6",
     "react-scripts": "next",
     "react-toastify": "^8.1.0",
@@ -80,6 +82,8 @@
     "@types/tailwindcss": "^2.2.4",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.5",
+    "prettier": "2.5.1",
+    "prettier-plugin-tailwindcss": "^0.1.4",
     "tailwindcss": "^3.0.2"
   }
 }

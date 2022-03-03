@@ -7,6 +7,7 @@ export const FUJI: ChainConfig = {
   image: avaxIcon,
   subText: "Avalanche testnet",
   chainId: 43113,
+  chainColor: "#E841421A",
   rpcUrl: "https://api.avax-test.network/ext/bc/C/rpc",
   // currency: "Test AVAX",
   currency: "AVAX",
@@ -18,7 +19,7 @@ export const FUJI: ChainConfig = {
     apiKey: "CdOSOVUtJ.f50d832e-1e7c-45f6-9a2e-9aefc4fc8b56",
   },
   assetSentTopicId:
-    "0xec1dcc5633614eade4a5730f51adc7444a5103a8477965a32f2e886f5b20f694",
+    "0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c",
   networkAgnosticTransfer: true, // Set this to enable network agnostic gasless transactions
   graphURL: "https://api.thegraph.com/subgraphs/name/divyan73/hyphen-fuji",
   explorerUrl: "https://testnet.snowtrace.io",

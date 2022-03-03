@@ -4,17 +4,17 @@ import {
   useContext,
   useEffect,
   useState,
-} from "react";
-import { ethers } from "ethers";
-import Web3Modal from "web3modal";
-import WalletConnectProvider from "@walletconnect/web3-provider";
+} from 'react';
+import { ethers } from 'ethers';
+import Web3Modal from 'web3modal';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
   signer: ethers.Signer | undefined;
   web3Modal: Web3Modal | undefined;
-  connect: Web3Modal["connect"];
-  disconnect: Web3Modal["clearCachedProvider"];
+  connect: Web3Modal['connect'];
+  disconnect: Web3Modal['clearCachedProvider'];
   accounts: string[] | undefined;
   currentChainId: number | undefined;
   isLoggedIn: boolean;
@@ -22,10 +22,10 @@ interface IWalletProviderContext {
 }
 
 const WalletProviderContext = createContext<IWalletProviderContext | null>(
-  null
+  null,
 );
 
-const WalletProviderProvider: React.FC = (props) => {
+const WalletProviderProvider: React.FC = props => {
   const [walletProvider, setWalletProvider] = useState<
     undefined | ethers.providers.Web3Provider
   >();
@@ -73,7 +73,7 @@ const WalletProviderProvider: React.FC = (props) => {
             },
           },
         },
-      })
+      }),
     );
   }, []);
 
@@ -84,7 +84,7 @@ const WalletProviderProvider: React.FC = (props) => {
     (async () => {
       let { chainId } = await walletProvider.getNetwork();
       let accounts = await walletProvider.listAccounts();
-      setAccounts(accounts.map((a) => a.toLowerCase()));
+      setAccounts(accounts.map(a => a.toLowerCase()));
       setCurrentChainId(chainId);
     })();
   }, [walletProvider]);
@@ -99,16 +99,16 @@ const WalletProviderProvider: React.FC = (props) => {
     if (!rawEthereumProvider) return;
 
     function handleAccountsChanged(accounts: string[]) {
-      console.log("accountsChanged!");
-      setAccounts(accounts.map((a) => a.toLowerCase()));
+      console.log('accountsChanged!');
+      setAccounts(accounts.map(a => a.toLowerCase()));
       reinit(rawEthereumProvider);
     }
 
     // Wallet documentation recommends reloading page on chain change.
     // Ref: https://docs.metamask.io/guide/ethereum-provider.html#events
     function handleChainChanged(chainId: string | number) {
-      console.log("chainChanged!");
-      if (typeof chainId === "string") {
+      console.log('chainChanged!');
+      if (typeof chainId === 'string') {
         setCurrentChainId(Number.parseInt(chainId));
       } else {
         setCurrentChainId(chainId);
@@ -117,43 +117,48 @@ const WalletProviderProvider: React.FC = (props) => {
     }
 
     function handleConnect(info: { chainId: number }) {
-      console.log("connect!");
-      setCurrentChainId(info.chainId);
+      console.log('connect!');
+      const { chainId } = info;
+      if (typeof chainId === 'string') {
+        setCurrentChainId(Number.parseInt(chainId));
+      } else {
+        setCurrentChainId(chainId);
+      }
       reinit(rawEthereumProvider);
     }
 
     function handleDisconnect(error: { code: number; message: string }) {
-      console.log("disconnect");
+      console.log('disconnect');
       console.error(error);
     }
 
     // Subscribe to accounts change
-    rawEthereumProvider.on("accountsChanged", handleAccountsChanged);
+    rawEthereumProvider.on('accountsChanged', handleAccountsChanged);
 
     // Subscribe to network change
-    rawEthereumProvider.on("chainChanged", handleChainChanged);
+    rawEthereumProvider.on('chainChanged', handleChainChanged);
 
     // Subscribe to provider connection
-    rawEthereumProvider.on("connect", handleConnect);
+    rawEthereumProvider.on('connect', handleConnect);
 
     // Subscribe to provider disconnection
-    rawEthereumProvider.on("disconnect", handleDisconnect);
+    rawEthereumProvider.on('disconnect', handleDisconnect);
 
     // Remove event listeners on unmount!
     return () => {
       rawEthereumProvider.removeListener(
-        "accountsChanged",
-        handleAccountsChanged
+        'accountsChanged',
+        handleAccountsChanged,
       );
-      rawEthereumProvider.removeListener("networkChanged", handleChainChanged);
-      rawEthereumProvider.removeListener("connect", handleConnect);
-      rawEthereumProvider.removeListener("disconnect", handleDisconnect);
+      rawEthereumProvider.removeListener('chainChanged', handleChainChanged);
+      rawEthereumProvider.removeListener('connect', handleConnect);
+      rawEthereumProvider.removeListener('disconnect', handleDisconnect);
     };
   }, [rawEthereumProvider]);
 
   const connect = useCallback(async () => {
     if (!web3Modal) {
-      console.error("Web3Modal not initialized.");
+      console.error('Web3Modal not initialized.');
       return;
     }
     let provider = await web3Modal.connect();
@@ -163,7 +168,7 @@ const WalletProviderProvider: React.FC = (props) => {
 
   const disconnect = useCallback(async () => {
     if (!web3Modal) {
-      console.error("Web3Modal not initialized.");
+      console.error('Web3Modal not initialized.');
       return;
     }
     web3Modal.clearCachedProvider();

@@ -1,5 +1,6 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { BigNumber, ethers } from 'ethers';
+import { useQuery } from 'react-query';
 import {
   createContext,
   FormEvent,
@@ -10,12 +11,13 @@ import {
   useState,
 } from 'react';
 
-import lpmanagerABI from 'abis/lpmanager.abi.json';
+import lpmanagerABI from 'abis/LiquidityPools.abi.json';
 
 // @ts-ignore
 import { RESPONSE_CODES } from '@biconomy/hyphen';
 
 import {
+  BASE_DIVISOR,
   DEFAULT_FIXED_DECIMAL_POINT,
   LP_FEE_FRACTION,
   NATIVE_ADDRESS,
@@ -31,6 +33,7 @@ import useAsync, { Status } from 'hooks/useLoading';
 import { useWalletProvider } from './WalletProvider';
 import { useBiconomy } from './Biconomy';
 import { useNotifications } from './Notifications';
+import useLiquidityPools from 'hooks/useLiquidityPools';
 
 export enum ValidationErrors {
   INVALID_AMOUNT,
@@ -53,6 +56,7 @@ interface ITransactionContext {
         lpFeeProcessedString: string;
         transactionFeeProcessedString: string;
         amountToGetProcessedString: string;
+        rewardAmountString: string | undefined;
       };
   transactionAmountValidationErrors: ValidationErrors[];
   // receiver address
@@ -96,6 +100,8 @@ const TransactionProvider: React.FC = props => {
   const { fromChain, toChain } = useChains()!;
   const { isBiconomyEnabled } = useBiconomy()!;
   const { accounts } = useWalletProvider()!;
+  const { getTransferFee } = useLiquidityPools(toChain)!;
+  const { getRewardAmount } = useLiquidityPools(fromChain)!;
   const { addTxNotification } = useNotifications()!;
 
   // exit hash for last transaction
@@ -163,6 +169,42 @@ const TransactionProvider: React.FC = props => {
   //   fetchSelectedTokenApprovalError,
   // ]);
 
+  let { data: transferFee } = useQuery(
+    ['transferFeeByToken', selectedToken, toChain, transferAmount],
+    () => {
+      if(!selectedToken || !toChain || !transferAmount) {
+        return;
+      }
+      let tokenAddress = selectedToken[toChain.chainId].address;
+      let tokenDecimal = selectedToken[toChain.chainId].decimal
+
+      let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
+      return getTransferFee(tokenAddress, rawTransferAmount.toString());
+    },
+    {
+      // Execute only when tokenAddress is available.
+      enabled: !!(selectedToken && toChain && transferAmount),
+    },
+  );
+
+  let {data: rewardAmount} = useQuery(
+    ['rewardAmountByToken', selectedToken, fromChain, transferAmount],
+    () => {
+      if(!selectedToken || !fromChain || !transferAmount) {
+        return;
+      }
+      let tokenAddress = selectedToken[fromChain.chainId].address;
+      let tokenDecimal = selectedToken[fromChain.chainId].decimal
+
+      let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
+      return getRewardAmount(tokenAddress, rawTransferAmount.toString());;
+    },
+    {
+      // Execute only when tokenAddress is available.
+      enabled: !!(selectedToken && fromChain && transferAmount),
+    }
+  );
+
   const changeTransferAmountInputValue = (amount: string) => {
     const regExp = /^((\d+)?(\.\d{0,3})?)$/;
     // match any number of digits, and after that also optionally match, one decimal point followed by any number of digits
@@ -179,104 +221,128 @@ const TransactionProvider: React.FC = props => {
   };
 
   const calculateTransactionFee = useCallback(async () => {
-    const fetchOptions = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json;charset=utf-8',
-      },
-    };
+    try{
 
-    if (!fromChain || !selectedToken || !toChain || !transferAmount)
-      throw new Error('App not initialised');
-
-    if (isNaN(transferAmount)) throw new Error('Transfer amount is invalid');
-    console.log('calculate fee for amount', transferAmount);
-
-    let fixedDecimalPoint =
-      selectedToken[fromChain.chainId].fixedDecimalPoint ||
-      DEFAULT_FIXED_DECIMAL_POINT;
-
-    let lpFeeAmountRaw = (LP_FEE_FRACTION * transferAmount) / 100;
-    let lpFeeProcessedString;
-
-    lpFeeProcessedString = lpFeeAmountRaw.toFixed(fixedDecimalPoint);
-
-    let fetchResponse = await getTokenGasPriceDebounced(
-      selectedToken[toChain.chainId].address,
-      toChain.chainId,
-      fetchOptions,
-    );
-
-    // Check the balance again using tokenAmount
-    // let userBalanceCheck = await checkUserBalance(amount);
-
-    // if (!userBalanceCheck) return;
-    // if (!config.isNativeAddress(selectedToken.address)) {
-    //   await checkTokenApproval(amount);
-    // }
-
-    if (!fetchResponse || !fetchResponse.json) {
-      throw new Error(`Invalid response`);
-    }
-
-    let response = await fetchResponse.json();
-
-    if (!response || !response.tokenGasPrice) {
-      throw new Error(
-        `Unable to get token gas price for ${selectedToken.symbol}`,
+      const fetchOptions = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json;charset=utf-8',
+        },
+      };
+  
+      if (!fromChain || !selectedToken || !toChain || !transferAmount)
+        throw new Error('App not initialised');
+  
+      if (isNaN(transferAmount)) throw new Error('Transfer amount is invalid');
+      console.log('calculate fee for amount', transferAmount);
+  
+  
+  
+      let fixedDecimalPoint =
+        selectedToken[fromChain.chainId].fixedDecimalPoint ||
+        DEFAULT_FIXED_DECIMAL_POINT;
+      
+      let transferFeePerc = transferFee/BASE_DIVISOR;
+  
+      let lpFeeAmountRaw = (transferFeePerc * transferAmount) / 100;
+      let lpFeeProcessedString;
+  
+      lpFeeProcessedString = lpFeeAmountRaw.toFixed(fixedDecimalPoint);
+  
+      let fetchResponse = await getTokenGasPriceDebounced(
+        selectedToken[toChain.chainId].address,
+        toChain.chainId,
+        fetchOptions,
       );
-    }
-
-    console.log(
-      `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
-    );
-
-    let tokenGasPrice = response.tokenGasPrice;
-
-    if (!tokenGasPrice) {
-      throw new Error(
-        'Error while getting selectedTokenConfig and tokenGasPrice from hyphen API',
+  
+      // Check the balance again using tokenAmount
+      // let userBalanceCheck = await checkUserBalance(amount);
+  
+      // if (!userBalanceCheck) return;
+      // if (!config.isNativeAddress(selectedToken.address)) {
+      //   await checkTokenApproval(amount);
+      // }
+  
+      if (!fetchResponse || !fetchResponse.json) {
+        throw new Error(`Invalid response`);
+      }
+  
+      let response = await fetchResponse.json();
+  
+      if (!response || !response.tokenGasPrice) {
+        throw new Error(
+          `Unable to get token gas price for ${selectedToken.symbol}`,
+        );
+      }
+  
+      console.log(
+        `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
       );
-    }
-
-    let overhead = selectedToken[fromChain.chainId].transferOverhead;
-    let decimal = selectedToken[fromChain.chainId].decimal;
-
-    if (!overhead || !decimal) {
-      throw new Error(
-        'Error while getting token overhead gas and decimal from config',
+  
+      let tokenGasPrice = response.tokenGasPrice;
+  
+      if (!tokenGasPrice) {
+        throw new Error(
+          'Error while getting selectedTokenConfig and tokenGasPrice from hyphen API',
+        );
+      }
+  
+      let overhead = selectedToken[fromChain.chainId].transferOverhead;
+      let decimal = selectedToken[fromChain.chainId].decimal;
+  
+      let rewardAmountString;
+      console.log("************** REWARD AMOUNT  *********", rewardAmount);
+      if(rewardAmount != undefined && rewardAmount.gt && rewardAmount.gt(0)) {
+        rewardAmount = formatRawEthValue(rewardAmount.toString(), decimal);
+        rewardAmountString = toFixed(
+          rewardAmount,
+          fixedDecimalPoint,
+        );
+      }
+  
+      if (!overhead || !decimal) {
+        throw new Error(
+          'Error while getting token overhead gas and decimal from config',
+        );
+      }
+  
+      let transactionFeeRaw = BigNumber.from(overhead).mul(tokenGasPrice);
+  
+      let transactionFee = formatRawEthValue(
+        transactionFeeRaw.toString(),
+        decimal,
       );
+  
+      let transactionFeeProcessedString = toFixed(
+        transactionFee,
+        fixedDecimalPoint,
+      );
+  
+      let amountToGet =
+        transferAmount -
+        parseFloat(transactionFee) -
+        parseFloat(lpFeeProcessedString);
+  
+      if(rewardAmount) {
+        amountToGet += parseFloat(rewardAmount);
+      }
+
+      let amountToGetProcessedString = toFixed(
+        amountToGet.toString(),
+        fixedDecimalPoint,
+      );
+  
+      if (amountToGet <= 0) throw new Error('Amount too low');
+  
+      return {
+        rewardAmountString,
+        lpFeeProcessedString,
+        transactionFeeProcessedString,
+        amountToGetProcessedString,
+      };
+    } catch(error) {
+      console.log(error);
     }
-
-    let transactionFeeRaw = BigNumber.from(overhead).mul(tokenGasPrice);
-
-    let transactionFee = formatRawEthValue(
-      transactionFeeRaw.toString(),
-      decimal,
-    );
-
-    let transactionFeeProcessedString = toFixed(
-      transactionFee,
-      fixedDecimalPoint,
-    );
-
-    let amountToGet =
-      transferAmount -
-      parseFloat(transactionFee) -
-      parseFloat(lpFeeProcessedString);
-
-    let amountToGetProcessedString = toFixed(
-      amountToGet.toString(),
-      fixedDecimalPoint,
-    );
-
-    if (amountToGet <= 0) throw new Error('Amount too low');
-
-    return {
-      lpFeeProcessedString,
-      transactionFeeProcessedString,
-      amountToGetProcessedString,
-    };
   }, [fromChain, toChain, selectedToken, transferAmount]);
 
   const {
@@ -534,29 +600,28 @@ const TransactionProvider: React.FC = props => {
       let tokenReceipt = receipt.logs.find(
         receiptLog => receiptLog.topics[0] === toChain.assetSentTopicId,
       );
+      try {
 
-      if (!tokenReceipt) {
-        throw new Error('No valid receipt log data');
+        if (!tokenReceipt) {
+          throw new Error('No valid receipt log data');
+        }
+        const data = lpManagerInterface.parseLog(tokenReceipt);
+        if (!data?.args?.transferredAmount) throw new Error('Invalid log data');
+        let amount = data.args.transferredAmount;
+        let processedAmount = ethers.utils.formatUnits(
+          amount,
+          selectedToken[fromChain.chainId].decimal,
+        );
+        processedAmount = toFixed(
+          processedAmount,
+          selectedToken[fromChain.chainId].fixedDecimalPoint ||
+            DEFAULT_FIXED_DECIMAL_POINT,
+        );
+        return processedAmount;
+      } catch(error) {
+        console.log(error);
+        throw new Error('Error while filtering and parsing logs');
       }
-
-      const data = lpManagerInterface.parseLog(tokenReceipt);
-
-      if (!data?.args?.transferredAmount) throw new Error('Invalid log data');
-
-      let amount = data.args.transferredAmount;
-
-      let processedAmount = ethers.utils.formatUnits(
-        amount,
-        selectedToken[fromChain.chainId].decimal,
-      );
-
-      processedAmount = toFixed(
-        processedAmount,
-        selectedToken[fromChain.chainId].fixedDecimalPoint ||
-          DEFAULT_FIXED_DECIMAL_POINT,
-      );
-
-      return processedAmount;
     },
     [fromChain, toChain, selectedToken, toChainRpcUrlProvider],
   );

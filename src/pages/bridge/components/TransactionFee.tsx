@@ -81,6 +81,39 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                   )}
                 </div>
               </article>
+
+              {
+                transactionFee && transactionFee.rewardAmountString ? (
+                <article className="flex items-center justify-between font-medium">
+                <div className="flex items-center">
+                  <HiInformationCircle
+                    data-tip
+                    data-for="lpFee"
+                    className="mr-2"
+                  />
+                  <CustomTooltip id="lpFee">
+                    <span>
+                      Reward amount for filling up the pool close to supplied liquidity
+                    </span>
+                  </CustomTooltip>
+                  
+                  Reward Amount
+                </div>
+                <div className="text-right font-mono">
+                  {fetchTransactionFeeStatus === Status.SUCCESS &&
+                  transactionFee ? (
+                    <>{`${transactionFee.rewardAmountString} ${selectedToken?.symbol}`}</>
+                  ) : (
+                    <Skeleton
+                      baseColor="#ffffff10"
+                      highlightColor="#ffffff15"
+                      className="max-w-[80px]"
+                    />
+                  )}
+                </div>
+              </article>)
+              : null
+              }
               <article className="flex items-center justify-between font-medium">
                 <div className="flex items-center">
                   <HiInformationCircle

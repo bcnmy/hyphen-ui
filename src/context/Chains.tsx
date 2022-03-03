@@ -66,9 +66,10 @@ const ChainsProvider: React.FC = props => {
     // console.log({ currentChainId, chainsList });
     if (currentMetamaskChain) {
       setFromChain(currentMetamaskChain);
-      // console.log(currentMetamaskChain);
+      setSelectedNetwork(currentMetamaskChain);
     } else {
       setFromChain(chainsList[0]);
+      setSelectedNetwork(chainsList[0]);
     }
   }, [currentChainId]);
 

@@ -14,11 +14,7 @@ function LiquidityPositions() {
   const { getUserPositions } = useLPToken(selectedNetwork);
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
 
-  const {
-    isLoading,
-    isError,
-    data: userPositions,
-  } = useQuery(
+  const { isLoading, data: userPositions } = useQuery(
     ['userPositions', accounts],
     () => {
       if (!accounts) return;

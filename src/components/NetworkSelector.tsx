@@ -1,24 +1,11 @@
-import { Fragment, useEffect } from 'react';
+import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiOutlineChevronDown } from 'react-icons/hi';
-import { useWalletProvider } from 'context/WalletProvider';
 import { ChainConfig, chains } from 'config/chains';
 import { useChains } from 'context/Chains';
 
 function NetworkSelector() {
-  const { currentChainId } = useWalletProvider()!;
   const { selectedNetwork, changeSelectedNetwork } = useChains()!;
-
-  useEffect(() => {
-    const network = chains.find(
-      chainObj => chainObj.chainId === currentChainId,
-    )!;
-    if (network) {
-      changeSelectedNetwork(network);
-    } else {
-      changeSelectedNetwork(chains[0]);
-    }
-  }, [changeSelectedNetwork, currentChainId]);
 
   function handleNetworkChange(selectedNetwork: ChainConfig) {
     changeSelectedNetwork(selectedNetwork);

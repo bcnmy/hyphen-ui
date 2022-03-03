@@ -12,7 +12,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const userAddress = accounts?.[0];
 
-  const showNetworkSelector = !['/bridge', '/pool'].includes(location.pathname);
+  const showNetworkSelector = !['/bridge'].includes(location.pathname);
 
   return (
     <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">

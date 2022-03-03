@@ -11,6 +11,8 @@ async function getTokenBalance(
   chain: ChainConfig,
   token: TokenConfig,
 ) {
+  if (!accountAddress || !chain || !token) return;
+
   const { chainId, nativeDecimal, rpcUrl } = chain;
   const {
     [chainId]: { address: tokenAddress },

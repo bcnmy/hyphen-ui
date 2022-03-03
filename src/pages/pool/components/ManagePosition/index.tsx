@@ -14,23 +14,28 @@ import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { chains } from 'config/chains';
 import { useState } from 'react';
-import { useChains } from 'context/Chains';
 import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
+import Skeleton from 'react-loading-skeleton';
 
 function ManagePosition() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { isLoggedIn } = useWalletProvider()!;
-  const { fromChain, selectedNetwork } = useChains()!;
+  const { connect, isLoggedIn } = useWalletProvider()!;
   const { addTxNotification } = useNotifications()!;
 
-  const { getPositionMetadata } = useLPToken(selectedNetwork);
+  const chain = chainId
+    ? chains.find(chainObj => {
+        return chainObj.chainId === Number.parseInt(chainId);
+      })!
+    : undefined;
+
+  const { getPositionMetadata } = useLPToken(chain);
   const { claimFee, getTokenAmount, getTotalLiquidity, removeLiquidity } =
-    useLiquidityProviders(selectedNetwork);
-  const { getTokenTotalCap } = useWhitelistPeriodManager(selectedNetwork);
+    useLiquidityProviders(chain);
+  const { getTokenTotalCap } = useWhitelistPeriodManager(chain);
 
   const [liquidityRemovalAmount, setLiquidityRemovalAmount] =
     useState<string>('');
@@ -41,17 +46,12 @@ function ManagePosition() {
       ['positionMetadata', positionId],
       () => getPositionMetadata(BigNumber.from(positionId)),
       {
-        enabled: !!(isLoggedIn && positionId),
+        // Execute only when positionid is available.
+        enabled: !!positionId,
       },
     );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
-
-  const chain = chainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === Number.parseInt(chainId);
-      })
-    : null;
 
   const token =
     chainId && tokenAddress
@@ -71,7 +71,7 @@ function ManagePosition() {
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!(isLoggedIn && tokenAddress),
+      enabled: !!tokenAddress,
     },
   );
 
@@ -80,7 +80,7 @@ function ManagePosition() {
     () => getTokenAmount(shares, tokenAddress),
     {
       // Execute only when shares & tokenAddress is available.
-      enabled: !!(isLoggedIn && shares && tokenAddress),
+      enabled: !!(shares && tokenAddress),
     },
   );
 
@@ -88,8 +88,8 @@ function ManagePosition() {
     ['tokenTotalCap', tokenAddress],
     () => getTokenTotalCap(tokenAddress),
     {
-      // Execute only when accounts are available.
-      enabled: !!(isLoggedIn && tokenAddress),
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
     },
   );
 
@@ -109,7 +109,7 @@ function ManagePosition() {
       addTxNotification(
         removeLiquidityTx,
         'Remove liquidity',
-        `${fromChain?.explorerUrl}/tx/${removeLiquidityTx.hash}`,
+        `${chain?.explorerUrl}/tx/${removeLiquidityTx.hash}`,
       );
       return await removeLiquidityTx.wait(1);
     },
@@ -124,7 +124,7 @@ function ManagePosition() {
     addTxNotification(
       claimFeeTx,
       'Claim fee',
-      `${fromChain?.explorerUrl}/tx/${claimFeeTx.hash}`,
+      `${chain?.explorerUrl}/tx/${claimFeeTx.hash}`,
     );
     return await claimFeeTx.wait(1);
   });
@@ -159,6 +159,9 @@ function ManagePosition() {
     formattedSuppliedLiquidity && formattedTokenAmount
       ? formattedSuppliedLiquidity - formattedTokenAmount
       : 0;
+
+  const isDataLoading =
+    !isLoggedIn || !formattedSuppliedLiquidity || removeLiquidityLoading;
 
   const isRemovalAmountGtSuppliedLiquidity =
     liquidityRemovalAmount && formattedSuppliedLiquidity
@@ -243,8 +246,6 @@ function ManagePosition() {
     reset();
   }
 
-  if (isPositionMetadataLoading) return null;
-
   return (
     <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
       <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
@@ -266,7 +267,10 @@ function ManagePosition() {
         </div>
       </header>
 
-      <AssetOverview positionId={BigNumber.from(positionId)} />
+      <AssetOverview
+        chainId={chainId}
+        positionId={BigNumber.from(positionId)}
+      />
 
       <section className="mt-8 grid grid-cols-2">
         <div className="max-h-100 h-100 border-r pr-12.5 pt-9">
@@ -277,11 +281,22 @@ function ManagePosition() {
             />
             <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
-              <span>
-                {makeNumberCompact(formattedTotalLiquidity) || '...'}{' '}
-                {token?.symbol} /{' '}
-                {makeNumberCompact(formattedTokenTotalCap) || '...'}{' '}
-                {token?.symbol}
+              <span className="flex">
+                {formattedTotalLiquidity && formattedTokenTotalCap ? (
+                  <>
+                    {makeNumberCompact(formattedTotalLiquidity)}
+                    {token?.symbol} /{' '}
+                    {makeNumberCompact(formattedTokenTotalCap)}
+                    {token?.symbol}
+                  </>
+                ) : (
+                  <Skeleton
+                    baseColor="#615ccd20"
+                    enableAnimation
+                    highlightColor="#615ccd05"
+                    className="!mx-1 !w-20"
+                  />
+                )}
               </span>
             </div>
           </div>
@@ -296,7 +311,7 @@ function ManagePosition() {
               <button
                 className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}
-                disabled={removeLiquidityLoading}
+                disabled={isDataLoading}
               >
                 MAX
               </button>
@@ -310,7 +325,7 @@ function ManagePosition() {
             className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
             value={liquidityRemovalAmount}
             onChange={handleLiquidityAmountChange}
-            disabled={removeLiquidityLoading}
+            disabled={isDataLoading}
           />
 
           <StepSlider
@@ -318,22 +333,29 @@ function ManagePosition() {
             onChange={handleSliderChange}
             step={25}
             value={sliderValue}
-            disabled={removeLiquidityLoading}
+            disabled={isDataLoading}
           />
 
-          <button
-            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-            disabled={
-              isRemovalAmountGtSuppliedLiquidity || removeLiquidityLoading
-            }
-            onClick={handleConfirmRemovalClick}
-          >
-            {isRemovalAmountGtSuppliedLiquidity
-              ? 'Amount more than supplied liquidity'
-              : removeLiquidityLoading
-              ? 'Removing Liquidity'
-              : 'Confirm Removal'}
-          </button>
+          {isLoggedIn ? (
+            <button
+              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              disabled={isDataLoading || isRemovalAmountGtSuppliedLiquidity}
+              onClick={handleConfirmRemovalClick}
+            >
+              {isRemovalAmountGtSuppliedLiquidity
+                ? 'Amount more than supplied liquidity'
+                : removeLiquidityLoading
+                ? 'Removing Liquidity'
+                : 'Confirm Removal'}
+            </button>
+          ) : (
+            <button
+              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              onClick={connect}
+            >
+              Connect Your Wallet
+            </button>
+          )}
           <button
             className="h-15 w-full rounded-2.5 border-2 border-hyphen-purple font-semibold text-hyphen-purple hover:bg-hyphen-purple hover:text-white"
             onClick={handleIncreaseLiquidity}

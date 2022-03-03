@@ -246,11 +246,8 @@ function AddLiquidity() {
       )!;
 
       if (isLoggedIn && accounts) {
-        const { displayBalance } = await getTokenBalance(
-          accounts[0],
-          selectedNetwork,
-          token,
-        );
+        const { displayBalance } =
+          (await getTokenBalance(accounts[0], selectedNetwork, token)) || {};
 
         if (token[selectedNetwork.chainId].address !== NATIVE_ADDRESS) {
           const tokenAllowance = await getTokenAllowance(
@@ -533,7 +530,7 @@ function AddLiquidity() {
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
-                    enableAnimation={!!liquidityBalance}
+                    enableAnimation
                     highlightColor="#615ccd05"
                     className="!mx-1 !w-11"
                   />
@@ -637,11 +634,22 @@ function AddLiquidity() {
               />
               <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
                 <span>Pool cap</span>
-                <span>
-                  {makeNumberCompact(formattedTotalLiquidity) || '...'}{' '}
-                  {selectedToken?.name} /{' '}
-                  {makeNumberCompact(formattedTokenTotalCap) || '...'}{' '}
-                  {selectedToken?.name}
+                <span className="flex">
+                  {formattedTotalLiquidity && formattedTokenTotalCap ? (
+                    <>
+                      {makeNumberCompact(formattedTotalLiquidity)}
+                      {selectedToken?.name} /{' '}
+                      {makeNumberCompact(formattedTokenTotalCap)}
+                      {selectedToken?.name}
+                    </>
+                  ) : (
+                    <Skeleton
+                      baseColor="#615ccd20"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!mx-1 !w-20"
+                    />
+                  )}
                 </span>
               </div>
             </div>

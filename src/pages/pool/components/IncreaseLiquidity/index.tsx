@@ -18,22 +18,26 @@ import AssetOverview from '../AssetOverview';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
-import { useChains } from 'context/Chains';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { accounts, isLoggedIn } = useWalletProvider()!;
-  const { selectedNetwork } = useChains()!;
+  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const { addTxNotification } = useNotifications()!;
 
-  const { getPositionMetadata } = useLPToken(selectedNetwork);
+  const chain = chainId
+    ? chains.find(chainObj => {
+        return chainObj.chainId === Number.parseInt(chainId);
+      })!
+    : undefined;
+
+  const { getPositionMetadata } = useLPToken(chain);
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
-    useLiquidityProviders(selectedNetwork);
+    useLiquidityProviders(chain);
   const { getTokenTotalCap, getTotalLiquidityByLp, getTokenWalletCap } =
-    useWhitelistPeriodManager(selectedNetwork);
+    useWhitelistPeriodManager(chain);
 
   const [liquidityBalance, setLiquidityBalance] = useState<
     string | undefined
@@ -48,17 +52,12 @@ function IncreaseLiquidity() {
     ['positionMetadata', positionId],
     () => getPositionMetadata(BigNumber.from(positionId)),
     {
-      enabled: !!(isLoggedIn && positionId),
+      // Execute only when positionId is available.
+      enabled: !!positionId,
     },
   );
 
   const [tokenAddress, suppliedLiquidity] = positionMetadata || [];
-
-  const chain = chainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === Number.parseInt(chainId);
-      })
-    : null;
 
   const token =
     chainId && tokenAddress
@@ -78,7 +77,7 @@ function IncreaseLiquidity() {
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!(isLoggedIn && tokenAddress),
+      enabled: !!tokenAddress,
     },
   );
 
@@ -87,7 +86,7 @@ function IncreaseLiquidity() {
     () => getTokenTotalCap(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!(isLoggedIn && tokenAddress),
+      enabled: !!tokenAddress,
     },
   );
 
@@ -96,7 +95,7 @@ function IncreaseLiquidity() {
     () => getTokenWalletCap(tokenAddress),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!(isLoggedIn && tokenAddress),
+      enabled: !!tokenAddress,
     },
   );
 
@@ -105,7 +104,7 @@ function IncreaseLiquidity() {
     () => getTotalLiquidityByLp(tokenAddress, accounts),
     {
       // Execute only when tokenAddress is available.
-      enabled: !!(isLoggedIn && tokenAddress && accounts),
+      enabled: !!(tokenAddress && accounts),
     },
   );
 
@@ -158,7 +157,8 @@ function IncreaseLiquidity() {
       )
     : suppliedLiquidity;
 
-  const isDataLoading = !liquidityBalance || increaseLiquidityLoading;
+  const isDataLoading =
+    !isLoggedIn || !liquidityBalance || increaseLiquidityLoading;
 
   const isLiquidityAmountGtWalletBalance =
     liquidityIncreaseAmount && walletBalance
@@ -187,11 +187,8 @@ function IncreaseLiquidity() {
   useEffect(() => {
     async function getWalletBalance() {
       if (!accounts || !chain || !token) return;
-      const { displayBalance } = await getTokenBalance(
-        accounts[0],
-        chain,
-        token,
-      );
+      const { displayBalance } =
+        (await getTokenBalance(accounts[0], chain, token)) || {};
       setWalletBalance(displayBalance);
     }
     getWalletBalance();
@@ -320,7 +317,10 @@ function IncreaseLiquidity() {
         </div>
       </header>
 
-      <AssetOverview positionId={BigNumber.from(positionId)} />
+      <AssetOverview
+        chainId={chainId}
+        positionId={BigNumber.from(positionId)}
+      />
 
       <section className="mt-8 grid grid-cols-2">
         <div className="max-h-84 h-84 border-r pr-12.5 pt-9">
@@ -331,11 +331,22 @@ function IncreaseLiquidity() {
             />
             <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
-              <span>
-                {makeNumberCompact(formattedTotalLiquidity) || '...'}{' '}
-                {token?.symbol} /{' '}
-                {makeNumberCompact(formattedTokenTotalCap) || '...'}{' '}
-                {token?.symbol}
+              <span className="flex">
+                {formattedTotalLiquidity && formattedTokenTotalCap ? (
+                  <>
+                    {makeNumberCompact(formattedTotalLiquidity)}
+                    {token?.symbol} /{' '}
+                    {makeNumberCompact(formattedTokenTotalCap)}
+                    {token?.symbol}
+                  </>
+                ) : (
+                  <Skeleton
+                    baseColor="#615ccd20"
+                    enableAnimation
+                    highlightColor="#615ccd05"
+                    className="!mx-1 !w-20"
+                  />
+                )}
               </span>
             </div>
           </div>
@@ -352,7 +363,7 @@ function IncreaseLiquidity() {
               ) : (
                 <Skeleton
                   baseColor="#615ccd20"
-                  enableAnimation={!!liquidityBalance}
+                  enableAnimation
                   highlightColor="#615ccd05"
                   className="!mx-1 !w-11"
                 />
@@ -387,28 +398,37 @@ function IncreaseLiquidity() {
             value={sliderValue}
           />
 
-          <button
-            className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-            disabled={
-              isDataLoading ||
-              liquidityIncreaseAmount === '' ||
-              isLiquidityAmountGtWalletBalance ||
-              isLiquidityAmountGtLiquidityBalance
-            }
-            onClick={handleConfirmSupplyClick}
-          >
-            {!liquidityBalance
-              ? 'Getting your balance'
-              : liquidityIncreaseAmount === ''
-              ? 'Enter Amount'
-              : isLiquidityAmountGtWalletBalance
-              ? 'Insufficient wallet balance'
-              : isLiquidityAmountGtLiquidityBalance
-              ? 'This amount exceeds your wallet cap'
-              : increaseLiquidityLoading
-              ? 'Increasing Liquidity'
-              : 'Confirm Supply'}
-          </button>
+          {isLoggedIn ? (
+            <button
+              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              disabled={
+                isDataLoading ||
+                liquidityIncreaseAmount === '' ||
+                isLiquidityAmountGtWalletBalance ||
+                isLiquidityAmountGtLiquidityBalance
+              }
+              onClick={handleConfirmSupplyClick}
+            >
+              {!liquidityBalance
+                ? 'Getting your balance'
+                : liquidityIncreaseAmount === ''
+                ? 'Enter Amount'
+                : isLiquidityAmountGtWalletBalance
+                ? 'Insufficient wallet balance'
+                : isLiquidityAmountGtLiquidityBalance
+                ? 'This amount exceeds your wallet cap'
+                : increaseLiquidityLoading
+                ? 'Increasing Liquidity'
+                : 'Confirm Supply'}
+            </button>
+          ) : (
+            <button
+              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+              onClick={connect}
+            >
+              Connect Your Wallet
+            </button>
+          )}
         </div>
         <div className="max-h-84 flex h-84 flex-col justify-between pl-12.5 pt-3">
           <div className="grid grid-cols-2">

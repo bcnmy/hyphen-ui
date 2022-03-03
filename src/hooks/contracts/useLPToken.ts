@@ -6,18 +6,17 @@ import { useWalletProvider } from 'context/WalletProvider';
 import { ChainConfig } from 'config/chains';
 
 function useLPToken(chain: ChainConfig | undefined) {
-  const { isLoggedIn } = useWalletProvider()!;
   const contractAddress = chain ? LPToken[chain.chainId].address : undefined;
 
   const lpTokenContract = useMemo(() => {
-    if (!chain || !contractAddress || !isLoggedIn) return;
+    if (!chain || !contractAddress) return;
 
     return new ethers.Contract(
       contractAddress,
       lpTokenABI,
       new ethers.providers.JsonRpcProvider(chain.rpcUrl),
     );
-  }, [chain, contractAddress, isLoggedIn]);
+  }, [chain, contractAddress]);
 
   const getPositionMetadata = useCallback(
     (positionId: BigNumber) => {

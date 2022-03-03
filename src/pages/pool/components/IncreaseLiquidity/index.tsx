@@ -295,7 +295,8 @@ function IncreaseLiquidity() {
         Number.parseFloat(liquidityIncreaseAmount)
       : undefined;
     setLiquidityBalance(updatedWalletBalance?.toString());
-    reset();
+    setLiquidityIncreaseAmount('');
+    setSliderValue(0);
   }
 
   return (

@@ -19,7 +19,7 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
   const navigate = useNavigate();
 
   const { currentChainId, isLoggedIn } = useWalletProvider()!;
-  const { fromChain, selectedNetwork } = useChains()!;
+  const { selectedNetwork } = useChains()!;
 
   const { getPositionMetadata } = useLPToken(selectedNetwork);
   const { getTokenAmount, getTotalLiquidity } =
@@ -30,13 +30,13 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
       ['positionMetadata', positionId],
       () => getPositionMetadata(positionId),
       {
-        enabled: !!isLoggedIn,
+        enabled: !!(isLoggedIn && positionId),
       },
     );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
-  const { data: totalLiquidity } = useQuery(
+  const { isLoading: isTotalLiquidityLoading, data: totalLiquidity } = useQuery(
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
@@ -45,7 +45,7 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
     },
   );
 
-  const { data: tokenAmount } = useQuery(
+  const { isLoading: isTokenAmountLoading, data: tokenAmount } = useQuery(
     ['tokenAmount', { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
@@ -70,7 +70,12 @@ function AssetOverview({ positionId, hideClosedPositions }: IAssetOverview) {
         })
       : null;
 
-  if (isPositionMetadataLoading || !token || !chain || !currentChainId) {
+  const isDataLoading =
+    isPositionMetadataLoading ||
+    isTotalLiquidityLoading ||
+    isTokenAmountLoading;
+
+  if (isDataLoading || !token || !chain || !currentChainId) {
     return (
       <Skeleton
         baseColor="#615ccd20"

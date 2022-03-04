@@ -163,7 +163,10 @@ function ManagePosition() {
       : 0;
 
   const isDataLoading =
-    !isLoggedIn || !formattedSuppliedLiquidity || removeLiquidityLoading;
+    !isLoggedIn ||
+    !formattedSuppliedLiquidity ||
+    removeLiquidityLoading ||
+    claimFeeLoading;
 
   const isRemovalAmountGtSuppliedLiquidity =
     liquidityRemovalAmount && formattedSuppliedLiquidity

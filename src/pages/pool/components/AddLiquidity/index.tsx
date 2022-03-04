@@ -285,16 +285,14 @@ function AddLiquidity() {
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function handleTokenChange() {
-      if (!selectedChain || !selectedToken || !liquidityProvidersAddress) {
+      if (!chainId || !tokenSymbol || !liquidityProvidersAddress) {
         return null;
       }
 
       const chain = chains.find(
-        chainObj => chainObj.chainId === selectedChain.id,
+        chainObj => chainObj.chainId === Number.parseInt(chainId),
       )!;
-      const token = tokens.find(
-        tokenObj => tokenObj.symbol === selectedToken.id,
-      )!;
+      const token = tokens.find(tokenObj => tokenObj.symbol === tokenSymbol)!;
 
       if (isLoggedIn && accounts) {
         const { displayBalance } =
@@ -318,13 +316,7 @@ function AddLiquidity() {
     }
 
     handleTokenChange();
-  }, [
-    accounts,
-    isLoggedIn,
-    liquidityProvidersAddress,
-    selectedChain,
-    selectedToken,
-  ]);
+  }, [accounts, chainId, isLoggedIn, liquidityProvidersAddress, tokenSymbol]);
 
   function reset() {
     setLiquidityAmount('');
@@ -337,6 +329,14 @@ function AddLiquidity() {
     updatePoolShare('0');
   }
 
+  function handleTokenChange(selectedToken: Option) {
+    const { symbol: tokenSymbol } = tokens.find(
+      tokenObj => tokenObj.symbol === selectedToken.id,
+    )!;
+    reset();
+    navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
+  }
+
   function handleChainChange(selectedChain: Option) {
     const { chainId } = chains.find(
       chainObj => chainObj.chainId === selectedChain.id,
@@ -344,6 +344,7 @@ function AddLiquidity() {
     const [{ symbol: tokenSymbol }] = tokens.filter(
       tokenObj => tokenObj[chainId],
     );
+    reset();
     navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
   }
 
@@ -550,7 +551,7 @@ function AddLiquidity() {
                 options={tokenOptions}
                 selected={selectedToken}
                 setSelected={tokenOption => {
-                  setSelectedToken(tokenOption);
+                  handleTokenChange(tokenOption);
                   reset();
                 }}
                 label={'asset'}

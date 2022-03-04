@@ -40,7 +40,7 @@ function LiquidityPositions() {
     refetch();
   }, [refetch, remove, selectedNetwork]);
 
-  function handleAddLiquidityClick() {
+  function handleAddLiquidity() {
     const [{ chainId }] = chains;
     const [{ symbol: tokenSymbol }] = tokens.filter(
       tokenObj => tokenObj[chainId],
@@ -81,7 +81,7 @@ function LiquidityPositions() {
 
         <button
           className="absolute right-10 flex h-9 w-28 items-center justify-center rounded-xl bg-hyphen-purple text-xs text-white"
-          onClick={handleAddLiquidityClick}
+          onClick={handleAddLiquidity}
         >
           + Add Liquidity
         </button>

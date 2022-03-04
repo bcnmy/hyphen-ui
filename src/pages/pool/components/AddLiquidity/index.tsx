@@ -223,6 +223,7 @@ function AddLiquidity() {
       ? Number.parseFloat(liquidityAmount) > Number.parseFloat(liquidityBalance)
       : false;
 
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     const chain = chainId
       ? chainOptions.find(chainObj => chainObj.id === Number.parseInt(chainId))
@@ -235,6 +236,7 @@ function AddLiquidity() {
     setSelectedToken(token);
   }, [chainId, chainOptions, tokenOptions, tokenSymbol]);
 
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
       const balance = ethers.utils.formatUnits(
@@ -308,6 +310,11 @@ function AddLiquidity() {
       tokenObj => tokenObj[chainId],
     );
     navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
+  }
+
+  function handleNetworkChange() {
+    if (!walletProvider || !chain) return;
+    switchNetwork(walletProvider, chain);
   }
 
   async function handleLiquidityAmountChange(
@@ -581,38 +588,48 @@ function AddLiquidity() {
                     ? `${selectedToken?.name} Approved`
                     : `Approve ${selectedToken?.name}`}
                 </button>
-                <button
-                  className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  onClick={handleConfirmSupplyClick}
-                  disabled={
-                    isDataLoading ||
-                    liquidityAmount === '' ||
-                    !isSelectedTokenApproved ||
-                    isLiquidityAmountGtWalletBalance ||
-                    isLiquidityAmountGtLiquidityBalance
-                  }
-                >
-                  {!liquidityBalance
-                    ? 'Getting your balance'
-                    : liquidityAmount === ''
-                    ? 'Enter Amount'
-                    : isLiquidityAmountGtWalletBalance
-                    ? 'Insufficient wallet balance'
-                    : isLiquidityAmountGtLiquidityBalance
-                    ? 'This amount exceeds your wallet cap'
-                    : addLiquidityLoading
-                    ? 'Adding Liquidity'
-                    : 'Confirm Supply'}
-                </button>
+                {currentChainId === chain?.chainId ? (
+                  <button
+                    className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                    onClick={handleConfirmSupplyClick}
+                    disabled={
+                      isDataLoading ||
+                      liquidityAmount === '' ||
+                      !isSelectedTokenApproved ||
+                      isLiquidityAmountGtWalletBalance ||
+                      isLiquidityAmountGtLiquidityBalance
+                    }
+                  >
+                    {!liquidityBalance
+                      ? 'Getting your balance'
+                      : liquidityAmount === ''
+                      ? 'Enter Amount'
+                      : isLiquidityAmountGtWalletBalance
+                      ? 'Insufficient wallet balance'
+                      : isLiquidityAmountGtLiquidityBalance
+                      ? 'This amount exceeds your wallet cap'
+                      : addLiquidityLoading
+                      ? 'Adding Liquidity'
+                      : 'Confirm Supply'}
+                  </button>
+                ) : (
+                  <button
+                    className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                    onClick={handleNetworkChange}
+                  >
+                    Switch to {chain?.name}
+                  </button>
+                )}
               </>
-            ) : (
+            ) : null}
+            {!isLoggedIn ? (
               <button
                 className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                 onClick={connect}
               >
                 Connect Your Wallet
               </button>
-            )}
+            ) : null}
           </div>
           <div className="max-h-100 h-100 pl-12.5">
             <div className="mb-12 grid grid-cols-2 gap-2.5">

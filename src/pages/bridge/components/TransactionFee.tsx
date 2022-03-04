@@ -24,6 +24,8 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
     ? isToChainEthereum(toChain.chainId)
     : false;
 
+  console.log(fetchTransactionFeeStatus);
+
   return (
     <Transition
       in={
@@ -61,8 +63,8 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                   {transactionFee ? (
                     <CustomTooltip id="lpFee">
                       <span>
-                        {transactionFee.transferFee}% fee to be given to
-                        liquidity providers
+                        {transactionFee.transferFeePercentage}% fee to be given
+                        to liquidity providers
                       </span>
                     </CustomTooltip>
                   ) : null}
@@ -75,8 +77,9 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                   ) : (
                     <Skeleton
                       baseColor="#ffffff10"
-                      highlightColor="#ffffff15"
-                      className="max-w-[80px]"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!w-32"
                     />
                   )}
                 </div>
@@ -105,8 +108,9 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                     ) : (
                       <Skeleton
                         baseColor="#ffffff10"
-                        highlightColor="#ffffff15"
-                        className="max-w-[80px]"
+                        enableAnimation
+                        highlightColor="#615ccd05"
+                        className="!w-32"
                       />
                     )}
                   </div>
@@ -137,8 +141,9 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                   ) : (
                     <Skeleton
                       baseColor="#ffffff10"
-                      highlightColor="#ffffff15"
-                      className="max-w-[80px]"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!w-32"
                     />
                   )}
                 </div>
@@ -167,8 +172,9 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                   ) : (
                     <Skeleton
                       baseColor="#ffffff10"
-                      highlightColor="#ffffff15"
-                      className="max-w-[80px]"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!w-32"
                     />
                   )}
                 </div>

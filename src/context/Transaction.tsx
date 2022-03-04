@@ -57,7 +57,7 @@ interface ITransactionContext {
         transactionFeeProcessedString: string;
         amountToGetProcessedString: string;
         rewardAmountString: string | undefined;
-        transferFee: string | undefined;
+        transferFeePercentage: string | undefined;
       };
   transactionAmountValidationErrors: ValidationErrors[];
   // receiver address
@@ -346,6 +346,10 @@ const TransactionProvider: React.FC = props => {
         fixedDecimalPoint,
       );
 
+      const transferFeePercentage = (
+        transferFee.toString() / BASE_DIVISOR
+      ).toFixed(3);
+
       if (amountToGet <= 0) throw new Error('Amount too low');
 
       return {
@@ -353,7 +357,7 @@ const TransactionProvider: React.FC = props => {
         lpFeeProcessedString,
         transactionFeeProcessedString,
         amountToGetProcessedString,
-        transferFee,
+        transferFeePercentage,
       };
     } catch (error) {
       console.log(error);

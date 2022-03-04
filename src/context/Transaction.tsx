@@ -170,40 +170,40 @@ const TransactionProvider: React.FC = props => {
   //   fetchSelectedTokenApprovalError,
   // ]);
 
-  let { data: transferFee, isLoading: isTransferFeeLoading } = useQuery(
-    ['transferFeeByToken', selectedToken, toChain, transferAmount],
-    async () => {
-      if (!selectedToken || !toChain || !transferAmount) {
-        return;
-      }
-      let tokenAddress = selectedToken[toChain.chainId].address;
-      let tokenDecimal = selectedToken[toChain.chainId].decimal;
-      let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
-      return await getTransferFee(tokenAddress, rawTransferAmount.toString());
-    },
-    {
-      // Execute only when tokenAddress is available.
-      enabled: !!(selectedToken && toChain && transferAmount),
-    },
-  );
+  // let { data: transferFee, isLoading: isTransferFeeLoading } = useQuery(
+  //   ['transferFeeByToken', selectedToken, toChain, transferAmount],
+  //   async () => {
+  //     if (!selectedToken || !toChain || !transferAmount) {
+  //       return;
+  //     }
+  //     let tokenAddress = selectedToken[toChain.chainId].address;
+  //     let tokenDecimal = selectedToken[toChain.chainId].decimal;
+  //     let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
+  //     return await getTransferFee(tokenAddress, rawTransferAmount.toString());
+  //   },
+  //   {
+  //     // Execute only when tokenAddress is available.
+  //     enabled: !!(selectedToken && toChain && transferAmount),
+  //   },
+  // );
 
-  let { data: rewardAmount } = useQuery(
-    ['rewardAmountByToken', selectedToken, fromChain, transferAmount],
-    () => {
-      if (!selectedToken || !fromChain || !transferAmount) {
-        return;
-      }
-      let tokenAddress = selectedToken[fromChain.chainId].address;
-      let tokenDecimal = selectedToken[fromChain.chainId].decimal;
+  // let { data: rewardAmount } = useQuery(
+  //   ['rewardAmountByToken', selectedToken, fromChain, transferAmount],
+  //   () => {
+  //     if (!selectedToken || !fromChain || !transferAmount) {
+  //       return;
+  //     }
+  //     let tokenAddress = selectedToken[fromChain.chainId].address;
+  //     let tokenDecimal = selectedToken[fromChain.chainId].decimal;
 
-      let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
-      return getRewardAmount(tokenAddress, rawTransferAmount.toString());
-    },
-    {
-      // Execute only when tokenAddress is available.
-      enabled: !!(selectedToken && fromChain && transferAmount),
-    },
-  );
+  //     let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
+  //     return getRewardAmount(tokenAddress, rawTransferAmount.toString());
+  //   },
+  //   {
+  //     // Execute only when tokenAddress is available.
+  //     enabled: !!(selectedToken && fromChain && transferAmount),
+  //   },
+  // );
 
   const changeTransferAmountInputValue = (amount: string) => {
     const regExp = /^((\d+)?(\.\d{0,3})?)$/;
@@ -243,7 +243,7 @@ const TransactionProvider: React.FC = props => {
       }
       let tokenAddress = selectedToken[toChain.chainId].address;
       let tokenDecimal = selectedToken[toChain.chainId].decimal;
-      let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
+      let rawTransferAmount = ethers.utils.parseUnits(transferAmount.toString(), tokenDecimal);
 
       let transferFee = await getTransferFee(
         tokenAddress,
@@ -310,7 +310,7 @@ const TransactionProvider: React.FC = props => {
 
       console.log('************** REWARD AMOUNT  *********', rewardAmount);
       if (rewardAmount !== undefined && rewardAmount.gt && rewardAmount.gt(0)) {
-        rewardAmount = formatRawEthValue(rewardAmount.toString(), decimal);
+        rewardAmount = formatRawEthValue(rewardAmount, decimal);
         rewardAmountString = toFixed(rewardAmount, fixedDecimalPoint);
       }
 

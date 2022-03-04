@@ -59,7 +59,7 @@ function ManagePosition() {
     chainId && tokenAddress
       ? tokens.find(tokenObj => {
           return (
-            tokenObj[Number.parseInt(chainId)].address.toLowerCase() ===
+            tokenObj[Number.parseInt(chainId)]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })

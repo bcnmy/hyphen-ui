@@ -108,7 +108,7 @@ function AssetOverview({
     chain && tokenAddress
       ? tokens.find(tokenObj => {
           return (
-            tokenObj[chain.chainId].address.toLowerCase() ===
+            tokenObj[chain.chainId]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })

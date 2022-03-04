@@ -44,6 +44,10 @@ ReactDOM.render(
                 <Route path="" element={<PoolsOverview />} />
                 <Route path="add-liquidity" element={<AddLiquidity />} />
                 <Route
+                  path="add-liquidity/:chainId/:tokenSymbol"
+                  element={<AddLiquidity />}
+                />
+                <Route
                   path="manage-position/:chainId/:positionId"
                   element={<ManagePosition />}
                 />

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { HiArrowSmLeft } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
@@ -27,7 +27,9 @@ import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders
 
 function AddLiquidity() {
   const navigate = useNavigate();
+  const { chainId, tokenSymbol } = useParams();
   const queryClient = useQueryClient();
+
   const {
     accounts,
     connect,
@@ -39,53 +41,7 @@ function AddLiquidity() {
   const { fromChain, selectedNetwork, changeSelectedNetwork } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
-  const { addLiquidity, addNativeLiquidity, getTotalLiquidity } =
-    useLiquidityProviders(selectedNetwork);
-  const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
-    useWhitelistPeriodManager(selectedNetwork);
-  const liquidityProvidersAddress = selectedNetwork
-    ? LiquidityProviders[selectedNetwork.chainId].address
-    : undefined;
-
-  const [selectedToken, setSelectedToken] = useState<Option | undefined>();
-  const tokenDecimals = useMemo(() => {
-    if (!currentChainId || !selectedToken) return undefined;
-    const token = tokens.find(token => token.symbol === selectedToken?.id)!;
-    return token[currentChainId].decimal;
-  }, [currentChainId, selectedToken]);
-  const [isSelectedTokenApproved, setIsSelectedTokenApproved] = useState<
-    boolean | undefined
-  >();
-  const [selectedTokenAllowance, setSelectedTokenAllowance] =
-    useState<BigNumber>();
-  const [selectedTokenAddress, setSelectedTokenAddress] = useState<
-    string | undefined
-  >();
-  const [chain, setChain] = useState<Option | undefined>();
-  const [liquidityBalance, setLiquidityBalance] = useState<
-    string | undefined
-  >();
-  const [walletBalance, setWalletBalance] = useState<string | undefined>();
-  const [liquidityAmount, setLiquidityAmount] = useState<string>('');
-  const [sliderValue, setSliderValue] = useState<number>(0);
-
-  const [poolShare, setPoolShare] = useState<number>(0);
-  const tokenOptions = useMemo(() => {
-    return selectedNetwork
-      ? tokens
-          .filter(tokenObj => tokenObj[selectedNetwork.chainId])
-          .map(tokenObj => ({
-            id: tokenObj.symbol,
-            name: tokenObj.symbol,
-            image: tokenObj.image,
-          }))
-      : tokens.map(tokenObj => ({
-          id: tokenObj.symbol,
-          name: tokenObj.symbol,
-          image: tokenObj.image,
-        }));
-  }, [selectedNetwork]);
-
+  // States
   const chainOptions = useMemo(() => {
     return chains.map(chainObj => {
       return {
@@ -96,6 +52,58 @@ function AddLiquidity() {
       };
     });
   }, []);
+  const [selectedChain, setSelectedChain] = useState<Option | undefined>();
+  const chain = selectedChain
+    ? chains.find(chainObj => chainObj.chainId === selectedChain.id)
+    : undefined;
+
+  // Liquidity Contracts
+  const liquidityProvidersAddress = chain
+    ? LiquidityProviders[chain.chainId].address
+    : undefined;
+  const { addLiquidity, addNativeLiquidity, getTotalLiquidity } =
+    useLiquidityProviders(chain);
+  const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
+    useWhitelistPeriodManager(chain);
+
+  const tokenOptions = useMemo(() => {
+    return selectedChain
+      ? tokens
+          .filter(tokenObj => tokenObj[selectedChain.id])
+          .map(tokenObj => ({
+            id: tokenObj.symbol,
+            name: tokenObj.symbol,
+            image: tokenObj.image,
+          }))
+      : tokens.map(tokenObj => ({
+          id: tokenObj.symbol,
+          name: tokenObj.symbol,
+          image: tokenObj.image,
+        }));
+  }, [selectedChain]);
+  const [selectedToken, setSelectedToken] = useState<Option | undefined>();
+
+  const [isSelectedTokenApproved, setIsSelectedTokenApproved] = useState<
+    boolean | undefined
+  >();
+  const [selectedTokenAllowance, setSelectedTokenAllowance] =
+    useState<BigNumber>();
+  const [selectedTokenAddress, setSelectedTokenAddress] = useState<
+    string | undefined
+  >();
+  const [liquidityBalance, setLiquidityBalance] = useState<
+    string | undefined
+  >();
+  const [walletBalance, setWalletBalance] = useState<string | undefined>();
+  const [liquidityAmount, setLiquidityAmount] = useState<string>('');
+  const [sliderValue, setSliderValue] = useState<number>(0);
+  const [poolShare, setPoolShare] = useState<number>(0);
+
+  const tokenDecimals = useMemo(() => {
+    if (!currentChainId || !selectedToken) return undefined;
+    const token = tokens.find(token => token.symbol === selectedToken?.id)!;
+    return token[currentChainId].decimal;
+  }, [currentChainId, selectedToken]);
 
   const {
     isVisible: isApprovalModalVisible,
@@ -103,6 +111,7 @@ function AddLiquidity() {
     showModal: showApprovalModal,
   } = useModal();
 
+  // Queries & Mutations
   const { data: totalLiquidity } = useQuery(
     ['totalLiquidity', selectedTokenAddress],
     () => getTotalLiquidity(selectedTokenAddress),
@@ -215,6 +224,18 @@ function AddLiquidity() {
       : false;
 
   useEffect(() => {
+    const chain = chainId
+      ? chainOptions.find(chainObj => chainObj.id === Number.parseInt(chainId))
+      : chainOptions[0];
+    const token = tokenSymbol
+      ? tokenOptions.find(tokenObj => tokenObj.id === tokenSymbol)
+      : tokenOptions[0];
+
+    setSelectedChain(chain);
+    setSelectedToken(token);
+  }, [chainId, chainOptions, tokenOptions, tokenSymbol]);
+
+  useEffect(() => {
     if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
       const balance = ethers.utils.formatUnits(
         tokenWalletCap.sub(totalLiquidityByLP),
@@ -226,35 +247,28 @@ function AddLiquidity() {
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
-    if (selectedNetwork && tokenOptions) {
-      setSelectedToken(tokenOptions[0]);
-      setChain(
-        chainOptions.find(network => network.id === selectedNetwork.chainId),
-      );
-    }
-  }, [chainOptions, selectedNetwork, tokenOptions]);
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
     async function handleTokenChange() {
-      if (!selectedNetwork || !selectedToken || !liquidityProvidersAddress) {
+      if (!selectedChain || !selectedToken || !liquidityProvidersAddress) {
         return null;
       }
 
+      const chain = chains.find(
+        chainObj => chainObj.chainId === selectedChain.id,
+      )!;
       const token = tokens.find(
         tokenObj => tokenObj.symbol === selectedToken.id,
       )!;
 
       if (isLoggedIn && accounts) {
         const { displayBalance } =
-          (await getTokenBalance(accounts[0], selectedNetwork, token)) || {};
+          (await getTokenBalance(accounts[0], chain, token)) || {};
 
-        if (token[selectedNetwork.chainId].address !== NATIVE_ADDRESS) {
+        if (token[chain.chainId].address !== NATIVE_ADDRESS) {
           const tokenAllowance = await getTokenAllowance(
             accounts[0],
-            new ethers.providers.JsonRpcProvider(selectedNetwork.rpcUrl),
+            new ethers.providers.JsonRpcProvider(chain.rpcUrl),
             liquidityProvidersAddress,
-            token[selectedNetwork.chainId].address,
+            token[chain.chainId].address,
           );
           setSelectedTokenAllowance(tokenAllowance);
         } else {
@@ -263,7 +277,7 @@ function AddLiquidity() {
         setWalletBalance(displayBalance);
       }
 
-      setSelectedTokenAddress(token[selectedNetwork.chainId].address);
+      setSelectedTokenAddress(token[chain.chainId].address);
     }
 
     handleTokenChange();
@@ -271,7 +285,7 @@ function AddLiquidity() {
     accounts,
     isLoggedIn,
     liquidityProvidersAddress,
-    selectedNetwork,
+    selectedChain,
     selectedToken,
   ]);
 
@@ -287,19 +301,13 @@ function AddLiquidity() {
   }
 
   async function handleChainChange(selectedChain: Option) {
-    const newChain = chains.find(
+    const { chainId } = chains.find(
       chainObj => chainObj.chainId === selectedChain.id,
     )!;
-    setChain(selectedChain);
-
-    if (walletProvider) {
-      const res = switchNetwork(walletProvider, newChain);
-      if (res === null) {
-        changeSelectedNetwork(newChain);
-      }
-    } else {
-      changeSelectedNetwork(newChain);
-    }
+    const [{ symbol: tokenSymbol }] = tokens.filter(
+      tokenObj => tokenObj[chainId],
+    );
+    navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
   }
 
   async function handleLiquidityAmountChange(
@@ -426,7 +434,7 @@ function AddLiquidity() {
     if (
       !accounts ||
       !selectedTokenAddress ||
-      !selectedNetwork ||
+      !chain ||
       !liquidityProvidersAddress
     ) {
       return;
@@ -434,7 +442,7 @@ function AddLiquidity() {
 
     const tokenAllowance = await getTokenAllowance(
       accounts[0],
-      new ethers.providers.JsonRpcProvider(selectedNetwork.rpcUrl),
+      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
       liquidityProvidersAddress,
       selectedTokenAddress,
     );
@@ -465,12 +473,12 @@ function AddLiquidity() {
 
   return (
     <>
-      {chain && selectedToken && liquidityAmount ? (
+      {selectedChain && selectedToken && liquidityAmount ? (
         <ApprovalModal
           executeTokenApproval={executeTokenApproval}
           isVisible={isApprovalModalVisible}
           onClose={hideApprovalModal}
-          selectedChainName={chain.name}
+          selectedChainName={selectedChain.name}
           selectedTokenName={selectedToken.name}
           transferAmount={parseFloat(liquidityAmount)}
         />
@@ -509,7 +517,7 @@ function AddLiquidity() {
               />
               <Select
                 options={chainOptions}
-                selected={chain}
+                selected={selectedChain}
                 setSelected={chainOption => {
                   handleChainChange(chainOption);
                   reset();

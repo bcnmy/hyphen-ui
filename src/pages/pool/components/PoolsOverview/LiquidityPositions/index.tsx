@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import AssetOverview from '../../AssetOverview';
 import { useWalletProvider } from 'context/WalletProvider';
@@ -7,8 +7,11 @@ import useLPToken from 'hooks/contracts/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
 import { useEffect, useState } from 'react';
 import { useChains } from 'context/Chains';
+import { chains } from 'config/chains';
+import tokens from 'config/tokens';
 
 function LiquidityPositions() {
+  const navigate = useNavigate();
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const { selectedNetwork } = useChains()!;
 
@@ -36,6 +39,15 @@ function LiquidityPositions() {
     remove();
     refetch();
   }, [refetch, remove, selectedNetwork]);
+
+  function handleAddLiquidityClick() {
+    const [{ chainId }] = chains;
+    const [{ symbol: tokenSymbol }] = tokens.filter(
+      tokenObj => tokenObj[chainId],
+    );
+
+    navigate(`add-liquidity/${chainId}/${tokenSymbol}`);
+  }
 
   return (
     <article className="mb-2.5 rounded-10 bg-white p-2.5">
@@ -67,12 +79,12 @@ function LiquidityPositions() {
 
         <h2 className="text-xl text-hyphen-purple">Your Positions</h2>
 
-        <Link
-          to="add-liquidity"
+        <button
           className="absolute right-10 flex h-9 w-28 items-center justify-center rounded-xl bg-hyphen-purple text-xs text-white"
+          onClick={handleAddLiquidityClick}
         >
           + Add Liquidity
-        </Link>
+        </button>
       </header>
 
       {!isLoading ? (

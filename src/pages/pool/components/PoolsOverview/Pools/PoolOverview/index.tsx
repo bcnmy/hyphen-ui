@@ -9,6 +9,7 @@ import ProgressBar from 'components/ProgressBar';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
+import { useNavigate } from 'react-router-dom';
 
 interface IPoolOverview {
   apy: number;
@@ -19,6 +20,7 @@ interface IPoolOverview {
 }
 
 function PoolOverview({ apy, chain, feeApy, rewardApy, token }: IPoolOverview) {
+  const navigate = useNavigate();
   const { address, chainColor, decimal, symbol, tokenImage } = token;
 
   const { getTotalLiquidity } = useLiquidityProviders(chain);
@@ -52,10 +54,15 @@ function PoolOverview({ apy, chain, feeApy, rewardApy, token }: IPoolOverview) {
       ? Number.parseFloat(ethers.utils.formatUnits(tokenTotalCap, decimal))
       : tokenTotalCap;
 
+  function handlePoolOverviewClick() {
+    navigate(`add-liquidity/${chain.chainId}/${symbol}`);
+  }
+
   return (
     <section
       className="relative flex h-37.5 w-full cursor-pointer items-center justify-center text-hyphen-gray-400"
       style={{ backgroundColor: chainColor }}
+      onClick={handlePoolOverviewClick}
     >
       <div className="absolute left-12.5 flex items-center">
         <img src={tokenImage} alt={symbol} className="mr-2 h-8 w-8" />

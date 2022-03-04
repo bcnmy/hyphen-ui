@@ -67,7 +67,7 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
           label={'source'}
         />
       </div>
-      <div className="mb-1.5 flex items-end">
+      <div className="mb-3 flex items-end">
         <button
           className="rounded-full border border-hyphen-purple/10 bg-hyphen-purple bg-opacity-20 p-2 text-hyphen-purple transition-all"
           onClick={switchChains}

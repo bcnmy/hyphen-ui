@@ -169,10 +169,9 @@ function AssetOverview({
         ) / 100
       : 0;
 
-  const apy = 81.19;
   const unclaimedFees =
-    suppliedLiquidity && tokenAmount
-      ? formattedSuppliedLiquidity - formattedTokenAmount
+    formattedSuppliedLiquidity && formattedTokenAmount
+      ? formattedTokenAmount - formattedSuppliedLiquidity
       : 0;
 
   function handleAssetOverviewClick() {
@@ -232,7 +231,8 @@ function AssetOverview({
           </div>
         </div>
         <span className="font-mono text-xs">
-          Unclaimed Fees: ~ ${unclaimedFees}
+          Unclaimed Fees: ~ {unclaimedFees > 0 ? unclaimedFees.toFixed(5) : 0}{' '}
+          {tokenSymbol}
         </span>
       </div>
     </section>

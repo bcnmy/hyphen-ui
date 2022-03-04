@@ -17,13 +17,15 @@ import { useState } from 'react';
 import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
 import Skeleton from 'react-loading-skeleton';
+import switchNetwork from 'utils/switchNetwork';
 
 function ManagePosition() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { connect, isLoggedIn } = useWalletProvider()!;
+  const { connect, currentChainId, isLoggedIn, walletProvider } =
+    useWalletProvider()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
@@ -173,13 +175,16 @@ function ManagePosition() {
     setSliderValue(0);
   }
 
+  function handleNetworkChange() {
+    if (!walletProvider || !chain) return;
+    switchNetwork(walletProvider, chain);
+  }
+
   function handleIncreaseLiquidity() {
     navigate(`../increase-liquidity/${chainId}/${positionId}`);
   }
 
-  async function handleLiquidityAmountChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleLiquidityAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
     const regExp = /^((\d+)?(\.\d{0,3})?)$/;
     const newLiquidityRemovalAmount = e.target.value;
     const isInputValid = regExp.test(newLiquidityRemovalAmount);
@@ -336,17 +341,28 @@ function ManagePosition() {
           />
 
           {isLoggedIn ? (
-            <button
-              className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-              disabled={isDataLoading || isRemovalAmountGtSuppliedLiquidity}
-              onClick={handleConfirmRemovalClick}
-            >
-              {isRemovalAmountGtSuppliedLiquidity
-                ? 'Amount more than supplied liquidity'
-                : removeLiquidityLoading
-                ? 'Removing Liquidity'
-                : 'Confirm Removal'}
-            </button>
+            <>
+              {currentChainId === chain?.chainId ? (
+                <button
+                  className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                  disabled={isDataLoading || isRemovalAmountGtSuppliedLiquidity}
+                  onClick={handleConfirmRemovalClick}
+                >
+                  {isRemovalAmountGtSuppliedLiquidity
+                    ? 'Amount more than supplied liquidity'
+                    : removeLiquidityLoading
+                    ? 'Removing Liquidity'
+                    : 'Confirm Removal'}
+                </button>
+              ) : (
+                <button
+                  className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                  onClick={handleNetworkChange}
+                >
+                  Switch to {chain?.name}
+                </button>
+              )}
+            </>
           ) : (
             <button
               className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
@@ -374,24 +390,44 @@ function ManagePosition() {
             {unclaimedFees}
           </div>
 
-          <button
-            className="mb-[3.125rem] flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-            disabled={unclaimedFees === 0}
-            onClick={handleClaimFeeClick}
-          >
-            {unclaimedFees === 0 ? (
-              'No fees to claim'
-            ) : (
-              <>
-                <img
-                  src={collectFeesIcon}
-                  alt="Collect fees"
-                  className="mr-1"
-                />
-                Collect Fees
-              </>
-            )}
-          </button>
+          {isLoggedIn ? (
+            <>
+              {currentChainId === chain?.chainId ? (
+                <button
+                  className="mb-[3.125rem] flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                  disabled={unclaimedFees === 0}
+                  onClick={handleClaimFeeClick}
+                >
+                  {unclaimedFees === 0 ? (
+                    'No fees to claim'
+                  ) : (
+                    <>
+                      <img
+                        src={collectFeesIcon}
+                        alt="Collect fees"
+                        className="mr-1"
+                      />
+                      Collect Fees
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                  onClick={handleNetworkChange}
+                >
+                  Switch to {chain?.name}
+                </button>
+              )}
+            </>
+          ) : (
+            <button
+              className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+              onClick={connect}
+            >
+              Connect Your Wallet
+            </button>
+          )}
 
           <LiquidityInfo />
         </div>

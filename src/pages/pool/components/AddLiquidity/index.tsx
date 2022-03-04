@@ -302,7 +302,7 @@ function AddLiquidity() {
     updatePoolShare('0');
   }
 
-  async function handleChainChange(selectedChain: Option) {
+  function handleChainChange(selectedChain: Option) {
     const { chainId } = chains.find(
       chainObj => chainObj.chainId === selectedChain.id,
     )!;
@@ -317,9 +317,7 @@ function AddLiquidity() {
     switchNetwork(walletProvider, chain);
   }
 
-  async function handleLiquidityAmountChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleLiquidityAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
     const regExp = /^((\d+)?(\.\d{0,3})?)$/;
     const newLiquidityAmount = e.target.value;
     const isInputValid = regExp.test(newLiquidityAmount);

@@ -18,13 +18,15 @@ import AssetOverview from '../AssetOverview';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
+import switchNetwork from 'utils/switchNetwork';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
+  const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
+    useWalletProvider()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
@@ -212,9 +214,12 @@ function IncreaseLiquidity() {
     updatePoolShare('0');
   }
 
-  async function handleLiquidityAmountChange(
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleNetworkChange() {
+    if (!walletProvider || !chain) return;
+    switchNetwork(walletProvider, chain);
+  }
+
+  function handleLiquidityAmountChange(e: React.ChangeEvent<HTMLInputElement>) {
     const regExp = /^((\d+)?(\.\d{0,3})?)$/;
     const newLiquidityIncreaseAmount = e.target.value;
     const isInputValid = regExp.test(newLiquidityIncreaseAmount);
@@ -398,28 +403,39 @@ function IncreaseLiquidity() {
           />
 
           {isLoggedIn ? (
-            <button
-              className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-              disabled={
-                isDataLoading ||
-                liquidityIncreaseAmount === '' ||
-                isLiquidityAmountGtWalletBalance ||
-                isLiquidityAmountGtLiquidityBalance
-              }
-              onClick={handleConfirmSupplyClick}
-            >
-              {!liquidityBalance
-                ? 'Getting your balance'
-                : liquidityIncreaseAmount === ''
-                ? 'Enter Amount'
-                : isLiquidityAmountGtWalletBalance
-                ? 'Insufficient wallet balance'
-                : isLiquidityAmountGtLiquidityBalance
-                ? 'This amount exceeds your wallet cap'
-                : increaseLiquidityLoading
-                ? 'Increasing Liquidity'
-                : 'Confirm Supply'}
-            </button>
+            <>
+              {currentChainId === chain?.chainId ? (
+                <button
+                  className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                  disabled={
+                    isDataLoading ||
+                    liquidityIncreaseAmount === '' ||
+                    isLiquidityAmountGtWalletBalance ||
+                    isLiquidityAmountGtLiquidityBalance
+                  }
+                  onClick={handleConfirmSupplyClick}
+                >
+                  {!liquidityBalance
+                    ? 'Getting your balance'
+                    : liquidityIncreaseAmount === ''
+                    ? 'Enter Amount'
+                    : isLiquidityAmountGtWalletBalance
+                    ? 'Insufficient wallet balance'
+                    : isLiquidityAmountGtLiquidityBalance
+                    ? 'This amount exceeds your wallet cap'
+                    : increaseLiquidityLoading
+                    ? 'Increasing Liquidity'
+                    : 'Confirm Supply'}
+                </button>
+              ) : (
+                <button
+                  className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                  onClick={handleNetworkChange}
+                >
+                  Switch to {chain?.name}
+                </button>
+              )}
+            </>
           ) : (
             <button
               className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"

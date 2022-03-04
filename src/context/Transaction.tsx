@@ -252,7 +252,6 @@ const TransactionProvider: React.FC = props => {
       if (!transferFee) {
         return;
       }
-
       let transferFeePerc = transferFee.toString() / BASE_DIVISOR;
 
       let lpFeeAmountRaw = (transferFeePerc * transferAmount) / 100;

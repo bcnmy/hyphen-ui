@@ -7,7 +7,7 @@ export const GOERLI: ChainConfig = {
   image: ethIcon,
   subText: "Ethereum testnet",
   chainId: 5,
-  rpcUrl: "https://goerli.infura.io/v3/d126f392798444609246423b06116c77",
+  rpcUrl: "https://eth-goerli.alchemyapi.io/v2/meF8z-onSwabyq4wsaR0ApbqV9vrYDpn",
   currency: "GETH",
   // currency: "Goerli ETH",
   nativeToken: NATIVE_ADDRESS,

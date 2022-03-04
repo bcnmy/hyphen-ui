@@ -22,5 +22,7 @@ export const MUMBAI: ChainConfig = {
     '0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c',
   networkAgnosticTransfer: true, // Set this to enable network agnostic gasless transactions
   graphURL: 'https://api.thegraph.com/subgraphs/name/divyan73/lpmanagermumbai',
+  v2GraphURL:
+    'https://api.thegraph.com/subgraphs/name/shantanu-bico/hyphenv2-liquidity-pool-mumbai',
   explorerUrl: 'https://mumbai.polygonscan.com',
 };

@@ -1,6 +1,7 @@
 import { BigNumber, ethers } from 'ethers';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
+import { request, gql } from 'graphql-request';
 import tokens from 'config/tokens';
 import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
@@ -8,6 +9,8 @@ import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
 import { useChains } from 'context/Chains';
+import { HiInformationCircle } from 'react-icons/hi';
+import CustomTooltip from 'components/CustomTooltip';
 
 interface IAssetOverview {
   chainId?: string;
@@ -35,6 +38,8 @@ function AssetOverview({
         return chainObj.chainId === Number.parseInt(chainId);
       })
     : undefined;
+
+  const v2GraphEndpoint = chain?.v2GraphURL;
 
   const { getPositionMetadata } = useLPToken(chain);
   const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders(chain);
@@ -68,6 +73,38 @@ function AssetOverview({
       enabled: !!(shares && tokenAddress),
     },
   );
+
+  const { data: feeAPY } = useQuery(
+    ['apy', tokenAddress],
+    async () => {
+      if (!v2GraphEndpoint || !tokenAddress) return;
+
+      const {
+        rollingApyFor24Hour: { apy: feeAPY },
+      } = await request(
+        v2GraphEndpoint,
+        gql`
+          query {
+            rollingApyFor24Hour(
+              id: "0"
+              where: { tokenAddress: $tokenAddress }
+            ) {
+              apy
+            }
+          }
+        `,
+      );
+      return feeAPY;
+    },
+    {
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
+    },
+  );
+
+  const rewardAPY = 0;
+  const feeAPYAsFloat = Number.parseFloat(Number.parseFloat(feeAPY).toFixed(2));
+  const APY = rewardAPY + feeAPYAsFloat;
 
   const token =
     chain && tokenAddress
@@ -176,8 +213,19 @@ function AssetOverview({
       <div className="flex flex-col items-end">
         <span className="mb-2.5 text-xxs font-bold uppercase ">APY</span>
         <div className="mb-5">
-          <div className="flex flex-col">
-            <span className="font-mono text-2xl">{apy}%</span>
+          <div className="flex flex-col items-end">
+            <div className="flex items-center">
+              <span className="font-mono text-2xl">{APY ? APY : '...'}%</span>
+              <HiInformationCircle
+                className="ml-1 h-5 w-5 text-hyphen-gray-400"
+                data-tip
+                data-for="apy"
+              />
+              <CustomTooltip id="apy">
+                <p>Reward APY: {rewardAPY ? rewardAPY : '...'}%</p>
+                <p>Fee APY: {feeAPYAsFloat ? feeAPYAsFloat : '...'}%</p>
+              </CustomTooltip>
+            </div>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
               Annualized
             </span>

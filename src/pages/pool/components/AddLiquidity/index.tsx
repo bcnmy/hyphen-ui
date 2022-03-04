@@ -12,6 +12,7 @@ import getTokenBalance from 'utils/getTokenBalance';
 import { BigNumber, ethers } from 'ethers';
 import Skeleton from 'react-loading-skeleton';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { request, gql } from 'graphql-request';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { NATIVE_ADDRESS } from 'config/constants';
@@ -56,6 +57,7 @@ function AddLiquidity() {
   const chain = selectedChain
     ? chains.find(chainObj => chainObj.chainId === selectedChain.id)
     : undefined;
+  const v2GraphEndpoint = chain?.v2GraphURL;
 
   // Liquidity Contracts
   const liquidityProvidersAddress = chain
@@ -111,7 +113,7 @@ function AddLiquidity() {
     showModal: showApprovalModal,
   } = useModal();
 
-  // Queries & Mutations
+  // Queries
   const { data: totalLiquidity } = useQuery(
     ['totalLiquidity', selectedTokenAddress],
     () => getTotalLiquidity(selectedTokenAddress),
@@ -139,6 +141,35 @@ function AddLiquidity() {
     },
   );
 
+  const { data: feeAPY } = useQuery(
+    ['apy', selectedTokenAddress],
+    async () => {
+      if (!v2GraphEndpoint || !selectedTokenAddress) return;
+
+      const {
+        rollingApyFor24Hour: { apy: feeAPY },
+      } = await request(
+        v2GraphEndpoint,
+        gql`
+          query {
+            rollingApyFor24Hour(
+              id: "0"
+              where: { tokenAddress: $selectedTokenAddress }
+            ) {
+              apy
+            }
+          }
+        `,
+      );
+      return feeAPY;
+    },
+    {
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!selectedTokenAddress,
+    },
+  );
+
+  // Mutations
   const {
     isLoading: approveTokenLoading,
     isSuccess: approveTokenSuccess,
@@ -209,6 +240,10 @@ function AddLiquidity() {
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
       : tokenTotalCap;
+
+  const rewardAPY = 0;
+  const feeAPYAsFloat = Number.parseFloat(Number.parseFloat(feeAPY).toFixed(2));
+  const APY = rewardAPY + feeAPYAsFloat;
 
   const isDataLoading =
     !liquidityBalance || approveTokenLoading || addLiquidityLoading;
@@ -636,7 +671,7 @@ function AddLiquidity() {
                   APY
                 </span>
                 <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                  81.19%
+                  {APY ? APY : '...'}%
                 </div>
               </div>
               <div className="flex flex-col">

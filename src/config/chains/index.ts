@@ -27,6 +27,7 @@ export type ChainConfig = {
   assetSentTopicId: string;
   networkAgnosticTransfer: boolean;
   graphURL: string;
+  v2GraphURL?: string;
   explorerUrl: string;
 };
 

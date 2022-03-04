@@ -39,12 +39,9 @@ function Pools() {
 
                   return tokenObj ? (
                     <PoolOverview
-                      apy={83}
-                      chain={chainObj}
-                      feeApy={20}
-                      rewardApy={63}
-                      token={tokenObj}
                       key={`${chainObj.chainId}-${tokenSymbol}`}
+                      chain={chainObj}
+                      token={tokenObj}
                     />
                   ) : null;
                 });

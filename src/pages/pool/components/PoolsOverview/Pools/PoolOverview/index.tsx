@@ -1,5 +1,6 @@
 import { ethers } from 'ethers';
 import { useQuery } from 'react-query';
+import { request, gql } from 'graphql-request';
 import Skeleton from 'react-loading-skeleton';
 import { HiInformationCircle } from 'react-icons/hi';
 import { ChainConfig, chains } from 'config/chains';
@@ -12,16 +13,14 @@ import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 
 interface IPoolOverview {
-  apy: number;
   chain: ChainConfig;
-  feeApy: number;
-  rewardApy: number;
   token: any;
 }
 
-function PoolOverview({ apy, chain, feeApy, rewardApy, token }: IPoolOverview) {
+function PoolOverview({ chain, token }: IPoolOverview) {
   const navigate = useNavigate();
   const { address, chainColor, decimal, symbol, tokenImage } = token;
+  const { v2GraphURL: v2GraphEndpoint } = chain;
 
   const { getTotalLiquidity } = useLiquidityProviders(chain);
   const { getTokenTotalCap } = useWhitelistPeriodManager(chain);
@@ -43,6 +42,35 @@ function PoolOverview({ apy, chain, feeApy, rewardApy, token }: IPoolOverview) {
       enabled: !!address,
     },
   );
+
+  const { data: feeAPY } = useQuery(
+    ['apy', address],
+    async () => {
+      if (!v2GraphEndpoint || !address) return;
+
+      const {
+        rollingApyFor24Hour: { apy: feeAPY },
+      } = await request(
+        v2GraphEndpoint,
+        gql`
+          query {
+            rollingApyFor24Hour(id: "0", where: { tokenAddress: $address }) {
+              apy
+            }
+          }
+        `,
+      );
+      return feeAPY;
+    },
+    {
+      // Execute only when tokenAddress is available.
+      enabled: !!address,
+    },
+  );
+
+  const rewardAPY = 0;
+  const feeAPYAsFloat = Number.parseFloat(Number.parseFloat(feeAPY).toFixed(2));
+  const APY = rewardAPY + feeAPYAsFloat;
 
   const formattedTotalLiquidity =
     totalLiquidity && decimal
@@ -75,15 +103,15 @@ function PoolOverview({ apy, chain, feeApy, rewardApy, token }: IPoolOverview) {
       </div>
       <div className="flex flex-col">
         <div className="flex items-center">
-          <span className="font-mono text-2xl">{apy}%</span>
+          <span className="font-mono text-2xl">{APY ? APY : '...'}%</span>
           <HiInformationCircle
-            className="ml-1 h-4 w-4 text-gray-500"
+            className="ml-1 h-5 w-5 text-hyphen-gray-400"
             data-tip
             data-for="apy"
           />
           <CustomTooltip id="apy">
-            <p>Reward APY: {rewardApy}%</p>
-            <p>Fee APY: {feeApy}%</p>
+            <p>Reward APY: {rewardAPY ? rewardAPY : '...'}%</p>
+            <p>Fee APY: {feeAPY ? feeAPY : '...'}%</p>
           </CustomTooltip>
         </div>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

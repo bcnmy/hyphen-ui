@@ -88,10 +88,10 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                   <div className="flex items-center">
                     <HiInformationCircle
                       data-tip
-                      data-for="lpFee"
+                      data-for="reward-fee"
                       className="mr-2"
                     />
-                    <CustomTooltip id="lpFee">
+                    <CustomTooltip id="reward-fee">
                       <span>
                         Reward amount for filling up the pool close to supplied
                         liquidity

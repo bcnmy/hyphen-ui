@@ -48,6 +48,7 @@ export interface ITransactionDetails {
   fromChainExplorerUrl: string;
   fromChainLabel: string;
   lpFee: string;
+  rewardAmount: string;
   receivedTokenAddress: string;
   receivedTokenSymbol: string;
   receiver: string;

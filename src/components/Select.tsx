@@ -72,7 +72,7 @@ export const Select: React.FC<ISelectProps> = ({
         <div className="relative mt-2 h-15">
           <Listbox.Button
             className={twMerge(
-              'relative h-full w-full cursor-default cursor-pointer rounded-2.5 border bg-white py-2 pl-4 pr-10 text-left focus:outline-none',
+              'relative h-full w-full cursor-pointer rounded-2.5 border bg-white py-2 pl-4 pr-10 text-left focus:outline-none',
               disabled && 'cursor-not-allowed bg-gray-200 text-gray-900/80',
             )}
           >

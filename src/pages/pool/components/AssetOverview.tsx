@@ -8,7 +8,6 @@ import { chains } from 'config/chains';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
-import { useChains } from 'context/Chains';
 import { HiInformationCircle } from 'react-icons/hi';
 import CustomTooltip from 'components/CustomTooltip';
 
@@ -26,8 +25,7 @@ function AssetOverview({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { currentChainId, isLoggedIn } = useWalletProvider()!;
-  const { selectedNetwork } = useChains()!;
+  const { currentChainId } = useWalletProvider()!;
 
   const chain = currentChainId
     ? chains.find(chainObj => {

@@ -57,6 +57,7 @@ interface ITransactionContext {
         transactionFeeProcessedString: string;
         amountToGetProcessedString: string;
         rewardAmountString: string | undefined;
+        transferFee: string | undefined;
       };
   transactionAmountValidationErrors: ValidationErrors[];
   // receiver address
@@ -244,11 +245,14 @@ const TransactionProvider: React.FC = props => {
       let tokenDecimal = selectedToken[toChain.chainId].decimal;
       let rawTransferAmount = transferAmount * Math.pow(10, tokenDecimal);
 
-      let transferFee = await getTransferFee(tokenAddress, rawTransferAmount.toString());
-      if(!transferFee) {
+      let transferFee = await getTransferFee(
+        tokenAddress,
+        rawTransferAmount.toString(),
+      );
+      if (!transferFee) {
         return;
       }
-      debugger;
+
       let transferFeePerc = transferFee.toString() / BASE_DIVISOR;
 
       let lpFeeAmountRaw = (transferFeePerc * transferAmount) / 100;
@@ -300,10 +304,13 @@ const TransactionProvider: React.FC = props => {
       let rewardAmountString;
       let tokenAddressFromChain = selectedToken[fromChain.chainId].address;
 
-      let rewardAmount = await getRewardAmount(tokenAddressFromChain, rawTransferAmount.toString());
-      debugger;
+      let rewardAmount = await getRewardAmount(
+        tokenAddressFromChain,
+        rawTransferAmount.toString(),
+      );
+
       console.log('************** REWARD AMOUNT  *********', rewardAmount);
-      if (rewardAmount != undefined && rewardAmount.gt && rewardAmount.gt(0)) {
+      if (rewardAmount !== undefined && rewardAmount.gt && rewardAmount.gt(0)) {
         rewardAmount = formatRawEthValue(rewardAmount.toString(), decimal);
         rewardAmountString = toFixed(rewardAmount, fixedDecimalPoint);
       }
@@ -347,11 +354,19 @@ const TransactionProvider: React.FC = props => {
         lpFeeProcessedString,
         transactionFeeProcessedString,
         amountToGetProcessedString,
+        transferFee,
       };
     } catch (error) {
       console.log(error);
     }
-  }, [fromChain, toChain, selectedToken, transferAmount]);
+  }, [
+    fromChain,
+    getRewardAmount,
+    getTransferFee,
+    selectedToken,
+    toChain,
+    transferAmount,
+  ]);
 
   const {
     execute: fetchTransactionFee,

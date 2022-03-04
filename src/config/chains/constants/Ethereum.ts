@@ -7,7 +7,7 @@ export const ETHEREUM: ChainConfig = {
   image: ethIcon,
   subText: "Ethereum Mainnet",
   chainId: 1,
-  rpcUrl: "https://mainnet.infura.io/v3/d126f392798444609246423b06116c77",
+  rpcUrl: "https://eth-mainnet.alchemyapi.io/v2/wO7WAmNPAsZFhRlpd-xYjM-5Pl5Dx8-G",
   currency: "ETH",
   nativeToken: NATIVE_ADDRESS,
   nativeDecimal: 18,

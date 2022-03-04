@@ -158,12 +158,15 @@ function ManagePosition() {
       : tokenTotalCap;
 
   const unclaimedFees =
-    formattedSuppliedLiquidity && formattedTokenAmount
-      ? formattedSuppliedLiquidity - formattedTokenAmount
+    formattedTokenAmount && formattedSuppliedLiquidity
+      ? formattedTokenAmount - formattedSuppliedLiquidity
       : 0;
 
   const isDataLoading =
-    !isLoggedIn || !formattedSuppliedLiquidity || removeLiquidityLoading;
+    !isLoggedIn ||
+    !formattedSuppliedLiquidity ||
+    removeLiquidityLoading ||
+    claimFeeLoading;
 
   const isRemovalAmountGtSuppliedLiquidity =
     liquidityRemovalAmount && formattedSuppliedLiquidity
@@ -398,7 +401,7 @@ function ManagePosition() {
             Unclaimed Fees
           </label>
           <div className="mt-2 mb-8 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-            {unclaimedFees}
+            {unclaimedFees > 0 ? unclaimedFees.toFixed(5) : 0} {token?.symbol}
           </div>
 
           {isLoggedIn ? (

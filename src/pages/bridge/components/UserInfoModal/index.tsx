@@ -103,8 +103,6 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
     },
   );
 
-  console.log(data);
-
   // useEffect(() => {
   //   function getTokenInfo(
   //     amount: number,

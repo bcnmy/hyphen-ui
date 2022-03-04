@@ -24,8 +24,6 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
     ? isToChainEthereum(toChain.chainId)
     : false;
 
-  console.log(fetchTransactionFeeStatus);
-
   return (
     <Transition
       in={

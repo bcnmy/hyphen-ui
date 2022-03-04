@@ -1,5 +1,5 @@
-import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, HTMLAttributes } from "react";
+import { Dialog, Transition } from '@headlessui/react';
+import React, { Fragment, HTMLAttributes } from 'react';
 
 interface IModalProps extends HTMLAttributes<HTMLDivElement> {
   isVisible: boolean;
@@ -27,7 +27,7 @@ const Modal: React.FunctionComponent<IModalProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Dialog.Overlay className="absolute inset-0 bg-black bg-opacity-40 firefox:bg-opacity-70 backdrop-blur-[2px]" />
+          <Dialog.Overlay className="absolute inset-0 bg-black bg-opacity-40 backdrop-blur-[2px] firefox:bg-opacity-70" />
         </Transition.Child>
         <Transition.Child
           as={Fragment}
@@ -38,8 +38,8 @@ const Modal: React.FunctionComponent<IModalProps> = ({
           leaveFrom="opacity-100 scale-100"
           leaveTo="opacity-0 scale-95"
         >
-          <div className="flex-grow max-w-lg flex flex-col">
-            <div className="my-auto relative">{children}</div>
+          <div className="flex max-w-lg flex-grow flex-col">
+            <div className="relative my-auto">{children}</div>
           </div>
         </Transition.Child>
       </Dialog>

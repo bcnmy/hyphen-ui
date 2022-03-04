@@ -371,13 +371,17 @@ function AddLiquidity() {
           newLiquidityAmount,
           tokenDecimals,
         );
-        let rawLiquidityAmountHexString = rawLiquidityAmount.toHexString();
 
-        if (selectedTokenAllowance.lt(rawLiquidityAmountHexString)) {
+        if (selectedTokenAllowance.lt(rawLiquidityAmount)) {
           setIsSelectedTokenApproved(false);
         } else {
           setIsSelectedTokenApproved(true);
         }
+      } else if (
+        newLiquidityAmount === '' &&
+        selectedTokenAddress !== NATIVE_ADDRESS
+      ) {
+        setIsSelectedTokenApproved(undefined);
       } else {
         setIsSelectedTokenApproved(true);
       }
@@ -407,13 +411,17 @@ function AddLiquidity() {
           newLiquidityAmount,
           tokenDecimals,
         );
-        let rawLiquidityAmountHexString = rawLiquidityAmount.toHexString();
 
-        if (selectedTokenAllowance.lt(rawLiquidityAmountHexString)) {
+        if (selectedTokenAllowance.lt(rawLiquidityAmount)) {
           setIsSelectedTokenApproved(false);
         } else {
           setIsSelectedTokenApproved(true);
         }
+      } else if (
+        newLiquidityAmount === '' &&
+        selectedTokenAddress !== NATIVE_ADDRESS
+      ) {
+        setIsSelectedTokenApproved(undefined);
       } else {
         setIsSelectedTokenApproved(true);
       }

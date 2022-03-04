@@ -248,7 +248,6 @@ const TransactionProvider: React.FC = props => {
       if(!transferFee) {
         return;
       }
-      debugger;
       let transferFeePerc = transferFee.toString() / BASE_DIVISOR;
 
       let lpFeeAmountRaw = (transferFeePerc * transferAmount) / 100;
@@ -301,7 +300,7 @@ const TransactionProvider: React.FC = props => {
       let tokenAddressFromChain = selectedToken[fromChain.chainId].address;
 
       let rewardAmount = await getRewardAmount(tokenAddressFromChain, rawTransferAmount.toString());
-      debugger;
+
       console.log('************** REWARD AMOUNT  *********', rewardAmount);
       if (rewardAmount != undefined && rewardAmount.gt && rewardAmount.gt(0)) {
         rewardAmount = formatRawEthValue(rewardAmount.toString(), decimal);

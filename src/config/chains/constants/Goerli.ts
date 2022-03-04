@@ -8,7 +8,7 @@ export const GOERLI: ChainConfig = {
   subText: 'Ethereum testnet',
   chainId: 5,
   chainColor: '#C4C4C41A',
-  rpcUrl: 'https://goerli.infura.io/v3/d126f392798444609246423b06116c77',
+  rpcUrl: ' https://rpc.goerli.mudit.blog/',
   currency: 'GETH',
   // currency: "Goerli ETH",
   nativeToken: NATIVE_ADDRESS,

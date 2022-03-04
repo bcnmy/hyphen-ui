@@ -107,11 +107,11 @@ function PoolOverview({ chain, token }: IPoolOverview) {
           <HiInformationCircle
             className="ml-1 h-5 w-5 text-hyphen-gray-400"
             data-tip
-            data-for="apy"
+            data-for={`${chain.name}-${symbol}-apy`}
           />
-          <CustomTooltip id="apy">
-            <p>Reward APY: {rewardAPY ? rewardAPY : '...'}%</p>
-            <p>Fee APY: {feeAPY ? feeAPY : '...'}%</p>
+          <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
+            <p>Reward APY: {rewardAPY}%</p>
+            <p>Fee APY: {feeAPYAsFloat ? feeAPYAsFloat : '...'}%</p>
           </CustomTooltip>
         </div>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

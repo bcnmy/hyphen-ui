@@ -10,7 +10,8 @@ const chainPairs = [
   [AVALANCHE, ETHEREUM],
   [AVALANCHE, POLYGON],
   [ETHEREUM, POLYGON],
-  [FUJI, RINKEBY],
+  [FUJI, GOERLI],
+  [FUJI, MUMBAI],
   [GOERLI, MUMBAI],
 ];
 

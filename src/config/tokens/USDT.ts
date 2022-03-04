@@ -46,4 +46,12 @@ export const USDT: TokenConfig = {
     symbol: "USDT",
     chainColor: ETHEREUM.chainColor
   },
+  [FUJI.chainId]: {
+    address: '0xB4E0F6FEF81BdFea0856bB846789985c9CFf7e85',
+    transferOverhead: 127000,
+    decimal: 18,
+    symbol: 'USDT',
+    fixedDecimalPoint: 5,
+    chainColor: FUJI.chainColor,
+  }
 };

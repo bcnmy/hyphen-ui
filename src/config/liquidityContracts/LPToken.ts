@@ -6,12 +6,12 @@ import { LiquidityContractConfig } from '.';
 export const LPToken: LiquidityContractConfig = {
   name: 'LPToken',
   [MUMBAI.chainId]: {
-    address: '0x97fd31fBbE132067f017D0ea1c416A4eb7136917',
+    address: '0x48E2577e5f781CBb3374912a31b1aa39c9E11d39',
   },
   [GOERLI.chainId]: {
-    address: '0xD89Dff0b2BE1D7992A2E271931c54367F46DDba1',
+    address: '0x4644FAB4089f1241899BE7007E9399B06A399972',
   },
   [FUJI.chainId]: {
-    address: '0x8c76c0fE215e6116BdE4f0b8eeC98862b48C8A8F',
+    address: '0x3C30506d3cBfa117d007a8c9813Ff93b3Bffa357',
   },
 };

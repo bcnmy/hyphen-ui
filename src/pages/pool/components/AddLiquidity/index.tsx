@@ -616,7 +616,7 @@ function AddLiquidity() {
                   {liquidityAmount === '' && !isSelectedTokenApproved
                     ? 'Enter amount to see approval'
                     : approveTokenLoading
-                    ? 'Approving Token...'
+                    ? 'Approving Token'
                     : isSelectedTokenApproved
                     ? `${selectedToken?.name} Approved`
                     : `Approve ${selectedToken?.name}`}

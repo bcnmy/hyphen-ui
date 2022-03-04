@@ -6,12 +6,12 @@ import { LiquidityContractConfig } from '.';
 export const LiquidityProviders: LiquidityContractConfig = {
   name: 'LiquidityProviders',
   [MUMBAI.chainId]: {
-    address: '0x9a0D29104729a46334618c5c93B995d6F76Bfd7c',
+    address: '0xFD210117F5b9d98Eb710295E30FFF77dF2d80002',
   },
   [GOERLI.chainId]: {
-    address: '0x16E6f52B5e01Ad29DB03f1A374a984fb8Ea8Ed40',
+    address: '0x658D3F3076e971a74b2712Cf6e9B951BdB2f3fe8',
   },
   [FUJI.chainId]: {
-    address: '0xa4d4D30c4C9ae6893e75445A26123AAE869b6435',
+    address: '0x17D42A784928a8168a871fA627bb1e4023D25C2A',
   },
 };

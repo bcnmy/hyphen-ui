@@ -6,12 +6,12 @@ import { LiquidityContractConfig } from '.';
 export const LiquidityPool: LiquidityContractConfig = {
   name: 'LiquidityPool',
   [MUMBAI.chainId]: {
-    address: '0xFFe2aB07484f91a9E48a71F7Cd9a8C9E6911eB56',
+    address: '0xDe4e4CDa407Eee8d9E76261a1F2d229A572743dE',
   },
   [GOERLI.chainId]: {
-    address: '0x55EA70A11E7AcE4C21225Fb84aDA36467622f6d7',
+    address: '0x8033Bd14c4C114C14C910fe05Ff13DB4C481a85D',
   },
   [FUJI.chainId]: {
-    address: '0x4C943bA53DDAb515D4E8fe968CecE3BBB0f0C738',
+    address: '0xB726675394b2dDeE2C897ad31a62C7545Ad7C68D',
   },
 };

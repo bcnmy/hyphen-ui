@@ -311,7 +311,18 @@ function ManagePosition() {
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
-              Balance: {formattedSuppliedLiquidity || '...'} {token?.symbol}
+              Balance:{' '}
+              {formattedSuppliedLiquidity ? (
+                formattedSuppliedLiquidity
+              ) : (
+                <Skeleton
+                  baseColor="#615ccd20"
+                  enableAnimation
+                  highlightColor="#615ccd05"
+                  className="!mx-1 !w-11"
+                />
+              )}{' '}
+              {token?.symbol}
               <button
                 className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}

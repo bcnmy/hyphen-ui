@@ -84,7 +84,7 @@ function useLiquidityProviders(chain: ChainConfig | undefined) {
     (tokenAddress: string | undefined) => {
       if (!liquidityProvidersContract) return;
 
-      return liquidityProvidersContract.totalReserve(tokenAddress);
+      return liquidityProvidersContract.totalLiquidity(tokenAddress);
     },
     [liquidityProvidersContract],
   );

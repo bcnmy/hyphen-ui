@@ -219,10 +219,10 @@ function AssetOverview({
               <HiInformationCircle
                 className="ml-1 h-5 w-5 text-hyphen-gray-400"
                 data-tip
-                data-for="apy"
+                data-for={`${positionId}-apy`}
               />
-              <CustomTooltip id="apy">
-                <p>Reward APY: {rewardAPY ? rewardAPY : '...'}%</p>
+              <CustomTooltip id={`${positionId}-apy`}>
+                <p>Reward APY: {rewardAPY}%</p>
                 <p>Fee APY: {feeAPYAsFloat ? feeAPYAsFloat : '...'}%</p>
               </CustomTooltip>
             </div>

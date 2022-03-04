@@ -14,6 +14,7 @@ export interface ITransferRecord {
   lpFee: string;
   transactionFee: string;
   transferTime: string;
+  rewardAmount?: string;
 }
 
 interface ITransactionInfoModalContext {

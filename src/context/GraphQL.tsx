@@ -6,7 +6,7 @@ type clientInstance = { [chainId: number]: InstanceType<typeof ApolloClient> };
 
 export const apolloClients = chains.reduce((accumulator, currentValue) => {
   accumulator[currentValue.chainId] = new ApolloClient({
-    uri: currentValue.graphURL,
+    uri: currentValue.v2GraphURL,
     cache: new InMemoryCache(),
   });
   return accumulator;

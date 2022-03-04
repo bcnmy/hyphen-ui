@@ -5,11 +5,11 @@ import { ENV } from "types/environment";
 
 let hyphenBaseUrl;
 if (process.env.REACT_APP_ENV === ENV.production) {
-  hyphenBaseUrl = "https://hyphen-api.biconomy.io";
+  hyphenBaseUrl = "https://hyphen-v2-api.biconomy.io";
 } else if (process.env.REACT_APP_ENV === ENV.test) {
-  hyphenBaseUrl = "https://hyphen-test-api.biconomy.io";
+  hyphenBaseUrl = "https://hyphen-v2-integration-api.biconomy.io";
 } else {
-  hyphenBaseUrl = "https://hyphen-staging-api.biconomy.io";
+  hyphenBaseUrl = "https://hyphen-v2-staging-api.biconomy.io";
 }
 
 const hyphen = {

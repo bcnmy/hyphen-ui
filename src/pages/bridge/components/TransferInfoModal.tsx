@@ -124,6 +124,14 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
                 {transferRecord.lpFee} {transferRecord.token.symbol}
               </span>
             </li>
+            {transferRecord.rewardAmount && 
+              <li className="flex justify-between mb-1">
+                <span className="text-gray-500">Reward Amount</span>
+                <span className="text-gray-700">
+                  {transferRecord.rewardAmount} {transferRecord.token.symbol}
+                </span>
+              </li>
+            }
             <li className="flex justify-between">
               <span className="text-gray-500">Transaction fee</span>
               <span className="text-gray-700">

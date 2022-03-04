@@ -414,6 +414,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
       toChain,
       lpFee: transactionFee.lpFeeProcessedString,
       transactionFee: transactionFee.transactionFeeProcessedString,
+      rewardAmount: transactionFee.rewardAmountString,
       transferTime: formatDistanceStrict(endTime, startTime),
     };
 

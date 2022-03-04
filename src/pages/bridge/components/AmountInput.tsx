@@ -65,7 +65,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           <span className="ml-1 min-w-[40px] text-left">
             {getPoolInfoStatus === Status.SUCCESS &&
             poolInfo?.minDepositAmount ? (
-              <>{poolInfo.minDepositAmount}</>
+              <>{Math.trunc(poolInfo.minDepositAmount * 100) / 100}</>
             ) : (
               <>
                 <Skeleton
@@ -94,7 +94,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           <span className="ml-1 min-w-[40px] text-left">
             {getPoolInfoStatus === Status.SUCCESS &&
             poolInfo?.maxDepositAmount ? (
-              <>{poolInfo.maxDepositAmount}</>
+              <>{Math.trunc(poolInfo.maxDepositAmount * 100) / 100}</>
             ) : (
               <>
                 <Skeleton

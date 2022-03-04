@@ -361,7 +361,7 @@ function IncreaseLiquidity() {
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
-              Balance:{' '}
+              Your Address Limit:{' '}
               {liquidityBalance ? (
                 liquidityBalance
               ) : (

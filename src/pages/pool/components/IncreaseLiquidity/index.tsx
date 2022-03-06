@@ -429,7 +429,7 @@ function IncreaseLiquidity() {
                 </button>
               ) : (
                 <button
-                  className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                  className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                   onClick={handleNetworkChange}
                 >
                   Switch to {chain?.name}

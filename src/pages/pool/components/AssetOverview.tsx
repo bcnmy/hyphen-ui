@@ -27,13 +27,13 @@ function AssetOverview({
 
   const { currentChainId } = useWalletProvider()!;
 
-  const chain = currentChainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === currentChainId;
-      })
-    : chainId
+  const chain = chainId
     ? chains.find(chainObj => {
         return chainObj.chainId === Number.parseInt(chainId);
+      })
+    : currentChainId
+    ? chains.find(chainObj => {
+        return chainObj.chainId === currentChainId;
       })
     : undefined;
 

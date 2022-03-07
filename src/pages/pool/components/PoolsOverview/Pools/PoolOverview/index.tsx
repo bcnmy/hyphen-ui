@@ -43,24 +43,22 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: feeAPY } = useQuery(
+  const { data: feeAPYData } = useQuery(
     ['apy', address],
     async () => {
       if (!v2GraphEndpoint || !address) return;
 
-      const {
-        rollingApyFor24Hour: { apy: feeAPY },
-      } = await request(
+      const { rollingApyFor24Hour } = await request(
         v2GraphEndpoint,
         gql`
           query {
-            rollingApyFor24Hour(id: "0", where: { tokenAddress: $address }) {
+            rollingApyFor24Hour(id: "${address.toLowerCase()}") {
               apy
             }
           }
         `,
       );
-      return feeAPY;
+      return rollingApyFor24Hour;
     },
     {
       // Execute only when tokenAddress is available.
@@ -69,8 +67,10 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   );
 
   const rewardAPY = 0;
-  const feeAPYAsFloat = Number.parseFloat(Number.parseFloat(feeAPY).toFixed(2));
-  const APY = rewardAPY + feeAPYAsFloat;
+  const feeAPY = feeAPYData
+    ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
+    : 0;
+  const APY = rewardAPY + feeAPY;
 
   const formattedTotalLiquidity =
     totalLiquidity && decimal
@@ -103,7 +103,9 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       </div>
       <div className="flex flex-col">
         <div className="flex items-center">
-          <span className="font-mono text-2xl">{APY ? APY : '...'}%</span>
+          <span className="font-mono text-2xl">
+            {APY !== null || APY !== undefined ? `${APY}%` : '...'}
+          </span>
           <HiInformationCircle
             className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
             data-tip
@@ -112,7 +114,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
           />
           <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
             <p>Reward APY: {rewardAPY}%</p>
-            <p>Fee APY: {feeAPYAsFloat ? feeAPYAsFloat : '...'}%</p>
+            <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
           </CustomTooltip>
         </div>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

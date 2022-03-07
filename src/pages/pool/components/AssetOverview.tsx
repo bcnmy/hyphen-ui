@@ -59,27 +59,22 @@ function AssetOverview({
     },
   );
 
-  const { data: feeAPY } = useQuery(
+  const { data: feeAPYData } = useQuery(
     ['apy', tokenAddress],
     async () => {
       if (!v2GraphEndpoint || !tokenAddress) return;
 
-      const {
-        rollingApyFor24Hour: { apy: feeAPY },
-      } = await request(
+      const { rollingApyFor24Hour } = await request(
         v2GraphEndpoint,
         gql`
           query {
-            rollingApyFor24Hour(
-              id: "0"
-              where: { tokenAddress: $tokenAddress }
-            ) {
+            rollingApyFor24Hour(id: "${tokenAddress.toLowerCase()}") {
               apy
             }
           }
         `,
       );
-      return feeAPY;
+      return rollingApyFor24Hour;
     },
     {
       // Execute only when tokenAddress is available.
@@ -88,14 +83,16 @@ function AssetOverview({
   );
 
   const rewardAPY = 0;
-  const feeAPYAsFloat = Number.parseFloat(Number.parseFloat(feeAPY).toFixed(2));
-  const APY = rewardAPY + feeAPYAsFloat;
+  const feeAPY = feeAPYData
+    ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
+    : 0;
+  const APY = rewardAPY + feeAPY;
 
   const token =
     chain && tokenAddress
       ? tokens.find(tokenObj => {
           return (
-            tokenObj[chainId].address.toLowerCase() ===
+            tokenObj[chainId]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })
@@ -199,15 +196,18 @@ function AssetOverview({
         <div className="mb-5">
           <div className="flex flex-col items-end">
             <div className="flex items-center">
-              <span className="font-mono text-2xl">{APY ? APY : '...'}%</span>
+              <span className="font-mono text-2xl">
+                {APY >= 0 ? `${APY}%` : '...'}
+              </span>
               <HiInformationCircle
-                className="ml-1 h-5 w-5 text-hyphen-gray-400"
+                className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
                 data-tip
                 data-for={`${positionId}-apy`}
+                onClick={e => e.stopPropagation()}
               />
               <CustomTooltip id={`${positionId}-apy`}>
                 <p>Reward APY: {rewardAPY}%</p>
-                <p>Fee APY: {feeAPYAsFloat ? feeAPYAsFloat : '...'}%</p>
+                <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
               </CustomTooltip>
             </div>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

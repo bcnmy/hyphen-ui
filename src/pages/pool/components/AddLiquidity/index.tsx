@@ -141,27 +141,22 @@ function AddLiquidity() {
     },
   );
 
-  const { data: feeAPY } = useQuery(
+  const { data: feeAPYData } = useQuery(
     ['apy', selectedTokenAddress],
     async () => {
       if (!v2GraphEndpoint || !selectedTokenAddress) return;
 
-      const {
-        rollingApyFor24Hour: { apy: feeAPY },
-      } = await request(
+      const { rollingApyFor24Hour } = await request(
         v2GraphEndpoint,
         gql`
           query {
-            rollingApyFor24Hour(
-              id: "0"
-              where: { tokenAddress: $selectedTokenAddress }
-            ) {
+            rollingApyFor24Hour(id: "${selectedTokenAddress.toLowerCase()}") {
               apy
             }
           }
         `,
       );
-      return feeAPY;
+      return rollingApyFor24Hour;
     },
     {
       // Execute only when selectedTokenAddress is available.
@@ -242,8 +237,10 @@ function AddLiquidity() {
       : tokenTotalCap;
 
   const rewardAPY = 0;
-  const feeAPYAsFloat = Number.parseFloat(Number.parseFloat(feeAPY).toFixed(2));
-  const APY = rewardAPY + feeAPYAsFloat;
+  const feeAPY = feeAPYData
+    ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
+    : 0;
+  const APY = rewardAPY + feeAPY;
 
   const isDataLoading =
     !liquidityBalance || approveTokenLoading || addLiquidityLoading;
@@ -680,7 +677,7 @@ function AddLiquidity() {
                   APY
                 </span>
                 <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                  {APY ? APY : '...'}%
+                  {APY >= 0 ? `${APY}%` : '...'}
                 </div>
               </div>
               <div className="flex flex-col">

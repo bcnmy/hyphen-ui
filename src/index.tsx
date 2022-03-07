@@ -15,20 +15,10 @@ import Pool from 'pages/pool/Pool';
 import Bridge from 'pages/bridge/Bridge';
 import AddLiquidity from 'pages/pool/components/AddLiquidity';
 import PoolsOverview from 'pages/pool/components/PoolsOverview';
-import PoolOverview from 'pages/pool/components/PoolsOverview/Pools/PoolOverview';
 import ManagePosition from 'pages/pool/components/ManagePosition';
 import IncreaseLiquidity from 'pages/pool/components/IncreaseLiquidity';
 
-// Refetch the data after 1 hour.
-const oneHourInMs = 60 * 60 * 1000;
-const queryClientOptions = {
-  defaultOptions: {
-    queries: {
-      staleTime: oneHourInMs,
-    },
-  },
-};
-const queryClient = new QueryClient(queryClientOptions);
+const queryClient = new QueryClient();
 
 ReactDOM.render(
   <React.StrictMode>

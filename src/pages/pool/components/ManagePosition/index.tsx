@@ -275,10 +275,12 @@ function ManagePosition() {
         </div>
       </header>
 
-      <AssetOverview
-        chainId={chainId}
-        positionId={BigNumber.from(positionId)}
-      />
+      {chainId ? (
+        <AssetOverview
+          chainId={Number.parseInt(chainId)}
+          positionId={BigNumber.from(positionId)}
+        />
+      ) : null}
 
       <section className="mt-8 grid grid-cols-2">
         <div className="max-h-100 h-100 border-r pr-12.5 pt-9">

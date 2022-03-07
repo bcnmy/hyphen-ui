@@ -6,9 +6,9 @@ import { useWalletProvider } from 'context/WalletProvider';
 import useLPToken from 'hooks/contracts/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
 import { useEffect, useState } from 'react';
-import { useChains } from 'context/Chains';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
+import { useChains } from 'context/Chains';
 
 function LiquidityPositions() {
   const navigate = useNavigate();
@@ -31,14 +31,13 @@ function LiquidityPositions() {
       return getUserPositions(accounts);
     },
     {
-      enabled: !!isLoggedIn,
+      enabled: !!accounts,
     },
   );
 
   useEffect(() => {
     remove();
-    refetch();
-  }, [refetch, remove, selectedNetwork]);
+  }, [selectedNetwork, refetch, remove]);
 
   function handleAddLiquidity() {
     const [{ chainId }] = chains;
@@ -87,13 +86,16 @@ function LiquidityPositions() {
         </button>
       </header>
 
-      {!isLoading ? (
+      {!isLoading && selectedNetwork ? (
         userPositions && userPositions.length > 0 ? (
           <section className="grid grid-cols-2 gap-2.5">
             {userPositions.map((userPositionId: BigNumber) => {
               return (
                 <AssetOverview
-                  key={userPositionId.toNumber()}
+                  key={`${
+                    selectedNetwork.chainId
+                  }-${userPositionId.toString()}`}
+                  chainId={selectedNetwork.chainId}
                   positionId={userPositionId}
                   hideClosedPositions={hideClosedPositions}
                 />

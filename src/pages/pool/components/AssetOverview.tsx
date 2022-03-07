@@ -12,7 +12,7 @@ import { HiInformationCircle } from 'react-icons/hi';
 import CustomTooltip from 'components/CustomTooltip';
 
 interface IAssetOverview {
-  chainId?: string;
+  chainId: number;
   positionId: BigNumber;
   hideClosedPositions?: boolean | false;
 }
@@ -25,31 +25,18 @@ function AssetOverview({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { currentChainId } = useWalletProvider()!;
+  const chain = chains.find(chainObj => {
+    return chainObj.chainId === chainId;
+  })!;
 
-  const chain = chainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === Number.parseInt(chainId);
-      })
-    : currentChainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === currentChainId;
-      })
-    : undefined;
-
-  const v2GraphEndpoint = chain?.v2GraphURL;
+  const v2GraphEndpoint = chain.v2GraphURL;
 
   const { getPositionMetadata } = useLPToken(chain);
   const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders(chain);
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
-    useQuery(
-      ['positionMetadata', positionId],
-      () => getPositionMetadata(positionId),
-      {
-        // Execute only when positionId is available.
-        enabled: !!positionId,
-      },
+    useQuery(['positionMetadata', positionId], () =>
+      getPositionMetadata(positionId),
     );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
@@ -108,7 +95,7 @@ function AssetOverview({
     chain && tokenAddress
       ? tokens.find(tokenObj => {
           return (
-            tokenObj[chain.chainId]?.address.toLowerCase() ===
+            tokenObj[chainId].address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })

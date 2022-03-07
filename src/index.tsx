@@ -18,7 +18,17 @@ import PoolsOverview from 'pages/pool/components/PoolsOverview';
 import ManagePosition from 'pages/pool/components/ManagePosition';
 import IncreaseLiquidity from 'pages/pool/components/IncreaseLiquidity';
 
-const queryClient = new QueryClient();
+const queryClientOptions = {
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      retry: false,
+    },
+  },
+};
+const queryClient = new QueryClient(queryClientOptions);
 
 ReactDOM.render(
   <React.StrictMode>

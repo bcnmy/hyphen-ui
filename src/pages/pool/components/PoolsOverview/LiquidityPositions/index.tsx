@@ -5,7 +5,7 @@ import AssetOverview from '../../AssetOverview';
 import { useWalletProvider } from 'context/WalletProvider';
 import useLPToken from 'hooks/contracts/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import { useChains } from 'context/Chains';
@@ -18,12 +18,7 @@ function LiquidityPositions() {
   const { getUserPositions } = useLPToken(selectedNetwork);
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
 
-  const {
-    isLoading,
-    data: userPositions,
-    refetch,
-    remove,
-  } = useQuery(
+  const { isLoading, data: userPositions } = useQuery(
     ['userPositions', accounts],
     () => {
       if (!accounts) return;
@@ -31,13 +26,12 @@ function LiquidityPositions() {
       return getUserPositions(accounts);
     },
     {
-      enabled: !!accounts,
+      enabled: !!isLoggedIn,
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
     },
   );
-
-  useEffect(() => {
-    remove();
-  }, [selectedNetwork, refetch, remove]);
 
   function handleAddLiquidity() {
     const [{ chainId }] = chains;

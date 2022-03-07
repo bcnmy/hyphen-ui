@@ -390,7 +390,7 @@ function ManagePosition() {
           <button
             className="h-15 w-full rounded-2.5 border-2 border-hyphen-purple font-semibold text-hyphen-purple hover:bg-hyphen-purple hover:text-white"
             onClick={handleIncreaseLiquidity}
-            disabled={removeLiquidityLoading}
+            disabled={isDataLoading}
           >
             + Increase Liquidity
           </button>
@@ -411,11 +411,13 @@ function ManagePosition() {
               {currentChainId === chain?.chainId ? (
                 <button
                   className="mb-[3.125rem] flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={unclaimedFees === 0}
+                  disabled={isDataLoading || unclaimedFees === 0}
                   onClick={handleClaimFeeClick}
                 >
                   {unclaimedFees === 0 ? (
                     'No fees to claim'
+                  ) : claimFeeLoading ? (
+                    'Claiming Fees'
                   ) : (
                     <>
                       <img

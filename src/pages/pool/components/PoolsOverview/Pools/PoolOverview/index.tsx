@@ -105,9 +105,10 @@ function PoolOverview({ chain, token }: IPoolOverview) {
         <div className="flex items-center">
           <span className="font-mono text-2xl">{APY ? APY : '...'}%</span>
           <HiInformationCircle
-            className="ml-1 h-5 w-5 text-hyphen-gray-400"
+            className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
             data-tip
             data-for={`${chain.name}-${symbol}-apy`}
+            onClick={e => e.stopPropagation()}
           />
           <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
             <p>Reward APY: {rewardAPY}%</p>

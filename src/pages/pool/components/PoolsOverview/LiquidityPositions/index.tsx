@@ -55,7 +55,7 @@ function LiquidityPositions() {
               }`}
               onClick={() => setHideClosedPositions(true)}
             >
-              Active Position
+              Active Positions
             </button>
             <button
               className={`text-xs  ${

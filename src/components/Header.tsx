@@ -69,6 +69,30 @@ function Header({ showUserInfoModal }: IHeaderProps) {
             </span>
           )}
         </NavLink>
+        <NavLink
+          to="/farms"
+          className={({ isActive }) => (isActive ? 'relative' : 'relative')}
+        >
+          {({ isActive }) => (
+            <span
+              className={
+                isActive
+                  ? 'relative'
+                  : 'relative text-gray-400 hover:text-white'
+              }
+            >
+              Farms
+              <span
+                className={
+                  isActive
+                    ? 'absolute -inset-1 top-[33px] block h-[5px] rounded-t-full bg-white'
+                    : 'hidden'
+                }
+                aria-hidden="true"
+              ></span>
+            </span>
+          )}
+        </NavLink>
         <a
           target="_blank"
           href="https://hyphen-info.biconomy.io/"

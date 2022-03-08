@@ -17,6 +17,8 @@ import AddLiquidity from 'pages/pool/components/AddLiquidity';
 import PoolsOverview from 'pages/pool/components/PoolsOverview';
 import ManagePosition from 'pages/pool/components/ManagePosition';
 import IncreaseLiquidity from 'pages/pool/components/IncreaseLiquidity';
+import Farms from 'pages/farms';
+import FarmsOverview from 'pages/farms/components/FarmsOverview';
 
 const queryClientOptions = {
   defaultOptions: {
@@ -55,6 +57,9 @@ ReactDOM.render(
                   path="increase-liquidity/:chainId/:positionId"
                   element={<IncreaseLiquidity />}
                 />
+              </Route>
+              <Route path="/farms" element={<Farms />}>
+                <Route path="" element={<FarmsOverview />} />
               </Route>
             </Route>
           </Routes>

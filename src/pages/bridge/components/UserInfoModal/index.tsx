@@ -234,6 +234,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   }
 
   function handleTransactionsRefetch() {
+    setLoading(true);
     refetch();
   }
 

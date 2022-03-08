@@ -1,33 +1,14 @@
 import { Dialog } from '@headlessui/react';
 import { DEFAULT_FIXED_DECIMAL_POINT } from 'config/constants';
 import { formatDistanceStrict } from 'date-fns';
+import { BigNumber, ethers } from 'ethers';
 import {
   HiOutlineArrowNarrowRight,
   HiOutlineArrowSmRight,
 } from 'react-icons/hi';
 import { IoMdClose } from 'react-icons/io';
 import Modal from '../../../../components/Modal';
-
-export interface ITransactionDetails {
-  amount: string;
-  amountReceived: string;
-  depositHash: string;
-  endTimeStamp: number;
-  fromChainId: number;
-  fromChainExplorerUrl: string;
-  fromChainLabel: string;
-  lpFee: string;
-  rewardAmount: string;
-  receivedTokenAddress: string;
-  receivedTokenSymbol: string;
-  receiver: string;
-  startTimeStamp: number;
-  toChainId: number;
-  toChainExplorerUrl: string;
-  toChainLabel: string;
-  tokenSymbol: string;
-  transferHash: string;
-}
+import { ITransactionDetails } from '../UserInfoModal';
 
 export interface ITransactionDetailModal {
   isVisible: boolean;
@@ -47,25 +28,21 @@ function TransactionDetailModal({
   const {
     amount,
     amountReceived,
-    endTimeStamp,
+    endTimestamp,
+    fromChain,
     fromChainExplorerUrl,
-    fromChainLabel,
     lpFee,
-    receivedTokenSymbol,
-    startTimeStamp,
+    rewardAmount,
+    startTimestamp,
+    toChain,
     toChainExplorerUrl,
-    toChainLabel,
-    tokenSymbol,
+    token,
+    transferFee,
   } = transactionDetails!;
   const transactionTime = formatDistanceStrict(
-    new Date(endTimeStamp * 1000),
-    new Date(startTimeStamp * 1000),
+    new Date(+endTimestamp * 1000),
+    new Date(+startTimestamp * 1000),
   );
-  const transactionFee = (
-    Number.parseFloat(amount) -
-    Number.parseFloat(lpFee) -
-    Number.parseFloat(amountReceived)
-  ).toFixed(DEFAULT_FIXED_DECIMAL_POINT);
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
@@ -85,7 +62,7 @@ function TransactionDetailModal({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Sent</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {amount} {tokenSymbol}
+                  {amount} {token.symbol}
                 </span>
                 <a
                   target="_blank"
@@ -93,7 +70,7 @@ function TransactionDetailModal({
                   rel="noreferrer"
                   className="flex items-center text-hyphen-purple"
                 >
-                  {fromChainLabel}
+                  {fromChain.name}
                   <HiOutlineArrowSmRight className="h-5 w-5 -rotate-45" />
                 </a>
               </div>
@@ -101,7 +78,7 @@ function TransactionDetailModal({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Received</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {amountReceived} {receivedTokenSymbol}
+                  {amountReceived} {token.symbol}
                 </span>
                 <a
                   target="_blank"
@@ -109,7 +86,7 @@ function TransactionDetailModal({
                   rel="noreferrer"
                   className="flex items-center text-hyphen-purple"
                 >
-                  {toChainLabel}
+                  {toChain.name}
                   <HiOutlineArrowSmRight className="h-5 w-5 -rotate-45" />
                 </a>
               </div>
@@ -125,13 +102,19 @@ function TransactionDetailModal({
             <li className="mb-1 flex justify-between">
               <span className="text-gray-500">Liquidity provider fee</span>
               <span className="text-gray-700">
-                {lpFee} {tokenSymbol}
+                {lpFee} {token.symbol}
+              </span>
+            </li>
+            <li className="mb-1 flex justify-between">
+              <span className="text-gray-500">Reward amount</span>
+              <span className="text-gray-700">
+                {rewardAmount} {token.symbol}
               </span>
             </li>
             <li className="flex justify-between">
               <span className="text-gray-500">Transaction fee</span>
               <span className="text-gray-700">
-                {transactionFee} {tokenSymbol}
+                {transferFee} {token.symbol}
               </span>
             </li>
           </ul>

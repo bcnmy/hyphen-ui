@@ -50,7 +50,7 @@ export interface ITransactionDetails {
   toChain: ChainConfig;
   toChainExplorerUrl: string;
   token: TokenConfig;
-  transferFee: string;
+  transactionFee: string;
 }
 
 const USER_DEPOSITS = gql`
@@ -170,8 +170,11 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         const formattedLpFee = Number.parseFloat(
           ethers.utils.formatUnits(lpFee, tokenDecimals),
         ).toFixed(3);
-        const formattedTransferFee = Number.parseFloat(
-          ethers.utils.formatUnits(transferFee, tokenDecimals),
+        const formattedTransactionFee = Number.parseFloat(
+          ethers.utils.formatUnits(
+            BigNumber.from(transferFee).sub(BigNumber.from(lpFee)),
+            tokenDecimals,
+          ),
         ).toFixed(3);
 
         const transactionDetails = {
@@ -188,7 +191,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           toChain,
           toChainExplorerUrl,
           token,
-          transferFee: formattedTransferFee,
+          transactionFee: formattedTransactionFee,
         };
 
         transformedTransactions.push(transactionDetails);

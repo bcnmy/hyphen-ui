@@ -37,7 +37,7 @@ function TransactionDetailModal({
     toChain,
     toChainExplorerUrl,
     token,
-    transferFee,
+    transactionFee,
   } = transactionDetails!;
   const transactionTime = formatDistanceStrict(
     new Date(+endTimestamp * 1000),
@@ -114,7 +114,7 @@ function TransactionDetailModal({
             <li className="flex justify-between">
               <span className="text-gray-500">Transaction fee</span>
               <span className="text-gray-700">
-                {transferFee} {token.symbol}
+                {transactionFee} {token.symbol}
               </span>
             </li>
           </ul>

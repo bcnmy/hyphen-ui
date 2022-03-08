@@ -21,12 +21,12 @@ function LiquidityPositions() {
   const { isLoading, data: userPositions } = useQuery(
     ['userPositions', accounts],
     () => {
-      if (!accounts) return;
+      if (!isLoggedIn || !accounts) return;
 
       return getUserPositions(accounts);
     },
     {
-      enabled: !!isLoggedIn,
+      enabled: !!(isLoggedIn && accounts),
       refetchOnWindowFocus: true,
       refetchOnMount: true,
       refetchOnReconnect: true,
@@ -80,8 +80,8 @@ function LiquidityPositions() {
         </button>
       </header>
 
-      {!isLoading && selectedNetwork ? (
-        userPositions && userPositions.length > 0 ? (
+      {!isLoading ? (
+        selectedNetwork && userPositions && userPositions.length > 0 ? (
           <section className="grid grid-cols-2 gap-2.5">
             {userPositions.map((userPositionId: BigNumber) => {
               return (

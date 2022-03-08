@@ -5,18 +5,23 @@ import { ChainConfig, chains } from 'config/chains';
 import { useChains } from 'context/Chains';
 import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
+import { useQueryClient } from 'react-query';
 
 function NetworkSelector() {
+  const queryClient = useQueryClient();
+
   const { walletProvider } = useWalletProvider()!;
   const { selectedNetwork, changeSelectedNetwork } = useChains()!;
 
-  function handleNetworkChange(selectedNetwork: ChainConfig) {
+  async function handleNetworkChange(selectedNetwork: ChainConfig) {
     if (walletProvider) {
-      const res = switchNetwork(walletProvider, selectedNetwork);
+      const res = await switchNetwork(walletProvider, selectedNetwork);
       if (res === null) {
+        queryClient.removeQueries();
         changeSelectedNetwork(selectedNetwork);
       }
     } else {
+      queryClient.removeQueries();
       changeSelectedNetwork(selectedNetwork);
     }
   }

@@ -78,8 +78,6 @@ const ChainsProvider: React.FC = props => {
 
     if (network) {
       setSelectedNetwork(network);
-    } else {
-      setSelectedNetwork(chainsList[0]);
     }
   }, [currentChainId]);
 

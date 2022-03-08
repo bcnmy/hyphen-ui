@@ -69,7 +69,13 @@ const WalletProviderProvider: React.FC = props => {
           walletconnect: {
             package: WalletConnectProvider, // required
             options: {
-              infuraId: process.env.REACT_APP_INFURA_ID, // required
+              // TODO: Add mainnet rpc urls.
+              rpc: {
+                5: 'https://eth-goerli.alchemyapi.io/v2/mtR7c3X54OxnXVf_npwUrdNC57aIghCp',
+                43113: 'https://api.avax-test.network/ext/bc/C/rpc',
+                80001:
+                  'https://polygon-mumbai.g.alchemy.com/v2/a6rWdKyJis3Y8cWN6oDCWIxu8lrFX4J8',
+              },
             },
           },
         },

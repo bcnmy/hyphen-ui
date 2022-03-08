@@ -16,56 +16,84 @@ import {
 import Modal from '../../../../components/Modal';
 import { getProviderInfo } from 'web3modal';
 import { useChains } from 'context/Chains';
-import { tokens } from '../../../../config/tokens';
-import { ChainConfig } from '../../../../config/chains';
+import { TokenConfig, tokens } from '../../../../config/tokens';
+import { ChainConfig, chains } from '../../../../config/chains';
 import TransactionDetailModal from '../TransactionDetailModal';
 import useModal from 'hooks/useModal';
 import { twMerge } from 'tailwind-merge';
 import { DEFAULT_FIXED_DECIMAL_POINT } from 'config/constants';
+import { useHyphen } from 'context/Hyphen';
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
   onClose: () => void;
 }
 
-export interface ITransaction {
-  amount: number;
-  from: string;
+// export interface ITransaction {
+//   amount: number;
+//   from: string;
+//   id: string;
+//   receiver: string;
+//   timestamp: string;
+//   toChainId: string;
+//   tokenAddress: string;
+//   __typename: string;
+// }
+
+// export interface ITransactionDetails {
+//   amount: string;
+//   amountReceived: string;
+//   depositHash: string;
+//   endTimeStamp: number;
+//   fromChainId: number;
+//   fromChainExplorerUrl: string;
+//   fromChainLabel: string;
+//   lpFee: string;
+//   rewardAmount: string;
+//   receivedTokenAddress: string;
+//   receivedTokenSymbol: string;
+//   receiver: string;
+//   startTimeStamp: number;
+//   toChainId: number;
+//   toChainExplorerUrl: string;
+//   toChainLabel: string;
+//   tokenSymbol: string;
+//   transferHash: string;
+// }
+
+export interface IUserDeposits {
   id: string;
-  receiver: string;
+  amount: string;
+  rewardAmount: string;
   timestamp: string;
-  toChainId: string;
   tokenAddress: string;
-  __typename: string;
+  toChainID: string;
 }
 
 export interface ITransactionDetails {
   amount: string;
-  amountReceived: string;
   depositHash: string;
-  endTimeStamp: number;
-  fromChainId: number;
-  fromChainExplorerUrl: string;
-  fromChainLabel: string;
-  lpFee: string;
+  exitHash: string;
+  fromChain: ChainConfig;
   rewardAmount: string;
-  receivedTokenAddress: string;
-  receivedTokenSymbol: string;
-  receiver: string;
-  startTimeStamp: number;
-  toChainId: number;
-  toChainExplorerUrl: string;
-  toChainLabel: string;
-  tokenSymbol: string;
-  transferHash: string;
+  toChain: ChainConfig;
+  token: TokenConfig;
 }
 
-const USER_TRANSACTIONS = gql`
-  query USER_TRANSACTIONS($address: String!) {
-    deposits(where: { sender: $address }) {
-      tokenAddress
+const USER_DEPOSITS = gql`
+  query USER_DEPOSITS($address: String!) {
+    deposits(
+      first: 5
+      where: { sender: $address }
+      orderBy: timestamp
+      orderDirection: desc
+    ) {
+      id
       amount
+      rewardAmount
       timestamp
+      tokenAddress
+      toChainID
     }
   }
 `;
@@ -85,38 +113,126 @@ const FUNDS_TO_USER = gql`
 `;
 
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
+  const { accounts, disconnect, rawEthereumProvider } = useWalletProvider()!;
+  const { chainsList, fromChain } = useChains()!;
+  const { hyphen } = useHyphen()!;
+
+  const [loading, setLoading] = useState(true);
   const [addressCopied, setAddressCopied] = useState(false);
   const [userTransactions, setUserTransactions] = useState<any>();
   const [transactionDetails, setTransactionDetails] =
     useState<ITransactionDetails>();
-  const { accounts, disconnect, rawEthereumProvider } = useWalletProvider()!;
-  const { chainsList, fromChain } = useChains()!;
+
   const { name: providerName } = getProviderInfo(rawEthereumProvider);
   const userAddress = accounts?.[0];
-  const { data, loading, networkStatus, refetch } = useQuery(
-    USER_TRANSACTIONS,
-    {
-      fetchPolicy: 'no-cache',
-      notifyOnNetworkStatusChange: true,
-      skip: !isVisible,
-      variables: { address: userAddress },
-    },
-  );
+  const {
+    data: userDepositsData,
+    networkStatus,
+    refetch,
+  } = useQuery(USER_DEPOSITS, {
+    fetchPolicy: 'no-cache',
+    notifyOnNetworkStatusChange: true,
+    skip: !isVisible,
+    variables: { address: userAddress },
+  });
+
+  useEffect(() => {
+    function getTokenInfo(
+      amount: string,
+      tokenAddress: string,
+      fromChainId: number,
+    ): { formattedAmount: string; symbol: string } {
+      const tokenInfo = tokens.find(token => {
+        const { address } = token[fromChainId];
+        return address.toLowerCase() === tokenAddress.toLowerCase();
+      })!;
+      const { decimal, symbol } = tokenInfo[fromChainId];
+      const formattedAmount = (+ethers.utils.formatUnits(
+        amount,
+        decimal,
+      )).toFixed(DEFAULT_FIXED_DECIMAL_POINT);
+
+      return { formattedAmount, symbol };
+    }
+
+    async function getTransferInfo(
+      depositHash: string,
+      fromChainId: number,
+      toChainId: number,
+    ) {
+      const apolloClient = apolloClients[toChainId];
+      const { data } = await apolloClient.query({
+        query: FUNDS_TO_USER,
+        variables: { depositHash: depositHash },
+      });
+      return data.fundsSentToUsers[0];
+    }
+
+    async function getUserTransactions(
+      fromChain: ChainConfig,
+      userDeposits: IUserDeposits[],
+    ) {
+      let transformedTransactions = [];
+      for (const userDeposit of userDeposits) {
+        const {
+          id: depositHash,
+          amount,
+          rewardAmount,
+          timestamp,
+          tokenAddress,
+          toChainID,
+        } = userDeposit;
+
+        const { exitHash } = await hyphen.depositManager.checkDepositStatus({
+          depositHash,
+          fromChainId: fromChain.chainId,
+        });
+        const toChain = chains.find(
+          chainObj => chainObj.chainId === Number.parseInt(toChainID, 10),
+        );
+        const token = tokens.find(
+          tokenObj =>
+            tokenObj[fromChain.chainId].address.toLowerCase() ===
+            tokenAddress.toLowerCase(),
+        );
+
+        const transactionDetails = {
+          amount,
+          depositHash,
+          exitHash,
+          fromChain,
+          rewardAmount,
+          toChain,
+          token,
+        };
+
+        transformedTransactions.push(transactionDetails);
+      }
+
+      setUserTransactions(transformedTransactions);
+      setLoading(false);
+    }
+
+    if (fromChain && userDepositsData) {
+      const { deposits: userDeposits } = userDepositsData;
+      getUserTransactions(fromChain, userDeposits);
+    }
+  }, [fromChain, hyphen, userDepositsData]);
 
   // useEffect(() => {
   //   function getTokenInfo(
   //     amount: number,
   //     tokenAddress: string,
-  //     fromChainId: number
+  //     fromChainId: number,
   //   ): { formattedAmount: string; symbol: string } {
-  //     const tokenInfo = tokens.find((token) => {
+  //     const tokenInfo = tokens.find(token => {
   //       const { address } = token[fromChainId];
   //       return address.toLowerCase() === tokenAddress.toLowerCase();
   //     })!;
   //     const { decimal, symbol } = tokenInfo[fromChainId];
   //     const formattedAmount = (+ethers.utils.formatUnits(
   //       amount.toString(),
-  //       decimal
+  //       decimal,
   //     )).toFixed(DEFAULT_FIXED_DECIMAL_POINT);
 
   //     return { formattedAmount, symbol };
@@ -134,7 +250,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   //   async function getUserTransactions(
   //     chainsList: ChainConfig[],
   //     data: { fundsDepositeds: ITransaction[] },
-  //     fromChain: ChainConfig
+  //     fromChain: ChainConfig,
   //   ) {
   //     const { chainId: fromChainId, name: fromChainLabel } = fromChain;
   //     const { fundsDepositeds } = data;
@@ -152,7 +268,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   //         getTokenInfo(amount, sentTokenAddress, fromChainId);
   //       const toChainId = Number.parseInt(toChainIdAsString, 10);
   //       const { name: toChainLabel } = chainsList.find(
-  //         (chain) => chain.chainId === toChainId
+  //         chain => chain.chainId === toChainId,
   //       )!;
   //       const {
   //         id: transferHash,
@@ -166,7 +282,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   //       const { formattedAmount: lpFee } = getTokenInfo(
   //         feeEarned,
   //         receivedTokenAddress,
-  //         toChainId
+  //         toChainId,
   //       );
 
   //       const transactionDetails = {
@@ -228,9 +344,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   }
 
   function handleTransactionsRefetch() {
-    setUserTransactions(undefined);
     refetch();
   }
+
+  console.log(userTransactions);
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
@@ -307,24 +424,35 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           {!loading && userTransactions && userTransactions.length > 0 ? (
             <ul>
               {userTransactions.map((userTransaction: ITransactionDetails) => {
-                const { image, symbol } = tokens.find(
-                  token => token.symbol === userTransaction.tokenSymbol,
-                )!;
-                const fromChainExplorerUrl = `${
-                  chainsList.find(
-                    chain => chain.chainId === userTransaction.fromChainId,
-                  )!.explorerUrl
-                }/tx/${userTransaction.depositHash}`;
-                const toChainExplorerUrl = `${
-                  chainsList.find(
-                    chain => chain.chainId === userTransaction.toChainId,
-                  )!.explorerUrl
-                }/tx/${userTransaction.transferHash}`;
+                const {
+                  amount,
+                  depositHash,
+                  exitHash,
+                  fromChain,
+                  rewardAmount,
+                  toChain,
+                  token,
+                } = userTransaction;
+                const { chainId: fromChainId, name: fromChainName } = fromChain;
+                const { name: toChainName } = toChain;
+                const {
+                  image,
+                  symbol,
+                  [fromChainId]: { decimal: tokenDecimals },
+                } = token;
+                const formattedAmount = Number.parseFloat(
+                  ethers.utils.formatUnits(
+                    BigNumber.from(amount).sub(BigNumber.from(rewardAmount)),
+                    tokenDecimals,
+                  ),
+                ).toFixed(3);
+                const fromChainExplorerUrl = `${fromChain.explorerUrl}/tx/${depositHash}`;
+                const toChainExplorerUrl = `${toChain.explorerUrl}/tx/${exitHash}`;
 
                 return (
                   <li
                     className="mb-2 flex items-center justify-between p-2 last:mb-0"
-                    key={userTransaction.depositHash}
+                    key={depositHash}
                   >
                     <div className="flex items-center">
                       <img
@@ -334,7 +462,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
                       />
                       <div className="flex flex-col">
                         <span className="font-semibold text-gray-700">
-                          {userTransaction.amount} {userTransaction.tokenSymbol}
+                          {formattedAmount} {symbol}
                         </span>
                         <span className="flex items-center text-sm">
                           <a
@@ -343,7 +471,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
                             rel="noreferrer"
                             className="text-hyphen-purple"
                           >
-                            {userTransaction.fromChainLabel}
+                            {fromChainName}
                           </a>
                           <HiOutlineArrowNarrowRight className="mx-1 h-4 w-4 text-gray-500" />
                           <a
@@ -352,20 +480,20 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
                             rel="noreferrer"
                             className="text-hyphen-purple"
                           >
-                            {userTransaction.toChainLabel}
+                            {toChainName}
                           </a>
                         </span>
                       </div>
                     </div>
                     <button
                       className="flex items-center rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100"
-                      onClick={() =>
-                        handleDetailsOpen({
-                          ...userTransaction,
-                          fromChainExplorerUrl,
-                          toChainExplorerUrl,
-                        })
-                      }
+                      // onClick={() =>
+                      //   handleDetailsOpen({
+                      //     ...userTransaction,
+                      //     fromChainExplorerUrl,
+                      //     toChainExplorerUrl,
+                      //   })
+                      // }
                     >
                       Details
                     </button>
@@ -377,11 +505,11 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         </article>
       </div>
 
-      <TransactionDetailModal
+      {/* <TransactionDetailModal
         isVisible={isTransactionDetailModalVisible}
         onClose={handleDetailsClose}
         transactionDetails={transactionDetails}
-      />
+      /> */}
     </Modal>
   );
 }

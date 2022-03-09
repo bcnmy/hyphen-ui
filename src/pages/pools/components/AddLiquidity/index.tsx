@@ -39,7 +39,7 @@ function AddLiquidity() {
     signer,
     walletProvider,
   } = useWalletProvider()!;
-  const { fromChain, selectedNetwork, changeSelectedNetwork } = useChains()!;
+  const { fromChain } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
   // States
@@ -332,7 +332,7 @@ function AddLiquidity() {
       tokenObj => tokenObj.symbol === selectedToken.id,
     )!;
     reset();
-    navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
+    navigate(`/pools/add-liquidity/${chainId}/${tokenSymbol}`);
   }
 
   function handleChainChange(selectedChain: Option) {
@@ -343,7 +343,7 @@ function AddLiquidity() {
       tokenObj => tokenObj[chainId],
     );
     reset();
-    navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
+    navigate(`/pools/add-liquidity/${chainId}/${tokenSymbol}`);
   }
 
   function handleNetworkChange() {
@@ -515,7 +515,7 @@ function AddLiquidity() {
 
   function onAddTokenLiquiditySuccess() {
     queryClient.invalidateQueries();
-    navigate('/pool');
+    navigate('/pools');
   }
 
   return (

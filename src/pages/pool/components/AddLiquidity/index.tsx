@@ -280,6 +280,7 @@ function AddLiquidity() {
   }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  // Refactor tokenApproval using useQuery (see IncreaseLiquidity component.)
   useEffect(() => {
     async function handleTokenChange() {
       if (!chainId || !tokenSymbol || !liquidityProvidersAddress) {

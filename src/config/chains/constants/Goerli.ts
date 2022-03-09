@@ -17,7 +17,7 @@ export const GOERLI: ChainConfig = {
   assetSentTopicId:
     '0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c',
   biconomy: {
-    enable: true,
+    enable: false,
     apiKey: 'Ze_BIjFdZ.e5900961-0c16-4cb1-b4b7-604a5069daa8',
   },
   graphURL: 'https://api.thegraph.com/subgraphs/name/divyan73/lpmanagergoerli',

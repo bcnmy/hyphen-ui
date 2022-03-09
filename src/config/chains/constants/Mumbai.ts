@@ -16,7 +16,7 @@ export const MUMBAI: ChainConfig = {
   nativeFaucetURL: 'https://faucet.matic.network/',
   biconomy: {
     enable: true,
-    apiKey: 'r8N3i0Ukw.bb5dd97d-af25-47cb-9281-2069f1b95ade',
+    apiKey: 'caJKZjSLf.6b37855a-e928-4bbd-95b7-4368c00ffe58',
   },
   assetSentTopicId:
     '0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c',

@@ -219,7 +219,10 @@ function IncreaseLiquidity() {
       : 0;
 
   const isDataLoading =
-    !isLoggedIn || !liquidityBalance || increaseLiquidityLoading;
+    !isLoggedIn ||
+    !liquidityBalance ||
+    approveTokenLoading ||
+    increaseLiquidityLoading;
 
   const isLiquidityAmountGtWalletBalance =
     liquidityIncreaseAmount && walletBalance

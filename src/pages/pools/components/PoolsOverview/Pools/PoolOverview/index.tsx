@@ -101,8 +101,8 @@ function PoolOverview({ chain, token }: IPoolOverview) {
           </span>
         </div>
       </div>
-      <div className="flex flex-col">
-        <div className="flex items-center">
+      <div className="flex flex-col items-center">
+        <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
             {APY !== null || APY !== undefined ? `${APY}%` : '...'}
           </span>

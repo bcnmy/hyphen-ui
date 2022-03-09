@@ -17,7 +17,7 @@ import AddLiquidity from 'pages/pools/components/AddLiquidity';
 import PoolsOverview from 'pages/pools/components/PoolsOverview';
 import ManagePosition from 'pages/pools/components/ManagePosition';
 import IncreaseLiquidity from 'pages/pools/components/IncreaseLiquidity';
-import Farms from 'pages/farms';
+import Farms from 'pages/farms/Farms';
 import FarmsOverview from 'pages/farms/components/FarmsOverview';
 
 const queryClientOptions = {

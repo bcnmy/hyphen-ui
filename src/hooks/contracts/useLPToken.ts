@@ -2,7 +2,6 @@ import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import lpTokenABI from 'abis/LPToken.abi.json';
 import { LPToken } from 'config/liquidityContracts/LPToken';
-import { useWalletProvider } from 'context/WalletProvider';
 import { ChainConfig } from 'config/chains';
 
 function useLPToken(chain: ChainConfig | undefined) {

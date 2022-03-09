@@ -24,6 +24,18 @@ function Pools() {
 
       {!isLoading ? (
         <section className="grid grid-cols-1 gap-1">
+          <div className="relative mb-1 mt-2 flex justify-center">
+            <h3 className="absolute left-[3.125rem] text-xxs font-semibold uppercase text-hyphen-gray-400">
+              Asset
+            </h3>
+            <h3 className="text-xxs font-semibold uppercase text-hyphen-gray-400">
+              APY
+            </h3>
+            <h3 className="absolute right-[3.125rem] text-xxs font-semibold uppercase text-hyphen-gray-400">
+              Pool Capacity
+            </h3>
+          </div>
+
           {chains && tokensObject
             ? chains.map(chainObj => {
                 return Object.keys(tokensObject).map((tokenSymbol: any) => {

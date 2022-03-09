@@ -54,7 +54,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   const rewardAPY = 55;
 
   function handleFarmOverviewClick() {
-    console.log('handleFarmOverviewClick');
+    navigate(`add-staking-position/${chain.chainId}/${symbol}`);
   }
 
   return (

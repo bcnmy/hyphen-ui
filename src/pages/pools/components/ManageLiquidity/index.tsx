@@ -1,7 +1,7 @@
 import ProgressBar from 'components/ProgressBar';
 import { HiArrowSmLeft } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
-import AssetOverview from '../AssetOverview';
+import LiquidityPositionOverview from '../LiquidityPositionOverview';
 import StepSlider from '../StepSlider';
 import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import LiquidityInfo from '../LiquidityInfo';
@@ -276,7 +276,7 @@ function ManagePosition() {
       </header>
 
       {chainId ? (
-        <AssetOverview
+        <LiquidityPositionOverview
           chainId={Number.parseInt(chainId)}
           positionId={BigNumber.from(positionId)}
         />

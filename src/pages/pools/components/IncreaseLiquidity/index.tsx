@@ -14,7 +14,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import getTokenBalance from 'utils/getTokenBalance';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import AssetOverview from '../AssetOverview';
+import LiquidityPositionOverview from '../LiquidityPositionOverview';
 import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
@@ -450,7 +450,7 @@ function IncreaseLiquidity() {
         </header>
 
         {chainId ? (
-          <AssetOverview
+          <LiquidityPositionOverview
             chainId={Number.parseInt(chainId)}
             positionId={BigNumber.from(positionId)}
           />

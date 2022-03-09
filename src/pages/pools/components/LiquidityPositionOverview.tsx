@@ -11,17 +11,17 @@ import Skeleton from 'react-loading-skeleton';
 import { HiInformationCircle } from 'react-icons/hi';
 import CustomTooltip from 'components/CustomTooltip';
 
-interface IAssetOverview {
+interface ILiquidityPositionOverview {
   chainId: number;
   positionId: BigNumber;
   hideClosedPositions?: boolean | false;
 }
 
-function AssetOverview({
+function LiquidityPositionOverview({
   chainId,
   positionId,
   hideClosedPositions,
-}: IAssetOverview) {
+}: ILiquidityPositionOverview) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -156,7 +156,7 @@ function AssetOverview({
       ? formattedTokenAmount - formattedSuppliedLiquidity
       : 0;
 
-  function handleAssetOverviewClick() {
+  function handleLiquidityPositionClick() {
     if (poolShare > 0 && isUserOnPools) {
       navigate(`manage-position/${chain?.chainId}/${positionId}`);
     }
@@ -171,7 +171,7 @@ function AssetOverview({
       className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
         poolShare > 0 && isUserOnPools ? 'cursor-pointer' : 'cursor-not-allowed'
       }`}
-      onClick={handleAssetOverviewClick}
+      onClick={handleLiquidityPositionClick}
       style={{ backgroundColor: chainColor }}
     >
       <div className="flex flex-col">
@@ -224,4 +224,4 @@ function AssetOverview({
   );
 }
 
-export default AssetOverview;
+export default LiquidityPositionOverview;

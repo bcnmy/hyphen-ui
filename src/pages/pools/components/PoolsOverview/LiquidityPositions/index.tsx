@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
-import AssetOverview from '../../AssetOverview';
+import LiquidityPositionOverview from '../../LiquidityPositionOverview';
 import { useWalletProvider } from 'context/WalletProvider';
 import useLPToken from 'hooks/contracts/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
@@ -85,7 +85,7 @@ function LiquidityPositions() {
           <section className="grid grid-cols-2 gap-2.5">
             {userPositions.map((userPositionId: BigNumber) => {
               return (
-                <AssetOverview
+                <LiquidityPositionOverview
                   key={`${
                     selectedNetwork.chainId
                   }-${userPositionId.toString()}`}

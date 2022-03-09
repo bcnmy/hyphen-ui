@@ -78,9 +78,7 @@ function Farms() {
               fill="currentFill"
             />
           </svg>
-          <span className="text-hyphen-gray-400">
-            Getting Hyphen liquidity pools.
-          </span>
+          <span className="text-hyphen-gray-400">Getting Hyphen farms.</span>
         </section>
       )}
     </article>

@@ -85,11 +85,6 @@ function AddLiquidity() {
   }, [selectedChain]);
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
 
-  const [isSelectedTokenApproved, setIsSelectedTokenApproved] = useState<
-    boolean | undefined
-  >();
-  const [selectedTokenAllowance, setSelectedTokenAllowance] =
-    useState<BigNumber>();
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<
     string | undefined
   >();
@@ -161,6 +156,35 @@ function AddLiquidity() {
     {
       // Execute only when selectedTokenAddress is available.
       enabled: !!selectedTokenAddress,
+    },
+  );
+
+  const { data: tokenAllowance, refetch: refetchTokenAllowance } = useQuery(
+    'tokenAllowance',
+    () => {
+      if (
+        !accounts ||
+        !chain ||
+        !liquidityProvidersAddress ||
+        !selectedTokenAddress ||
+        selectedTokenAddress === NATIVE_ADDRESS
+      )
+        return;
+
+      return getTokenAllowance(
+        accounts[0],
+        new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+        liquidityProvidersAddress,
+        selectedTokenAddress,
+      );
+    },
+    {
+      enabled: !!(
+        accounts &&
+        chain &&
+        liquidityProvidersAddress &&
+        selectedTokenAddress
+      ),
     },
   );
 
@@ -236,6 +260,13 @@ function AddLiquidity() {
         )
       : tokenTotalCap;
 
+  const formattedTokenAllowance =
+    tokenAllowance && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
+        )
+      : 0;
+
   const rewardAPY = 0;
   const feeAPY = feeAPYData
     ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
@@ -253,6 +284,11 @@ function AddLiquidity() {
   const isLiquidityAmountGtLiquidityBalance =
     liquidityAmount && liquidityBalance
       ? Number.parseFloat(liquidityAmount) > Number.parseFloat(liquidityBalance)
+      : false;
+
+  const isLiquidityAmountGtTokenAllowance =
+    liquidityAmount && formattedTokenAllowance >= 0
+      ? Number.parseFloat(liquidityAmount) > formattedTokenAllowance
       : false;
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
@@ -295,18 +331,6 @@ function AddLiquidity() {
       if (isLoggedIn && accounts) {
         const { displayBalance } =
           (await getTokenBalance(accounts[0], chain, token)) || {};
-
-        if (token[chain.chainId].address !== NATIVE_ADDRESS) {
-          const tokenAllowance = await getTokenAllowance(
-            accounts[0],
-            new ethers.providers.JsonRpcProvider(chain.rpcUrl),
-            liquidityProvidersAddress,
-            token[chain.chainId].address,
-          );
-          setSelectedTokenAllowance(tokenAllowance);
-        } else {
-          setIsSelectedTokenApproved(true);
-        }
         setWalletBalance(displayBalance);
       }
 
@@ -320,8 +344,6 @@ function AddLiquidity() {
     setLiquidityAmount('');
     setLiquidityBalance(undefined);
     setSelectedTokenAddress(undefined);
-    setSelectedTokenAllowance(undefined);
-    setIsSelectedTokenApproved(undefined);
     setSliderValue(0);
     setWalletBalance(undefined);
     updatePoolShare('0');
@@ -359,30 +381,6 @@ function AddLiquidity() {
     if (isInputValid) {
       setLiquidityAmount(newLiquidityAmount);
       updatePoolShare(newLiquidityAmount);
-
-      if (
-        newLiquidityAmount !== '' &&
-        selectedTokenAddress !== NATIVE_ADDRESS &&
-        selectedTokenAllowance
-      ) {
-        let rawLiquidityAmount = ethers.utils.parseUnits(
-          newLiquidityAmount,
-          tokenDecimals,
-        );
-
-        if (selectedTokenAllowance.lt(rawLiquidityAmount)) {
-          setIsSelectedTokenApproved(false);
-        } else {
-          setIsSelectedTokenApproved(true);
-        }
-      } else if (
-        newLiquidityAmount === '' &&
-        selectedTokenAddress !== NATIVE_ADDRESS
-      ) {
-        setIsSelectedTokenApproved(undefined);
-      } else {
-        setIsSelectedTokenApproved(true);
-      }
     }
   }
 
@@ -390,7 +388,6 @@ function AddLiquidity() {
     setSliderValue(value);
 
     if (value === 0) {
-      setIsSelectedTokenApproved(undefined);
       setLiquidityAmount('');
       updatePoolShare('0');
     } else if (walletBalance && parseFloat(walletBalance) > 0) {
@@ -399,30 +396,6 @@ function AddLiquidity() {
       ).toString();
       setLiquidityAmount(newLiquidityAmount);
       updatePoolShare(newLiquidityAmount);
-
-      if (
-        newLiquidityAmount !== '' &&
-        selectedTokenAddress !== NATIVE_ADDRESS &&
-        selectedTokenAllowance
-      ) {
-        let rawLiquidityAmount = ethers.utils.parseUnits(
-          newLiquidityAmount,
-          tokenDecimals,
-        );
-
-        if (selectedTokenAllowance.lt(rawLiquidityAmount)) {
-          setIsSelectedTokenApproved(false);
-        } else {
-          setIsSelectedTokenApproved(true);
-        }
-      } else if (
-        newLiquidityAmount === '' &&
-        selectedTokenAddress !== NATIVE_ADDRESS
-      ) {
-        setIsSelectedTokenApproved(undefined);
-      } else {
-        setIsSelectedTokenApproved(true);
-      }
     }
   }
 
@@ -455,7 +428,12 @@ function AddLiquidity() {
     isInfiniteApproval: boolean,
     tokenAmount: number,
   ) {
-    if (!selectedTokenAddress || !signer || !liquidityProvidersAddress) {
+    if (
+      !chain ||
+      !selectedTokenAddress ||
+      !signer ||
+      !liquidityProvidersAddress
+    ) {
       return;
     }
 
@@ -472,7 +450,7 @@ function AddLiquidity() {
     addTxNotification(
       tokenApproveTx,
       'Token approval',
-      `${fromChain?.explorerUrl}/tx/${tokenApproveTx.hash}`,
+      `${chain.explorerUrl}/tx/${tokenApproveTx.hash}`,
     );
     return await tokenApproveTx.wait(1);
   }
@@ -487,14 +465,7 @@ function AddLiquidity() {
       return;
     }
 
-    const tokenAllowance = await getTokenAllowance(
-      accounts[0],
-      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
-      liquidityProvidersAddress,
-      selectedTokenAddress,
-    );
-    setSelectedTokenAllowance(tokenAllowance);
-    setIsSelectedTokenApproved(true);
+    refetchTokenAllowance();
   }
 
   function handleConfirmSupplyClick() {
@@ -613,18 +584,16 @@ function AddLiquidity() {
               <>
                 <button
                   className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={
-                    isDataLoading ||
-                    isSelectedTokenApproved ||
-                    isSelectedTokenApproved === undefined
-                  }
+                  disabled={isDataLoading || !isLiquidityAmountGtTokenAllowance}
                   onClick={showApprovalModal}
                 >
-                  {liquidityAmount === '' && !isSelectedTokenApproved
+                  {liquidityAmount === '' ||
+                  (Number.parseFloat(liquidityAmount) === 0 &&
+                    !isLiquidityAmountGtTokenAllowance)
                     ? 'Enter amount to see approval'
                     : approveTokenLoading
                     ? 'Approving Token'
-                    : isSelectedTokenApproved
+                    : !isLiquidityAmountGtTokenAllowance
                     ? `${selectedToken?.name} Approved`
                     : `Approve ${selectedToken?.name}`}
                 </button>
@@ -635,14 +604,16 @@ function AddLiquidity() {
                     disabled={
                       isDataLoading ||
                       liquidityAmount === '' ||
-                      !isSelectedTokenApproved ||
+                      Number.parseFloat(liquidityAmount) === 0 ||
                       isLiquidityAmountGtWalletBalance ||
-                      isLiquidityAmountGtLiquidityBalance
+                      isLiquidityAmountGtLiquidityBalance ||
+                      isLiquidityAmountGtTokenAllowance
                     }
                   >
                     {!liquidityBalance
                       ? 'Getting your balance'
-                      : liquidityAmount === ''
+                      : liquidityAmount === '' ||
+                        Number.parseFloat(liquidityAmount) === 0
                       ? 'Enter Amount'
                       : isLiquidityAmountGtWalletBalance
                       ? 'Insufficient wallet balance'

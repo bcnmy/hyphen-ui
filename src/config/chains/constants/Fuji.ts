@@ -15,7 +15,7 @@ export const FUJI: ChainConfig = {
   nativeDecimal: 18,
   nativeFaucetURL: 'https://faucet.avax-test.network/',
   biconomy: {
-    enable: true,
+    enable: false,
     apiKey: 'CdOSOVUtJ.f50d832e-1e7c-45f6-9a2e-9aefc4fc8b56',
   },
   assetSentTopicId:

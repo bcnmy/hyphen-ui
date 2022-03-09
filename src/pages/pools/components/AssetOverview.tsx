@@ -115,7 +115,7 @@ function AssetOverview({
     );
   }
 
-  const isUserOnPool = location.pathname === '/pool';
+  const isUserOnPools = location.pathname === '/pools';
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
@@ -157,19 +157,19 @@ function AssetOverview({
       : 0;
 
   function handleAssetOverviewClick() {
-    if (poolShare > 0 && isUserOnPool) {
+    if (poolShare > 0 && isUserOnPools) {
       navigate(`manage-position/${chain?.chainId}/${positionId}`);
     }
   }
 
-  if (hideClosedPositions && poolShare === 0 && isUserOnPool) return null;
+  if (hideClosedPositions && poolShare === 0 && isUserOnPools) return null;
 
-  if (!hideClosedPositions && poolShare > 0 && isUserOnPool) return null;
+  if (!hideClosedPositions && poolShare > 0 && isUserOnPools) return null;
 
   return (
     <section
       className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
-        poolShare > 0 && isUserOnPool ? 'cursor-pointer' : 'cursor-not-allowed'
+        poolShare > 0 && isUserOnPools ? 'cursor-pointer' : 'cursor-not-allowed'
       }`}
       onClick={handleAssetOverviewClick}
       style={{ backgroundColor: chainColor }}

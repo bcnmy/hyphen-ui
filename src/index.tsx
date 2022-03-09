@@ -11,12 +11,12 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AppProviders from './context';
-import Pool from 'pages/pool/Pool';
+import Pools from 'pages/pools/Pools';
 import Bridge from 'pages/bridge/Bridge';
-import AddLiquidity from 'pages/pool/components/AddLiquidity';
-import PoolsOverview from 'pages/pool/components/PoolsOverview';
-import ManagePosition from 'pages/pool/components/ManagePosition';
-import IncreaseLiquidity from 'pages/pool/components/IncreaseLiquidity';
+import AddLiquidity from 'pages/pools/components/AddLiquidity';
+import PoolsOverview from 'pages/pools/components/PoolsOverview';
+import ManagePosition from 'pages/pools/components/ManagePosition';
+import IncreaseLiquidity from 'pages/pools/components/IncreaseLiquidity';
 import Farms from 'pages/farms';
 import FarmsOverview from 'pages/farms/components/FarmsOverview';
 
@@ -42,7 +42,7 @@ ReactDOM.render(
             <Route path="/" element={<App />}>
               <Route path="/" element={<Navigate replace to="/bridge" />} />
               <Route path="/bridge" element={<Bridge />} />
-              <Route path="/pool" element={<Pool />}>
+              <Route path="/pools" element={<Pools />}>
                 <Route path="" element={<PoolsOverview />} />
                 <Route path="add-liquidity" element={<AddLiquidity />} />
                 <Route

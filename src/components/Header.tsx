@@ -46,7 +46,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
           )}
         </NavLink>
         <NavLink
-          to="/pool"
+          to="/pools"
           className={({ isActive }) => (isActive ? 'relative' : 'relative')}
         >
           {({ isActive }) => (
@@ -57,7 +57,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
                   : 'relative text-gray-400 hover:text-white'
               }
             >
-              Pool
+              Pools
               <span
                 className={
                   isActive

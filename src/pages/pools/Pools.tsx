@@ -2,12 +2,12 @@ import { useWalletProvider } from 'context/WalletProvider';
 import { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 
-function Pool() {
+function Pools() {
   const { isLoggedIn, connect } = useWalletProvider()!;
 
   useEffect(() => {
     (async () => {
-      await connect().catch((e) => {
+      await connect().catch(e => {
         console.error(e);
       });
     })();
@@ -20,4 +20,4 @@ function Pool() {
   );
 }
 
-export default Pool;
+export default Pools;

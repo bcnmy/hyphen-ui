@@ -19,14 +19,25 @@ import LiquidityInfo from '../LiquidityInfo';
 import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
 import switchNetwork from 'utils/switchNetwork';
+import getTokenAllowance from 'utils/getTokenAllowance';
+import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
+import giveTokenAllowance from 'utils/giveTokenAllowance';
+import ApprovalModal from 'pages/bridge/components/ApprovalModal';
+import useModal from 'hooks/useModal';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
-    useWalletProvider()!;
+  const {
+    accounts,
+    connect,
+    currentChainId,
+    isLoggedIn,
+    signer,
+    walletProvider,
+  } = useWalletProvider()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
@@ -35,6 +46,9 @@ function IncreaseLiquidity() {
       })!
     : undefined;
 
+  const liquidityProvidersAddress = chain
+    ? LiquidityProviders[chain.chainId].address
+    : undefined;
   const { getPositionMetadata } = useLPToken(chain);
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
     useLiquidityProviders(chain);
@@ -49,6 +63,12 @@ function IncreaseLiquidity() {
     useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [poolShare, setPoolShare] = useState<number>();
+
+  const {
+    isVisible: isApprovalModalVisible,
+    hideModal: hideApprovalModal,
+    showModal: showApprovalModal,
+  } = useModal();
 
   const { data: positionMetadata } = useQuery(
     ['positionMetadata', positionId],
@@ -110,6 +130,38 @@ function IncreaseLiquidity() {
     },
   );
 
+  const { data: tokenAllowance, refetch: refetchTokenAllowance } = useQuery(
+    'tokenAllowance',
+    () => {
+      if (!accounts || !chain || !liquidityProvidersAddress || !token) return;
+
+      return getTokenAllowance(
+        accounts[0],
+        new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+        liquidityProvidersAddress,
+        token[chain.chainId].address,
+      );
+    },
+    {
+      enabled: !!(accounts && chain && liquidityProvidersAddress && token),
+    },
+  );
+
+  const {
+    isLoading: approveTokenLoading,
+    isSuccess: approveTokenSuccess,
+    data: approveTokenTx,
+    mutate: approveTokenMutation,
+  } = useMutation(
+    ({
+      isInfiniteApproval,
+      tokenAmount,
+    }: {
+      isInfiniteApproval: boolean;
+      tokenAmount: number;
+    }) => approveToken(isInfiniteApproval, tokenAmount),
+  );
+
   const {
     isLoading: increaseLiquidityLoading,
     isSuccess: increaseLiquiditySuccess,
@@ -159,6 +211,13 @@ function IncreaseLiquidity() {
       )
     : suppliedLiquidity;
 
+  const formattedTokenAllowance =
+    tokenAllowance && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
+        )
+      : 0;
+
   const isDataLoading =
     !isLoggedIn || !liquidityBalance || increaseLiquidityLoading;
 
@@ -172,6 +231,11 @@ function IncreaseLiquidity() {
     liquidityIncreaseAmount && liquidityBalance
       ? Number.parseFloat(liquidityIncreaseAmount) >
         Number.parseFloat(liquidityBalance)
+      : false;
+
+  const isLiquidityAmountGtTokenAllowance =
+    liquidityIncreaseAmount && formattedTokenAllowance >= 0
+      ? Number.parseFloat(liquidityIncreaseAmount) > formattedTokenAllowance
       : false;
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
@@ -273,6 +337,58 @@ function IncreaseLiquidity() {
     setPoolShare(Math.round(newPoolShare * 100) / 100);
   }
 
+  function executeTokenApproval(
+    isInfiniteApproval: boolean,
+    tokenAmount: number,
+  ) {
+    approveTokenMutation(
+      { isInfiniteApproval, tokenAmount },
+      {
+        onSuccess: onTokenApprovalSuccess,
+      },
+    );
+  }
+
+  async function approveToken(
+    isInfiniteApproval: boolean,
+    tokenAmount: number,
+  ) {
+    if (
+      !chain ||
+      !token ||
+      !signer ||
+      !liquidityProvidersAddress ||
+      !tokenDecimals
+    ) {
+      return;
+    }
+
+    const rawTokenAmount = isInfiniteApproval
+      ? ethers.constants.MaxUint256
+      : ethers.utils.parseUnits(tokenAmount.toString(), tokenDecimals);
+
+    const tokenApproveTx = await giveTokenAllowance(
+      liquidityProvidersAddress,
+      signer,
+      token[chain.chainId].address,
+      rawTokenAmount,
+    );
+    addTxNotification(
+      tokenApproveTx,
+      'Token approval',
+      `${chain.explorerUrl}/tx/${tokenApproveTx.hash}`,
+    );
+    return await tokenApproveTx.wait(1);
+  }
+
+  async function onTokenApprovalSuccess() {
+    if (!accounts || !token || !chain || !liquidityProvidersAddress) {
+      return;
+    }
+
+    refetchTokenAllowance();
+  }
+
   function handleConfirmSupplyClick() {
     if (!token || !chain || !tokenDecimals) {
       return;
@@ -302,166 +418,198 @@ function IncreaseLiquidity() {
   }
 
   return (
-    <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
-      <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
-        <div className="absolute left-0">
-          <button
-            className="flex items-center rounded text-hyphen-gray-400"
-            onClick={() => navigate(-1)}
-          >
-            <HiArrowSmLeft className="h-5 w-auto" />
-          </button>
-        </div>
-
-        <h2 className="text-xl text-hyphen-purple">Increase Liquidity</h2>
-
-        <div className="absolute right-0 flex">
-          <button className="mr-4 text-xs text-hyphen-purple" onClick={reset}>
-            Clear All
-          </button>
-        </div>
-      </header>
-
-      {chainId ? (
-        <AssetOverview
-          chainId={Number.parseInt(chainId)}
-          positionId={BigNumber.from(positionId)}
+    <>
+      {chain && token && liquidityIncreaseAmount ? (
+        <ApprovalModal
+          executeTokenApproval={executeTokenApproval}
+          isVisible={isApprovalModalVisible}
+          onClose={hideApprovalModal}
+          selectedChainName={chain.name}
+          selectedTokenName={token.symbol}
+          transferAmount={parseFloat(liquidityIncreaseAmount)}
         />
       ) : null}
+      <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
+        <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
+          <div className="absolute left-0">
+            <button
+              className="flex items-center rounded text-hyphen-gray-400"
+              onClick={() => navigate(-1)}
+            >
+              <HiArrowSmLeft className="h-5 w-auto" />
+            </button>
+          </div>
 
-      <section className="mt-8 grid grid-cols-2">
-        <div className="max-h-84 h-84 border-r pr-12.5 pt-9">
-          <div className="mb-9">
-            <ProgressBar
-              currentProgress={formattedTotalLiquidity}
-              totalProgress={formattedTokenTotalCap}
-            />
-            <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
-              <span>Pool cap</span>
-              <span className="flex">
-                {formattedTotalLiquidity >= 0 && formattedTokenTotalCap >= 0 ? (
-                  <>
-                    {makeNumberCompact(formattedTotalLiquidity)} {token?.symbol}{' '}
-                    / {makeNumberCompact(formattedTokenTotalCap)}{' '}
-                    {token?.symbol}
-                  </>
+          <h2 className="text-xl text-hyphen-purple">Increase Liquidity</h2>
+
+          <div className="absolute right-0 flex">
+            <button className="mr-4 text-xs text-hyphen-purple" onClick={reset}>
+              Clear All
+            </button>
+          </div>
+        </header>
+
+        {chainId ? (
+          <AssetOverview
+            chainId={Number.parseInt(chainId)}
+            positionId={BigNumber.from(positionId)}
+          />
+        ) : null}
+
+        <section className="mt-8 grid grid-cols-2">
+          <div className="max-h-100 h-100 border-r pr-12.5 pt-9">
+            <div className="mb-8">
+              <ProgressBar
+                currentProgress={formattedTotalLiquidity}
+                totalProgress={formattedTokenTotalCap}
+              />
+              <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
+                <span>Pool cap</span>
+                <span className="flex">
+                  {formattedTotalLiquidity >= 0 &&
+                  formattedTokenTotalCap >= 0 ? (
+                    <>
+                      {makeNumberCompact(formattedTotalLiquidity)}{' '}
+                      {token?.symbol} /{' '}
+                      {makeNumberCompact(formattedTokenTotalCap)}{' '}
+                      {token?.symbol}
+                    </>
+                  ) : (
+                    <Skeleton
+                      baseColor="#615ccd20"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!mx-1 !w-20"
+                    />
+                  )}
+                </span>
+              </div>
+            </div>
+
+            <label
+              htmlFor="liquidityIncreaseAmount"
+              className="flex justify-between px-5 text-xxs font-bold uppercase"
+            >
+              <span className="text-hyphen-gray-400">Input</span>
+              <span className="flex items-center text-hyphen-gray-300">
+                Your Address Limit:{' '}
+                {liquidityBalance ? (
+                  liquidityBalance
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
                     enableAnimation
                     highlightColor="#615ccd05"
-                    className="!mx-1 !w-20"
+                    className="!mx-1 !w-11"
                   />
+                )}{' '}
+                {token?.symbol}
+                <button
+                  className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                  onClick={handleMaxButtonClick}
+                  disabled={isDataLoading}
+                >
+                  MAX
+                </button>
+              </span>
+            </label>
+
+            <input
+              id="liquidityIncreaseAmount"
+              placeholder="0.000"
+              type="number"
+              inputMode="decimal"
+              className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+              value={liquidityIncreaseAmount}
+              onChange={handleLiquidityAmountChange}
+              disabled={isDataLoading}
+            />
+
+            <StepSlider
+              disabled={isDataLoading}
+              dots
+              onChange={handleSliderChange}
+              step={25}
+              value={sliderValue}
+            />
+
+            {isLoggedIn ? (
+              <>
+                <button
+                  className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                  disabled={isDataLoading || !isLiquidityAmountGtTokenAllowance}
+                  onClick={showApprovalModal}
+                >
+                  {liquidityIncreaseAmount === '' ||
+                  (Number.parseFloat(liquidityIncreaseAmount) === 0 &&
+                    !isLiquidityAmountGtTokenAllowance)
+                    ? 'Enter amount to see approval'
+                    : approveTokenLoading
+                    ? 'Approving Token'
+                    : !isLiquidityAmountGtTokenAllowance
+                    ? `${token?.symbol} Approved`
+                    : `Approve ${token?.symbol}`}
+                </button>
+                {currentChainId === chain?.chainId ? (
+                  <button
+                    className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                    disabled={
+                      isDataLoading ||
+                      liquidityIncreaseAmount === '' ||
+                      Number.parseFloat(liquidityIncreaseAmount) === 0 ||
+                      isLiquidityAmountGtWalletBalance ||
+                      isLiquidityAmountGtLiquidityBalance ||
+                      isLiquidityAmountGtTokenAllowance
+                    }
+                    onClick={handleConfirmSupplyClick}
+                  >
+                    {!liquidityBalance
+                      ? 'Getting your balance'
+                      : liquidityIncreaseAmount === '' ||
+                        Number.parseFloat(liquidityIncreaseAmount) === 0
+                      ? 'Enter Amount'
+                      : isLiquidityAmountGtWalletBalance
+                      ? 'Insufficient wallet balance'
+                      : isLiquidityAmountGtLiquidityBalance
+                      ? 'This amount exceeds your wallet cap'
+                      : increaseLiquidityLoading
+                      ? 'Increasing Liquidity'
+                      : 'Confirm Supply'}
+                  </button>
+                ) : (
+                  <button
+                    className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                    onClick={handleNetworkChange}
+                  >
+                    Switch to {chain?.name}
+                  </button>
                 )}
-              </span>
-            </div>
-          </div>
-
-          <label
-            htmlFor="liquidityIncreaseAmount"
-            className="flex justify-between px-5 text-xxs font-bold uppercase"
-          >
-            <span className="text-hyphen-gray-400">Input</span>
-            <span className="flex items-center text-hyphen-gray-300">
-              Your Address Limit:{' '}
-              {liquidityBalance ? (
-                liquidityBalance
-              ) : (
-                <Skeleton
-                  baseColor="#615ccd20"
-                  enableAnimation
-                  highlightColor="#615ccd05"
-                  className="!mx-1 !w-11"
-                />
-              )}{' '}
-              {token?.symbol}
+              </>
+            ) : (
               <button
-                className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
-                onClick={handleMaxButtonClick}
-                disabled={isDataLoading}
+                className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                onClick={connect}
               >
-                MAX
+                Connect Your Wallet
               </button>
-            </span>
-          </label>
-
-          <input
-            id="liquidityIncreaseAmount"
-            placeholder="0.000"
-            type="number"
-            inputMode="decimal"
-            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
-            value={liquidityIncreaseAmount}
-            onChange={handleLiquidityAmountChange}
-            disabled={isDataLoading}
-          />
-
-          <StepSlider
-            disabled={isDataLoading}
-            dots
-            onChange={handleSliderChange}
-            step={25}
-            value={sliderValue}
-          />
-
-          {isLoggedIn ? (
-            <>
-              {currentChainId === chain?.chainId ? (
-                <button
-                  className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={
-                    isDataLoading ||
-                    liquidityIncreaseAmount === '' ||
-                    isLiquidityAmountGtWalletBalance ||
-                    isLiquidityAmountGtLiquidityBalance
-                  }
-                  onClick={handleConfirmSupplyClick}
-                >
-                  {!liquidityBalance
-                    ? 'Getting your balance'
-                    : liquidityIncreaseAmount === ''
-                    ? 'Enter Amount'
-                    : isLiquidityAmountGtWalletBalance
-                    ? 'Insufficient wallet balance'
-                    : isLiquidityAmountGtLiquidityBalance
-                    ? 'This amount exceeds your wallet cap'
-                    : increaseLiquidityLoading
-                    ? 'Increasing Liquidity'
-                    : 'Confirm Supply'}
-                </button>
-              ) : (
-                <button
-                  className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
-                  onClick={handleNetworkChange}
-                >
-                  Switch to {chain?.name}
-                </button>
-              )}
-            </>
-          ) : (
-            <button
-              className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
-              onClick={connect}
-            >
-              Connect Your Wallet
-            </button>
-          )}
-        </div>
-        <div className="max-h-84 flex h-84 flex-col justify-between pl-12.5 pt-3">
-          <div className="grid grid-cols-2">
-            <div className="flex flex-col">
-              <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
-                Updated pool share
-              </span>
-              <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                {poolShare || '...'}%
+            )}
+          </div>
+          <div className="max-h-100 flex h-100 flex-col justify-between pl-12.5 pt-3">
+            <div className="grid grid-cols-2">
+              <div className="flex flex-col">
+                <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                  Updated pool share
+                </span>
+                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                  {poolShare || '...'}%
+                </div>
               </div>
             </div>
+            <LiquidityInfo />
           </div>
-          <LiquidityInfo />
-        </div>
-      </section>
-    </article>
+        </section>
+      </article>
+    </>
   );
 }
 

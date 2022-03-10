@@ -115,7 +115,8 @@ function AssetOverview({
     );
   }
 
-  const isUserOnPool = location.pathname === '/pool';
+  const isUserOnPool =
+    location.pathname === '/pool' || location.pathname === '/pool/';
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
@@ -161,6 +162,8 @@ function AssetOverview({
       navigate(`manage-position/${chain?.chainId}/${positionId}`);
     }
   }
+
+  console.log(hideClosedPositions, poolShare, isUserOnPool);
 
   if (hideClosedPositions && poolShare === 0 && isUserOnPool) return null;
 

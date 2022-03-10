@@ -133,7 +133,14 @@ function IncreaseLiquidity() {
   const { data: tokenAllowance, refetch: refetchTokenAllowance } = useQuery(
     'tokenAllowance',
     () => {
-      if (!accounts || !chain || !liquidityProvidersAddress || !token) return;
+      if (
+        !accounts ||
+        !chain ||
+        !liquidityProvidersAddress ||
+        !token ||
+        token[chain.chainId].address === NATIVE_ADDRESS
+      )
+        return;
 
       return getTokenAllowance(
         accounts[0],
@@ -223,6 +230,9 @@ function IncreaseLiquidity() {
     !liquidityBalance ||
     approveTokenLoading ||
     increaseLiquidityLoading;
+
+  const isNativeToken =
+    chain && token ? token[chain.chainId].address === NATIVE_ADDRESS : false;
 
   const isLiquidityAmountGtWalletBalance =
     liquidityIncreaseAmount && walletBalance
@@ -540,7 +550,11 @@ function IncreaseLiquidity() {
               <>
                 <button
                   className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={isDataLoading || !isLiquidityAmountGtTokenAllowance}
+                  disabled={
+                    isDataLoading ||
+                    isNativeToken ||
+                    !isLiquidityAmountGtTokenAllowance
+                  }
                   onClick={showApprovalModal}
                 >
                   {liquidityIncreaseAmount === '' ||
@@ -549,7 +563,7 @@ function IncreaseLiquidity() {
                     ? 'Enter amount to see approval'
                     : approveTokenLoading
                     ? 'Approving Token'
-                    : !isLiquidityAmountGtTokenAllowance
+                    : isNativeToken || !isLiquidityAmountGtTokenAllowance
                     ? `${token?.symbol} Approved`
                     : `Approve ${token?.symbol}`}
                 </button>

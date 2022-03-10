@@ -163,8 +163,6 @@ function AssetOverview({
     }
   }
 
-  console.log(hideClosedPositions, poolShare, isUserOnPool);
-
   if (hideClosedPositions && poolShare === 0 && isUserOnPool) return null;
 
   if (!hideClosedPositions && poolShare > 0 && isUserOnPool) return null;

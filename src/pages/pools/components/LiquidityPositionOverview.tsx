@@ -115,7 +115,7 @@ function LiquidityPositionOverview({
     );
   }
 
-  const isUserOnPool =
+  const isUserOnPools =
     location.pathname === '/pools' || location.pathname === '/pools/';
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;

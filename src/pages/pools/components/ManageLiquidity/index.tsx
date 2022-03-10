@@ -136,26 +136,26 @@ function ManagePosition() {
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
         )
-      : null;
+      : 0;
 
   const formattedTokenAmount =
     tokenAmount && tokenDecimals
       ? Number.parseFloat(ethers.utils.formatUnits(tokenAmount, tokenDecimals))
-      : null;
+      : 0;
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
         )
-      : totalLiquidity;
+      : 0;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
-      : tokenTotalCap;
+      : 0;
 
   const unclaimedFees =
     formattedTokenAmount && formattedSuppliedLiquidity
@@ -169,9 +169,7 @@ function ManagePosition() {
     claimFeeLoading;
 
   const isRemovalAmountGtSuppliedLiquidity =
-    liquidityRemovalAmount && formattedSuppliedLiquidity
-      ? Number.parseFloat(liquidityRemovalAmount) > formattedSuppliedLiquidity
-      : false;
+    Number.parseFloat(liquidityRemovalAmount) > formattedSuppliedLiquidity;
 
   function reset() {
     setLiquidityRemovalAmount('');
@@ -317,7 +315,7 @@ function ManagePosition() {
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
               Balance:{' '}
-              {formattedSuppliedLiquidity ? (
+              {formattedSuppliedLiquidity >= 0 ? (
                 formattedSuppliedLiquidity
               ) : (
                 <Skeleton

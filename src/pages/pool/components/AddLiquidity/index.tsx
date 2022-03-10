@@ -353,6 +353,7 @@ function AddLiquidity() {
     const { symbol: tokenSymbol } = tokens.find(
       tokenObj => tokenObj.symbol === selectedToken.id,
     )!;
+    queryClient.removeQueries();
     reset();
     navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
   }
@@ -364,6 +365,7 @@ function AddLiquidity() {
     const [{ symbol: tokenSymbol }] = tokens.filter(
       tokenObj => tokenObj[chainId],
     );
+    queryClient.removeQueries();
     reset();
     navigate(`/pool/add-liquidity/${chainId}/${tokenSymbol}`);
   }

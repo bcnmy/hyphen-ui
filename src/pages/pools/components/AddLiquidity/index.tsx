@@ -97,10 +97,10 @@ function AddLiquidity() {
   const [poolShare, setPoolShare] = useState<number>(0);
 
   const tokenDecimals = useMemo(() => {
-    if (!currentChainId || !selectedToken) return undefined;
-    const token = tokens.find(token => token.symbol === selectedToken?.id)!;
-    return token[currentChainId].decimal;
-  }, [currentChainId, selectedToken]);
+    if (!chainId || !tokenSymbol) return undefined;
+    const token = tokens.find(token => token.symbol === tokenSymbol)!;
+    return token[Number.parseInt(chainId)].decimal;
+  }, [chainId, tokenSymbol]);
 
   const {
     isVisible: isApprovalModalVisible,

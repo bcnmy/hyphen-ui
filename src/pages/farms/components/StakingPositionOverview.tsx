@@ -1,9 +1,10 @@
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';
 import { useQuery } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
+import Skeleton from 'react-loading-skeleton';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -30,6 +31,8 @@ function StakingPositionOverview({
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
+  const rewardAPY = 55;
+
   const token =
     chain && tokenAddress
       ? tokens.find(tokenObj => {
@@ -40,7 +43,30 @@ function StakingPositionOverview({
         })
       : null;
 
+  const isDataLoading = isPositionMetadataLoading;
+
+  if (isDataLoading || !token || !chain) {
+    return (
+      <Skeleton
+        baseColor="#615ccd20"
+        enableAnimation
+        highlightColor="#615ccd05"
+        className="!h-37.5 !rounded-7.5"
+        containerClassName="block leading-none"
+      />
+    );
+  }
+
   const isUserOnFarms = location.pathname === '/farms';
+
+  const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
+
+  const formattedSuppliedLiquidity =
+    suppliedLiquidity && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
+        )
+      : suppliedLiquidity;
 
   const { name: chainName } = chain;
   const {
@@ -78,36 +104,23 @@ function StakingPositionOverview({
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">Pool Share: {poolShare}%</span>
+        <span className="font-mono text-xs">TVL: $525,234</span>
       </div>
       <div className="flex flex-col items-end">
-        <span className="mb-2.5 text-xxs font-bold uppercase ">APY</span>
+        <span className="mb-2.5 text-xxs font-bold uppercase ">Reward APY</span>
         <div className="mb-5">
           <div className="flex flex-col items-end">
             <div className="flex items-center">
               <span className="font-mono text-2xl">
-                {APY >= 0 ? `${APY}%` : '...'}
+                {rewardAPY >= 0 ? `${rewardAPY}%` : '...'}
               </span>
-              <HiInformationCircle
-                className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
-                data-tip
-                data-for={`${positionId}-apy`}
-                onClick={e => e.stopPropagation()}
-              />
-              <CustomTooltip id={`${positionId}-apy`}>
-                <p>Reward APY: {rewardAPY}%</p>
-                <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
-              </CustomTooltip>
             </div>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
               Annualized
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">
-          Unclaimed Fees: ~ {unclaimedFees > 0 ? unclaimedFees.toFixed(5) : 0}{' '}
-          {tokenSymbol}
-        </span>
+        <span className="font-mono text-xs">Farm Rate: 566 BICO per day</span>
       </div>
     </section>
   );

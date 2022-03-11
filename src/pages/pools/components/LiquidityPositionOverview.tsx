@@ -158,19 +158,23 @@ function LiquidityPositionOverview({
       : 0;
 
   function handleLiquidityPositionClick() {
-    if (poolShare > 0 && isUserOnPools) {
+    if (formattedSuppliedLiquidity > 0 && isUserOnPools) {
       navigate(`manage-position/${chain?.chainId}/${positionId}`);
     }
   }
 
-  if (hideClosedPositions && poolShare === 0 && isUserOnPools) return null;
+  if (hideClosedPositions && formattedSuppliedLiquidity <= 0 && isUserOnPools)
+    return null;
 
-  if (!hideClosedPositions && poolShare > 0 && isUserOnPools) return null;
+  if (!hideClosedPositions && formattedSuppliedLiquidity > 0 && isUserOnPools)
+    return null;
 
   return (
     <section
       className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
-        poolShare > 0 && isUserOnPools ? 'cursor-pointer' : 'cursor-not-allowed'
+        formattedSuppliedLiquidity > 0 && isUserOnPools
+          ? 'cursor-pointer'
+          : 'cursor-not-allowed'
       }`}
       onClick={handleLiquidityPositionClick}
       style={{ backgroundColor: chainColor }}

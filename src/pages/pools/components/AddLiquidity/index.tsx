@@ -276,6 +276,8 @@ function AddLiquidity() {
   const isDataLoading =
     !liquidityBalance || approveTokenLoading || addLiquidityLoading;
 
+  const isNativeToken = selectedTokenAddress === NATIVE_ADDRESS;
+
   const isLiquidityAmountGtWalletBalance =
     liquidityAmount && walletBalance
       ? Number.parseFloat(liquidityAmount) > Number.parseFloat(walletBalance)
@@ -551,9 +553,9 @@ function AddLiquidity() {
             >
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex text-hyphen-gray-300">
-                Your Address Limit:{' '}
-                {liquidityBalance ? (
-                  liquidityBalance
+                Wallet Balance:{' '}
+                {walletBalance ? (
+                  walletBalance
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
@@ -586,7 +588,11 @@ function AddLiquidity() {
               <>
                 <button
                   className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={isDataLoading || !isLiquidityAmountGtTokenAllowance}
+                  disabled={
+                    isDataLoading ||
+                    isNativeToken ||
+                    !isLiquidityAmountGtTokenAllowance
+                  }
                   onClick={showApprovalModal}
                 >
                   {liquidityAmount === '' ||
@@ -595,7 +601,7 @@ function AddLiquidity() {
                     ? 'Enter amount to see approval'
                     : approveTokenLoading
                     ? 'Approving Token'
-                    : !isLiquidityAmountGtTokenAllowance
+                    : isNativeToken || !isLiquidityAmountGtTokenAllowance
                     ? `${selectedToken?.name} Approved`
                     : `Approve ${selectedToken?.name}`}
                 </button>

@@ -44,6 +44,7 @@ export interface ITransactionDetails {
   exitHash: string;
   fromChain: ChainConfig;
   fromChainExplorerUrl: string;
+  gasFee: string;
   lpFee: string;
   rewardAmount: string;
   startTimestamp: number;
@@ -74,6 +75,7 @@ const USER_DEPOSITS = gql`
 const FEE_INFO = gql`
   query FEE_INFO($exitHash: String!) {
     feeDetailLogEntry(id: $exitHash) {
+      gasFee
       lpFee
       timestamp
       transferFee
@@ -148,12 +150,18 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         const tokenDecimals = token[fromChain.chainId].decimal;
 
         const {
-          feeDetailLogEntry: { lpFee, timestamp: endTimestamp, transferFee },
+          feeDetailLogEntry: {
+            gasFee,
+            lpFee,
+            timestamp: endTimestamp,
+            transferFee,
+          },
         } = await getFeeInfo(exitHash, toChain);
 
-        const amountReceived = BigNumber.from(amount).sub(
-          BigNumber.from(lpFee).add(BigNumber.from(transferFee)),
-        );
+        const amountReceived = BigNumber.from(amount)
+          .add(BigNumber.from(rewardAmount))
+          .sub(BigNumber.from(transferFee))
+          .sub(BigNumber.from(gasFee));
 
         const formattedAmount = Number.parseFloat(
           ethers.utils.formatUnits(
@@ -161,15 +169,23 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
             tokenDecimals,
           ),
         ).toFixed(3);
+
         const formattedAmountReceived = Number.parseFloat(
           ethers.utils.formatUnits(amountReceived, tokenDecimals),
         ).toFixed(3);
+
         const formattedRewardAmount = Number.parseFloat(
           ethers.utils.formatUnits(rewardAmount, tokenDecimals),
         ).toFixed(3);
+
+        const formattedGasFee = Number.parseFloat(
+          ethers.utils.formatUnits(gasFee, tokenDecimals),
+        ).toFixed(3);
+
         const formattedLpFee = Number.parseFloat(
           ethers.utils.formatUnits(lpFee, tokenDecimals),
         ).toFixed(3);
+
         const formattedTransactionFee = Number.parseFloat(
           ethers.utils.formatUnits(
             BigNumber.from(transferFee).sub(BigNumber.from(lpFee)),
@@ -185,6 +201,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           exitHash,
           fromChain,
           fromChainExplorerUrl,
+          gasFees: formattedGasFee,
           lpFee: formattedLpFee,
           rewardAmount: formattedRewardAmount,
           startTimestamp,

@@ -133,7 +133,14 @@ function IncreaseLiquidity() {
   const { data: tokenAllowance, refetch: refetchTokenAllowance } = useQuery(
     'tokenAllowance',
     () => {
-      if (!accounts || !chain || !liquidityProvidersAddress || !token) return;
+      if (
+        !accounts ||
+        !chain ||
+        !liquidityProvidersAddress ||
+        !token ||
+        token[chain.chainId].address === NATIVE_ADDRESS
+      )
+        return;
 
       return getTokenAllowance(
         accounts[0],
@@ -223,6 +230,9 @@ function IncreaseLiquidity() {
     !liquidityBalance ||
     approveTokenLoading ||
     increaseLiquidityLoading;
+
+  const isNativeToken =
+    chain && token ? token[chain.chainId].address === NATIVE_ADDRESS : false;
 
   const isLiquidityAmountGtWalletBalance =
     liquidityIncreaseAmount && walletBalance
@@ -495,9 +505,9 @@ function IncreaseLiquidity() {
             >
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex items-center text-hyphen-gray-300">
-                Your Address Limit:{' '}
-                {liquidityBalance ? (
-                  liquidityBalance
+                Wallet Balance:{' '}
+                {walletBalance ? (
+                  walletBalance
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
@@ -507,26 +517,29 @@ function IncreaseLiquidity() {
                   />
                 )}{' '}
                 {token?.symbol}
-                <button
-                  className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
-                  onClick={handleMaxButtonClick}
-                  disabled={isDataLoading}
-                >
-                  MAX
-                </button>
               </span>
             </label>
 
-            <input
-              id="liquidityIncreaseAmount"
-              placeholder="0.000"
-              type="number"
-              inputMode="decimal"
-              className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
-              value={liquidityIncreaseAmount}
-              onChange={handleLiquidityAmountChange}
-              disabled={isDataLoading}
-            />
+            <div className="relative mt-2 mb-6">
+              <input
+                id="liquidityIncreaseAmount"
+                placeholder="0.000"
+                type="number"
+                inputMode="decimal"
+                className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                value={liquidityIncreaseAmount}
+                onChange={handleLiquidityAmountChange}
+                disabled={isDataLoading}
+              />
+
+              <button
+                className="absolute right-[18px] top-[22px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                onClick={handleMaxButtonClick}
+                disabled={isDataLoading}
+              >
+                MAX
+              </button>
+            </div>
 
             <StepSlider
               disabled={isDataLoading}
@@ -540,7 +553,11 @@ function IncreaseLiquidity() {
               <>
                 <button
                   className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={isDataLoading || !isLiquidityAmountGtTokenAllowance}
+                  disabled={
+                    isDataLoading ||
+                    isNativeToken ||
+                    !isLiquidityAmountGtTokenAllowance
+                  }
                   onClick={showApprovalModal}
                 >
                   {liquidityIncreaseAmount === '' ||
@@ -549,7 +566,7 @@ function IncreaseLiquidity() {
                     ? 'Enter amount to see approval'
                     : approveTokenLoading
                     ? 'Approving Token'
-                    : !isLiquidityAmountGtTokenAllowance
+                    : isNativeToken || !isLiquidityAmountGtTokenAllowance
                     ? `${token?.symbol} Approved`
                     : `Approve ${token?.symbol}`}
                 </button>

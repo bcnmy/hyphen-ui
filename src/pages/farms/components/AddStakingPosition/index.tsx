@@ -31,6 +31,7 @@ function AddStakingPosition() {
         return tokenObj.symbol === tokenSymbol;
       })
     : undefined;
+  const chainColor = chain && token ? token[chain.chainId].chainColor : '';
 
   const { getPositionMetadata, getUserPositions } = useLPToken(chain);
 
@@ -152,7 +153,19 @@ function AddStakingPosition() {
                 {filteredUserPositions.map(
                   (userPosition: BigNumber, index: number) => {
                     return (
-                      <div className="mx-1 h-2.5 w-2.5 rounded-full bg-hyphen-gray-200"></div>
+                      <button
+                        key={`${chainId}-${userPosition.toString()}`}
+                        className={`mx-1 h-2.5 rounded-full ${
+                          currentPosition === index
+                            ? 'w-14'
+                            : 'w-2.5 bg-hyphen-gray-100'
+                        }`}
+                        onClick={() => setCurrentPosition(index)}
+                        style={{
+                          backgroundColor:
+                            currentPosition === index ? chainColor : '',
+                        }}
+                      ></button>
                     );
                   },
                 )}

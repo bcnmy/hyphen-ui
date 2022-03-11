@@ -158,19 +158,23 @@ function AssetOverview({
       : 0;
 
   function handleAssetOverviewClick() {
-    if (poolShare > 0 && isUserOnPool) {
+    if (formattedSuppliedLiquidity > 0 && isUserOnPool) {
       navigate(`manage-position/${chain?.chainId}/${positionId}`);
     }
   }
 
-  if (hideClosedPositions && poolShare === 0 && isUserOnPool) return null;
+  if (hideClosedPositions && formattedSuppliedLiquidity <= 0 && isUserOnPool)
+    return null;
 
-  if (!hideClosedPositions && poolShare > 0 && isUserOnPool) return null;
+  if (!hideClosedPositions && formattedSuppliedLiquidity > 0 && isUserOnPool)
+    return null;
 
   return (
     <section
       className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
-        poolShare > 0 && isUserOnPool ? 'cursor-pointer' : 'cursor-not-allowed'
+        formattedSuppliedLiquidity > 0 && isUserOnPool
+          ? 'cursor-pointer'
+          : 'cursor-not-allowed'
       }`}
       onClick={handleAssetOverviewClick}
       style={{ backgroundColor: chainColor }}

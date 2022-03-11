@@ -31,7 +31,6 @@ function TransactionDetailModal({
     endTimestamp,
     fromChain,
     fromChainExplorerUrl,
-    gasFee,
     lpFee,
     rewardAmount,
     startTimestamp,

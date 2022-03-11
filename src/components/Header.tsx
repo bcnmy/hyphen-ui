@@ -2,6 +2,7 @@ import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useWalletProvider } from 'context/WalletProvider';
 import { HiOutlineArrowSmRight } from 'react-icons/hi';
 import NetworkSelector from './NetworkSelector';
+import { ENV } from 'types/environment';
 
 interface IHeaderProps {
   showUserInfoModal: () => void;
@@ -14,6 +15,11 @@ function Header({ showUserInfoModal }: IHeaderProps) {
 
   const showNetworkSelector =
     location.pathname === '/pool' || location.pathname === '/pool/';
+
+  const statsUrl =
+    process.env.REACT_APP_ENV === ENV.production
+      ? 'https://hyphen-info.biconomy.io/'
+      : 'https://hyphen-stats-staging.biconomy.io/';
 
   return (
     <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">
@@ -72,7 +78,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
         </NavLink>
         <a
           target="_blank"
-          href="https://hyphen-info.biconomy.io/"
+          href={statsUrl}
           rel="noreferrer"
           className="relative flex items-center text-gray-400 hover:text-white"
         >

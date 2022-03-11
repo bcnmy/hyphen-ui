@@ -314,7 +314,7 @@ function ManagePosition() {
           >
             <span className="text-hyphen-gray-400">Input</span>
             <span className="flex items-center text-hyphen-gray-300">
-              Balance:{' '}
+              Liquidity Balance:{' '}
               {formattedSuppliedLiquidity >= 0 ? (
                 formattedSuppliedLiquidity
               ) : (
@@ -326,25 +326,29 @@ function ManagePosition() {
                 />
               )}{' '}
               {token?.symbol}
-              <button
-                className="ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
-                onClick={handleMaxButtonClick}
-                disabled={isDataLoading}
-              >
-                MAX
-              </button>
             </span>
           </label>
-          <input
-            id="liquidityRemovalAmount"
-            placeholder="0.000"
-            type="number"
-            inputMode="decimal"
-            className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
-            value={liquidityRemovalAmount}
-            onChange={handleLiquidityAmountChange}
-            disabled={isDataLoading}
-          />
+
+          <div className="relative mt-2 mb-6">
+            <input
+              id="liquidityRemovalAmount"
+              placeholder="0.000"
+              type="number"
+              inputMode="decimal"
+              className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+              value={liquidityRemovalAmount}
+              onChange={handleLiquidityAmountChange}
+              disabled={isDataLoading}
+            />
+
+            <button
+              className="absolute right-[18px] top-[22px] flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+              onClick={handleMaxButtonClick}
+              disabled={isDataLoading}
+            >
+              MAX
+            </button>
+          </div>
 
           <StepSlider
             dots

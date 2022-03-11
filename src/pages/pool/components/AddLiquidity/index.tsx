@@ -553,9 +553,9 @@ function AddLiquidity() {
             >
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex text-hyphen-gray-300">
-                Your Address Limit:{' '}
-                {liquidityBalance ? (
-                  liquidityBalance
+                Wallet Balance:{' '}
+                {walletBalance ? (
+                  walletBalance
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"

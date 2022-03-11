@@ -13,6 +13,8 @@ import StakingPositionOverview from '../StakingPositionOverview';
 import emptyPositionsIcon from '../../../../assets/images/empty-positions-icon.svg';
 import { useState } from 'react';
 import tokens from 'config/tokens';
+import FarmsInfo from 'pages/farms/FarmsInfo';
+import Skeleton from 'react-loading-skeleton';
 
 function AddStakingPosition() {
   const navigate = useNavigate();
@@ -31,9 +33,13 @@ function AddStakingPosition() {
         return tokenObj.symbol === tokenSymbol;
       })
     : undefined;
+
   const chainColor = chain && token ? token[chain.chainId].chainColor : '';
 
-  const { getPositionMetadata, getUserPositions } = useLPToken(chain);
+  const { getPositionMetadata, getTokenURI, getUserPositions } =
+    useLPToken(chain);
+
+  const [currentPosition, setCurrentPosition] = useState<number>(0);
 
   const { isLoading, data: userPositions } = useQuery(
     ['userPositions', accounts],
@@ -59,22 +65,35 @@ function AddStakingPosition() {
     }) ?? [],
   );
 
-  const [firstPositionMetadata] = userPositionsMetadata;
-  const { status: firstPositionStatus } = firstPositionMetadata || {};
-
   const filteredUserPositions =
     userPositions?.filter((userPosition: BigNumber, index: number) => {
       const { data: positionMetadata } =
         (userPositionsMetadata[index] as any) ?? [];
-      const [tokenAddress] = positionMetadata ?? [];
+      const [tokenAddress, suppliedLiquidity] = positionMetadata ?? [];
 
       return chain && token && tokenAddress
         ? token[chain.chainId].address.toLowerCase() ===
-            tokenAddress.toLowerCase()
+            tokenAddress.toLowerCase() && suppliedLiquidity.gt(0)
         : false;
     }) ?? [];
 
-  const [currentPosition, setCurrentPosition] = useState<number>(0);
+  const userPositionsNFTs = useQueries(
+    filteredUserPositions?.map((userPosition: BigNumber) => {
+      return {
+        queryKey: ['userPositionsNFTs', userPosition],
+        queryFn: () => getTokenURI(userPosition),
+      };
+    }) ?? [],
+  );
+
+  const { data }: { data: any } = userPositionsNFTs[currentPosition] ?? {};
+  const jsonManifestString = data ? atob(data.substring(29)) : '';
+  const { image: userPositionNFT = undefined } = jsonManifestString
+    ? JSON.parse(jsonManifestString)
+    : {};
+
+  const [firstPositionMetadata] = userPositionsMetadata;
+  const { status: firstPositionStatus } = firstPositionMetadata || {};
 
   function handlePrevPositionClick() {
     const newPosition =
@@ -123,54 +142,101 @@ function AddStakingPosition() {
           token &&
           filteredUserPositions &&
           firstPositionStatus === 'success' ? (
-            <section className="grid grid-cols-1">
-              <div className="relative">
-                <button
-                  className="absolute top-[60px] left-[-15px] flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100"
-                  onClick={handlePrevPositionClick}
-                >
-                  <HiOutlineChevronLeft />
-                </button>
-                {filteredUserPositions.map(
-                  (userPosition: BigNumber, index: number) => {
-                    return index === currentPosition ? (
-                      <StakingPositionOverview
-                        key={`${chainId}-${userPosition.toString()}`}
-                        chainId={chain.chainId}
-                        positionId={userPosition}
-                      />
-                    ) : null;
-                  },
-                )}
-                <button
-                  className="absolute top-[60px] right-[-15px] flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100"
-                  onClick={handleNextPositionClick}
-                >
-                  <HiOutlineChevronRight />
-                </button>
-              </div>
-              <div className="mt-4 flex justify-center">
-                {filteredUserPositions.map(
-                  (userPosition: BigNumber, index: number) => {
-                    return (
-                      <button
-                        key={`${chainId}-${userPosition.toString()}`}
-                        className={`mx-1 h-2.5 rounded-full ${
-                          currentPosition === index
-                            ? 'w-14'
-                            : 'w-2.5 bg-hyphen-gray-100'
-                        }`}
-                        onClick={() => setCurrentPosition(index)}
-                        style={{
-                          backgroundColor:
-                            currentPosition === index ? chainColor : '',
-                        }}
-                      ></button>
-                    );
-                  },
-                )}
-              </div>
-            </section>
+            <>
+              <section className="grid grid-cols-1">
+                <div className="relative mb-8">
+                  <button
+                    className="absolute top-[60px] left-[-15px] flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100"
+                    onClick={handlePrevPositionClick}
+                  >
+                    <HiOutlineChevronLeft />
+                  </button>
+                  {filteredUserPositions.map(
+                    (userPosition: BigNumber, index: number) => {
+                      return index === currentPosition ? (
+                        <StakingPositionOverview
+                          key={`${chainId}-${userPosition.toString()}`}
+                          chainId={chain.chainId}
+                          positionId={userPosition}
+                        />
+                      ) : null;
+                    },
+                  )}
+                  <button
+                    className="absolute top-[60px] right-[-15px] flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100"
+                    onClick={handleNextPositionClick}
+                  >
+                    <HiOutlineChevronRight />
+                  </button>
+                </div>
+                <div className="mb-8 flex justify-center">
+                  {filteredUserPositions.map(
+                    (userPosition: BigNumber, index: number) => {
+                      return (
+                        <button
+                          key={`${chainId}-${userPosition.toString()}`}
+                          className={`mx-1 h-2.5 rounded-full ${
+                            currentPosition === index
+                              ? 'w-14'
+                              : 'w-2.5 bg-hyphen-gray-100'
+                          }`}
+                          onClick={() => setCurrentPosition(index)}
+                          style={{
+                            backgroundColor:
+                              currentPosition === index ? chainColor : '',
+                          }}
+                        ></button>
+                      );
+                    },
+                  )}
+                </div>
+              </section>
+
+              <section className="grid grid-cols-2">
+                <div className="flex h-[612px] max-h-[612px] flex-col border-r pr-12.5 pt-2">
+                  <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                    Your Position NFT
+                  </span>
+
+                  {userPositionNFT ? (
+                    <img
+                      src={userPositionNFT}
+                      alt="Position NFT"
+                      className="mt-2"
+                    />
+                  ) : (
+                    <Skeleton
+                      baseColor="#615ccd20"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!mt-2 !h-[411px] !w-[411px] !rounded-7.5"
+                      containerClassName="block leading-none"
+                    />
+                  )}
+
+                  <button className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300">
+                    Approve NFT
+                  </button>
+                  <button className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300">
+                    Stake NFT Position
+                  </button>
+                </div>
+
+                <div className="flex h-[612px] max-h-[612px] flex-col justify-between pl-12.5 pt-2">
+                  <div className="grid grid-cols-2">
+                    <div className="flex flex-col">
+                      <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                        Unclaimed Bico
+                      </span>
+                      <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                        0
+                      </div>
+                    </div>
+                  </div>
+                  <FarmsInfo />
+                </div>
+              </section>
+            </>
           ) : (
             <section className="flex h-auto flex-col items-center justify-start">
               <div className="mt-12 mb-16 flex items-center">

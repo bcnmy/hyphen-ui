@@ -26,6 +26,15 @@ function useLPToken(chain: ChainConfig | undefined) {
     [lpTokenContract],
   );
 
+  const getTokenURI = useCallback(
+    (positionId: BigNumber) => {
+      if (!lpTokenContract) return;
+
+      return lpTokenContract.tokenURI(positionId);
+    },
+    [lpTokenContract],
+  );
+
   const getUserPositions = useCallback(
     (accounts: string[]) => {
       if (!lpTokenContract) return;
@@ -35,7 +44,7 @@ function useLPToken(chain: ChainConfig | undefined) {
     [lpTokenContract],
   );
 
-  return { getPositionMetadata, getUserPositions };
+  return { getPositionMetadata, getTokenURI, getUserPositions };
 }
 
 export default useLPToken;

@@ -551,54 +551,56 @@ function IncreaseLiquidity() {
 
             {isLoggedIn ? (
               <>
-                <button
-                  className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={
-                    isDataLoading ||
-                    isNativeToken ||
-                    !isLiquidityAmountGtTokenAllowance
-                  }
-                  onClick={showApprovalModal}
-                >
-                  {liquidityIncreaseAmount === '' ||
-                  (Number.parseFloat(liquidityIncreaseAmount) === 0 &&
-                    !isLiquidityAmountGtTokenAllowance)
-                    ? 'Enter amount to see approval'
-                    : approveTokenLoading
-                    ? 'Approving Token'
-                    : isNativeToken || !isLiquidityAmountGtTokenAllowance
-                    ? `${token?.symbol} Approved`
-                    : `Approve ${token?.symbol}`}
-                </button>
                 {currentChainId === chain?.chainId ? (
-                  <button
-                    className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                    disabled={
-                      isDataLoading ||
-                      liquidityIncreaseAmount === '' ||
-                      Number.parseFloat(liquidityIncreaseAmount) === 0 ||
-                      isLiquidityAmountGtWalletBalance ||
-                      isLiquidityAmountGtLiquidityBalance ||
-                      isLiquidityAmountGtTokenAllowance
-                    }
-                    onClick={handleConfirmSupplyClick}
-                  >
-                    {!liquidityBalance
-                      ? 'Getting your balance'
-                      : liquidityIncreaseAmount === '' ||
-                        Number.parseFloat(liquidityIncreaseAmount) === 0
-                      ? 'Enter Amount'
-                      : isLiquidityAmountGtWalletBalance
-                      ? 'Insufficient wallet balance'
-                      : isLiquidityAmountGtLiquidityBalance
-                      ? 'This amount exceeds your wallet cap'
-                      : increaseLiquidityLoading
-                      ? 'Increasing Liquidity'
-                      : 'Confirm Supply'}
-                  </button>
+                  <>
+                    <button
+                      className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                      disabled={
+                        isDataLoading ||
+                        isNativeToken ||
+                        !isLiquidityAmountGtTokenAllowance
+                      }
+                      onClick={showApprovalModal}
+                    >
+                      {liquidityIncreaseAmount === '' ||
+                      (Number.parseFloat(liquidityIncreaseAmount) === 0 &&
+                        !isLiquidityAmountGtTokenAllowance)
+                        ? 'Enter amount to see approval'
+                        : approveTokenLoading
+                        ? 'Approving Token'
+                        : isNativeToken || !isLiquidityAmountGtTokenAllowance
+                        ? `${token?.symbol} Approved`
+                        : `Approve ${token?.symbol}`}
+                    </button>
+                    <button
+                      className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                      disabled={
+                        isDataLoading ||
+                        liquidityIncreaseAmount === '' ||
+                        Number.parseFloat(liquidityIncreaseAmount) === 0 ||
+                        isLiquidityAmountGtWalletBalance ||
+                        isLiquidityAmountGtLiquidityBalance ||
+                        isLiquidityAmountGtTokenAllowance
+                      }
+                      onClick={handleConfirmSupplyClick}
+                    >
+                      {!liquidityBalance
+                        ? 'Getting your balance'
+                        : liquidityIncreaseAmount === '' ||
+                          Number.parseFloat(liquidityIncreaseAmount) === 0
+                        ? 'Enter Amount'
+                        : isLiquidityAmountGtWalletBalance
+                        ? 'Insufficient wallet balance'
+                        : isLiquidityAmountGtLiquidityBalance
+                        ? 'This amount exceeds your wallet cap'
+                        : increaseLiquidityLoading
+                        ? 'Increasing Liquidity'
+                        : 'Confirm Supply'}
+                    </button>
+                  </>
                 ) : (
                   <button
-                    className="mt-11 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                    className="mt-28 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                     onClick={handleNetworkChange}
                   >
                     Switch to {chain?.name}

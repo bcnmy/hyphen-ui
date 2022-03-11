@@ -251,26 +251,26 @@ function AddLiquidity() {
       ? Number.parseFloat(
           ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const formattedTokenAllowance =
     tokenAllowance && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const rewardAPY = 0;
   const feeAPY = feeAPYData
     ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
-    : 0;
+    : -1;
   const APY = rewardAPY + feeAPY;
 
   const isDataLoading =

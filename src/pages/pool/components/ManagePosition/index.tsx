@@ -136,31 +136,31 @@ function ManagePosition() {
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const formattedTokenAmount =
     tokenAmount && tokenDecimals
       ? Number.parseFloat(ethers.utils.formatUnits(tokenAmount, tokenDecimals))
-      : 0;
+      : -1;
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const unclaimedFees =
     formattedTokenAmount && formattedSuppliedLiquidity
       ? formattedTokenAmount - formattedSuppliedLiquidity
-      : 0;
+      : -1;
 
   const isDataLoading =
     !isLoggedIn ||

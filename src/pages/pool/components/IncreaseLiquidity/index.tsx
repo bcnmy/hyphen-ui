@@ -203,27 +203,27 @@ function IncreaseLiquidity() {
       ? Number.parseFloat(
           ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const formattedSuppliedLiquidity = tokenDecimals
     ? Number.parseFloat(
         ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
       )
-    : 0;
+    : -1;
 
   const formattedTokenAllowance =
     tokenAllowance && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
         )
-      : 0;
+      : -1;
 
   const isDataLoading =
     !isLoggedIn ||

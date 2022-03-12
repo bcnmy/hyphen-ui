@@ -11,6 +11,7 @@ import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
+import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 
 interface IFarmOverview {
   chain: ChainConfig;
@@ -19,39 +20,113 @@ interface IFarmOverview {
 
 function FarmOverview({ chain, token }: IFarmOverview) {
   const navigate = useNavigate();
-  const { address, chainColor, decimal, symbol, tokenImage } = token;
+  const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
+    token;
 
-  const { getRewardsPerSecond, getRewardTokenAddress } =
+  const { getSuppliedLiquidityByToken } = useLiquidityProviders(chain);
+  const { getRewardRatePerSecond, getRewardTokenAddress } =
     useLiquidityFarming(chain);
 
-  // const { data: rewardsPerSecond } = useQuery(
-  //   ['rewardsPerSecond', address],
-  //   () => getRewardsPerSecond(address),
-  //   {
-  //     // Execute only when address is available.
-  //     enabled: !!address,
-  //   },
-  // );
+  const { data: suppliedLiquidity } = useQuery(
+    [`${chain.chainId}-${symbol}-suppliedLiquidity`, address],
+    () => getSuppliedLiquidityByToken(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
 
-  // const { data: rewardTokenAddress } = useQuery(
-  //   ['rewardTokenAddress', address],
-  //   () => getRewardTokenAddress(address),
-  //   {
-  //     // Execute only when address is available.
-  //     enabled: !!address,
-  //   },
-  // );
+  const { data: tokenPriceInUSD } = useQuery(
+    `${chain.chainId}-${symbol}-priceInUSD`,
+    () =>
+      fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json()),
+  );
+
+  const { data: rewardsRatePerSecond } = useQuery(
+    [`${chain.chainId}-${symbol}-rewardsRatePerSecond`, address],
+    () => getRewardRatePerSecond(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
+
+  const { data: rewardTokenAddress } = useQuery(
+    [`${chain.chainId}-${symbol}-rewardTokenAddress`, address],
+    () => getRewardTokenAddress(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
+
+  const rewardToken = rewardTokenAddress
+    ? tokens.find(tokenObj => {
+        return tokenObj[chain.chainId]
+          ? tokenObj[chain.chainId].address.toLowerCase() ===
+              rewardTokenAddress.toLowerCase()
+          : false;
+      })
+    : undefined;
+
+  const { data: rewardTokenPriceInUSD } = useQuery(
+    [
+      `${chain.chainId}-${rewardToken?.symbol}-rewardTokenPriceInUSD`,
+      rewardToken,
+    ],
+    () => {
+      if (!rewardToken) return;
+
+      return fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json());
+    },
+    {
+      enabled: !!rewardToken,
+    },
+  );
+
+  const rewardRatePerSecondInUSD =
+    rewardsRatePerSecond && rewardToken && rewardTokenPriceInUSD
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            rewardsRatePerSecond,
+            rewardToken[chain.chainId].decimal,
+          ),
+        ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
+      : undefined;
+
+  const totalValueLockedInUSD =
+    suppliedLiquidity && tokenPriceInUSD
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidity, decimal),
+        ) * tokenPriceInUSD[coinGeckoId as string].usd
+      : undefined;
+
+  const secondsInYear = 31536000;
+
+  const rewardAPY =
+    rewardRatePerSecondInUSD && totalValueLockedInUSD
+      ? Math.pow(
+          1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
+          secondsInYear,
+        ) - 1
+      : undefined;
 
   const SECONDS_IN_24_HOURS = 86400;
-  // const rewardsPerDay = rewardsPerSecond
-  //   ? rewardsPerSecond * SECONDS_IN_24_HOURS
-  //   : null;
-  // const rewardToken = tokens.find(
-  //   tokenObj =>
-  //     tokenObj[chain.chainId].address.toLowerCase() ===
-  //     rewardTokenAddress.toLowerCase(),
-  // );
-  const rewardAPY = 55;
+  const rewardsPerDay =
+    rewardsRatePerSecond && rewardToken && chain
+      ? (
+          Number.parseFloat(
+            ethers.utils.formatUnits(
+              rewardsRatePerSecond,
+              rewardToken[chain.chainId].decimal,
+            ),
+          ) * SECONDS_IN_24_HOURS
+        ).toFixed(3)
+      : null;
 
   function handleFarmOverviewClick() {
     navigate(`add-staking-position/${chain.chainId}/${symbol}`);
@@ -85,7 +160,9 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         </span>
       </div>
       <div className="absolute right-12.5 flex h-12 w-[250px] flex-col items-end justify-end">
-        <span className="font-mono text-2xl">566.67 BICO</span>
+        <span className="font-mono text-2xl">
+          {rewardsPerDay} {rewardToken?.symbol}
+        </span>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
           Per Day
         </span>

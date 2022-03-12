@@ -20,6 +20,7 @@ import IncreaseLiquidity from 'pages/pools/components/IncreaseLiquidity';
 import Farms from 'pages/farms/Farms';
 import FarmsOverview from 'pages/farms/components/FarmsOverview';
 import AddStakingPosition from 'pages/farms/components/AddStakingPosition';
+import ManageStakingPosition from 'pages/farms/components/ManageStakingPosition';
 
 const queryClientOptions = {
   defaultOptions: {
@@ -64,6 +65,10 @@ ReactDOM.render(
                 <Route
                   path="add-staking-position/:chainId/:tokenSymbol"
                   element={<AddStakingPosition />}
+                />
+                <Route
+                  path="manage-staking-position/:chainId/:positionId"
+                  element={<ManageStakingPosition />}
                 />
               </Route>
             </Route>

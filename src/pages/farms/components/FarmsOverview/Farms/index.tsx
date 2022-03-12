@@ -38,25 +38,28 @@ function Farms() {
 
           {chains && tokensObject
             ? chains.map(chainObj => {
-                return Object.keys(tokensObject).map((tokenSymbol: any) => {
-                  const token = tokens.find(
-                    tokenObj => tokenObj.symbol === tokenSymbol,
-                  )!;
-                  const tokenObj = token[chainObj.chainId]
-                    ? {
-                        tokenImage: token.image,
-                        ...token[chainObj.chainId],
-                      }
-                    : null;
+                return Object.keys(tokensObject).map(
+                  (tokenSymbol: any, index) => {
+                    const token = tokens.find(
+                      tokenObj => tokenObj.symbol === tokenSymbol,
+                    )!;
+                    const tokenObj = token[chainObj.chainId]
+                      ? {
+                          coinGeckoId: token.coinGeckoId,
+                          tokenImage: token.image,
+                          ...token[chainObj.chainId],
+                        }
+                      : null;
 
-                  return tokenObj ? (
-                    <FarmOverview
-                      key={`${chainObj.chainId}-${tokenSymbol}`}
-                      chain={chainObj}
-                      token={tokenObj}
-                    />
-                  ) : null;
-                });
+                    return tokenObj ? (
+                      <FarmOverview
+                        key={`${chainObj.chainId}-${tokenSymbol}`}
+                        chain={chainObj}
+                        token={tokenObj}
+                      />
+                    ) : null;
+                  },
+                );
               })
             : null}
         </section>

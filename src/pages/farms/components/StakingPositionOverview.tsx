@@ -83,7 +83,7 @@ function StakingPositionOverview({
 
   return (
     <section
-      className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
+      className={`grid h-37.5 grid-cols-3 rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
         isUserOnFarms ? 'cursor-pointer' : ''
       }`}
       onClick={handleStakingPositionClick}
@@ -106,10 +106,11 @@ function StakingPositionOverview({
         </div>
         <span className="font-mono text-xs">TVL: $525,234</span>
       </div>
-      <div className="flex flex-col items-end">
+
+      <div className="flex flex-col items-center">
         <span className="mb-2.5 text-xxs font-bold uppercase ">Reward APY</span>
         <div className="mb-5">
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-center">
             <div className="flex items-center">
               <span className="font-mono text-2xl">
                 {rewardAPY >= 0 ? `${rewardAPY}%` : '...'}
@@ -121,6 +122,23 @@ function StakingPositionOverview({
           </div>
         </div>
         <span className="font-mono text-xs">Farm Rate: 566 BICO per day</span>
+      </div>
+
+      <div className="flex flex-col items-end">
+        <span className="mb-2.5 text-xxs font-bold uppercase ">
+          Your Reward Rate
+        </span>
+        <div className="mb-5">
+          <div className="flex flex-col items-end">
+            <div className="flex items-center">
+              <span className="font-mono text-2xl">0.775 BICO</span>
+            </div>
+            <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
+              Per Day
+            </span>
+          </div>
+        </div>
+        <span className="font-mono text-xs">Unclaimed BICO: 0</span>
       </div>
     </section>
   );

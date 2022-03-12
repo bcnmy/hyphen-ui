@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react';
-import { BigNumber, ethers } from 'ethers';
-import liquidityFarmingABI from 'abis/LPToken.abi.json';
+import { ethers } from 'ethers';
+import liquidityFarmingABI from 'abis/LiquidityFarming.abi.json';
 import { LiquidityFarming } from 'config/liquidityContracts/LiquidityFarming';
 import { ChainConfig } from 'config/chains';
 
@@ -19,11 +19,11 @@ function useLiquidityFarming(chain: ChainConfig | undefined) {
     );
   }, [chain, contractAddress]);
 
-  const getRewardsPerSecond = useCallback(
+  const getRewardRatePerSecond = useCallback(
     (address: string) => {
       if (!liquidityFarmingContract) return;
 
-      return liquidityFarmingContract.rewardsPerSecond(address);
+      return liquidityFarmingContract.getRewardRatePerSecond(address);
     },
     [liquidityFarmingContract],
   );
@@ -37,7 +37,7 @@ function useLiquidityFarming(chain: ChainConfig | undefined) {
     [liquidityFarmingContract],
   );
 
-  return { getRewardsPerSecond, getRewardTokenAddress };
+  return { getRewardRatePerSecond, getRewardTokenAddress };
 }
 
 export default useLiquidityFarming;

@@ -59,6 +59,17 @@ function useLiquidityProviders(chain: ChainConfig | undefined) {
     [liquidityProvidersContractSigner],
   );
 
+  const getSuppliedLiquidityByToken = useCallback(
+    (tokenAddress: string) => {
+      if (!liquidityProvidersContract) return;
+
+      return liquidityProvidersContract.getSuppliedLiquidityByToken(
+        tokenAddress,
+      );
+    },
+    [liquidityProvidersContract],
+  );
+
   const getTokenAmount = useCallback(
     (shares: BigNumber, tokenAddress: string) => {
       if (!liquidityProvidersContract) return;
@@ -140,6 +151,7 @@ function useLiquidityProviders(chain: ChainConfig | undefined) {
     addLiquidity,
     addNativeLiquidity,
     claimFee,
+    getSuppliedLiquidityByToken,
     getTokenAmount,
     getTokenPriceInLPShares,
     getTotalLiquidity,

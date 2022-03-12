@@ -12,6 +12,7 @@ import ethIcon from '../../assets/images/tokens/eth-icon.svg';
 export const ETH: TokenConfig = {
   symbol: 'ETH',
   image: ethIcon,
+  coinGeckoId: 'ethereum',
   [MUMBAI.chainId]: {
     address: '0xa6fa4fb5f76172d178d61b04b0ecd319c5d1c0aa',
     transferOverhead: 124000,

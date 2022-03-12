@@ -1,11 +1,13 @@
-import { ETH } from "./ETH";
-import { USDC } from "./USDC";
-import { USDT } from "./USDT";
-import { BICO } from "./BICO";
+import { ETH } from './ETH';
+import { USDC } from './USDC';
+import { USDT } from './USDT';
+import { BICO } from './BICO';
+import { AVAX } from './AVAX';
 
 export type TokenConfig = {
   symbol: string;
   image?: string;
+  coinGeckoId?: string;
   // root level symbol is the common name to be used
   [chainId: number]: {
     address: string;
@@ -17,11 +19,6 @@ export type TokenConfig = {
   };
 };
 
-export const tokens = [
-  ETH,
-  USDC,
-  USDT,
-  BICO
-];
+export const tokens = [AVAX, ETH, USDC, USDT, BICO];
 
 export default tokens;

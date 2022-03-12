@@ -11,12 +11,6 @@
       {
         "indexed": true,
         "internalType": "uint256",
-        "name": "oldValue",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
         "name": "newValue",
         "type": "uint256"
       }

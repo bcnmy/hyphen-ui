@@ -14,7 +14,7 @@ export const ETHEREUM: ChainConfig = {
   nativeDecimal: 18,
   nativeFaucetURL: "",
   assetSentTopicId:
-    "0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c",
+    "0x6bfd5ee5792d66b151a3fab9f56ee828a0f1c3216d4b752e267cd5590326b15c",
   biconomy: {
     enable: false,
     apiKey: "fWz3rAdDl.44d92a99-9ca4-47b1-98ca-aa2bae068e38",

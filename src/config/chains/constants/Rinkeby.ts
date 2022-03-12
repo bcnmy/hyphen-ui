@@ -14,7 +14,7 @@ export const RINKEBY: ChainConfig = {
   nativeDecimal: 18,
   nativeFaucetURL: 'https://rinkeby-faucet.com/',
   assetSentTopicId:
-    '0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c',
+    '0x6bfd5ee5792d66b151a3fab9f56ee828a0f1c3216d4b752e267cd5590326b15c',
   biconomy: {
     enable: false,
     apiKey: 'Ze_BIjFdZ.e5900961-0c16-4cb1-b4b7-604a5069daa8',

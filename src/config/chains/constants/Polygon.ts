@@ -18,7 +18,7 @@ export const POLYGON: ChainConfig = {
     apiKey: "jYEsJEDel.8bc71a9b-4097-4f77-98dc-3a713e3988b9",
   },
   assetSentTopicId:
-    "0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c",
+    "0x6bfd5ee5792d66b151a3fab9f56ee828a0f1c3216d4b752e267cd5590326b15c",
   networkAgnosticTransfer: true,
   graphURL: "https://api.thegraph.com/subgraphs/name/divyan73/hyphenpolygonv2",
   explorerUrl: "https://polygonscan.com",

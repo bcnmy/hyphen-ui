@@ -155,7 +155,7 @@ function AddStakingPosition() {
                     (userPosition: BigNumber, index: number) => {
                       return index === currentPosition ? (
                         <StakingPositionOverview
-                          key={`${chainId}-${userPosition.toString()}`}
+                          key={`${userPosition.toString()}`}
                           chainId={chain.chainId}
                           positionId={userPosition}
                         />

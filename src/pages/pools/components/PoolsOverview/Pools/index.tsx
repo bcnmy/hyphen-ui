@@ -51,7 +51,7 @@ function Pools() {
 
                   return tokenObj ? (
                     <PoolOverview
-                      key={`${chainObj.chainId}-${tokenSymbol}`}
+                      key={`pool-${chainObj.name}-${tokenSymbol}`}
                       chain={chainObj}
                       token={tokenObj}
                     />

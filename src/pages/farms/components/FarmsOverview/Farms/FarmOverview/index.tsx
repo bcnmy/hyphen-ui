@@ -28,7 +28,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     useLiquidityFarming(chain);
 
   const { data: suppliedLiquidity } = useQuery(
-    [`${chain.chainId}-${symbol}-suppliedLiquidity`, address],
+    ['suppliedLiquidity', address],
     () => getSuppliedLiquidityByToken(address),
     {
       // Execute only when address is available.
@@ -37,15 +37,18 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   );
 
   const { data: tokenPriceInUSD } = useQuery(
-    `${chain.chainId}-${symbol}-priceInUSD`,
+    ['tokenPriceInUSD', coinGeckoId],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
       ).then(res => res.json()),
+    {
+      enabled: !!coinGeckoId,
+    },
   );
 
   const { data: rewardsRatePerSecond } = useQuery(
-    [`${chain.chainId}-${symbol}-rewardsRatePerSecond`, address],
+    ['rewardsRatePerSecond', address],
     () => getRewardRatePerSecond(address),
     {
       // Execute only when address is available.
@@ -54,7 +57,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   );
 
   const { data: rewardTokenAddress } = useQuery(
-    [`${chain.chainId}-${symbol}-rewardTokenAddress`, address],
+    ['rewardTokenAddress', address],
     () => getRewardTokenAddress(address),
     {
       // Execute only when address is available.
@@ -72,10 +75,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     : undefined;
 
   const { data: rewardTokenPriceInUSD } = useQuery(
-    [
-      `${chain.chainId}-${rewardToken?.symbol}-rewardTokenPriceInUSD`,
-      rewardToken,
-    ],
+    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
     () => {
       if (!rewardToken) return;
 
@@ -114,6 +114,13 @@ function FarmOverview({ chain, token }: IFarmOverview) {
           secondsInYear,
         ) - 1
       : undefined;
+
+  console.log(
+    chain.name,
+    symbol,
+    rewardRatePerSecondInUSD,
+    totalValueLockedInUSD,
+  );
 
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =

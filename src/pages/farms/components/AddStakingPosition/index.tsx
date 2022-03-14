@@ -1,6 +1,6 @@
 import { chains } from 'config/chains';
 import { useWalletProvider } from 'context/WalletProvider';
-import { BigNumber } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';
 import {
   HiArrowSmLeft,
@@ -15,6 +15,8 @@ import { useState } from 'react';
 import tokens from 'config/tokens';
 import FarmsInfo from 'pages/farms/FarmsInfo';
 import Skeleton from 'react-loading-skeleton';
+import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 
 function AddStakingPosition() {
   const navigate = useNavigate();
@@ -87,9 +89,9 @@ function AddStakingPosition() {
   );
 
   const { data }: { data: any } = userPositionsNFTs[currentPosition] ?? {};
-  const jsonManifestString = data ? atob(data.substring(29)) : '';
-  const { image: userPositionNFT = undefined } = jsonManifestString
-    ? JSON.parse(jsonManifestString)
+  const nftJsonManifestString = data ? atob(data.substring(29)) : '';
+  const { image: userPositionNFT = undefined } = nftJsonManifestString
+    ? JSON.parse(nftJsonManifestString)
     : {};
 
   const [firstPositionMetadata] = userPositionsMetadata;

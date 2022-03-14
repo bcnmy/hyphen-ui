@@ -37,7 +37,20 @@ function useLiquidityFarming(chain: ChainConfig | undefined) {
     [liquidityFarmingContract],
   );
 
-  return { getRewardRatePerSecond, getRewardTokenAddress };
+  const getTotalSharesStaked = useCallback(
+    (address: string) => {
+      if (!liquidityFarmingContract) return;
+
+      return liquidityFarmingContract.totalSharesStaked(address);
+    },
+    [liquidityFarmingContract],
+  );
+
+  return {
+    getRewardRatePerSecond,
+    getRewardTokenAddress,
+    getTotalSharesStaked,
+  };
 }
 
 export default useLiquidityFarming;

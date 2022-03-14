@@ -5,6 +5,8 @@ import useLPToken from 'hooks/contracts/useLPToken';
 import { useQuery } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
+import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
+import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -23,6 +25,12 @@ function StakingPositionOverview({
   })!;
 
   const { getPositionMetadata } = useLPToken(chain);
+  const { getSuppliedLiquidityByToken } = useLiquidityProviders(chain);
+  const {
+    getRewardRatePerSecond,
+    getRewardTokenAddress,
+    getTotalSharesStaked,
+  } = useLiquidityFarming(chain);
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(['positionMetadata', positionId], () =>
@@ -30,8 +38,6 @@ function StakingPositionOverview({
     );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
-
-  const rewardAPY = 55;
 
   const token =
     chain && tokenAddress
@@ -42,6 +48,89 @@ function StakingPositionOverview({
           );
         })
       : null;
+
+  const { data: suppliedLiquidityByToken } = useQuery(
+    ['suppliedLiquidityByToken', tokenAddress],
+    () => getSuppliedLiquidityByToken(tokenAddress),
+    {
+      // Execute only when address is available.
+      enabled: !!tokenAddress,
+    },
+  );
+
+  const { data: tokenPriceInUSD } = useQuery(
+    'tokenPriceInUSD',
+    () =>
+      fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json()),
+    {
+      enabled: !!token,
+    },
+  );
+
+  const { data: totalSharesStaked } = useQuery(
+    'totalSharesStaked',
+    () => {
+      if (!chain || !token) return;
+
+      return getTotalSharesStaked(token[chain.chainId].address);
+    },
+    {
+      // Execute only when address is available.
+      enabled: !!(chain && token),
+    },
+  );
+
+  const { data: rewardsRatePerSecond } = useQuery(
+    'rewardsRatePerSecond',
+    () => {
+      if (!chain || !token) return;
+
+      return getRewardRatePerSecond(token[chain.chainId].address);
+    },
+    {
+      // Execute only when address is available.
+      enabled: !!(chain && token),
+    },
+  );
+
+  const { data: rewardTokenAddress } = useQuery(
+    'rewardTokenAddress',
+    () => {
+      if (!chain || !token) return;
+
+      return getRewardTokenAddress(token[chain.chainId].address);
+    },
+    {
+      // Execute only when address is available.
+      enabled: !!(chain && token),
+    },
+  );
+
+  const rewardToken =
+    rewardTokenAddress && chain
+      ? tokens.find(tokenObj => {
+          return tokenObj[chain.chainId]
+            ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress.toLowerCase()
+            : false;
+        })
+      : undefined;
+
+  const { data: rewardTokenPriceInUSD } = useQuery(
+    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+    () => {
+      if (!rewardToken) return;
+
+      return fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json());
+    },
+    {
+      enabled: !!rewardToken,
+    },
+  );
 
   const isDataLoading = isPositionMetadataLoading;
 
@@ -74,6 +163,50 @@ function StakingPositionOverview({
     symbol: tokenSymbol,
     [chain.chainId]: { chainColor },
   } = token;
+
+  const rewardRatePerSecondInUSD =
+    rewardsRatePerSecond && rewardToken && rewardTokenPriceInUSD
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            rewardsRatePerSecond,
+            rewardToken[chain.chainId].decimal,
+          ),
+        ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
+      : undefined;
+
+  const totalValueLockedInUSD =
+    suppliedLiquidityByToken && tokenPriceInUSD && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
+        ) * tokenPriceInUSD[token?.coinGeckoId as string].usd
+      : undefined;
+
+  const secondsInYear = 31536000;
+
+  const rewardAPY =
+    rewardRatePerSecondInUSD && totalValueLockedInUSD
+      ? Math.pow(
+          1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
+          secondsInYear,
+        ) - 1
+      : undefined;
+
+  const SECONDS_IN_24_HOURS = 86400;
+  const rewardsPerDay =
+    rewardsRatePerSecond && rewardToken && chain
+      ? (
+          Number.parseFloat(
+            ethers.utils.formatUnits(
+              rewardsRatePerSecond,
+              rewardToken[chain.chainId].decimal,
+            ),
+          ) * SECONDS_IN_24_HOURS
+        ).toFixed(3)
+      : null;
+
+  if (shares && totalSharesStaked) {
+    console.log(shares.toString(), totalSharesStaked.toString());
+  }
 
   function handleStakingPositionClick() {
     if (isUserOnFarms) {
@@ -113,7 +246,16 @@ function StakingPositionOverview({
           <div className="flex flex-col items-center">
             <div className="flex items-center">
               <span className="font-mono text-2xl">
-                {rewardAPY >= 0 ? `${rewardAPY}%` : '...'}
+                {rewardAPY ? (
+                  `${rewardAPY}%`
+                ) : (
+                  <Skeleton
+                    baseColor="#615ccd20"
+                    enableAnimation
+                    highlightColor="#615ccd05"
+                    className="!mx-1 !w-28"
+                  />
+                )}
               </span>
             </div>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
@@ -121,7 +263,19 @@ function StakingPositionOverview({
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">Farm Rate: 566 BICO per day</span>
+        <span className="font-mono text-xs">
+          Farm Rate:{' '}
+          {rewardsPerDay ? (
+            `${rewardsPerDay} ${rewardToken?.symbol} per day`
+          ) : (
+            <Skeleton
+              baseColor="#615ccd20"
+              enableAnimation
+              highlightColor="#615ccd05"
+              className="!mx-1 !w-28"
+            />
+          )}
+        </span>
       </div>
 
       <div className="flex flex-col items-end">

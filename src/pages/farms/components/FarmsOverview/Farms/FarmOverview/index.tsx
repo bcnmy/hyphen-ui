@@ -27,8 +27,8 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   const { getRewardRatePerSecond, getRewardTokenAddress } =
     useLiquidityFarming(chain);
 
-  const { data: suppliedLiquidity } = useQuery(
-    ['suppliedLiquidity', address],
+  const { data: suppliedLiquidityByToken } = useQuery(
+    ['suppliedLiquidityByToken', address],
     () => getSuppliedLiquidityByToken(address),
     {
       // Execute only when address is available.
@@ -99,9 +99,9 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       : undefined;
 
   const totalValueLockedInUSD =
-    suppliedLiquidity && tokenPriceInUSD
+    suppliedLiquidityByToken && tokenPriceInUSD
       ? Number.parseFloat(
-          ethers.utils.formatUnits(suppliedLiquidity, decimal),
+          ethers.utils.formatUnits(suppliedLiquidityByToken, decimal),
         ) * tokenPriceInUSD[coinGeckoId as string].usd
       : undefined;
 
@@ -114,13 +114,6 @@ function FarmOverview({ chain, token }: IFarmOverview) {
           secondsInYear,
         ) - 1
       : undefined;
-
-  console.log(
-    chain.name,
-    symbol,
-    rewardRatePerSecondInUSD,
-    totalValueLockedInUSD,
-  );
 
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
@@ -157,9 +150,16 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
-            {rewardAPY !== null || rewardAPY !== undefined
-              ? `${rewardAPY}%`
-              : '...'}
+            {rewardAPY ? (
+              `${rewardAPY}%`
+            ) : (
+              <Skeleton
+                baseColor="#615ccd20"
+                enableAnimation
+                highlightColor="#615ccd05"
+                className="!mx-1 !w-28"
+              />
+            )}
           </span>
         </div>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
@@ -168,7 +168,23 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       </div>
       <div className="absolute right-12.5 flex h-12 w-[250px] flex-col items-end justify-end">
         <span className="font-mono text-2xl">
-          {rewardsPerDay} {rewardToken?.symbol}
+          {rewardsPerDay ? (
+            <div className="flex items-center">
+              <img
+                src={rewardToken?.image}
+                alt={rewardToken?.symbol}
+                className="mr-2.5 h-5 w-5"
+              />
+              {rewardsPerDay} {rewardToken?.symbol}
+            </div>
+          ) : (
+            <Skeleton
+              baseColor="#615ccd20"
+              enableAnimation
+              highlightColor="#615ccd05"
+              className="!mx-1 !w-28"
+            />
+          )}
         </span>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
           Per Day

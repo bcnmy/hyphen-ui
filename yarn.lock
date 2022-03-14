@@ -1920,10 +1920,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@biconomy/hyphen-staging@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/hyphen-staging/-/hyphen-staging-1.0.1.tgz#0cea47b021a0e9df8e7096ea1c0e7eb29eff62d3"
-  integrity sha512-djKB1Di/G92O/qpX1xqg6G1R9g02x1xUURa5gwDdnDNgIjntUuWhZp8Zabx5kp4H0izjUdlZT/1jmi+wA9QXQQ==
+"@biconomy/hyphen-staging@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/hyphen-staging/-/hyphen-staging-1.0.2.tgz#c90236643a5aed74d7eee4b3f7453be2bfcadf01"
+  integrity sha512-yioscl1B6trYxfM8dOEeUMTKxaY4HMlglsmpjP3E53mnTRfAn+rYUKotQMl3Zen2d0zoQRImniv30LrobKNp4g==
   dependencies:
     "@biconomy/mexa" "^2.0.24"
     ethers "^5.0.24"

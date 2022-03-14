@@ -56,7 +56,7 @@ const HyphenProvider: React.FC = (props) => {
           [ENV.test]: "test",
           [ENV.staging]: "staging",
           local: "",
-        }[ENV.staging],
+        }[process.env.REACT_APP_ENV],
         biconomy: {
           enable: isBiconomyEnabled,
           apiKey: fromChain?.biconomy.apiKey,
@@ -73,7 +73,7 @@ const HyphenProvider: React.FC = (props) => {
           [ENV.test]: "test",
           [ENV.staging]: "staging",
           local: "",
-        }[ENV.staging],
+        }[process.env.REACT_APP_ENV],
         signatureType: SIGNATURE_TYPES.EIP712,
       });
     }

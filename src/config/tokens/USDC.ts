@@ -40,7 +40,7 @@ export const USDC: TokenConfig = {
   [AVALANCHE.chainId]: {
     address: "0xa7d7079b0fead91f3e65f86e8915cb59c1a4c664",
     transferOverhead: 127000,
-    decimal: 18,
+    decimal: 6,
     symbol: "USDC",
     chainColor: AVALANCHE.chainColor
   },

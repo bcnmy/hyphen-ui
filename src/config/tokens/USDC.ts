@@ -12,14 +12,14 @@ export const USDC: TokenConfig = {
   [MUMBAI.chainId]: {
     address: "0xdA5289fCAAF71d52a80A254da614a192b693e977",
     transferOverhead: 116000,
-    decimal: 18,
+    decimal: 6,
     symbol: "USDC",
     chainColor: MUMBAI.chainColor
   },
   [GOERLI.chainId]: {
     address: "0xb5B640E6414b6DeF4FC9B3C1EeF373925effeCcF",
     transferOverhead: 138000,
-    decimal: 18,
+    decimal: 6,
     symbol: "USDC",
     chainColor: GOERLI.chainColor
   },

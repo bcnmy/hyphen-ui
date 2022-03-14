@@ -96,14 +96,14 @@ function FarmOverview({ chain, token }: IFarmOverview) {
             rewardToken[chain.chainId].decimal,
           ),
         ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : undefined;
+      : -1;
 
   const totalValueLockedInUSD =
     suppliedLiquidityByToken && tokenPriceInUSD
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidityByToken, decimal),
         ) * tokenPriceInUSD[coinGeckoId as string].usd
-      : undefined;
+      : -1;
 
   const secondsInYear = 31536000;
 
@@ -113,7 +113,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
           1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
           secondsInYear,
         ) - 1
-      : undefined;
+      : -1;
 
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
@@ -150,7 +150,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
-            {rewardAPY ? (
+            {rewardAPY >= 0 ? (
               `${rewardAPY.toFixed(3)}%`
             ) : (
               <Skeleton

@@ -155,7 +155,12 @@ function StakingPositionOverview({
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
         )
-      : suppliedLiquidity;
+      : -1;
+
+  const formattedTotalSharesStaked =
+    totalSharesStaked && tokenDecimals
+      ? ethers.utils.formatUnits(totalSharesStaked, tokenDecimals)
+      : -1;
 
   const { name: chainName } = chain;
   const {
@@ -202,11 +207,17 @@ function StakingPositionOverview({
             ),
           ) * SECONDS_IN_24_HOURS
         ).toFixed(3)
-      : null;
+      : undefined;
 
-  if (shares && totalSharesStaked) {
-    console.log(shares.toString(), totalSharesStaked.toString());
-  }
+  const yourRewardRate =
+    shares && formattedTotalSharesStaked > 0 && rewardsPerDay && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            shares.div(totalSharesStaked),
+            tokenDecimals,
+          ),
+        ) * Number.parseFloat(rewardsPerDay)
+      : 0;
 
   function handleStakingPositionClick() {
     if (isUserOnFarms) {
@@ -285,7 +296,19 @@ function StakingPositionOverview({
         <div className="mb-5">
           <div className="flex flex-col items-end">
             <div className="flex items-center">
-              <span className="font-mono text-2xl">0.775 BICO</span>
+              <span className="font-mono text-2xl">
+                {' '}
+                {yourRewardRate >= 0 ? (
+                  `${yourRewardRate} ${rewardToken?.symbol}`
+                ) : (
+                  <Skeleton
+                    baseColor="#615ccd20"
+                    enableAnimation
+                    highlightColor="#615ccd05"
+                    className="!mx-1 !w-28"
+                  />
+                )}
+              </span>
             </div>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
               Per Day

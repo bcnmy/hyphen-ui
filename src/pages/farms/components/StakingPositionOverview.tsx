@@ -197,10 +197,12 @@ function StakingPositionOverview({
 
   const rewardAPY =
     rewardRatePerSecondInUSD && totalValueLockedInUSD
-      ? Math.pow(
+      ? (Math.pow(
           1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
           secondsInYear,
-        ) - 1
+        ) -
+          1) *
+        100
       : -1;
 
   const SECONDS_IN_24_HOURS = 86400;

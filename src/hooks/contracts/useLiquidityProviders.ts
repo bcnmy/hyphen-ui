@@ -6,7 +6,7 @@ import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders
 import { ChainConfig } from 'config/chains';
 
 function useLiquidityProviders(chain: ChainConfig | undefined) {
-  const { isLoggedIn, signer } = useWalletProvider()!;
+  const { signer } = useWalletProvider()!;
   const contractAddress = chain
     ? LiquidityProviders[chain.chainId].address
     : undefined;
@@ -22,10 +22,10 @@ function useLiquidityProviders(chain: ChainConfig | undefined) {
   }, [chain, contractAddress]);
 
   const liquidityProvidersContractSigner = useMemo(() => {
-    if (!contractAddress || !isLoggedIn) return;
+    if (!contractAddress || !signer) return;
 
     return new ethers.Contract(contractAddress, liquidityProvidersABI, signer);
-  }, [contractAddress, isLoggedIn, signer]);
+  }, [contractAddress, signer]);
 
   const addLiquidity = useCallback(
     (tokenAddress: string, amount: BigNumber) => {

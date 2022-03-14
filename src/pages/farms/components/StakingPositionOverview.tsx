@@ -27,6 +27,7 @@ function StakingPositionOverview({
   const { getPositionMetadata } = useLPToken(chain);
   const { getSuppliedLiquidityByToken } = useLiquidityProviders(chain);
   const {
+    getPendingToken,
     getRewardRatePerSecond,
     getRewardTokenAddress,
     getTotalSharesStaked,
@@ -59,7 +60,7 @@ function StakingPositionOverview({
   );
 
   const { data: tokenPriceInUSD } = useQuery(
-    'tokenPriceInUSD',
+    ['tokenPriceInUSD', token?.coinGeckoId],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
@@ -69,21 +70,12 @@ function StakingPositionOverview({
     },
   );
 
-  const { data: totalSharesStaked } = useQuery(
-    'totalSharesStaked',
-    () => {
-      if (!chain || !token) return;
-
-      return getTotalSharesStaked(token[chain.chainId].address);
-    },
-    {
-      // Execute only when address is available.
-      enabled: !!(chain && token),
-    },
+  const { data: pendingToken } = useQuery(['pendingToken', positionId], () =>
+    getPendingToken(positionId),
   );
 
   const { data: rewardsRatePerSecond } = useQuery(
-    'rewardsRatePerSecond',
+    ['rewardsRatePerSecond', token],
     () => {
       if (!chain || !token) return;
 
@@ -101,6 +93,19 @@ function StakingPositionOverview({
       if (!chain || !token) return;
 
       return getRewardTokenAddress(token[chain.chainId].address);
+    },
+    {
+      // Execute only when address is available.
+      enabled: !!(chain && token),
+    },
+  );
+
+  const { data: totalSharesStaked } = useQuery(
+    'totalSharesStaked',
+    () => {
+      if (!chain || !token) return;
+
+      return getTotalSharesStaked(token[chain.chainId].address);
     },
     {
       // Execute only when address is available.
@@ -149,6 +154,8 @@ function StakingPositionOverview({
   const isUserOnFarms = location.pathname === '/farms';
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
+  const rewardTokenDecimals =
+    chain && rewardToken ? rewardToken[chain.chainId].decimal : null;
 
   const formattedSuppliedLiquidity =
     suppliedLiquidity && tokenDecimals
@@ -170,21 +177,21 @@ function StakingPositionOverview({
   } = token;
 
   const rewardRatePerSecondInUSD =
-    rewardsRatePerSecond && rewardToken && rewardTokenPriceInUSD
+    rewardsRatePerSecond &&
+    rewardToken &&
+    rewardTokenPriceInUSD &&
+    rewardTokenDecimals
       ? Number.parseFloat(
-          ethers.utils.formatUnits(
-            rewardsRatePerSecond,
-            rewardToken[chain.chainId].decimal,
-          ),
+          ethers.utils.formatUnits(rewardsRatePerSecond, rewardTokenDecimals),
         ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : undefined;
+      : -1;
 
   const totalValueLockedInUSD =
     suppliedLiquidityByToken && tokenPriceInUSD && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
         ) * tokenPriceInUSD[token?.coinGeckoId as string].usd
-      : undefined;
+      : -1;
 
   const secondsInYear = 31536000;
 
@@ -194,29 +201,34 @@ function StakingPositionOverview({
           1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
           secondsInYear,
         ) - 1
-      : undefined;
+      : -1;
 
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
-    rewardsRatePerSecond && rewardToken && chain
-      ? (
-          Number.parseFloat(
-            ethers.utils.formatUnits(
-              rewardsRatePerSecond,
-              rewardToken[chain.chainId].decimal,
-            ),
-          ) * SECONDS_IN_24_HOURS
-        ).toFixed(3)
-      : undefined;
+    rewardsRatePerSecond && rewardToken && chain && rewardTokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(rewardsRatePerSecond, rewardTokenDecimals),
+        ) * SECONDS_IN_24_HOURS
+      : -1;
 
   const yourRewardRate =
-    shares && formattedTotalSharesStaked > 0 && rewardsPerDay && tokenDecimals
+    shares &&
+    formattedTotalSharesStaked > 0 &&
+    rewardsPerDay >= 0 &&
+    tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(
             shares.div(totalSharesStaked),
             tokenDecimals,
           ),
-        ) * Number.parseFloat(rewardsPerDay)
+        ) * rewardsPerDay
+      : 0;
+
+  const unclaimedRewardToken =
+    pendingToken && rewardTokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(pendingToken, rewardTokenDecimals),
+        )
       : 0;
 
   function handleStakingPositionClick() {
@@ -257,8 +269,8 @@ function StakingPositionOverview({
           <div className="flex flex-col items-center">
             <div className="flex items-center">
               <span className="font-mono text-2xl">
-                {rewardAPY ? (
-                  `${rewardAPY}%`
+                {rewardAPY >= 0 ? (
+                  `${rewardAPY.toFixed(3)}%`
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
@@ -276,8 +288,8 @@ function StakingPositionOverview({
         </div>
         <span className="font-mono text-xs">
           Farm Rate:{' '}
-          {rewardsPerDay ? (
-            `${rewardsPerDay} ${rewardToken?.symbol} per day`
+          {rewardsPerDay >= 0 && rewardToken ? (
+            `${rewardsPerDay.toFixed(3)} ${rewardToken.symbol} per day`
           ) : (
             <Skeleton
               baseColor="#615ccd20"
@@ -298,8 +310,15 @@ function StakingPositionOverview({
             <div className="flex items-center">
               <span className="font-mono text-2xl">
                 {' '}
-                {yourRewardRate >= 0 ? (
-                  `${yourRewardRate} ${rewardToken?.symbol}`
+                {yourRewardRate >= 0 && rewardToken ? (
+                  <div className="flex items-center">
+                    <img
+                      src={rewardToken.image}
+                      alt={rewardToken.symbol}
+                      className="mr-2.5 h-5 w-5"
+                    />
+                    {yourRewardRate.toFixed(3)} {rewardToken.symbol}
+                  </div>
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
@@ -315,7 +334,20 @@ function StakingPositionOverview({
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">Unclaimed BICO: 0</span>
+        <span className="font-mono text-xs">
+          {rewardToken && unclaimedRewardToken ? (
+            `Unclaimed ${rewardToken.symbol}: ${
+              unclaimedRewardToken > 0 ? unclaimedRewardToken.toFixed(5) : 0
+            }`
+          ) : (
+            <Skeleton
+              baseColor="#615ccd20"
+              enableAnimation
+              highlightColor="#615ccd05"
+              className="!mx-1 !w-28"
+            />
+          )}
+        </span>
       </div>
     </section>
   );

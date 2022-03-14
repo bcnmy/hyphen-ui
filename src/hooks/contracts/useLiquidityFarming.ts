@@ -1,10 +1,12 @@
 import { useCallback, useMemo } from 'react';
-import { ethers } from 'ethers';
+import { BigNumber, ethers } from 'ethers';
 import liquidityFarmingABI from 'abis/LiquidityFarming.abi.json';
 import { LiquidityFarming } from 'config/liquidityContracts/LiquidityFarming';
 import { ChainConfig } from 'config/chains';
+import { useWalletProvider } from 'context/WalletProvider';
 
 function useLiquidityFarming(chain: ChainConfig | undefined) {
+  const { signer } = useWalletProvider()!;
   const contractAddress = chain
     ? LiquidityFarming[chain.chainId].address
     : undefined;
@@ -18,6 +20,30 @@ function useLiquidityFarming(chain: ChainConfig | undefined) {
       new ethers.providers.JsonRpcProvider(chain.rpcUrl),
     );
   }, [chain, contractAddress]);
+
+  const liquidityFarmingContractSigner = useMemo(() => {
+    if (!contractAddress || !signer) return;
+
+    return new ethers.Contract(contractAddress, liquidityFarmingABI, signer);
+  }, [contractAddress, signer]);
+
+  const getPendingToken = useCallback(
+    (positionId: BigNumber) => {
+      if (!liquidityFarmingContract) return;
+
+      return liquidityFarmingContract.pendingToken(positionId);
+    },
+    [liquidityFarmingContract],
+  );
+
+  const getStakedUserPositions = useCallback(
+    (accounts: string[]) => {
+      if (!liquidityFarmingContract || !accounts) return;
+
+      return liquidityFarmingContract.getNftIdsStaked(accounts[0]);
+    },
+    [liquidityFarmingContract],
+  );
 
   const getRewardRatePerSecond = useCallback(
     (address: string) => {
@@ -46,10 +72,22 @@ function useLiquidityFarming(chain: ChainConfig | undefined) {
     [liquidityFarmingContract],
   );
 
+  const stakeNFT = useCallback(
+    (positionId: BigNumber, accounts: string[]) => {
+      if (!liquidityFarmingContractSigner || !positionId || !accounts) return;
+
+      return liquidityFarmingContractSigner.deposit(positionId, accounts[0]);
+    },
+    [liquidityFarmingContractSigner],
+  );
+
   return {
+    getPendingToken,
+    getStakedUserPositions,
     getRewardRatePerSecond,
     getRewardTokenAddress,
     getTotalSharesStaked,
+    stakeNFT,
   };
 }
 

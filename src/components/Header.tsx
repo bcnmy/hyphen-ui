@@ -13,8 +13,12 @@ function Header({ showUserInfoModal }: IHeaderProps) {
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const userAddress = accounts?.[0];
 
-  const showNetworkSelector =
-    location.pathname === '/pool' || location.pathname === '/pool/';
+  const showNetworkSelector = [
+    '/pools',
+    '/pools/',
+    '/farms',
+    '/farms/',
+  ].includes(location.pathname);
 
   const statsUrl =
     process.env.REACT_APP_ENV === ENV.production

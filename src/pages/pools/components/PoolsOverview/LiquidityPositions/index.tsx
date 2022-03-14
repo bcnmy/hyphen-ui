@@ -86,9 +86,7 @@ function LiquidityPositions() {
             {userPositions.map((userPositionId: BigNumber) => {
               return (
                 <LiquidityPositionOverview
-                  key={`${
-                    selectedNetwork.chainId
-                  }-${userPositionId.toString()}`}
+                  key={`${userPositionId.toString()}`}
                   chainId={selectedNetwork.chainId}
                   positionId={userPositionId}
                   hideClosedPositions={hideClosedPositions}

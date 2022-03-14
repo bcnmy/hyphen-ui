@@ -151,7 +151,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
             {rewardAPY ? (
-              `${rewardAPY}%`
+              `${rewardAPY.toFixed(3)}%`
             ) : (
               <Skeleton
                 baseColor="#615ccd20"

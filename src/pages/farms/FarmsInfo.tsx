@@ -18,7 +18,7 @@ function FarmsInfo() {
           <img src={hyphenStatsIcon} alt="Hyphen info" className="mt-1.5" />
         </a>
       </div>
-      <div>
+      {/* <div>
         <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
           Learn more
         </span>
@@ -35,7 +35,7 @@ function FarmsInfo() {
             className="mt-1.5"
           />
         </a>
-      </div>
+      </div> */}
     </section>
   );
 }

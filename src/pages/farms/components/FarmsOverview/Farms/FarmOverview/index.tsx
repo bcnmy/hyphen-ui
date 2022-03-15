@@ -120,14 +120,12 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
     rewardsRatePerSecond && rewardToken && chain
-      ? (
-          Number.parseFloat(
-            ethers.utils.formatUnits(
-              rewardsRatePerSecond,
-              rewardToken[chain.chainId].decimal,
-            ),
-          ) * SECONDS_IN_24_HOURS
-        ).toFixed(3)
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            rewardsRatePerSecond,
+            rewardToken[chain.chainId].decimal,
+          ),
+        ) * SECONDS_IN_24_HOURS
       : null;
 
   function handleFarmOverviewClick() {
@@ -153,7 +151,10 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
             {rewardAPY >= 0 ? (
-              `${rewardAPY.toFixed(3)}%`
+              `${makeNumberCompact(
+                Number.parseFloat(rewardAPY.toFixed(3)),
+                3,
+              )}%`
             ) : (
               <Skeleton
                 baseColor="#615ccd20"
@@ -177,7 +178,11 @@ function FarmOverview({ chain, token }: IFarmOverview) {
                 alt={rewardToken?.symbol}
                 className="mr-2.5 h-5 w-5"
               />
-              {rewardsPerDay} {rewardToken?.symbol}
+              {makeNumberCompact(
+                Number.parseFloat(rewardsPerDay.toFixed(3)),
+                3,
+              )}{' '}
+              {rewardToken?.symbol}
             </div>
           ) : (
             <Skeleton

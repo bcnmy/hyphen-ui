@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Skeleton from 'react-loading-skeleton';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import { makeNumberCompact } from 'utils/makeNumberCompact';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -273,7 +274,10 @@ function StakingPositionOverview({
             <div className="flex items-center">
               <span className="font-mono text-2xl">
                 {rewardAPY >= 0 ? (
-                  `${rewardAPY.toFixed(3)}%`
+                  `${makeNumberCompact(
+                    Number.parseFloat(rewardAPY.toFixed(3)),
+                    3,
+                  )}%`
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
@@ -292,7 +296,10 @@ function StakingPositionOverview({
         <span className="font-mono text-xs">
           Farm Rate:{' '}
           {rewardsPerDay >= 0 && rewardToken ? (
-            `${rewardsPerDay.toFixed(3)} ${rewardToken.symbol} per day`
+            `${makeNumberCompact(
+              Number.parseFloat(rewardsPerDay.toFixed(3)),
+              3,
+            )} ${rewardToken.symbol} per day`
           ) : (
             <Skeleton
               baseColor="#615ccd20"
@@ -320,7 +327,11 @@ function StakingPositionOverview({
                       alt={rewardToken.symbol}
                       className="mr-2.5 h-5 w-5"
                     />
-                    {yourRewardRate.toFixed(3)} {rewardToken.symbol}
+                    {makeNumberCompact(
+                      Number.parseFloat(yourRewardRate.toFixed(3)),
+                      3,
+                    )}{' '}
+                    {rewardToken.symbol}
                   </div>
                 ) : (
                   <Skeleton
@@ -340,7 +351,12 @@ function StakingPositionOverview({
         <span className="font-mono text-xs">
           {rewardToken && unclaimedRewardToken >= 0 ? (
             `Unclaimed ${rewardToken.symbol}: ${
-              unclaimedRewardToken > 0 ? unclaimedRewardToken.toFixed(5) : 0
+              unclaimedRewardToken > 0
+                ? makeNumberCompact(
+                    Number.parseFloat(unclaimedRewardToken.toFixed(5)),
+                    5,
+                  )
+                : 0
             }`
           ) : (
             <Skeleton

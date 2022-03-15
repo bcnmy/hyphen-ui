@@ -6,6 +6,7 @@ import { useChains } from 'context/Chains';
 import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
 import { useQueryClient } from 'react-query';
+import CustomTooltip from './CustomTooltip';
 
 function NetworkSelector() {
   const queryClient = useQueryClient();
@@ -26,7 +27,21 @@ function NetworkSelector() {
     }
   }
 
-  if (!selectedNetwork) return null;
+  if (!selectedNetwork)
+    return (
+      <>
+        <div
+          className="flex h-8 w-[146px] cursor-default items-center rounded-xl bg-hyphen-purple bg-opacity-50 px-3 text-left text-white"
+          data-tip
+          data-for="wrongNetwork"
+        >
+          Wrong network
+        </div>
+        <CustomTooltip id="wrongNetwork">
+          <span>Please connect to a supported network in your wallet.</span>
+        </CustomTooltip>
+      </>
+    );
 
   return (
     <div className="w-[146px]">

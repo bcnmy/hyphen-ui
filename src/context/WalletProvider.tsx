@@ -71,8 +71,11 @@ const WalletProviderProvider: React.FC = props => {
             options: {
               // TODO: Add mainnet rpc urls.
               rpc: {
+                1: 'https://eth-mainnet.alchemyapi.io/v2/wO7WAmNPAsZFhRlpd-xYjM-5Pl5Dx8-G',
                 5: 'https://eth-goerli.alchemyapi.io/v2/mtR7c3X54OxnXVf_npwUrdNC57aIghCp',
+                137: 'https://polygon-rpc.com/',
                 43113: 'https://api.avax-test.network/ext/bc/C/rpc',
+                43114: 'https://api.avax.network/ext/bc/C/rpc',
                 80001:
                   'https://polygon-mumbai.g.alchemy.com/v2/a6rWdKyJis3Y8cWN6oDCWIxu8lrFX4J8',
               },

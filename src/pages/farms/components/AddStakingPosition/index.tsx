@@ -202,8 +202,6 @@ function AddStakingPosition() {
         LiquidityFarming[chain.chainId].address.toLowerCase()
       : false;
 
-  console.log(isNFTApproved);
-
   function handlePrevPositionClick() {
     const newPosition =
       currentPosition - 1 < 0

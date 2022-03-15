@@ -160,11 +160,10 @@ function AddStakingPosition() {
     ['NFTApprovalAddress', currentPosition],
     () => {
       if (!filteredUserPositions) return;
-
       return getNFTApprovalAddress(filteredUserPositions[currentPosition]);
     },
     {
-      enabled: !!filteredUserPositions,
+      enabled: !!filteredUserPositions.length,
     },
   );
 

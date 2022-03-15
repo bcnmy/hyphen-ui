@@ -141,14 +141,14 @@ function PoolOverview({ chain, token }: IPoolOverview) {
             rewardToken[chain.chainId].decimal,
           ),
         ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const totalValueLockedInUSD =
     suppliedLiquidityByToken && tokenPriceInUSD
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidityByToken, decimal),
         ) * tokenPriceInUSD[coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const secondsInYear = 31536000;
   const rewardAPY =
@@ -159,7 +159,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
         ) -
           1) *
         100
-      : -1;
+      : 0;
 
   const feeAPY = feeAPYData
     ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))

@@ -22,7 +22,7 @@ export const ETHEREUM: ChainConfig = {
   },
   graphURL: 'https://api.thegraph.com/subgraphs/name/divyan73/hyphenethereumv2',
   v2GraphURL:
-    'https://thegraph.com/hosted-service/subgraph/shantanu-bico/hyphenv2-liquidity-pool-ethereum',
+    'https://api.thegraph.com/subgraphs/name/shantanu-bico/hyphenv2-liquidity-pool-ethereum',
   networkAgnosticTransfer: false,
   explorerUrl: 'https://etherscan.io/',
 };

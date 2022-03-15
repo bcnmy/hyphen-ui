@@ -169,6 +169,11 @@ function StakingPositionOverview({
         )
       : -1;
 
+  const formattedTotalSharesStaked =
+    totalSharesStaked && tokenDecimals
+      ? ethers.utils.formatUnits(totalSharesStaked, tokenDecimals)
+      : -1;
+
   const { name: chainName } = chain;
   const {
     image: tokenImage,
@@ -217,8 +222,8 @@ function StakingPositionOverview({
     baseDivisor &&
     tokenDecimals &&
     shares &&
-    totalSharesStaked &&
-    rewardsPerDay >= 0
+    formattedTotalSharesStaked > 0 &&
+    rewardsPerDay > 0
       ? Number.parseFloat(shares.div(baseDivisor).div(totalSharesStaked)) *
         rewardsPerDay
       : 0;

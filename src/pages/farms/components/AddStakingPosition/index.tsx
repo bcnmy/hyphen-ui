@@ -222,7 +222,7 @@ function AddStakingPosition() {
   }
 
   function handleApproveNFTClick() {
-    if (!chain || !currentPosition || !filteredUserPositions) return;
+    if (!chain || currentPosition < 0 || !filteredUserPositions) return;
 
     approveNFTMutation(
       {
@@ -240,7 +240,7 @@ function AddStakingPosition() {
   }
 
   function handleStakeNFTClick() {
-    if (!accounts || !currentPosition || !filteredUserPositions) return;
+    if (!accounts || currentPosition < 0 || !filteredUserPositions) return;
 
     stakeNFTMutation(
       {

@@ -118,6 +118,8 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         100
       : 0;
 
+  console.log(rewardAPY);
+
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
     rewardsRatePerSecond && rewardToken && chain
@@ -153,10 +155,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
             {rewardAPY >= 0 ? (
-              `${makeNumberCompact(
-                Number.parseFloat(rewardAPY.toFixed(3)),
-                3,
-              )}%`
+              `${Number.parseFloat(rewardAPY.toFixed(3))}%`
             ) : (
               <Skeleton
                 baseColor="#615ccd20"

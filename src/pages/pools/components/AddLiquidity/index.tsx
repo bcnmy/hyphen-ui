@@ -519,7 +519,14 @@ function AddLiquidity() {
           <h2 className="text-xl text-hyphen-purple">Add Liquidity</h2>
 
           <div className="absolute right-0 flex">
-            <button className="mr-4 text-xs text-hyphen-purple" onClick={reset}>
+            <button
+              className="mr-4 text-xs text-hyphen-purple"
+              onClick={() => {
+                setLiquidityAmount('');
+                setSliderValue(0);
+                updatePoolShare('0');
+              }}
+            >
               Clear All
             </button>
           </div>

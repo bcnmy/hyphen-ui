@@ -235,16 +235,16 @@ function ManagePosition() {
   }
 
   function handleClaimFeeClick() {
-    if (unclaimedFees) {
-      claimFeeMutation(
-        {
-          positionId: BigNumber.from(positionId),
-        },
-        {
-          onSuccess: onRemoveLiquiditySuccess,
-        },
-      );
-    }
+    if (unclaimedFees <= 0) return;
+
+    claimFeeMutation(
+      {
+        positionId: BigNumber.from(positionId),
+      },
+      {
+        onSuccess: onRemoveLiquiditySuccess,
+      },
+    );
   }
 
   function onRemoveLiquiditySuccess() {

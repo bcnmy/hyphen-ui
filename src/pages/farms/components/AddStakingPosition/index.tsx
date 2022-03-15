@@ -50,7 +50,7 @@ function AddStakingPosition() {
     getTokenURI,
     getUserPositions,
   } = useLPToken(chain);
-  const { stakeNFT } = useLiquidityFarming(chain);
+  const { getRewardTokenAddress, stakeNFT } = useLiquidityFarming(chain);
 
   const [currentPosition, setCurrentPosition] = useState<number>(0);
 
@@ -84,6 +84,29 @@ function AddStakingPosition() {
       enabled: !!userPositions,
     },
   );
+
+  const { data: rewardTokenAddress } = useQuery(
+    'rewardTokenAddress',
+    () => {
+      if (!chain || !token) return;
+
+      return getRewardTokenAddress(token[chain.chainId].address);
+    },
+    {
+      // Execute only when address is available.
+      enabled: !!(chain && token),
+    },
+  );
+
+  const rewardToken =
+    rewardTokenAddress && chain
+      ? tokens.find(tokenObj => {
+          return tokenObj[chain.chainId]
+            ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress.toLowerCase()
+            : false;
+        })
+      : undefined;
 
   const { isLoading: approveNFTLoading, mutate: approveNFTMutation } =
     useMutation(
@@ -199,7 +222,7 @@ function AddStakingPosition() {
   }
 
   function handleApproveNFTClick() {
-    if (!chain || !filteredUserPositions) return;
+    if (!chain || !currentPosition || !filteredUserPositions) return;
 
     approveNFTMutation(
       {
@@ -217,7 +240,7 @@ function AddStakingPosition() {
   }
 
   function handleStakeNFTClick() {
-    if (!accounts || !filteredUserPositions) return;
+    if (!accounts || !currentPosition || !filteredUserPositions) return;
 
     stakeNFTMutation(
       {
@@ -373,13 +396,14 @@ function AddStakingPosition() {
               </div>
 
               <div className="flex h-[612px] max-h-[612px] flex-col justify-between pl-12.5 pt-2">
-                <div className="grid grid-cols-2">
+                <div className="grid grid-cols-1">
                   <div className="flex flex-col">
                     <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
-                      Unclaimed Bico
+                      Unclaimed {rewardToken?.symbol}
                     </span>
+
                     <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                      0
+                      0 {rewardToken?.symbol}
                     </div>
                   </div>
                 </div>

@@ -82,7 +82,7 @@ function LiquidityPositions() {
 
       {!isLoading ? (
         selectedNetwork && userPositions && userPositions.length > 0 ? (
-          <section className="grid grid-cols-2 gap-2.5">
+          <section className="grid grid-cols-1 gap-2.5">
             {userPositions.map((userPositionId: BigNumber) => {
               return (
                 <LiquidityPositionOverview

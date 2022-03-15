@@ -27,6 +27,18 @@ function useLiquidityFarming(chain: ChainConfig | undefined) {
     return new ethers.Contract(contractAddress, liquidityFarmingABI, signer);
   }, [contractAddress, signer]);
 
+  const claimFee = useCallback(
+    (positionId: BigNumber, accounts: string[]) => {
+      if (!liquidityFarmingContractSigner || !positionId || !accounts) return;
+
+      return liquidityFarmingContractSigner.extractRewards(
+        positionId,
+        accounts[0],
+      );
+    },
+    [liquidityFarmingContractSigner],
+  );
+
   const getPendingToken = useCallback(
     (positionId: BigNumber) => {
       if (!liquidityFarmingContract) return;
@@ -81,13 +93,24 @@ function useLiquidityFarming(chain: ChainConfig | undefined) {
     [liquidityFarmingContractSigner],
   );
 
+  const unstakeNFT = useCallback(
+    (positionId: BigNumber, accounts: string[]) => {
+      if (!liquidityFarmingContractSigner || !positionId || !accounts) return;
+
+      return liquidityFarmingContractSigner.withdraw(positionId, accounts[0]);
+    },
+    [liquidityFarmingContractSigner],
+  );
+
   return {
+    claimFee,
     getPendingToken,
     getStakedUserPositions,
     getRewardRatePerSecond,
     getRewardTokenAddress,
     getTotalSharesStaked,
     stakeNFT,
+    unstakeNFT,
   };
 }
 

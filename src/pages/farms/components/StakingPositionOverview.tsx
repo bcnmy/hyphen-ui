@@ -50,6 +50,8 @@ function StakingPositionOverview({
         })
       : null;
 
+  const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
+
   const { data: suppliedLiquidityByToken } = useQuery(
     ['suppliedLiquidityByToken', tokenAddress],
     () => getSuppliedLiquidityByToken(tokenAddress),
@@ -123,6 +125,9 @@ function StakingPositionOverview({
         })
       : undefined;
 
+  const rewardTokenDecimals =
+    chain && rewardToken ? rewardToken[chain.chainId].decimal : null;
+
   const { data: rewardTokenPriceInUSD } = useQuery(
     ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
     () => {
@@ -152,10 +157,6 @@ function StakingPositionOverview({
   }
 
   const isUserOnFarms = location.pathname === '/farms';
-
-  const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
-  const rewardTokenDecimals =
-    chain && rewardToken ? rewardToken[chain.chainId].decimal : null;
 
   const formattedSuppliedLiquidity =
     suppliedLiquidity && tokenDecimals
@@ -337,7 +338,7 @@ function StakingPositionOverview({
           </div>
         </div>
         <span className="font-mono text-xs">
-          {rewardToken && unclaimedRewardToken ? (
+          {rewardToken && unclaimedRewardToken >= 0 ? (
             `Unclaimed ${rewardToken.symbol}: ${
               unclaimedRewardToken > 0 ? unclaimedRewardToken.toFixed(5) : 0
             }`

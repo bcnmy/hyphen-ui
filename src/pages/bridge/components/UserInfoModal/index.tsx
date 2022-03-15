@@ -74,7 +74,7 @@ const USER_DEPOSITS = gql`
 
 const FEE_INFO = gql`
   query FEE_INFO($exitHash: String!) {
-    feeDetailLogEntry(id: $exitHash) {
+    assetSentToUserLogEntries(where: { id: $exitHash }) {
       gasFee
       lpFee
       timestamp
@@ -144,19 +144,21 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         const toChainExplorerUrl = `${toChain.explorerUrl}/tx/${exitHash}`;
         const token = tokens.find(
           tokenObj =>
-            tokenObj[fromChain.chainId].address.toLowerCase() ===
+            tokenObj[fromChain.chainId]?.address.toLowerCase() ===
             tokenAddress.toLowerCase(),
         )!;
         const tokenDecimals = token[fromChain.chainId].decimal;
 
+        const { assetSentToUserLogEntries } = await getFeeInfo(
+          exitHash,
+          toChain,
+        );
         const {
-          feeDetailLogEntry: {
-            gasFee,
-            lpFee,
-            timestamp: endTimestamp,
-            transferFee,
-          },
-        } = await getFeeInfo(exitHash, toChain);
+          gasFee,
+          lpFee,
+          timestamp: endTimestamp,
+          transferFee,
+        } = assetSentToUserLogEntries[0];
 
         const amountReceived = BigNumber.from(amount)
           .add(BigNumber.from(rewardAmount))

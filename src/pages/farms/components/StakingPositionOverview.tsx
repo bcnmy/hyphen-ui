@@ -274,10 +274,7 @@ function StakingPositionOverview({
             <div className="flex items-center">
               <span className="font-mono text-2xl">
                 {rewardAPY >= 0 ? (
-                  `${makeNumberCompact(
-                    Number.parseFloat(rewardAPY.toFixed(3)),
-                    3,
-                  )}%`
+                  `${Number.parseFloat(rewardAPY.toFixed(3))}%`
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"

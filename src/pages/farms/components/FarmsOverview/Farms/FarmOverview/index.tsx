@@ -118,8 +118,6 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         100
       : 0;
 
-  console.log(rewardAPY);
-
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
     rewardsRatePerSecond && rewardToken && chain

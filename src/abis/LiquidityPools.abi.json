@@ -37,6 +37,24 @@
         "internalType": "uint256",
         "name": "fromChainId",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "lpFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "transferFee",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "gasFee",
+        "type": "uint256"
       }
     ],
     "name": "AssetSent",
@@ -108,31 +126,6 @@
       }
     ],
     "name": "EthReceived",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "lpFee",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "transferFee",
-        "type": "uint256"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "gasFee",
-        "type": "uint256"
-      }
-    ],
-    "name": "FeeDetails",
     "type": "event"
   },
   {
@@ -241,6 +234,19 @@
       }
     ],
     "name": "Received",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "tokenManagerAddress",
+        "type": "address"
+      }
+    ],
+    "name": "TokenManagerChanged",
     "type": "event"
   },
   {
@@ -506,7 +512,7 @@
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "fee",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -895,6 +901,19 @@
       }
     ],
     "name": "setLiquidityProviders",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenManager",
+        "type": "address"
+      }
+    ],
+    "name": "setTokenManager",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

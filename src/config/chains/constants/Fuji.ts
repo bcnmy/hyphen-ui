@@ -19,7 +19,7 @@ export const FUJI: ChainConfig = {
     apiKey: 'CdOSOVUtJ.f50d832e-1e7c-45f6-9a2e-9aefc4fc8b56',
   },
   assetSentTopicId:
-    '0xfa67019f292323b49b589fc709d66c232c7b0ce022f3f32a39af2f91028bbf2c',
+    '0x6bfd5ee5792d66b151a3fab9f56ee828a0f1c3216d4b752e267cd5590326b15c',
   networkAgnosticTransfer: true, // Set this to enable network agnostic gasless transactions
   graphURL: 'https://api.thegraph.com/subgraphs/name/divyan73/hyphen-fuji',
   v2GraphURL:

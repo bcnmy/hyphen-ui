@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { request, gql } from 'graphql-request';
 import Skeleton from 'react-loading-skeleton';
 import { HiInformationCircle } from 'react-icons/hi';
@@ -20,6 +20,7 @@ interface IFarmOverview {
 
 function FarmOverview({ chain, token }: IFarmOverview) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
     token;
 
@@ -129,6 +130,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       : null;
 
   function handleFarmOverviewClick() {
+    queryClient.removeQueries('userPositions');
     navigate(`add-staking-position/${chain.chainId}/${symbol}`);
   }
 

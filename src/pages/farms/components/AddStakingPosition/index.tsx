@@ -56,7 +56,7 @@ function AddStakingPosition() {
   const [currentPosition, setCurrentPosition] = useState<number>(0);
 
   const { isLoading: isUserPositionsLoading, data: userPositions } = useQuery(
-    ['userPositions', accounts, chain],
+    ['userPositions', accounts],
     () => {
       if (!isLoggedIn || !accounts) return;
 
@@ -295,7 +295,7 @@ function AddStakingPosition() {
       ) : null}
 
       {isLoggedIn ? (
-        !isUserPositionsLoading && firstPositionMetadataStatus !== 'loading' ? (
+        !isDataLoading ? (
           chain &&
           token &&
           filteredUserPositions.length > 0 &&
@@ -433,7 +433,9 @@ function AddStakingPosition() {
                 </div>
               </section>
             </>
-          ) : (
+          ) : !isDataLoading &&
+            filteredUserPositions &&
+            filteredUserPositions.length === 0 ? (
             <section className="flex h-auto items-start justify-center">
               <div className="mt-12 mb-16 flex items-center">
                 <HiOutlineSearch className="mr-4 h-6 w-6 text-hyphen-gray-200" />
@@ -442,7 +444,7 @@ function AddStakingPosition() {
                 </span>
               </div>
             </section>
-          )
+          ) : null
         ) : (
           <section className="flex h-auto items-start justify-center">
             <div className="mt-12 mb-16 flex items-center">

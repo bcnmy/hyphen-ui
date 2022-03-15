@@ -11,6 +11,8 @@ import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
+import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import useLPToken from 'hooks/contracts/useLPToken';
 
 interface IPoolOverview {
   chain: ChainConfig;
@@ -19,11 +21,15 @@ interface IPoolOverview {
 
 function PoolOverview({ chain, token }: IPoolOverview) {
   const navigate = useNavigate();
-  const { address, chainColor, decimal, symbol, tokenImage } = token;
+  const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
+    token;
   const { v2GraphURL: v2GraphEndpoint } = chain;
 
-  const { getTotalLiquidity } = useLiquidityProviders(chain);
+  const { getSuppliedLiquidityByToken, getTotalLiquidity } =
+    useLiquidityProviders(chain);
   const { getTokenTotalCap } = useWhitelistPeriodManager(chain);
+  const { getRewardRatePerSecond, getRewardTokenAddress } =
+    useLiquidityFarming(chain);
 
   const { data: totalLiquidity } = useQuery(
     ['totalLiquidity', address],
@@ -66,7 +72,95 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const rewardAPY = 0;
+  const { data: suppliedLiquidityByToken } = useQuery(
+    ['suppliedLiquidityByToken', address],
+    () => getSuppliedLiquidityByToken(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
+
+  const { data: tokenPriceInUSD } = useQuery(
+    ['tokenPriceInUSD', coinGeckoId],
+    () =>
+      fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json()),
+    {
+      enabled: !!coinGeckoId,
+    },
+  );
+
+  const { data: rewardsRatePerSecond } = useQuery(
+    ['rewardsRatePerSecond', address],
+    () => getRewardRatePerSecond(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
+
+  const { data: rewardTokenAddress } = useQuery(
+    ['rewardTokenAddress', address],
+    () => getRewardTokenAddress(address),
+    {
+      // Execute only when address is available.
+      enabled: !!address,
+    },
+  );
+
+  const rewardToken = rewardTokenAddress
+    ? tokens.find(tokenObj => {
+        return tokenObj[chain.chainId]
+          ? tokenObj[chain.chainId].address.toLowerCase() ===
+              rewardTokenAddress.toLowerCase()
+          : false;
+      })
+    : undefined;
+
+  const { data: rewardTokenPriceInUSD } = useQuery(
+    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+    () => {
+      if (!rewardToken) return;
+
+      return fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json());
+    },
+    {
+      enabled: !!rewardToken,
+    },
+  );
+
+  const rewardRatePerSecondInUSD =
+    rewardsRatePerSecond && rewardToken && rewardTokenPriceInUSD
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            rewardsRatePerSecond,
+            rewardToken[chain.chainId].decimal,
+          ),
+        ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
+      : -1;
+
+  const totalValueLockedInUSD =
+    suppliedLiquidityByToken && tokenPriceInUSD
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidityByToken, decimal),
+        ) * tokenPriceInUSD[coinGeckoId as string].usd
+      : -1;
+
+  const secondsInYear = 31536000;
+  const rewardAPY =
+    rewardRatePerSecondInUSD && totalValueLockedInUSD
+      ? (Math.pow(
+          1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
+          secondsInYear,
+        ) -
+          1) *
+        100
+      : -1;
+
   const feeAPY = feeAPYData
     ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
     : 0;
@@ -104,7 +198,9 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
-            {APY !== null || APY !== undefined ? `${APY}%` : '...'}
+            {APY !== null || APY !== undefined
+              ? `${makeNumberCompact(APY, 3)}%`
+              : '...'}
           </span>
           <HiInformationCircle
             className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
@@ -113,7 +209,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
             onClick={e => e.stopPropagation()}
           />
           <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
-            <p>Reward APY: {rewardAPY}%</p>
+            <p>Reward APY: {makeNumberCompact(rewardAPY, 3)}%</p>
             <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
           </CustomTooltip>
         </div>

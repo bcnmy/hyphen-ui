@@ -44,6 +44,7 @@ function Pools() {
                   )!;
                   const tokenObj = token[chainObj.chainId]
                     ? {
+                        coinGeckoId: token.coinGeckoId,
                         tokenImage: token.image,
                         ...token[chainObj.chainId],
                       }

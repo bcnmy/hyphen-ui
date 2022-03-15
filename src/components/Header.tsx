@@ -22,7 +22,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
 
   const statsUrl =
     process.env.REACT_APP_ENV === ENV.production
-      ? 'https://hyphen-info.biconomy.io/'
+      ? 'https://hyphen-stats.biconomy.io/'
       : 'https://hyphen-stats-staging.biconomy.io/';
 
   return (

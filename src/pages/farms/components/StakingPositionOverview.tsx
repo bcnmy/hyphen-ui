@@ -26,7 +26,8 @@ function StakingPositionOverview({
   })!;
 
   const { getPositionMetadata } = useLPToken(chain);
-  const { getSuppliedLiquidityByToken } = useLiquidityProviders(chain);
+  const { getBaseDivisor, getSuppliedLiquidityByToken } =
+    useLiquidityProviders(chain);
   const {
     getPendingToken,
     getRewardRatePerSecond,
@@ -38,6 +39,8 @@ function StakingPositionOverview({
     useQuery(['positionMetadata', positionId], () =>
       getPositionMetadata(positionId),
     );
+
+  const { data: baseDivisor } = useQuery('baseDivisor', () => getBaseDivisor());
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
@@ -91,7 +94,7 @@ function StakingPositionOverview({
   );
 
   const { data: rewardTokenAddress } = useQuery(
-    'rewardTokenAddress',
+    ['rewardTokenAddress', token],
     () => {
       if (!chain || !token) return;
 
@@ -104,7 +107,7 @@ function StakingPositionOverview({
   );
 
   const { data: totalSharesStaked } = useQuery(
-    'totalSharesStaked',
+    ['totalSharesStaked', token],
     () => {
       if (!chain || !token) return;
 
@@ -166,11 +169,6 @@ function StakingPositionOverview({
         )
       : -1;
 
-  const formattedTotalSharesStaked =
-    totalSharesStaked && tokenDecimals
-      ? ethers.utils.formatUnits(totalSharesStaked, tokenDecimals)
-      : -1;
-
   const { name: chainName } = chain;
   const {
     image: tokenImage,
@@ -216,16 +214,13 @@ function StakingPositionOverview({
       : -1;
 
   const yourRewardRate =
+    baseDivisor &&
+    tokenDecimals &&
     shares &&
-    formattedTotalSharesStaked > 0 &&
-    rewardsPerDay >= 0 &&
-    tokenDecimals
-      ? Number.parseFloat(
-          ethers.utils.formatUnits(
-            shares.div(totalSharesStaked),
-            tokenDecimals,
-          ),
-        ) * rewardsPerDay
+    totalSharesStaked &&
+    rewardsPerDay >= 0
+      ? Number.parseFloat(shares.div(baseDivisor).div(totalSharesStaked)) *
+        rewardsPerDay
       : 0;
 
   const unclaimedRewardToken =

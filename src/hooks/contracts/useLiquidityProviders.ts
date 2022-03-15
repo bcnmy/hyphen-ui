@@ -59,6 +59,12 @@ function useLiquidityProviders(chain: ChainConfig | undefined) {
     [liquidityProvidersContractSigner],
   );
 
+  const getBaseDivisor = useCallback(() => {
+    if (!liquidityProvidersContract) return;
+
+    return liquidityProvidersContract.BASE_DIVISOR();
+  }, [liquidityProvidersContract]);
+
   const getSuppliedLiquidityByToken = useCallback(
     (tokenAddress: string) => {
       if (!liquidityProvidersContract) return;
@@ -151,6 +157,7 @@ function useLiquidityProviders(chain: ChainConfig | undefined) {
     addLiquidity,
     addNativeLiquidity,
     claimFee,
+    getBaseDivisor,
     getSuppliedLiquidityByToken,
     getTokenAmount,
     getTokenPriceInLPShares,

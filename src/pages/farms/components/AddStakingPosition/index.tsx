@@ -70,22 +70,6 @@ function AddStakingPosition() {
     },
   );
 
-  const {
-    isLoading: isNFTApprovalAddressLoading,
-    data: NFTApprovalAddress,
-    refetch: refetchNFTApprovalAddress,
-  } = useQuery(
-    ['NFTApprovalAddress', userPositions, currentPosition],
-    () => {
-      if (!userPositions) return;
-
-      return getNFTApprovalAddress(userPositions[currentPosition]);
-    },
-    {
-      enabled: !!userPositions,
-    },
-  );
-
   const { data: rewardTokenAddress } = useQuery(
     ['rewardTokenAddress', token],
     () => {
@@ -168,6 +152,22 @@ function AddStakingPosition() {
         : false;
     }) ?? [];
 
+  const {
+    isLoading: isNFTApprovalAddressLoading,
+    data: NFTApprovalAddress,
+    refetch: refetchNFTApprovalAddress,
+  } = useQuery(
+    ['NFTApprovalAddress', currentPosition],
+    () => {
+      if (!filteredUserPositions) return;
+
+      return getNFTApprovalAddress(filteredUserPositions[currentPosition]);
+    },
+    {
+      enabled: !!filteredUserPositions,
+    },
+  );
+
   const userPositionsNFTs = useQueries(
     filteredUserPositions?.map((userPosition: BigNumber) => {
       return {
@@ -201,6 +201,8 @@ function AddStakingPosition() {
       ? NFTApprovalAddress.toLowerCase() ===
         LiquidityFarming[chain.chainId].address.toLowerCase()
       : false;
+
+  console.log(isNFTApproved);
 
   function handlePrevPositionClick() {
     const newPosition =
@@ -238,6 +240,7 @@ function AddStakingPosition() {
   }
 
   function onApproveNFTSuccess() {
+    queryClient.removeQueries('NFTApprovalAddress');
     refetchNFTApprovalAddress();
   }
 
@@ -295,7 +298,7 @@ function AddStakingPosition() {
       ) : null}
 
       {isLoggedIn ? (
-        !isDataLoading ? (
+        !isUserPositionsLoading && firstPositionMetadataStatus !== 'loading' ? (
           chain &&
           token &&
           filteredUserPositions.length > 0 &&
@@ -433,7 +436,7 @@ function AddStakingPosition() {
                 </div>
               </section>
             </>
-          ) : !isDataLoading &&
+          ) : !isUserPositionsLoading &&
             filteredUserPositions &&
             filteredUserPositions.length === 0 ? (
             <section className="flex h-auto items-start justify-center">

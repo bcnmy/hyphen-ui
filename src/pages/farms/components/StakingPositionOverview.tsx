@@ -8,6 +8,7 @@ import Skeleton from 'react-loading-skeleton';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
+import { Decimal } from 'decimal.js';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -224,8 +225,11 @@ function StakingPositionOverview({
     shares &&
     formattedTotalSharesStaked > 0 &&
     rewardsPerDay > 0
-      ? Number.parseFloat(shares.div(baseDivisor).div(totalSharesStaked)) *
-        rewardsPerDay
+      ? new Decimal(shares.toString())
+          .div(baseDivisor.toString())
+          .div(totalSharesStaked.toString())
+          .mul(rewardsPerDay.toString())
+          .toNumber()
       : 0;
 
   const unclaimedRewardToken =

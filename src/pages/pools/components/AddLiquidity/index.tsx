@@ -533,7 +533,7 @@ function AddLiquidity() {
         </header>
 
         <section className="grid grid-cols-2">
-          <div className="max-h-100 h-100 border-r pr-12.5">
+          <div className="max-h-104.5 h-104.5 border-r pr-12.5">
             <div className="mb-6 grid grid-cols-2 gap-2.5">
               <Select
                 options={tokenOptions}
@@ -554,15 +554,52 @@ function AddLiquidity() {
                 label={'network'}
               />
             </div>
-            <label
-              htmlFor="liquidityAmount"
-              className="flex justify-between px-5 text-xxs font-bold uppercase"
-            >
-              <span className="text-hyphen-gray-400">Input</span>
-              <span className="flex text-hyphen-gray-300">
-                Wallet Balance:{' '}
-                {walletBalance ? (
-                  walletBalance
+
+            <div className="relative mb-6">
+              <label
+                htmlFor="liquidityAmount"
+                className="mb-2 flex justify-between px-5 text-xxs font-bold uppercase"
+              >
+                <span className="text-hyphen-gray-400">Input</span>
+                <span className="flex items-center text-hyphen-gray-300">
+                  Wallet Balance:{' '}
+                  {walletBalance ? (
+                    walletBalance
+                  ) : (
+                    <Skeleton
+                      baseColor="#615ccd20"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!mx-1 !w-11"
+                    />
+                  )}{' '}
+                  {selectedToken?.id}
+                </span>
+              </label>
+
+              <input
+                id="liquidityAmount"
+                placeholder="0.000"
+                type="number"
+                inputMode="decimal"
+                className="mb-2 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                value={liquidityAmount}
+                onChange={handleLiquidityAmountChange}
+                disabled={isDataLoading || !totalLiquidity}
+              />
+
+              <button
+                className="absolute right-[18px] top-[45px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                // onClick={handleMaxButtonClick}
+                disabled={isDataLoading}
+              >
+                MAX
+              </button>
+
+              <span className="flex items-center justify-end px-5 text-xxs font-bold uppercase text-red-400">
+                Wallet Cap:{' '}
+                {liquidityBalance ? (
+                  liquidityBalance
                 ) : (
                   <Skeleton
                     baseColor="#615ccd20"
@@ -573,17 +610,8 @@ function AddLiquidity() {
                 )}{' '}
                 {selectedToken?.id}
               </span>
-            </label>
-            <input
-              id="liquidityAmount"
-              placeholder="0.000"
-              type="number"
-              inputMode="decimal"
-              className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
-              value={liquidityAmount}
-              onChange={handleLiquidityAmountChange}
-              disabled={isDataLoading || !totalLiquidity}
-            />
+            </div>
+
             <StepSlider
               disabled={isDataLoading}
               dots
@@ -596,7 +624,7 @@ function AddLiquidity() {
                 {currentChainId === chain?.chainId ? (
                   <>
                     <button
-                      className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                      className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
                       disabled={
                         isDataLoading ||
                         isNativeToken ||
@@ -659,7 +687,7 @@ function AddLiquidity() {
               </button>
             ) : null}
           </div>
-          <div className="max-h-100 h-100 pl-12.5">
+          <div className="max-h-104.5 h-104.5 pl-12.5">
             <div className="mb-12 grid grid-cols-2 gap-2.5">
               <div className="flex flex-col">
                 <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
@@ -679,7 +707,7 @@ function AddLiquidity() {
               </div>
             </div>
 
-            <div className="mb-[4.375rem]">
+            <div className="mb-[5.5rem]">
               <ProgressBar
                 currentProgress={formattedTotalLiquidity}
                 totalProgress={formattedTokenTotalCap}

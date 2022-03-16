@@ -251,6 +251,12 @@ function IncreaseLiquidity() {
       ? Number.parseFloat(liquidityIncreaseAmount) > formattedTokenAllowance
       : false;
 
+  const isLiquidityAmountGtPoolCap =
+    liquidityIncreaseAmount && formattedTotalLiquidity && formattedTokenTotalCap
+      ? Number.parseFloat(liquidityIncreaseAmount) + formattedTotalLiquidity >
+        formattedTokenTotalCap
+      : false;
+
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
@@ -574,6 +580,7 @@ function IncreaseLiquidity() {
                         isDataLoading ||
                         isNativeToken ||
                         isLiquidityAmountGtWalletBalance ||
+                        isLiquidityAmountGtPoolCap ||
                         !isLiquidityAmountGtTokenAllowance
                       }
                       onClick={showApprovalModal}
@@ -596,7 +603,8 @@ function IncreaseLiquidity() {
                         Number.parseFloat(liquidityIncreaseAmount) === 0 ||
                         isLiquidityAmountGtWalletBalance ||
                         isLiquidityAmountGtLiquidityBalance ||
-                        isLiquidityAmountGtTokenAllowance
+                        isLiquidityAmountGtTokenAllowance ||
+                        isLiquidityAmountGtPoolCap
                       }
                       onClick={handleConfirmSupplyClick}
                     >
@@ -609,6 +617,8 @@ function IncreaseLiquidity() {
                         ? 'Insufficient wallet balance'
                         : isLiquidityAmountGtLiquidityBalance
                         ? 'This amount exceeds your wallet cap'
+                        : isLiquidityAmountGtPoolCap
+                        ? 'This amount exceeds the pool cap'
                         : increaseLiquidityLoading
                         ? 'Increasing Liquidity'
                         : 'Confirm Supply'}

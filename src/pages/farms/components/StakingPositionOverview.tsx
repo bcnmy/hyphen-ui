@@ -27,8 +27,11 @@ function StakingPositionOverview({
   })!;
 
   const { getPositionMetadata } = useLPToken(chain);
-  const { getBaseDivisor, getSuppliedLiquidityByToken } =
-    useLiquidityProviders(chain);
+  const {
+    getBaseDivisor,
+    getTokenPriceInLPShares,
+    getSuppliedLiquidityByToken,
+  } = useLiquidityProviders(chain);
   const {
     getPendingToken,
     getRewardRatePerSecond,
@@ -56,6 +59,15 @@ function StakingPositionOverview({
       : null;
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
+
+  const { data: tokenPriceInLPShares } = useQuery(
+    ['tokenPriceInLPShares', tokenAddress],
+    () => getTokenPriceInLPShares(tokenAddress),
+    {
+      // Execute only when address is available.
+      enabled: !!tokenAddress,
+    },
+  );
 
   const { data: suppliedLiquidityByToken } = useQuery(
     ['suppliedLiquidityByToken', tokenAddress],
@@ -182,6 +194,32 @@ function StakingPositionOverview({
     [chain.chainId]: { chainColor },
   } = token;
 
+  const tvl =
+    totalSharesStaked &&
+    baseDivisor &&
+    tokenPriceInLPShares &&
+    tokenDecimals &&
+    tokenPriceInUSD &&
+    token
+      ? new Decimal(totalSharesStaked.toString())
+          .mul(baseDivisor.toString())
+          .div(
+            new Decimal(tokenPriceInLPShares.toString()).mul(
+              10 ** tokenDecimals,
+            ),
+          )
+          .mul(tokenPriceInUSD[token.coinGeckoId as string].usd)
+          .toNumber()
+      : 0;
+
+  console.log(
+    totalSharesStaked,
+    baseDivisor,
+    tokenPriceInLPShares,
+    tokenDecimals,
+    tokenPriceInUSD,
+  );
+
   const rewardRatePerSecondInUSD =
     rewardsRatePerSecond &&
     rewardToken &&
@@ -268,7 +306,9 @@ function StakingPositionOverview({
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">TVL: $525,234</span>
+        <span className="font-mono text-xs">
+          TVL: ${makeNumberCompact(tvl, 3)}
+        </span>
       </div>
 
       <div className="flex flex-col items-center">

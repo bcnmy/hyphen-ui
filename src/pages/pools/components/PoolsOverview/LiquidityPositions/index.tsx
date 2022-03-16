@@ -34,7 +34,13 @@ function LiquidityPositions() {
   );
 
   function handleAddLiquidity() {
-    const [{ chainId }] = chains;
+    const isSelectedNetworkSupported = selectedNetwork
+      ? chains.find(chainObj => chainObj.chainId === selectedNetwork?.chainId)
+      : false;
+    const { chainId } =
+      isSelectedNetworkSupported && selectedNetwork
+        ? selectedNetwork
+        : chains[0];
     const [{ symbol: tokenSymbol }] = tokens.filter(
       tokenObj => tokenObj[chainId],
     );

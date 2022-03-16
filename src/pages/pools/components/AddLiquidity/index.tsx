@@ -604,6 +604,7 @@ function AddLiquidity() {
                       disabled={
                         isDataLoading ||
                         isNativeToken ||
+                        isLiquidityAmountGtWalletBalance ||
                         !isLiquidityAmountGtTokenAllowance
                       }
                       onClick={showApprovalModal}

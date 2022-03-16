@@ -212,14 +212,6 @@ function StakingPositionOverview({
           .toNumber()
       : 0;
 
-  console.log(
-    totalSharesStaked,
-    baseDivisor,
-    tokenPriceInLPShares,
-    tokenDecimals,
-    tokenPriceInUSD,
-  );
-
   const rewardRatePerSecondInUSD =
     rewardsRatePerSecond &&
     rewardToken &&

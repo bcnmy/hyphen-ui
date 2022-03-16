@@ -515,6 +515,15 @@ function AddLiquidity() {
     }
   }
 
+  function handleMaxButtonClick() {
+    if (walletBalance) {
+      setSliderValue(100);
+      setLiquidityAmount(
+        (Math.trunc(Number.parseFloat(walletBalance) * 1000) / 1000).toString(),
+      );
+    }
+  }
+
   function updatePoolShare(newLiquidityAmount: string) {
     const liquidityAmountInFloat = Number.parseFloat(newLiquidityAmount);
 
@@ -666,36 +675,49 @@ function AddLiquidity() {
                 label={'network'}
               />
             </div>
-            <label
-              htmlFor="liquidityAmount"
-              className="flex justify-between px-5 text-xxs font-bold uppercase"
-            >
-              <span className="text-hyphen-gray-400">Input</span>
-              <span className="flex text-hyphen-gray-300">
-                Wallet Balance:{' '}
-                {walletBalance ? (
-                  walletBalance
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-11"
-                  />
-                )}{' '}
-                {selectedToken?.id}
-              </span>
-            </label>
-            <input
-              id="liquidityAmount"
-              placeholder="0.000"
-              type="number"
-              inputMode="decimal"
-              className="mt-2 mb-6 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
-              value={liquidityAmount}
-              onChange={handleLiquidityAmountChange}
-              disabled={isDataLoading || !totalLiquidity}
-            />
+
+            <div className="relative mb-6">
+              <label
+                htmlFor="liquidityAmount"
+                className="mb-2 flex justify-between px-5 text-xxs font-bold uppercase"
+              >
+                <span className="text-hyphen-gray-400">Input</span>
+                <span className="flex items-center text-hyphen-gray-300">
+                  Wallet Balance:{' '}
+                  {walletBalance ? (
+                    walletBalance
+                  ) : (
+                    <Skeleton
+                      baseColor="#615ccd20"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!mx-1 !w-11"
+                    />
+                  )}{' '}
+                  {selectedToken?.id}
+                </span>
+              </label>
+
+              <input
+                id="liquidityAmount"
+                placeholder="0.000"
+                type="number"
+                inputMode="decimal"
+                className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                value={liquidityAmount}
+                onChange={handleLiquidityAmountChange}
+                disabled={isDataLoading || !totalLiquidity}
+              />
+
+              <button
+                className="absolute right-[18px] top-[45px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                onClick={handleMaxButtonClick}
+                disabled={isDataLoading}
+              >
+                MAX
+              </button>
+            </div>
+
             <StepSlider
               disabled={isDataLoading}
               dots

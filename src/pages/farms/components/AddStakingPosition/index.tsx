@@ -152,6 +152,13 @@ function AddStakingPosition() {
         : false;
     }) ?? [];
 
+  const hasUserPositionsLoaded =
+    userPositionsMetadata.length > 0
+      ? userPositionsMetadata.every(positionMetadata => {
+          return positionMetadata.status === 'success';
+        })
+      : false;
+
   const {
     isLoading: isNFTApprovalAddressLoading,
     data: NFTApprovalAddress,
@@ -160,10 +167,11 @@ function AddStakingPosition() {
     ['NFTApprovalAddress', currentPosition],
     () => {
       if (!filteredUserPositions) return;
+
       return getNFTApprovalAddress(filteredUserPositions[currentPosition]);
     },
     {
-      enabled: !!filteredUserPositions.length,
+      enabled: !!hasUserPositionsLoaded,
     },
   );
 

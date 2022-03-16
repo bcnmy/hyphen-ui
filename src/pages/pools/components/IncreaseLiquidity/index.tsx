@@ -313,9 +313,9 @@ function IncreaseLiquidity() {
     if (value === 0) {
       setLiquidityIncreaseAmount('');
       updatePoolShare('0');
-    } else if (liquidityBalance) {
+    } else if (walletBalance) {
       const newLiquidityIncreaseAmount = (
-        Math.trunc(Number.parseFloat(liquidityBalance) * (value / 100) * 1000) /
+        Math.trunc(Number.parseFloat(walletBalance) * (value / 100) * 1000) /
         1000
       ).toString();
       setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
@@ -324,12 +324,10 @@ function IncreaseLiquidity() {
   }
 
   function handleMaxButtonClick() {
-    if (liquidityBalance) {
+    if (walletBalance) {
       setSliderValue(100);
       setLiquidityIncreaseAmount(
-        (
-          Math.trunc(Number.parseFloat(liquidityBalance) * 1000) / 1000
-        ).toString(),
+        (Math.trunc(Number.parseFloat(walletBalance) * 1000) / 1000).toString(),
       );
     }
   }

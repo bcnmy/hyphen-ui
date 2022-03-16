@@ -792,7 +792,7 @@ function AddLiquidity() {
                   </>
                 ) : (
                   <button
-                    className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                    className="mt-[6.75rem] h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                     onClick={handleNetworkChange}
                   >
                     Switch to {chain?.name}
@@ -802,7 +802,7 @@ function AddLiquidity() {
             ) : null}
             {!isLoggedIn ? (
               <button
-                className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                className="mt-[6.75rem] h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                 onClick={connect}
               >
                 Connect Your Wallet

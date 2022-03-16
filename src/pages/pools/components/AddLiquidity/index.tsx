@@ -514,7 +514,7 @@ function AddLiquidity() {
           <div className="absolute left-0">
             <button
               className="flex items-center rounded text-hyphen-gray-400"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/pools')}
             >
               <HiArrowSmLeft className="h-5 w-auto" />
             </button>

@@ -198,7 +198,18 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
-            {APY !== null || APY !== undefined ? `${APY}%` : '...'}
+            {APY >= 0 && APY <= 10000 ? (
+              `${Number.parseFloat(APY.toFixed(3))}%`
+            ) : APY > 10000 ? (
+              `>10,000%`
+            ) : (
+              <Skeleton
+                baseColor="#615ccd20"
+                enableAnimation
+                highlightColor="#615ccd05"
+                className="!mx-1 !w-28"
+              />
+            )}
           </span>
           <HiInformationCircle
             className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
@@ -207,7 +218,12 @@ function PoolOverview({ chain, token }: IPoolOverview) {
             onClick={e => e.stopPropagation()}
           />
           <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
-            <p>Reward APY: {makeNumberCompact(rewardAPY, 3)}%</p>
+            <p>
+              Reward APY:{' '}
+              {APY > 10000
+                ? '>10,000%'
+                : `${Number.parseFloat(APY.toFixed(3))}%`}
+            </p>
             <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
           </CustomTooltip>
         </div>

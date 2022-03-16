@@ -152,16 +152,9 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
-            {rewardAPY >= 0 ? (
-              `${Number.parseFloat(rewardAPY.toFixed(3))}%`
-            ) : (
-              <Skeleton
-                baseColor="#615ccd20"
-                enableAnimation
-                highlightColor="#615ccd05"
-                className="!mx-1 !w-28"
-              />
-            )}
+            {rewardAPY > 10000
+              ? '>10,000%'
+              : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
           </span>
         </div>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

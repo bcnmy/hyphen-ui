@@ -167,12 +167,12 @@ function StakingPositionOverview({
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedTotalSharesStaked =
     totalSharesStaked && tokenDecimals
       ? ethers.utils.formatUnits(totalSharesStaked, tokenDecimals)
-      : -1;
+      : 0;
 
   const { name: chainName } = chain;
   const {
@@ -189,14 +189,14 @@ function StakingPositionOverview({
       ? Number.parseFloat(
           ethers.utils.formatUnits(rewardsRatePerSecond, rewardTokenDecimals),
         ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const totalValueLockedInUSD =
     suppliedLiquidityByToken && tokenPriceInUSD && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
         ) * tokenPriceInUSD[token?.coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const secondsInYear = 31536000;
 
@@ -208,7 +208,7 @@ function StakingPositionOverview({
         ) -
           1) *
         100
-      : -1;
+      : 0;
 
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
@@ -216,7 +216,7 @@ function StakingPositionOverview({
       ? Number.parseFloat(
           ethers.utils.formatUnits(rewardsRatePerSecond, rewardTokenDecimals),
         ) * SECONDS_IN_24_HOURS
-      : -1;
+      : 0;
 
   const yourRewardRate =
     baseDivisor &&
@@ -273,16 +273,9 @@ function StakingPositionOverview({
           <div className="flex flex-col items-center">
             <div className="flex items-center">
               <span className="font-mono text-2xl">
-                {rewardAPY >= 0 ? (
-                  `${Number.parseFloat(rewardAPY.toFixed(3))}%`
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-28"
-                  />
-                )}
+                {rewardAPY > 10000
+                  ? '>10,000%'
+                  : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
               </span>
             </div>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

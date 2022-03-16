@@ -24,7 +24,7 @@ function LiquidityInfo() {
         </span>
         <a
           className="mt-2 flex h-32.5 flex-col items-start justify-between rounded-lg border border-dashed p-5 text-hyphen-purple hover:bg-gray-50"
-          href="https://hyphen-stats.biconomy.io/"
+          href="https://medium.com/biconomy/hyphen-2-0-liquidity-providers-f6d00560851c"
           target="_blank"
           rel="noreferrer"
         >

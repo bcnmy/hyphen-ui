@@ -22,6 +22,6 @@ export const AVALANCHE: ChainConfig = {
   networkAgnosticTransfer: false, // Set this to enable network agnostic gasless transactions
   graphURL: 'https://api.thegraph.com/subgraphs/name/divyan73/hyphen-avalanche',
   v2GraphURL:
-    'https://thegraph.com/hosted-service/subgraph/shantanu-bico/hyphenv2-liquidity-pool-avalanche',
+    'https://api.thegraph.com/subgraphs/name/shantanu-bico/hyphenv2-liquidity-pool-avalanche',
   explorerUrl: 'https://snowtrace.io',
 };

@@ -16,6 +16,7 @@ export type TokenConfig = {
     symbol: string;
     fixedDecimalPoint?: number;
     chainColor: string;
+    isSupported?: boolean;
   };
 };
 

@@ -22,6 +22,6 @@ export const POLYGON: ChainConfig = {
   networkAgnosticTransfer: true,
   graphURL: 'https://api.thegraph.com/subgraphs/name/divyan73/hyphenpolygonv2',
   v2GraphURL:
-    'https://thegraph.com/hosted-service/subgraph/shantanu-bico/hyphenv2-liquidity-pool-polygon',
+    'https://api.thegraph.com/subgraphs/name/shantanu-bico/hyphenv2-liquidity-pool-polygon',
   explorerUrl: 'https://polygonscan.com',
 };

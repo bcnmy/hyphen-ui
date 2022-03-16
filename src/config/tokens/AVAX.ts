@@ -14,6 +14,7 @@ export const AVAX: TokenConfig = {
     decimal: 18,
     symbol: 'AVAX',
     chainColor: AVALANCHE.chainColor,
+    isSupported: false,
   },
   [FUJI.chainId]: {
     address: NATIVE_ADDRESS,
@@ -22,5 +23,6 @@ export const AVAX: TokenConfig = {
     symbol: 'AVAX',
     fixedDecimalPoint: 5,
     chainColor: FUJI.chainColor,
+    isSupported: false,
   },
 };

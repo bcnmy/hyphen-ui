@@ -20,6 +20,7 @@
     "awesome-debounce-promise": "^2.1.0",
     "buffer": "^6.0.3",
     "date-fns": "^2.28.0",
+    "decimal.js": "^10.3.1",
     "ethers": "^5.5.2",
     "graphql": "^16.2.0",
     "graphql-request": "^4.0.0",

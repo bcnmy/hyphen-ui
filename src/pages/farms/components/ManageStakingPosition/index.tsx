@@ -213,7 +213,7 @@ function ManageStakingPosition() {
         <div className="absolute left-0">
           <button
             className="flex items-center rounded text-hyphen-gray-400"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/farms')}
           >
             <HiArrowSmLeft className="h-5 w-auto" />
           </button>
@@ -261,7 +261,7 @@ function ManageStakingPosition() {
                 </button>
               ) : (
                 <button
-                  className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                  className="mt-10 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                   onClick={handleNetworkChange}
                 >
                   Switch to {chain?.name}
@@ -271,7 +271,7 @@ function ManageStakingPosition() {
           ) : null}
           {!isLoggedIn ? (
             <button
-              className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+              className="mt-10 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
               onClick={connect}
             >
               Connect Your Wallet
@@ -315,7 +315,7 @@ function ManageStakingPosition() {
                     </button>
                   ) : (
                     <button
-                      className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                      className="mt-10 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                       onClick={handleNetworkChange}
                     >
                       Switch to {chain?.name}
@@ -325,7 +325,7 @@ function ManageStakingPosition() {
               ) : null}
               {!isLoggedIn ? (
                 <button
-                  className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                  className="mt-10 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                   onClick={connect}
                 >
                   Connect Your Wallet

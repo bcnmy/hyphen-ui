@@ -313,9 +313,9 @@ function IncreaseLiquidity() {
     if (value === 0) {
       setLiquidityIncreaseAmount('');
       updatePoolShare('0');
-    } else if (liquidityBalance) {
+    } else if (walletBalance) {
       const newLiquidityIncreaseAmount = (
-        Math.trunc(Number.parseFloat(liquidityBalance) * (value / 100) * 1000) /
+        Math.trunc(Number.parseFloat(walletBalance) * (value / 100) * 1000) /
         1000
       ).toString();
       setLiquidityIncreaseAmount(newLiquidityIncreaseAmount);
@@ -324,12 +324,10 @@ function IncreaseLiquidity() {
   }
 
   function handleMaxButtonClick() {
-    if (liquidityBalance) {
+    if (walletBalance) {
       setSliderValue(100);
       setLiquidityIncreaseAmount(
-        (
-          Math.trunc(Number.parseFloat(liquidityBalance) * 1000) / 1000
-        ).toString(),
+        (Math.trunc(Number.parseFloat(walletBalance) * 1000) / 1000).toString(),
       );
     }
   }
@@ -447,7 +445,9 @@ function IncreaseLiquidity() {
           <div className="absolute left-0">
             <button
               className="flex items-center rounded text-hyphen-gray-400"
-              onClick={() => navigate(-1)}
+              onClick={() =>
+                navigate(`/pools/manage-position/${chainId}/${positionId}`)
+              }
             >
               <HiArrowSmLeft className="h-5 w-auto" />
             </button>
@@ -499,28 +499,28 @@ function IncreaseLiquidity() {
               </div>
             </div>
 
-            <label
-              htmlFor="liquidityIncreaseAmount"
-              className="flex justify-between px-5 text-xxs font-bold uppercase"
-            >
-              <span className="text-hyphen-gray-400">Input</span>
-              <span className="flex items-center text-hyphen-gray-300">
-                Wallet Balance:{' '}
-                {walletBalance ? (
-                  walletBalance
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-11"
-                  />
-                )}{' '}
-                {token?.symbol}
-              </span>
-            </label>
+            <div className="relative mb-6">
+              <label
+                htmlFor="liquidityIncreaseAmount"
+                className="mb-2 flex justify-between px-5 text-xxs font-bold uppercase"
+              >
+                <span className="text-hyphen-gray-400">Input</span>
+                <span className="flex items-center text-hyphen-gray-300">
+                  Wallet Balance:{' '}
+                  {walletBalance ? (
+                    walletBalance
+                  ) : (
+                    <Skeleton
+                      baseColor="#615ccd20"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!mx-1 !w-11"
+                    />
+                  )}{' '}
+                  {token?.symbol}
+                </span>
+              </label>
 
-            <div className="relative mt-2 mb-6">
               <input
                 id="liquidityIncreaseAmount"
                 placeholder="0.000"
@@ -533,7 +533,7 @@ function IncreaseLiquidity() {
               />
 
               <button
-                className="absolute right-[18px] top-[22px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                className="absolute right-[18px] top-[45px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
                 onClick={handleMaxButtonClick}
                 disabled={isDataLoading}
               >
@@ -558,6 +558,7 @@ function IncreaseLiquidity() {
                       disabled={
                         isDataLoading ||
                         isNativeToken ||
+                        isLiquidityAmountGtWalletBalance ||
                         !isLiquidityAmountGtTokenAllowance
                       }
                       onClick={showApprovalModal}

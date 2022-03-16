@@ -141,14 +141,14 @@ function PoolOverview({ chain, token }: IPoolOverview) {
             rewardToken[chain.chainId].decimal,
           ),
         ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const totalValueLockedInUSD =
     suppliedLiquidityByToken && tokenPriceInUSD
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidityByToken, decimal),
         ) * tokenPriceInUSD[coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const secondsInYear = 31536000;
   const rewardAPY =
@@ -159,7 +159,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
         ) -
           1) *
         100
-      : -1;
+      : 0;
 
   const feeAPY = feeAPYData
     ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
@@ -198,9 +198,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
-            {APY !== null || APY !== undefined
-              ? `${makeNumberCompact(APY, 3)}%`
-              : '...'}
+            {APY > 10000 ? '>10,000%' : `${Number.parseFloat(APY.toFixed(3))}%`}
           </span>
           <HiInformationCircle
             className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
@@ -209,7 +207,12 @@ function PoolOverview({ chain, token }: IPoolOverview) {
             onClick={e => e.stopPropagation()}
           />
           <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
-            <p>Reward APY: {makeNumberCompact(rewardAPY, 3)}%</p>
+            <p>
+              Reward APY:{' '}
+              {rewardAPY > 10000
+                ? '>10,000%'
+                : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
+            </p>
             <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
           </CustomTooltip>
         </div>

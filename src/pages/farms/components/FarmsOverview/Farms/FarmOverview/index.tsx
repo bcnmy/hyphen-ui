@@ -97,17 +97,16 @@ function FarmOverview({ chain, token }: IFarmOverview) {
             rewardToken[chain.chainId].decimal,
           ),
         ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const totalValueLockedInUSD =
     suppliedLiquidityByToken && tokenPriceInUSD
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidityByToken, decimal),
         ) * tokenPriceInUSD[coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const secondsInYear = 31536000;
-
   const rewardAPY =
     rewardRatePerSecondInUSD && totalValueLockedInUSD
       ? (Math.pow(
@@ -116,7 +115,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         ) -
           1) *
         100
-      : -1;
+      : 0;
 
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
@@ -127,7 +126,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
             rewardToken[chain.chainId].decimal,
           ),
         ) * SECONDS_IN_24_HOURS
-      : null;
+      : 0;
 
   function handleFarmOverviewClick() {
     queryClient.removeQueries('userPositions');
@@ -152,19 +151,9 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-center">
           <span className="font-mono text-2xl">
-            {rewardAPY >= 0 ? (
-              `${makeNumberCompact(
-                Number.parseFloat(rewardAPY.toFixed(3)),
-                3,
-              )}%`
-            ) : (
-              <Skeleton
-                baseColor="#615ccd20"
-                enableAnimation
-                highlightColor="#615ccd05"
-                className="!mx-1 !w-28"
-              />
-            )}
+            {rewardAPY > 10000
+              ? '>10,000%'
+              : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
           </span>
         </div>
         <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

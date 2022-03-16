@@ -25,6 +25,7 @@ import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
+import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 
 function AddLiquidity() {
   const navigate = useNavigate();
@@ -63,15 +64,25 @@ function AddLiquidity() {
   const liquidityProvidersAddress = chain
     ? LiquidityProviders[chain.chainId].address
     : undefined;
-  const { addLiquidity, addNativeLiquidity, getTotalLiquidity } =
-    useLiquidityProviders(chain);
+  const {
+    addLiquidity,
+    addNativeLiquidity,
+    getSuppliedLiquidityByToken,
+    getTotalLiquidity,
+  } = useLiquidityProviders(chain);
   const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
     useWhitelistPeriodManager(chain);
+  const { getRewardRatePerSecond, getRewardTokenAddress } =
+    useLiquidityFarming(chain);
 
   const tokenOptions = useMemo(() => {
     return selectedChain
       ? tokens
-          .filter(tokenObj => tokenObj[selectedChain.id])
+          .filter(
+            tokenObj =>
+              tokenObj[selectedChain.id] &&
+              tokenObj[selectedChain.id].isSupported,
+          )
           .map(tokenObj => ({
             id: tokenObj.symbol,
             name: tokenObj.symbol,
@@ -96,11 +107,11 @@ function AddLiquidity() {
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [poolShare, setPoolShare] = useState<number>(0);
 
-  const tokenDecimals = useMemo(() => {
-    if (!chainId || !tokenSymbol) return undefined;
-    const token = tokens.find(token => token.symbol === tokenSymbol)!;
-    return token[Number.parseInt(chainId)].decimal;
-  }, [chainId, tokenSymbol]);
+  const token = tokenSymbol
+    ? tokens.find(token => token.symbol === tokenSymbol)
+    : undefined;
+  const tokenDecimals =
+    chain && token ? token[chain.chainId].decimal : undefined;
 
   const {
     isVisible: isApprovalModalVisible,
@@ -246,6 +257,80 @@ function AddLiquidity() {
     },
   );
 
+  const { data: suppliedLiquidityByToken } = useQuery(
+    ['suppliedLiquidityByToken', selectedTokenAddress],
+    () => {
+      if (!selectedTokenAddress) return;
+
+      return getSuppliedLiquidityByToken(selectedTokenAddress);
+    },
+    {
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!selectedTokenAddress,
+    },
+  );
+
+  const { data: tokenPriceInUSD } = useQuery(
+    ['tokenPriceInUSD', token],
+    () =>
+      fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json()),
+    {
+      enabled: !!token,
+    },
+  );
+
+  const { data: rewardsRatePerSecond } = useQuery(
+    ['rewardsRatePerSecond', selectedTokenAddress],
+    () => {
+      if (!selectedTokenAddress) return;
+
+      return getRewardRatePerSecond(selectedTokenAddress);
+    },
+    {
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!selectedTokenAddress,
+    },
+  );
+
+  const { data: rewardTokenAddress } = useQuery(
+    ['rewardTokenAddress', selectedTokenAddress],
+    () => {
+      if (!selectedTokenAddress) return;
+
+      return getRewardTokenAddress(selectedTokenAddress);
+    },
+    {
+      // Execute only when selectedTokenAddress is available.
+      enabled: !!selectedTokenAddress,
+    },
+  );
+
+  const rewardToken =
+    rewardTokenAddress && chain
+      ? tokens.find(tokenObj => {
+          return tokenObj[chain.chainId]
+            ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress.toLowerCase()
+            : false;
+        })
+      : undefined;
+
+  const { data: rewardTokenPriceInUSD } = useQuery(
+    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+    () => {
+      if (!rewardToken) return;
+
+      return fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json());
+    },
+    {
+      enabled: !!rewardToken,
+    },
+  );
+
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
       ? Number.parseFloat(
@@ -267,10 +352,37 @@ function AddLiquidity() {
         )
       : -1;
 
-  const rewardAPY = 0;
+  const rewardRatePerSecondInUSD =
+    rewardsRatePerSecond && rewardTokenPriceInUSD && chain && rewardToken
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            rewardsRatePerSecond,
+            rewardToken[chain.chainId].decimal,
+          ),
+        ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
+      : 0;
+
+  const totalValueLockedInUSD =
+    suppliedLiquidityByToken && tokenPriceInUSD && token && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
+        ) * tokenPriceInUSD[token.coinGeckoId as string].usd
+      : 0;
+
+  const secondsInYear = 31536000;
+  const rewardAPY =
+    rewardRatePerSecondInUSD && totalValueLockedInUSD
+      ? (Math.pow(
+          1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
+          secondsInYear,
+        ) -
+          1) *
+        100
+      : 0;
+
   const feeAPY = feeAPYData
     ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
-    : -1;
+    : 0;
   const APY = rewardAPY + feeAPY;
 
   const isDataLoading =
@@ -365,7 +477,7 @@ function AddLiquidity() {
       chainObj => chainObj.chainId === selectedChain.id,
     )!;
     const [{ symbol: tokenSymbol }] = tokens.filter(
-      tokenObj => tokenObj[chainId],
+      tokenObj => tokenObj[chainId] && tokenObj[chainId].isSupported,
     );
     queryClient.removeQueries();
     reset();
@@ -400,6 +512,15 @@ function AddLiquidity() {
       ).toString();
       setLiquidityAmount(newLiquidityAmount);
       updatePoolShare(newLiquidityAmount);
+    }
+  }
+
+  function handleMaxButtonClick() {
+    if (walletBalance) {
+      setSliderValue(100);
+      setLiquidityAmount(
+        (Math.trunc(Number.parseFloat(walletBalance) * 1000) / 1000).toString(),
+      );
     }
   }
 
@@ -510,7 +631,7 @@ function AddLiquidity() {
           <div className="absolute left-0">
             <button
               className="flex items-center rounded text-hyphen-gray-400"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/pools')}
             >
               <HiArrowSmLeft className="h-5 w-auto" />
             </button>
@@ -582,7 +703,7 @@ function AddLiquidity() {
                 placeholder="0.000"
                 type="number"
                 inputMode="decimal"
-                className="mb-2 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
                 value={liquidityAmount}
                 onChange={handleLiquidityAmountChange}
                 disabled={isDataLoading || !totalLiquidity}
@@ -590,26 +711,11 @@ function AddLiquidity() {
 
               <button
                 className="absolute right-[18px] top-[45px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
-                // onClick={handleMaxButtonClick}
+                onClick={handleMaxButtonClick}
                 disabled={isDataLoading}
               >
                 MAX
               </button>
-
-              <span className="flex items-center justify-end px-5 text-xxs font-bold uppercase text-red-400">
-                Wallet Cap:{' '}
-                {liquidityBalance ? (
-                  liquidityBalance
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-11"
-                  />
-                )}{' '}
-                {selectedToken?.id}
-              </span>
             </div>
 
             <StepSlider
@@ -628,6 +734,7 @@ function AddLiquidity() {
                       disabled={
                         isDataLoading ||
                         isNativeToken ||
+                        isLiquidityAmountGtWalletBalance ||
                         !isLiquidityAmountGtTokenAllowance
                       }
                       onClick={showApprovalModal}
@@ -694,7 +801,9 @@ function AddLiquidity() {
                   APY
                 </span>
                 <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                  {APY >= 0 ? `${APY}%` : '...'}
+                  {APY > 10000
+                    ? '>10,000%'
+                    : `${Number.parseFloat(APY.toFixed(3))}%`}
                 </div>
               </div>
               <div className="flex flex-col">

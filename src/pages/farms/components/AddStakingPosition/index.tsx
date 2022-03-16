@@ -160,11 +160,10 @@ function AddStakingPosition() {
     ['NFTApprovalAddress', currentPosition],
     () => {
       if (!filteredUserPositions) return;
-
       return getNFTApprovalAddress(filteredUserPositions[currentPosition]);
     },
     {
-      enabled: !!filteredUserPositions,
+      enabled: !!filteredUserPositions.length,
     },
   );
 
@@ -267,7 +266,7 @@ function AddStakingPosition() {
         <div className="absolute left-0">
           <button
             className="flex items-center rounded text-hyphen-gray-400"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/farms')}
           >
             <HiArrowSmLeft className="h-5 w-auto" />
           </button>

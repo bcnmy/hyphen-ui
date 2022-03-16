@@ -8,6 +8,7 @@ import Skeleton from 'react-loading-skeleton';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
+import { Decimal } from 'decimal.js';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -26,8 +27,11 @@ function StakingPositionOverview({
   })!;
 
   const { getPositionMetadata } = useLPToken(chain);
-  const { getBaseDivisor, getSuppliedLiquidityByToken } =
-    useLiquidityProviders(chain);
+  const {
+    getBaseDivisor,
+    getTokenPriceInLPShares,
+    getSuppliedLiquidityByToken,
+  } = useLiquidityProviders(chain);
   const {
     getPendingToken,
     getRewardRatePerSecond,
@@ -55,6 +59,15 @@ function StakingPositionOverview({
       : null;
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
+
+  const { data: tokenPriceInLPShares } = useQuery(
+    ['tokenPriceInLPShares', tokenAddress],
+    () => getTokenPriceInLPShares(tokenAddress),
+    {
+      // Execute only when address is available.
+      enabled: !!tokenAddress,
+    },
+  );
 
   const { data: suppliedLiquidityByToken } = useQuery(
     ['suppliedLiquidityByToken', tokenAddress],
@@ -167,12 +180,12 @@ function StakingPositionOverview({
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedTotalSharesStaked =
     totalSharesStaked && tokenDecimals
       ? ethers.utils.formatUnits(totalSharesStaked, tokenDecimals)
-      : -1;
+      : 0;
 
   const { name: chainName } = chain;
   const {
@@ -180,6 +193,24 @@ function StakingPositionOverview({
     symbol: tokenSymbol,
     [chain.chainId]: { chainColor },
   } = token;
+
+  const tvl =
+    totalSharesStaked &&
+    baseDivisor &&
+    tokenPriceInLPShares &&
+    tokenDecimals &&
+    tokenPriceInUSD &&
+    token
+      ? new Decimal(totalSharesStaked.toString())
+          .mul(baseDivisor.toString())
+          .div(
+            new Decimal(tokenPriceInLPShares.toString()).mul(
+              10 ** tokenDecimals,
+            ),
+          )
+          .mul(tokenPriceInUSD[token.coinGeckoId as string].usd)
+          .toNumber()
+      : 0;
 
   const rewardRatePerSecondInUSD =
     rewardsRatePerSecond &&
@@ -189,14 +220,14 @@ function StakingPositionOverview({
       ? Number.parseFloat(
           ethers.utils.formatUnits(rewardsRatePerSecond, rewardTokenDecimals),
         ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const totalValueLockedInUSD =
     suppliedLiquidityByToken && tokenPriceInUSD && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
         ) * tokenPriceInUSD[token?.coinGeckoId as string].usd
-      : -1;
+      : 0;
 
   const secondsInYear = 31536000;
 
@@ -208,7 +239,7 @@ function StakingPositionOverview({
         ) -
           1) *
         100
-      : -1;
+      : 0;
 
   const SECONDS_IN_24_HOURS = 86400;
   const rewardsPerDay =
@@ -216,7 +247,7 @@ function StakingPositionOverview({
       ? Number.parseFloat(
           ethers.utils.formatUnits(rewardsRatePerSecond, rewardTokenDecimals),
         ) * SECONDS_IN_24_HOURS
-      : -1;
+      : 0;
 
   const yourRewardRate =
     baseDivisor &&
@@ -224,8 +255,11 @@ function StakingPositionOverview({
     shares &&
     formattedTotalSharesStaked > 0 &&
     rewardsPerDay > 0
-      ? Number.parseFloat(shares.div(baseDivisor).div(totalSharesStaked)) *
-        rewardsPerDay
+      ? new Decimal(shares.toString())
+          .div(baseDivisor.toString())
+          .div(totalSharesStaked.toString())
+          .mul(rewardsPerDay.toString())
+          .toNumber()
       : 0;
 
   const unclaimedRewardToken =
@@ -264,7 +298,9 @@ function StakingPositionOverview({
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">TVL: $525,234</span>
+        <span className="font-mono text-xs">
+          TVL: ${makeNumberCompact(tvl, 3)}
+        </span>
       </div>
 
       <div className="flex flex-col items-center">
@@ -273,19 +309,9 @@ function StakingPositionOverview({
           <div className="flex flex-col items-center">
             <div className="flex items-center">
               <span className="font-mono text-2xl">
-                {rewardAPY >= 0 ? (
-                  `${makeNumberCompact(
-                    Number.parseFloat(rewardAPY.toFixed(3)),
-                    3,
-                  )}%`
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-28"
-                  />
-                )}
+                {rewardAPY > 10000
+                  ? '>10,000%'
+                  : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
               </span>
             </div>
             <span className="text-xxs font-bold uppercase text-hyphen-gray-300">

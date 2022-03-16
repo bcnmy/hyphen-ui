@@ -190,7 +190,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
         const formattedTransactionFee = Number.parseFloat(
           ethers.utils.formatUnits(
-            BigNumber.from(transferFee).sub(BigNumber.from(lpFee)),
+            BigNumber.from(transferFee).sub(BigNumber.from(lpFee)).add(BigNumber.from(gasFee)),
             tokenDecimals,
           ),
         ).toFixed(3);

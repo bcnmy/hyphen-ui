@@ -15,6 +15,7 @@ export const DAI: TokenConfig = {
     decimal: 18,
     symbol: 'DAI',
     chainColor: MUMBAI.chainColor,
+    isSupported: false,
   },
   [GOERLI.chainId]: {
     address: '0x2686eca13186766760a0347ee8eeb5a88710e11b',
@@ -22,6 +23,7 @@ export const DAI: TokenConfig = {
     decimal: 18,
     symbol: 'DAI',
     chainColor: GOERLI.chainColor,
+    isSupported: false,
   },
   [POLYGON.chainId]: {
     address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063',
@@ -29,6 +31,7 @@ export const DAI: TokenConfig = {
     decimal: 18,
     symbol: 'DAI',
     chainColor: POLYGON.chainColor,
+    isSupported: false,
   },
   [ETHEREUM.chainId]: {
     address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -36,5 +39,6 @@ export const DAI: TokenConfig = {
     decimal: 18,
     symbol: 'DAI',
     chainColor: ETHEREUM.chainColor,
+    isSupported: false,
   },
 };

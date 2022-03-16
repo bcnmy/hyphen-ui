@@ -18,6 +18,7 @@ export const USDT: TokenConfig = {
     decimal: 18,
     symbol: 'USDT',
     chainColor: MUMBAI.chainColor,
+    isSupported: true,
   },
   [GOERLI.chainId]: {
     address: '0x64ef393b6846114bad71e2cb2ccc3e10736b5716',
@@ -25,6 +26,7 @@ export const USDT: TokenConfig = {
     decimal: 18,
     symbol: 'USDT',
     chainColor: GOERLI.chainColor,
+    isSupported: true,
   },
   [RINKEBY.chainId]: {
     address: '0xfab46e002bbf0b4509813474841e0716e6730136',
@@ -32,6 +34,7 @@ export const USDT: TokenConfig = {
     decimal: 18,
     symbol: 'USDT',
     chainColor: RINKEBY.chainColor,
+    isSupported: true,
   },
   [POLYGON.chainId]: {
     address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F',
@@ -39,6 +42,7 @@ export const USDT: TokenConfig = {
     decimal: 6,
     symbol: 'USDT',
     chainColor: POLYGON.chainColor,
+    isSupported: true,
   },
   [ETHEREUM.chainId]: {
     address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
@@ -46,6 +50,7 @@ export const USDT: TokenConfig = {
     decimal: 6,
     symbol: 'USDT',
     chainColor: ETHEREUM.chainColor,
+    isSupported: true,
   },
   [FUJI.chainId]: {
     address: '0xB4E0F6FEF81BdFea0856bB846789985c9CFf7e85',
@@ -54,5 +59,6 @@ export const USDT: TokenConfig = {
     symbol: 'USDT',
     fixedDecimalPoint: 5,
     chainColor: FUJI.chainColor,
+    isSupported: true,
   },
 };

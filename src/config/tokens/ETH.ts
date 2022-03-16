@@ -20,6 +20,7 @@ export const ETH: TokenConfig = {
     symbol: 'ETH',
     fixedDecimalPoint: 5,
     chainColor: MUMBAI.chainColor,
+    isSupported: true,
   },
   [GOERLI.chainId]: {
     address: NATIVE_ADDRESS,
@@ -28,6 +29,7 @@ export const ETH: TokenConfig = {
     symbol: 'ETH',
     fixedDecimalPoint: 5,
     chainColor: GOERLI.chainColor,
+    isSupported: true,
   },
   [POLYGON.chainId]: {
     address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
@@ -36,6 +38,7 @@ export const ETH: TokenConfig = {
     symbol: 'ETH',
     fixedDecimalPoint: 5,
     chainColor: POLYGON.chainColor,
+    isSupported: true,
   },
   [ETHEREUM.chainId]: {
     address: NATIVE_ADDRESS,
@@ -44,6 +47,7 @@ export const ETH: TokenConfig = {
     symbol: 'ETH',
     fixedDecimalPoint: 5,
     chainColor: ETHEREUM.chainColor,
+    isSupported: true,
   },
   [RINKEBY.chainId]: {
     address: NATIVE_ADDRESS,
@@ -52,6 +56,7 @@ export const ETH: TokenConfig = {
     symbol: 'ETH',
     fixedDecimalPoint: 5,
     chainColor: RINKEBY.chainColor,
+    isSupported: true,
   },
   [FUJI.chainId]: {
     address: '0x7fcdc2c1ef3e4a0bcc8155a558bb20a7218f2b05',
@@ -60,6 +65,7 @@ export const ETH: TokenConfig = {
     symbol: 'ETH',
     fixedDecimalPoint: 5,
     chainColor: FUJI.chainColor,
+    isSupported: true,
   },
   [AVALANCHE.chainId]: {
     address: '0x49d5c2bdffac6ce2bfdb6640f4f80f226bc10bab',
@@ -68,5 +74,6 @@ export const ETH: TokenConfig = {
     symbol: 'ETH',
     fixedDecimalPoint: 5,
     chainColor: AVALANCHE.chainColor,
+    isSupported: true,
   },
 };

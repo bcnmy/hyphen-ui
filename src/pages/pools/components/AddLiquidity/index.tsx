@@ -71,7 +71,11 @@ function AddLiquidity() {
   const tokenOptions = useMemo(() => {
     return selectedChain
       ? tokens
-          .filter(tokenObj => tokenObj[selectedChain.id])
+          .filter(
+            tokenObj =>
+              tokenObj[selectedChain.id] &&
+              tokenObj[selectedChain.id].isSupported,
+          )
           .map(tokenObj => ({
             id: tokenObj.symbol,
             name: tokenObj.symbol,
@@ -365,7 +369,7 @@ function AddLiquidity() {
       chainObj => chainObj.chainId === selectedChain.id,
     )!;
     const [{ symbol: tokenSymbol }] = tokens.filter(
-      tokenObj => tokenObj[chainId],
+      tokenObj => tokenObj[chainId] && tokenObj[chainId].isSupported,
     );
     queryClient.removeQueries();
     reset();

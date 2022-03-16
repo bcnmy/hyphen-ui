@@ -27,7 +27,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
 
   return (
     <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">
-      <Link to="/bridge" className="absolute left-6">
+      <Link to="/pools" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
           className="h-8 w-auto"

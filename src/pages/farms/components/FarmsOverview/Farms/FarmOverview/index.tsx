@@ -107,7 +107,6 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       : 0;
 
   const secondsInYear = 31536000;
-
   const rewardAPY =
     rewardRatePerSecondInUSD && totalValueLockedInUSD
       ? (Math.pow(

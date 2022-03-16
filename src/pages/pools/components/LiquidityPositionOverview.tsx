@@ -10,6 +10,7 @@ import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
 import { HiInformationCircle } from 'react-icons/hi';
 import CustomTooltip from 'components/CustomTooltip';
+import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 
 interface ILiquidityPositionOverview {
   chainId: number;
@@ -32,7 +33,10 @@ function LiquidityPositionOverview({
   const v2GraphEndpoint = chain.v2GraphURL;
 
   const { getPositionMetadata } = useLPToken(chain);
-  const { getTokenAmount, getTotalLiquidity } = useLiquidityProviders(chain);
+  const { getSuppliedLiquidityByToken, getTokenAmount, getTotalLiquidity } =
+    useLiquidityProviders(chain);
+  const { getRewardRatePerSecond, getRewardTokenAddress } =
+    useLiquidityFarming(chain);
 
   const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
     useQuery(['positionMetadata', positionId], () =>
@@ -40,6 +44,18 @@ function LiquidityPositionOverview({
     );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
+
+  const token =
+    chain && tokenAddress
+      ? tokens.find(tokenObj => {
+          return (
+            tokenObj[chainId]?.address.toLowerCase() ===
+            tokenAddress.toLowerCase()
+          );
+        })
+      : null;
+
+  const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
   const { isLoading: isTotalLiquidityLoading, data: totalLiquidity } = useQuery(
     ['totalLiquidity', tokenAddress],
@@ -82,21 +98,99 @@ function LiquidityPositionOverview({
     },
   );
 
-  const rewardAPY = 0;
+  const { data: suppliedLiquidityByToken } = useQuery(
+    ['suppliedLiquidityByToken', tokenAddress],
+    () => getSuppliedLiquidityByToken(tokenAddress),
+    {
+      // Execute only when address is available.
+      enabled: !!tokenAddress,
+    },
+  );
+
+  const { data: tokenPriceInUSD } = useQuery(
+    ['tokenPriceInUSD', token],
+    () =>
+      fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json()),
+    {
+      enabled: !!token,
+    },
+  );
+
+  const { data: rewardsRatePerSecond } = useQuery(
+    ['rewardsRatePerSecond', tokenAddress],
+    () => getRewardRatePerSecond(tokenAddress),
+    {
+      // Execute only when address is available.
+      enabled: !!tokenAddress,
+    },
+  );
+
+  const { data: rewardTokenAddress } = useQuery(
+    ['rewardTokenAddress', tokenAddress],
+    () => getRewardTokenAddress(tokenAddress),
+    {
+      // Execute only when address is available.
+      enabled: !!tokenAddress,
+    },
+  );
+
+  const rewardToken = rewardTokenAddress
+    ? tokens.find(tokenObj => {
+        return tokenObj[chain.chainId]
+          ? tokenObj[chain.chainId].address.toLowerCase() ===
+              rewardTokenAddress.toLowerCase()
+          : false;
+      })
+    : undefined;
+
+  const { data: rewardTokenPriceInUSD } = useQuery(
+    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+    () => {
+      if (!rewardToken) return;
+
+      return fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+      ).then(res => res.json());
+    },
+    {
+      enabled: !!rewardToken,
+    },
+  );
+
+  const rewardRatePerSecondInUSD =
+    rewardsRatePerSecond && rewardTokenPriceInUSD && rewardToken
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            rewardsRatePerSecond,
+            rewardToken[chain.chainId].decimal,
+          ),
+        ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
+      : 0;
+
+  const totalValueLockedInUSD =
+    suppliedLiquidityByToken && tokenPriceInUSD && token && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
+        ) * tokenPriceInUSD[token.coinGeckoId as string].usd
+      : 0;
+
+  const secondsInYear = 31536000;
+  const rewardAPY =
+    rewardRatePerSecondInUSD && totalValueLockedInUSD
+      ? (Math.pow(
+          1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
+          secondsInYear,
+        ) -
+          1) *
+        100
+      : 0;
+
   const feeAPY = feeAPYData
     ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
     : 0;
   const APY = rewardAPY + feeAPY;
-
-  const token =
-    chain && tokenAddress
-      ? tokens.find(tokenObj => {
-          return (
-            tokenObj[chainId]?.address.toLowerCase() ===
-            tokenAddress.toLowerCase()
-          );
-        })
-      : null;
 
   const isDataLoading =
     isPositionMetadataLoading ||
@@ -117,8 +211,6 @@ function LiquidityPositionOverview({
 
   const isUserOnPools =
     location.pathname === '/pools' || location.pathname === '/pools/';
-
-  const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
@@ -202,7 +294,9 @@ function LiquidityPositionOverview({
           <div className="flex flex-col items-end">
             <div className="flex items-center">
               <span className="font-mono text-2xl">
-                {APY >= 0 ? `${APY}%` : '...'}
+                {APY > 10000
+                  ? '>10,000%'
+                  : `${Number.parseFloat(APY.toFixed(3))}%`}
               </span>
               <HiInformationCircle
                 className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
@@ -211,7 +305,12 @@ function LiquidityPositionOverview({
                 onClick={e => e.stopPropagation()}
               />
               <CustomTooltip id={`${positionId}-apy`}>
-                <p>Reward APY: {rewardAPY}%</p>
+                <p>
+                  Reward APY:{' '}
+                  {rewardAPY > 10000
+                    ? '>10,000%'
+                    : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
+                </p>
                 <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
               </CustomTooltip>
             </div>

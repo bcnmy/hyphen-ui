@@ -42,8 +42,8 @@ ReactDOM.render(
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<App />}>
-              <Route path="/" element={<Navigate replace to="/bridge" />} />
-              <Route path="/bridge" element={<Bridge />} />
+              <Route path="/" element={<Navigate replace to="/pools" />} />
+              <Route path="/bridge-v2" element={<Bridge />} />
               <Route path="/pools" element={<Pools />}>
                 <Route path="" element={<PoolsOverview />} />
                 <Route path="add-liquidity" element={<AddLiquidity />} />

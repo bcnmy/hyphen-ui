@@ -1,5 +1,5 @@
-import { HiOutlineArrowSmRight } from "react-icons/hi";
-import poweredByBiconomy from "../assets/images/powered-by-biconomy.svg";
+import { HiOutlineArrowSmRight } from 'react-icons/hi';
+import poweredByBiconomy from '../assets/images/powered-by-biconomy.svg';
 
 function Footer() {
   return (
@@ -14,7 +14,7 @@ function Footer() {
       </a>
       <div className="mb-0.5 flex text-[#808080]">
         <a
-          href="https://discord.com/channels/692403655474937856/841926541235585035"
+          href="https://discord.com/channels/692403655474937856/947490096075141150"
           target="_blank"
           rel="noreferrer"
           className="hover:text-white"

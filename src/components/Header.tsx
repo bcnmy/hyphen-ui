@@ -35,7 +35,15 @@ function Header({ showUserInfoModal }: IHeaderProps) {
         />
       </Link>
       <nav className="flex gap-7 text-white">
-        <NavLink to="/bridge">
+        <a
+          target="_blank"
+          href="https://hyphen.biconomy.io"
+          rel="noreferrer"
+          className="relative flex items-center text-gray-400 hover:text-white"
+        >
+          Bridge
+        </a>
+        {/* <NavLink to="/bridge">
           {({ isActive }) => (
             <span
               className={
@@ -55,7 +63,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
               ></span>
             </span>
           )}
-        </NavLink>
+        </NavLink> */}
         <NavLink
           to="/pools"
           className={({ isActive }) => (isActive ? 'relative' : 'relative')}

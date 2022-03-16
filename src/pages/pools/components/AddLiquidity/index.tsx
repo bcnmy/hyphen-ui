@@ -703,7 +703,7 @@ function AddLiquidity() {
                 placeholder="0.000"
                 type="number"
                 inputMode="decimal"
-                className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                className="mb-2 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
                 value={liquidityAmount}
                 onChange={handleLiquidityAmountChange}
                 disabled={isDataLoading || !totalLiquidity}
@@ -716,6 +716,21 @@ function AddLiquidity() {
               >
                 MAX
               </button>
+
+              <span className="flex items-center justify-end px-5 text-xxs font-bold uppercase text-red-400">
+                Wallet Cap:{' '}
+                {liquidityBalance ? (
+                  liquidityBalance
+                ) : (
+                  <Skeleton
+                    baseColor="#615ccd20"
+                    enableAnimation
+                    highlightColor="#615ccd05"
+                    className="!mx-1 !w-11"
+                  />
+                )}{' '}
+                {selectedToken?.id}
+              </span>
             </div>
 
             <StepSlider

@@ -395,11 +395,6 @@ function AddLiquidity() {
       ? Number.parseFloat(liquidityAmount) > Number.parseFloat(walletBalance)
       : false;
 
-  const isLiquidityAmountGtLiquidityBalance =
-    liquidityAmount && liquidityBalance
-      ? Number.parseFloat(liquidityAmount) > Number.parseFloat(liquidityBalance)
-      : false;
-
   const isLiquidityAmountGtTokenAllowance =
     liquidityAmount && formattedTokenAllowance >= 0
       ? Number.parseFloat(liquidityAmount) > formattedTokenAllowance
@@ -722,21 +717,6 @@ function AddLiquidity() {
               >
                 MAX
               </button>
-
-              <span className="flex items-center justify-end px-5 text-xxs font-bold uppercase text-red-400">
-                Wallet Cap:{' '}
-                {liquidityBalance ? (
-                  liquidityBalance
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-11"
-                  />
-                )}{' '}
-                {selectedToken?.id}
-              </span>
             </div>
 
             <StepSlider
@@ -779,7 +759,6 @@ function AddLiquidity() {
                         liquidityAmount === '' ||
                         Number.parseFloat(liquidityAmount) === 0 ||
                         isLiquidityAmountGtWalletBalance ||
-                        isLiquidityAmountGtLiquidityBalance ||
                         isLiquidityAmountGtTokenAllowance ||
                         isLiquidityAmountGtPoolCap
                       }
@@ -791,8 +770,6 @@ function AddLiquidity() {
                         ? 'Enter Amount'
                         : isLiquidityAmountGtWalletBalance
                         ? 'Insufficient wallet balance'
-                        : isLiquidityAmountGtLiquidityBalance
-                        ? 'This amount exceeds your wallet cap'
                         : isLiquidityAmountGtPoolCap
                         ? 'This amount exceeds the pool cap'
                         : addLiquidityLoading

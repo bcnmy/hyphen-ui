@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { HiArrowSmLeft } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
 import Select, { Option } from 'components/Select';
@@ -120,7 +120,7 @@ function AddLiquidity() {
   } = useModal();
 
   // Queries
-  const { data: totalLiquidity } = useQuery(
+  const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
     ['totalLiquidity', selectedTokenAddress],
     () => getTotalLiquidity(selectedTokenAddress),
     {
@@ -129,7 +129,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenTotalCap } = useQuery(
+  const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
     ['tokenTotalCap', selectedTokenAddress],
     () => getTokenTotalCap(selectedTokenAddress),
     {
@@ -138,7 +138,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenWalletCap } = useQuery(
+  const { data: tokenWalletCap, isError: tokenWalletCapError } = useQuery(
     ['tokenWalletCap', selectedTokenAddress],
     () => getTokenWalletCap(selectedTokenAddress),
     {
@@ -147,7 +147,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: feeAPYData } = useQuery(
+  const { data: feeAPYData, isError: feeAPYDataError } = useQuery(
     ['apy', selectedTokenAddress],
     async () => {
       if (!v2GraphEndpoint || !selectedTokenAddress) return;
@@ -170,7 +170,11 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenAllowance, refetch: refetchTokenAllowance } = useQuery(
+  const {
+    data: tokenAllowance,
+    isError: tokenAllowanceError,
+    refetch: refetchTokenAllowance,
+  } = useQuery(
     'tokenAllowance',
     () => {
       if (
@@ -201,9 +205,8 @@ function AddLiquidity() {
 
   // Mutations
   const {
+    isError: approveTokenError,
     isLoading: approveTokenLoading,
-    isSuccess: approveTokenSuccess,
-    data: approveTokenTx,
     mutate: approveTokenMutation,
   } = useMutation(
     ({
@@ -216,8 +219,8 @@ function AddLiquidity() {
   );
 
   const {
+    isError: addLiquidityError,
     isLoading: addLiquidityLoading,
-    isSuccess: addLiquiditySuccess,
     mutate: addLiquidityMutation,
   } = useMutation(
     async ({
@@ -248,16 +251,20 @@ function AddLiquidity() {
     },
   );
 
-  const { data: totalLiquidityByLP } = useQuery(
-    ['totalLiquidityByLP', selectedTokenAddress],
-    () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
-    {
-      // Execute only when selectedTokenAddress and accounts are available.
-      enabled: !!(selectedTokenAddress && accounts),
-    },
-  );
+  const { data: totalLiquidityByLP, isError: totalLiquidityByLPError } =
+    useQuery(
+      ['totalLiquidityByLP', selectedTokenAddress],
+      () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
+      {
+        // Execute only when selectedTokenAddress and accounts are available.
+        enabled: !!(selectedTokenAddress && accounts),
+      },
+    );
 
-  const { data: suppliedLiquidityByToken } = useQuery(
+  const {
+    data: suppliedLiquidityByToken,
+    isError: suppliedLiquidityByTokenError,
+  } = useQuery(
     ['suppliedLiquidityByToken', selectedTokenAddress],
     () => {
       if (!selectedTokenAddress) return;
@@ -270,7 +277,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenPriceInUSD } = useQuery(
+  const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
     ['tokenPriceInUSD', token],
     () =>
       fetch(
@@ -281,31 +288,33 @@ function AddLiquidity() {
     },
   );
 
-  const { data: rewardsRatePerSecond } = useQuery(
-    ['rewardsRatePerSecond', selectedTokenAddress],
-    () => {
-      if (!selectedTokenAddress) return;
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', selectedTokenAddress],
+      () => {
+        if (!selectedTokenAddress) return;
 
-      return getRewardRatePerSecond(selectedTokenAddress);
-    },
-    {
-      // Execute only when selectedTokenAddress is available.
-      enabled: !!selectedTokenAddress,
-    },
-  );
+        return getRewardRatePerSecond(selectedTokenAddress);
+      },
+      {
+        // Execute only when selectedTokenAddress is available.
+        enabled: !!selectedTokenAddress,
+      },
+    );
 
-  const { data: rewardTokenAddress } = useQuery(
-    ['rewardTokenAddress', selectedTokenAddress],
-    () => {
-      if (!selectedTokenAddress) return;
+  const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
+    useQuery(
+      ['rewardTokenAddress', selectedTokenAddress],
+      () => {
+        if (!selectedTokenAddress) return;
 
-      return getRewardTokenAddress(selectedTokenAddress);
-    },
-    {
-      // Execute only when selectedTokenAddress is available.
-      enabled: !!selectedTokenAddress,
-    },
-  );
+        return getRewardTokenAddress(selectedTokenAddress);
+      },
+      {
+        // Execute only when selectedTokenAddress is available.
+        enabled: !!selectedTokenAddress,
+      },
+    );
 
   const rewardToken =
     rewardTokenAddress && chain
@@ -317,19 +326,69 @@ function AddLiquidity() {
         })
       : undefined;
 
-  const { data: rewardTokenPriceInUSD } = useQuery(
-    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
-    () => {
-      if (!rewardToken) return;
+  const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
+    useQuery(
+      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      () => {
+        if (!rewardToken) return;
 
-      return fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
-      ).then(res => res.json());
-    },
-    {
-      enabled: !!rewardToken,
-    },
-  );
+        return fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+        ).then(res => res.json());
+      },
+      {
+        enabled: !!rewardToken,
+      },
+    );
+
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  useEffect(() => {
+    const chain = chainId
+      ? chainOptions.find(chainObj => chainObj.id === Number.parseInt(chainId))
+      : chainOptions[0];
+    const token = tokenSymbol
+      ? tokenOptions.find(tokenObj => tokenObj.id === tokenSymbol)
+      : tokenOptions[0];
+
+    setSelectedChain(chain);
+    setSelectedToken(token);
+  }, [chainId, chainOptions, tokenOptions, tokenSymbol]);
+
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  useEffect(() => {
+    if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
+      const balance = ethers.utils.formatUnits(
+        tokenWalletCap.sub(totalLiquidityByLP),
+        tokenDecimals,
+      );
+      setLiquidityBalance(balance);
+    }
+  }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
+
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  // Refactor tokenApproval using useQuery (see IncreaseLiquidity component.)
+  useEffect(() => {
+    async function handleTokenChange() {
+      if (!chainId || !tokenSymbol || !liquidityProvidersAddress) {
+        return null;
+      }
+
+      const chain = chains.find(
+        chainObj => chainObj.chainId === Number.parseInt(chainId),
+      )!;
+      const token = tokens.find(tokenObj => tokenObj.symbol === tokenSymbol)!;
+
+      if (isLoggedIn && accounts) {
+        const { displayBalance } =
+          (await getTokenBalance(accounts[0], chain, token)) || {};
+        setWalletBalance(displayBalance);
+      }
+
+      setSelectedTokenAddress(token[chain.chainId].address);
+    }
+
+    handleTokenChange();
+  }, [accounts, chainId, isLoggedIn, liquidityProvidersAddress, tokenSymbol]);
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
@@ -385,8 +444,40 @@ function AddLiquidity() {
     : 0;
   const APY = rewardAPY + feeAPY;
 
+  const isError =
+    totalLiquidityError ||
+    tokenTotalCapError ||
+    tokenWalletCapError ||
+    feeAPYDataError ||
+    tokenAllowanceError ||
+    totalLiquidityByLPError ||
+    suppliedLiquidityByTokenError ||
+    tokenPriceInUSDError ||
+    rewardsRatePerSecondError ||
+    rewardTokenAddressError ||
+    rewardTokenPriceInUSDError ||
+    approveTokenError ||
+    addLiquidityError;
+
   const isDataLoading =
     !liquidityBalance || approveTokenLoading || addLiquidityLoading;
+
+  if (isError) {
+    return (
+      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
+        <div className="flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            {approveTokenError
+              ? 'Something went wrong while approving this token, please try again later.'
+              : addLiquidityError
+              ? 'Something went wrong while adding liquidity, please try again later.'
+              : 'We could not get the necessary information, please try again later.'}
+          </span>
+        </div>
+      </article>
+    );
+  }
 
   const isNativeToken = selectedTokenAddress === NATIVE_ADDRESS;
 
@@ -405,55 +496,6 @@ function AddLiquidity() {
       ? Number.parseFloat(liquidityAmount) + formattedTotalLiquidity >
         formattedTokenTotalCap
       : false;
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
-    const chain = chainId
-      ? chainOptions.find(chainObj => chainObj.id === Number.parseInt(chainId))
-      : chainOptions[0];
-    const token = tokenSymbol
-      ? tokenOptions.find(tokenObj => tokenObj.id === tokenSymbol)
-      : tokenOptions[0];
-
-    setSelectedChain(chain);
-    setSelectedToken(token);
-  }, [chainId, chainOptions, tokenOptions, tokenSymbol]);
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
-    if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
-      const balance = ethers.utils.formatUnits(
-        tokenWalletCap.sub(totalLiquidityByLP),
-        tokenDecimals,
-      );
-      setLiquidityBalance(balance);
-    }
-  }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  // Refactor tokenApproval using useQuery (see IncreaseLiquidity component.)
-  useEffect(() => {
-    async function handleTokenChange() {
-      if (!chainId || !tokenSymbol || !liquidityProvidersAddress) {
-        return null;
-      }
-
-      const chain = chains.find(
-        chainObj => chainObj.chainId === Number.parseInt(chainId),
-      )!;
-      const token = tokens.find(tokenObj => tokenObj.symbol === tokenSymbol)!;
-
-      if (isLoggedIn && accounts) {
-        const { displayBalance } =
-          (await getTokenBalance(accounts[0], chain, token)) || {};
-        setWalletBalance(displayBalance);
-      }
-
-      setSelectedTokenAddress(token[chain.chainId].address);
-    }
-
-    handleTokenChange();
-  }, [accounts, chainId, isLoggedIn, liquidityProvidersAddress, tokenSymbol]);
 
   function reset() {
     setLiquidityAmount('');

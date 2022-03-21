@@ -2,9 +2,10 @@ import { useQuery } from 'react-query';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import PoolOverview from './PoolOverview';
+import { HiOutlineXCircle } from 'react-icons/hi';
 
 function Pools() {
-  const { isLoading, data } = useQuery(
+  const { isError, isLoading, data } = useQuery(
     'tokens',
     () =>
       fetch(
@@ -16,8 +17,24 @@ function Pools() {
   );
   const { message: tokensObject } = data || {};
 
+  if (isError) {
+    return (
+      <article className="5 5 mb-2 rounded-10 bg-white p-2">
+        <section className="flex h-auto items-start justify-center">
+          <div className="my-16 flex items-center">
+            <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+            <span className="text-hyphen-gray-400">
+              Something went wrong while we were fetching the list of pools,
+              please try again later.
+            </span>
+          </div>
+        </section>
+      </article>
+    );
+  }
+
   return (
-    <article className="rounded-10 bg-white pt-2.5">
+    <article className="overflow-hidden rounded-10 bg-white pt-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
         <h2 className="text-xl text-hyphen-purple">Pools</h2>
       </header>

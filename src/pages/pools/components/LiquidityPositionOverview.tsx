@@ -3,12 +3,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { request, gql } from 'graphql-request';
 import tokens from 'config/tokens';
-import { useWalletProvider } from 'context/WalletProvider';
 import { chains } from 'config/chains';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
-import { HiInformationCircle } from 'react-icons/hi';
+import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
 import CustomTooltip from 'components/CustomTooltip';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 
@@ -38,10 +37,13 @@ function LiquidityPositionOverview({
   const { getRewardRatePerSecond, getRewardTokenAddress } =
     useLiquidityFarming(chain);
 
-  const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
-    useQuery(['positionMetadata', positionId], () =>
-      getPositionMetadata(positionId),
-    );
+  const {
+    isError: positionMetadataError,
+    isLoading: isPositionMetadataLoading,
+    data: positionMetadata,
+  } = useQuery(['positionMetadata', positionId], () =>
+    getPositionMetadata(positionId),
+  );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
@@ -57,7 +59,11 @@ function LiquidityPositionOverview({
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
-  const { isLoading: isTotalLiquidityLoading, data: totalLiquidity } = useQuery(
+  const {
+    isError: totalLiquidityError,
+    isLoading: isTotalLiquidityLoading,
+    data: totalLiquidity,
+  } = useQuery(
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
@@ -66,7 +72,11 @@ function LiquidityPositionOverview({
     },
   );
 
-  const { isLoading: isTokenAmountLoading, data: tokenAmount } = useQuery(
+  const {
+    isError: tokenAmountError,
+    isLoading: isTokenAmountLoading,
+    data: tokenAmount,
+  } = useQuery(
     ['tokenAmount', { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
@@ -75,7 +85,7 @@ function LiquidityPositionOverview({
     },
   );
 
-  const { data: feeAPYData } = useQuery(
+  const { isError: feeAPYDataError, data: feeAPYData } = useQuery(
     ['apy', tokenAddress],
     async () => {
       if (!v2GraphEndpoint || !tokenAddress) return;
@@ -98,7 +108,10 @@ function LiquidityPositionOverview({
     },
   );
 
-  const { data: suppliedLiquidityByToken } = useQuery(
+  const {
+    isError: suppliedLiquidityByTokenError,
+    data: suppliedLiquidityByToken,
+  } = useQuery(
     ['suppliedLiquidityByToken', tokenAddress],
     () => getSuppliedLiquidityByToken(tokenAddress),
     {
@@ -107,7 +120,7 @@ function LiquidityPositionOverview({
     },
   );
 
-  const { data: tokenPriceInUSD } = useQuery(
+  const { isError: tokenPriceInUSDError, data: tokenPriceInUSD } = useQuery(
     ['tokenPriceInUSD', token],
     () =>
       fetch(
@@ -118,23 +131,25 @@ function LiquidityPositionOverview({
     },
   );
 
-  const { data: rewardsRatePerSecond } = useQuery(
-    ['rewardsRatePerSecond', tokenAddress],
-    () => getRewardRatePerSecond(tokenAddress),
-    {
-      // Execute only when address is available.
-      enabled: !!tokenAddress,
-    },
-  );
+  const { isError: rewardsPerSecondError, data: rewardsRatePerSecond } =
+    useQuery(
+      ['rewardsRatePerSecond', tokenAddress],
+      () => getRewardRatePerSecond(tokenAddress),
+      {
+        // Execute only when address is available.
+        enabled: !!tokenAddress,
+      },
+    );
 
-  const { data: rewardTokenAddress } = useQuery(
-    ['rewardTokenAddress', tokenAddress],
-    () => getRewardTokenAddress(tokenAddress),
-    {
-      // Execute only when address is available.
-      enabled: !!tokenAddress,
-    },
-  );
+  const { isError: rewardTokenAddressError, data: rewardTokenAddress } =
+    useQuery(
+      ['rewardTokenAddress', tokenAddress],
+      () => getRewardTokenAddress(tokenAddress),
+      {
+        // Execute only when address is available.
+        enabled: !!tokenAddress,
+      },
+    );
 
   const rewardToken = rewardTokenAddress
     ? tokens.find(tokenObj => {
@@ -145,19 +160,20 @@ function LiquidityPositionOverview({
       })
     : undefined;
 
-  const { data: rewardTokenPriceInUSD } = useQuery(
-    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
-    () => {
-      if (!rewardToken) return;
+  const { isError: rewardTokenPriceInUSDError, data: rewardTokenPriceInUSD } =
+    useQuery(
+      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      () => {
+        if (!rewardToken) return;
 
-      return fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
-      ).then(res => res.json());
-    },
-    {
-      enabled: !!rewardToken,
-    },
-  );
+        return fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+        ).then(res => res.json());
+      },
+      {
+        enabled: !!rewardToken,
+      },
+    );
 
   const rewardRatePerSecondInUSD =
     rewardsRatePerSecond && rewardTokenPriceInUSD && rewardToken
@@ -192,6 +208,17 @@ function LiquidityPositionOverview({
     : 0;
   const APY = rewardAPY + feeAPY;
 
+  const isError =
+    positionMetadataError ||
+    totalLiquidityError ||
+    tokenAmountError ||
+    feeAPYDataError ||
+    suppliedLiquidityByTokenError ||
+    tokenPriceInUSDError ||
+    rewardsPerSecondError ||
+    rewardTokenAddressError ||
+    rewardTokenPriceInUSDError;
+
   const isDataLoading =
     isPositionMetadataLoading ||
     isTotalLiquidityLoading ||
@@ -206,6 +233,20 @@ function LiquidityPositionOverview({
         className="!h-37.5 !rounded-7.5"
         containerClassName="block leading-none"
       />
+    );
+  }
+
+  if (isError) {
+    return (
+      <section className="flex h-37.5 items-center justify-center rounded-7.5 border bg-white px-10 py-6 text-hyphen-gray-400">
+        <div className="my-16 flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            Something went wrong while we were fetching this position, please
+            try again later.
+          </span>
+        </div>
+      </section>
     );
   }
 

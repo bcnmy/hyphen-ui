@@ -1,5 +1,5 @@
 import ProgressBar from 'components/ProgressBar';
-import { HiArrowSmLeft } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import LiquidityPositionOverview from '../LiquidityPositionOverview';
 import StepSlider from '../StepSlider';
@@ -43,15 +43,18 @@ function ManagePosition() {
     useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
 
-  const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
-    useQuery(
-      ['positionMetadata', positionId],
-      () => getPositionMetadata(BigNumber.from(positionId)),
-      {
-        // Execute only when positionid is available.
-        enabled: !!positionId,
-      },
-    );
+  const {
+    data: positionMetadata,
+    isError: positionMetadataError,
+    isLoading: isPositionMetadataLoading,
+  } = useQuery(
+    ['positionMetadata', positionId],
+    () => getPositionMetadata(BigNumber.from(positionId)),
+    {
+      // Execute only when positionid is available.
+      enabled: !!positionId,
+    },
+  );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
@@ -68,7 +71,7 @@ function ManagePosition() {
   const tokenDecimals =
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;
 
-  const { data: totalLiquidity } = useQuery(
+  const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
@@ -77,7 +80,7 @@ function ManagePosition() {
     },
   );
 
-  const { data: tokenAmount } = useQuery(
+  const { data: tokenAmount, isError: tokenAmountError } = useQuery(
     ['tokenAmount', { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
@@ -86,7 +89,7 @@ function ManagePosition() {
     },
   );
 
-  const { data: tokenTotalCap } = useQuery(
+  const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
     ['tokenTotalCap', tokenAddress],
     () => getTokenTotalCap(tokenAddress),
     {
@@ -96,8 +99,8 @@ function ManagePosition() {
   );
 
   const {
+    isError: removeLiquidityError,
     isLoading: removeLiquidityLoading,
-    isSuccess: removeLiquiditySuccess,
     mutate: removeLiquidityMutation,
   } = useMutation(
     async ({
@@ -118,8 +121,8 @@ function ManagePosition() {
   );
 
   const {
+    isError: claimFeeError,
     isLoading: claimFeeLoading,
-    isSuccess: claimFeeSuccess,
     mutate: claimFeeMutation,
   } = useMutation(async ({ positionId }: { positionId: BigNumber }) => {
     const claimFeeTx = await claimFee(positionId);
@@ -162,11 +165,36 @@ function ManagePosition() {
       ? formattedTokenAmount - formattedSuppliedLiquidity
       : -1;
 
+  const isError =
+    positionMetadataError ||
+    totalLiquidityError ||
+    tokenAmountError ||
+    tokenTotalCapError ||
+    removeLiquidityError ||
+    claimFeeError;
+
   const isDataLoading =
     !isLoggedIn ||
     isPositionMetadataLoading ||
     removeLiquidityLoading ||
     claimFeeLoading;
+
+  if (isError) {
+    return (
+      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
+        <div className="flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            {removeLiquidityError
+              ? 'Something went wrong while removing liquidity, please try again later.'
+              : claimFeeError
+              ? 'Something went wrong while claiming fees, please try again later.'
+              : 'We could not get the necessary information, please try again later.'}
+          </span>
+        </div>
+      </article>
+    );
+  }
 
   const isRemovalAmountGtSuppliedLiquidity =
     Number.parseFloat(liquidityRemovalAmount) > formattedSuppliedLiquidity;

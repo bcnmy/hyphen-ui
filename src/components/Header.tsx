@@ -27,7 +27,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
 
   return (
     <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">
-      <Link to="/pools" className="absolute left-6">
+      <Link to="/bridge" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
           className="h-8 w-auto"
@@ -35,15 +35,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
         />
       </Link>
       <nav className="flex gap-7 text-white">
-        <a
-          target="_blank"
-          href="https://hyphen.biconomy.io"
-          rel="noreferrer"
-          className="relative flex items-center text-gray-400 hover:text-white"
-        >
-          Bridge
-        </a>
-        {/* <NavLink to="/bridge">
+        <NavLink to="/bridge">
           {({ isActive }) => (
             <span
               className={
@@ -63,7 +55,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
               ></span>
             </span>
           )}
-        </NavLink> */}
+        </NavLink>
         <NavLink
           to="/pools"
           className={({ isActive }) => (isActive ? 'relative' : 'relative')}

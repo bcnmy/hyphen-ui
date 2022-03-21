@@ -395,21 +395,21 @@ function AddLiquidity() {
       ? Number.parseFloat(
           ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedTokenAllowance =
     tokenAllowance && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const rewardRatePerSecondInUSD =
     rewardsRatePerSecond && rewardTokenPriceInUSD && chain && rewardToken
@@ -868,22 +868,12 @@ function AddLiquidity() {
               <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
                 <span>Pool cap</span>
                 <span className="flex">
-                  {formattedTotalLiquidity >= 0 &&
-                  formattedTokenTotalCap >= 0 ? (
-                    <>
-                      {makeNumberCompact(formattedTotalLiquidity)}{' '}
-                      {selectedToken?.name} /{' '}
-                      {makeNumberCompact(formattedTokenTotalCap)}{' '}
-                      {selectedToken?.name}
-                    </>
-                  ) : (
-                    <Skeleton
-                      baseColor="#615ccd20"
-                      enableAnimation
-                      highlightColor="#615ccd05"
-                      className="!mx-1 !w-20"
-                    />
-                  )}
+                  <>
+                    {makeNumberCompact(formattedTotalLiquidity)}{' '}
+                    {selectedToken?.name} /{' '}
+                    {makeNumberCompact(formattedTokenTotalCap)}{' '}
+                    {selectedToken?.name}
+                  </>
                 </span>
               </div>
             </div>

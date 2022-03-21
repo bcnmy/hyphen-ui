@@ -139,31 +139,31 @@ function ManagePosition() {
       ? Number.parseFloat(
           ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedTokenAmount =
     tokenAmount && tokenDecimals
       ? Number.parseFloat(ethers.utils.formatUnits(tokenAmount, tokenDecimals))
-      : -1;
+      : 0;
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const unclaimedFees =
     formattedTokenAmount && formattedSuppliedLiquidity
       ? formattedTokenAmount - formattedSuppliedLiquidity
-      : -1;
+      : 0;
 
   const isError =
     positionMetadataError ||
@@ -318,20 +318,10 @@ function ManagePosition() {
             <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
               <span>Pool cap</span>
               <span className="flex">
-                {formattedTotalLiquidity >= 0 && formattedTokenTotalCap >= 0 ? (
-                  <>
-                    {makeNumberCompact(formattedTotalLiquidity)} {token?.symbol}{' '}
-                    / {makeNumberCompact(formattedTokenTotalCap)}{' '}
-                    {token?.symbol}
-                  </>
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-20"
-                  />
-                )}
+                <>
+                  {makeNumberCompact(formattedTotalLiquidity)} {token?.symbol} /{' '}
+                  {makeNumberCompact(formattedTokenTotalCap)} {token?.symbol}
+                </>
               </span>
             </div>
           </div>
@@ -343,17 +333,7 @@ function ManagePosition() {
             >
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex items-center text-hyphen-gray-300">
-                Liquidity Balance:{' '}
-                {formattedSuppliedLiquidity >= 0 ? (
-                  formattedSuppliedLiquidity
-                ) : (
-                  <Skeleton
-                    baseColor="#615ccd20"
-                    enableAnimation
-                    highlightColor="#615ccd05"
-                    className="!mx-1 !w-11"
-                  />
-                )}{' '}
+                Liquidity Balance: {formattedSuppliedLiquidity}
                 {token?.symbol}
               </span>
             </label>

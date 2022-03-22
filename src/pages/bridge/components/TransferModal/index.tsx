@@ -262,9 +262,9 @@ const ReceivalStep: React.FC<
   useEffect(() => {
     try {
       if (!toChainRpcUrlProvider) {
-        console.error('Something has gone horribly wrong');
-        setReceivalError('Unrecoverable application error. Contact us.');
-        throw new Error('Something has gone horribly wrong');
+        console.error('Something has gone wrong, please try again later.');
+        setReceivalError('Something has gone wrong, please try again later.');
+        throw new Error('Something has gone wrong, please try again later.');
       } else if (exitHash && executed && active) {
         setReceivalState(Status.PENDING);
         (async () => {

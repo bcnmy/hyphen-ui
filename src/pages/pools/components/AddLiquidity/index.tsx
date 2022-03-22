@@ -444,6 +444,7 @@ function AddLiquidity() {
     : 0;
   const APY = rewardAPY + feeAPY;
 
+  // Check if there's an error in queries or mutations.
   const isError =
     totalLiquidityError ||
     tokenTotalCapError ||

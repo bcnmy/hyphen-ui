@@ -208,6 +208,7 @@ function LiquidityPositionOverview({
     : 0;
   const APY = rewardAPY + feeAPY;
 
+  // Check if there's an error in queries or mutations.
   const isError =
     positionMetadataError ||
     totalLiquidityError ||
@@ -224,18 +225,6 @@ function LiquidityPositionOverview({
     isTotalLiquidityLoading ||
     isTokenAmountLoading;
 
-  if (isDataLoading || !token || !chain) {
-    return (
-      <Skeleton
-        baseColor="#615ccd20"
-        enableAnimation
-        highlightColor="#615ccd05"
-        className="!h-37.5 !rounded-7.5"
-        containerClassName="block leading-none"
-      />
-    );
-  }
-
   if (isError) {
     return (
       <section className="flex h-37.5 items-center justify-center rounded-7.5 border bg-white px-10 py-6 text-hyphen-gray-400">
@@ -247,6 +236,18 @@ function LiquidityPositionOverview({
           </span>
         </div>
       </section>
+    );
+  }
+
+  if (isDataLoading || !token || !chain) {
+    return (
+      <Skeleton
+        baseColor="#615ccd20"
+        enableAnimation
+        highlightColor="#615ccd05"
+        className="!h-37.5 !rounded-7.5"
+        containerClassName="block leading-none"
+      />
     );
   }
 

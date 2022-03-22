@@ -165,6 +165,7 @@ function ManagePosition() {
       ? formattedTokenAmount - formattedSuppliedLiquidity
       : 0;
 
+  // Check if there's an error in queries or mutations.
   const isError =
     positionMetadataError ||
     totalLiquidityError ||

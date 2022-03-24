@@ -1,9 +1,9 @@
-name: Staging Deployment - Hyphen UI
+name: Production V2 Deployment - Hyphen UI
 
 on:
   push:
     branches:
-      - staging
+      - master-v2
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
       - name: Generate build
         run: |
           yarn install
-          yarn run build:staging
+          yarn run build:prod
         env:
           CI: false
           NODE_OPTIONS: --max_old_space_size=4096
@@ -35,8 +35,8 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 
-      # publish to staging environment
+      # publish to production environment
       - name: Deploy to S3
         run: |
-          aws s3 sync build s3://${{ secrets.S3_STAGING_BUCKET_NAME }}
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_STAGING_CF_ID }} --paths /
+          aws s3 sync build s3://${{ secrets.S3_PROD_V2_BUCKET_NAME }}
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_PROD_V2_CF_ID }} --paths /

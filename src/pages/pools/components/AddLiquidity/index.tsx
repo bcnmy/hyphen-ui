@@ -465,24 +465,30 @@ function AddLiquidity() {
   }
 
   function handleTokenChange(selectedToken: Option) {
-    const { symbol: tokenSymbol } = tokens.find(
+    const { symbol: newTokenSymbol } = tokens.find(
       tokenObj => tokenObj.symbol === selectedToken.id,
     )!;
-    queryClient.removeQueries();
-    reset();
-    navigate(`/pools/add-liquidity/${chainId}/${tokenSymbol}`);
+
+    if (newTokenSymbol !== tokenSymbol) {
+      queryClient.removeQueries();
+      reset();
+      navigate(`/pools/add-liquidity/${chainId}/${newTokenSymbol}`);
+    }
   }
 
   function handleChainChange(selectedChain: Option) {
-    const { chainId } = chains.find(
+    const { chainId: newChainId } = chains.find(
       chainObj => chainObj.chainId === selectedChain.id,
     )!;
-    const [{ symbol: tokenSymbol }] = tokens.filter(
-      tokenObj => tokenObj[chainId] && tokenObj[chainId].isSupported,
+    const [{ symbol: newTokenSymbol }] = tokens.filter(
+      tokenObj => tokenObj[newChainId] && tokenObj[newChainId].isSupported,
     );
-    queryClient.removeQueries();
-    reset();
-    navigate(`/pools/add-liquidity/${chainId}/${tokenSymbol}`);
+
+    if (chainId && newChainId !== Number.parseInt(chainId, 10)) {
+      queryClient.removeQueries();
+      reset();
+      navigate(`/pools/add-liquidity/${newChainId}/${newTokenSymbol}`);
+    }
   }
 
   function handleNetworkChange() {
@@ -662,7 +668,6 @@ function AddLiquidity() {
                 selected={selectedToken}
                 setSelected={tokenOption => {
                   handleTokenChange(tokenOption);
-                  reset();
                 }}
                 label={'asset'}
               />
@@ -671,7 +676,6 @@ function AddLiquidity() {
                 selected={selectedChain}
                 setSelected={chainOption => {
                   handleChainChange(chainOption);
-                  reset();
                 }}
                 label={'network'}
               />

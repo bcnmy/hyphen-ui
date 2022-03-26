@@ -7,6 +7,7 @@ import {
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
   HiOutlineSearch,
+  HiOutlineXCircle,
 } from 'react-icons/hi';
 import { useMutation, useQueries, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -55,7 +56,11 @@ function AddStakingPosition() {
 
   const [currentPosition, setCurrentPosition] = useState<number>(0);
 
-  const { isLoading: isUserPositionsLoading, data: userPositions } = useQuery(
+  const {
+    data: userPositions,
+    isError: userPositionsError,
+    isLoading: isUserPositionsLoading,
+  } = useQuery(
     ['userPositions', accounts],
     () => {
       if (!isLoggedIn || !accounts) return;
@@ -70,18 +75,19 @@ function AddStakingPosition() {
     },
   );
 
-  const { data: rewardTokenAddress } = useQuery(
-    ['rewardTokenAddress', token],
-    () => {
-      if (!chain || !token) return;
+  const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
+    useQuery(
+      ['rewardTokenAddress', token],
+      () => {
+        if (!chain || !token) return;
 
-      return getRewardTokenAddress(token[chain.chainId].address);
-    },
-    {
-      // Execute only when address is available.
-      enabled: !!(chain && token),
-    },
-  );
+        return getRewardTokenAddress(token[chain.chainId].address);
+      },
+      {
+        // Execute only when address is available.
+        enabled: !!(chain && token),
+      },
+    );
 
   const rewardToken =
     rewardTokenAddress && chain
@@ -93,26 +99,33 @@ function AddStakingPosition() {
         })
       : undefined;
 
-  const { isLoading: approveNFTLoading, mutate: approveNFTMutation } =
-    useMutation(
-      async ({
-        address,
-        positionId,
-      }: {
-        address: string;
-        positionId: BigNumber;
-      }) => {
-        const approveNFTTx = await getNFTApproval(address, positionId);
-        addTxNotification(
-          approveNFTTx,
-          'Approve NFT',
-          `${chain?.explorerUrl}/tx/${approveNFTTx.hash}`,
-        );
-        return await approveNFTTx.wait(1);
-      },
-    );
+  const {
+    isError: approveNFTError,
+    isLoading: approveNFTLoading,
+    mutate: approveNFTMutation,
+  } = useMutation(
+    async ({
+      address,
+      positionId,
+    }: {
+      address: string;
+      positionId: BigNumber;
+    }) => {
+      const approveNFTTx = await getNFTApproval(address, positionId);
+      addTxNotification(
+        approveNFTTx,
+        'Approve NFT',
+        `${chain?.explorerUrl}/tx/${approveNFTTx.hash}`,
+      );
+      return await approveNFTTx.wait(1);
+    },
+  );
 
-  const { isLoading: stakeNFTLoading, mutate: stakeNFTMutation } = useMutation(
+  const {
+    isError: stakeNFTError,
+    isLoading: stakeNFTLoading,
+    mutate: stakeNFTMutation,
+  } = useMutation(
     async ({
       positionId,
       accounts,
@@ -160,8 +173,9 @@ function AddStakingPosition() {
       : false;
 
   const {
-    isLoading: isNFTApprovalAddressLoading,
     data: NFTApprovalAddress,
+    isError: NFTApprovalAddressError,
+    isLoading: isNFTApprovalAddressLoading,
     refetch: refetchNFTApprovalAddress,
   } = useQuery(
     ['NFTApprovalAddress', currentPosition],
@@ -195,6 +209,14 @@ function AddStakingPosition() {
   const { status: firstPositionMetadataStatus } = firstPositionMetadata || {};
   const { status: firstPositionNFTStatus } = firstPositionNFT || {};
 
+  // Check if there's an error in queries or mutations.
+  const isError =
+    userPositionsError ||
+    rewardTokenAddressError ||
+    approveNFTError ||
+    stakeNFTError ||
+    NFTApprovalAddressError;
+
   const isDataLoading =
     isUserPositionsLoading ||
     isNFTApprovalAddressLoading ||
@@ -202,6 +224,23 @@ function AddStakingPosition() {
     stakeNFTLoading ||
     firstPositionMetadataStatus === 'loading' ||
     firstPositionNFTStatus === 'loading';
+
+  if (isError) {
+    return (
+      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
+        <div className="flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            {approveNFTError
+              ? 'Something went wrong while approving this NFT, please try again later.'
+              : stakeNFTError
+              ? 'Something went wrong while staking this NFT, please try again later.'
+              : 'We could not get the necessary information, please try again later.'}
+          </span>
+        </div>
+      </article>
+    );
+  }
 
   const isNFTApproved =
     NFTApprovalAddress && chain

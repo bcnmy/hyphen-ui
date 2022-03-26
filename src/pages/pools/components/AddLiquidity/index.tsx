@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { HiArrowSmLeft } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
 import Select, { Option } from 'components/Select';
@@ -120,7 +120,7 @@ function AddLiquidity() {
   } = useModal();
 
   // Queries
-  const { data: totalLiquidity } = useQuery(
+  const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
     ['totalLiquidity', selectedTokenAddress],
     () => getTotalLiquidity(selectedTokenAddress),
     {
@@ -129,7 +129,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenTotalCap } = useQuery(
+  const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
     ['tokenTotalCap', selectedTokenAddress],
     () => getTokenTotalCap(selectedTokenAddress),
     {
@@ -138,7 +138,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenWalletCap } = useQuery(
+  const { data: tokenWalletCap, isError: tokenWalletCapError } = useQuery(
     ['tokenWalletCap', selectedTokenAddress],
     () => getTokenWalletCap(selectedTokenAddress),
     {
@@ -147,7 +147,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: feeAPYData } = useQuery(
+  const { data: feeAPYData, isError: feeAPYDataError } = useQuery(
     ['apy', selectedTokenAddress],
     async () => {
       if (!v2GraphEndpoint || !selectedTokenAddress) return;
@@ -170,7 +170,11 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenAllowance, refetch: refetchTokenAllowance } = useQuery(
+  const {
+    data: tokenAllowance,
+    isError: tokenAllowanceError,
+    refetch: refetchTokenAllowance,
+  } = useQuery(
     'tokenAllowance',
     () => {
       if (
@@ -201,9 +205,8 @@ function AddLiquidity() {
 
   // Mutations
   const {
+    isError: approveTokenError,
     isLoading: approveTokenLoading,
-    isSuccess: approveTokenSuccess,
-    data: approveTokenTx,
     mutate: approveTokenMutation,
   } = useMutation(
     ({
@@ -216,8 +219,8 @@ function AddLiquidity() {
   );
 
   const {
+    isError: addLiquidityError,
     isLoading: addLiquidityLoading,
-    isSuccess: addLiquiditySuccess,
     mutate: addLiquidityMutation,
   } = useMutation(
     async ({
@@ -248,16 +251,20 @@ function AddLiquidity() {
     },
   );
 
-  const { data: totalLiquidityByLP } = useQuery(
-    ['totalLiquidityByLP', selectedTokenAddress],
-    () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
-    {
-      // Execute only when selectedTokenAddress and accounts are available.
-      enabled: !!(selectedTokenAddress && accounts),
-    },
-  );
+  const { data: totalLiquidityByLP, isError: totalLiquidityByLPError } =
+    useQuery(
+      ['totalLiquidityByLP', selectedTokenAddress],
+      () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
+      {
+        // Execute only when selectedTokenAddress and accounts are available.
+        enabled: !!(selectedTokenAddress && accounts),
+      },
+    );
 
-  const { data: suppliedLiquidityByToken } = useQuery(
+  const {
+    data: suppliedLiquidityByToken,
+    isError: suppliedLiquidityByTokenError,
+  } = useQuery(
     ['suppliedLiquidityByToken', selectedTokenAddress],
     () => {
       if (!selectedTokenAddress) return;
@@ -270,7 +277,7 @@ function AddLiquidity() {
     },
   );
 
-  const { data: tokenPriceInUSD } = useQuery(
+  const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
     ['tokenPriceInUSD', token],
     () =>
       fetch(
@@ -281,31 +288,33 @@ function AddLiquidity() {
     },
   );
 
-  const { data: rewardsRatePerSecond } = useQuery(
-    ['rewardsRatePerSecond', selectedTokenAddress],
-    () => {
-      if (!selectedTokenAddress) return;
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', selectedTokenAddress],
+      () => {
+        if (!selectedTokenAddress) return;
 
-      return getRewardRatePerSecond(selectedTokenAddress);
-    },
-    {
-      // Execute only when selectedTokenAddress is available.
-      enabled: !!selectedTokenAddress,
-    },
-  );
+        return getRewardRatePerSecond(selectedTokenAddress);
+      },
+      {
+        // Execute only when selectedTokenAddress is available.
+        enabled: !!selectedTokenAddress,
+      },
+    );
 
-  const { data: rewardTokenAddress } = useQuery(
-    ['rewardTokenAddress', selectedTokenAddress],
-    () => {
-      if (!selectedTokenAddress) return;
+  const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
+    useQuery(
+      ['rewardTokenAddress', selectedTokenAddress],
+      () => {
+        if (!selectedTokenAddress) return;
 
-      return getRewardTokenAddress(selectedTokenAddress);
-    },
-    {
-      // Execute only when selectedTokenAddress is available.
-      enabled: !!selectedTokenAddress,
-    },
-  );
+        return getRewardTokenAddress(selectedTokenAddress);
+      },
+      {
+        // Execute only when selectedTokenAddress is available.
+        enabled: !!selectedTokenAddress,
+      },
+    );
 
   const rewardToken =
     rewardTokenAddress && chain
@@ -317,94 +326,20 @@ function AddLiquidity() {
         })
       : undefined;
 
-  const { data: rewardTokenPriceInUSD } = useQuery(
-    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
-    () => {
-      if (!rewardToken) return;
+  const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
+    useQuery(
+      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      () => {
+        if (!rewardToken) return;
 
-      return fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
-      ).then(res => res.json());
-    },
-    {
-      enabled: !!rewardToken,
-    },
-  );
-
-  const formattedTotalLiquidity =
-    totalLiquidity && tokenDecimals
-      ? Number.parseFloat(
-          ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
-        )
-      : -1;
-
-  const formattedTokenTotalCap =
-    tokenTotalCap && tokenDecimals
-      ? Number.parseFloat(
-          ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
-        )
-      : -1;
-
-  const formattedTokenAllowance =
-    tokenAllowance && tokenDecimals
-      ? Number.parseFloat(
-          ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
-        )
-      : -1;
-
-  const rewardRatePerSecondInUSD =
-    rewardsRatePerSecond && rewardTokenPriceInUSD && chain && rewardToken
-      ? Number.parseFloat(
-          ethers.utils.formatUnits(
-            rewardsRatePerSecond,
-            rewardToken[chain.chainId].decimal,
-          ),
-        ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
-      : 0;
-
-  const totalValueLockedInUSD =
-    suppliedLiquidityByToken && tokenPriceInUSD && token && tokenDecimals
-      ? Number.parseFloat(
-          ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
-        ) * tokenPriceInUSD[token.coinGeckoId as string].usd
-      : 0;
-
-  const secondsInYear = 31536000;
-  const rewardAPY =
-    rewardRatePerSecondInUSD && totalValueLockedInUSD
-      ? (Math.pow(
-          1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
-          secondsInYear,
-        ) -
-          1) *
-        100
-      : 0;
-
-  const feeAPY = feeAPYData
-    ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
-    : 0;
-  const APY = rewardAPY + feeAPY;
-
-  const isDataLoading =
-    !liquidityBalance || approveTokenLoading || addLiquidityLoading;
-
-  const isNativeToken = selectedTokenAddress === NATIVE_ADDRESS;
-
-  const isLiquidityAmountGtWalletBalance =
-    liquidityAmount && walletBalance
-      ? Number.parseFloat(liquidityAmount) > Number.parseFloat(walletBalance)
-      : false;
-
-  const isLiquidityAmountGtTokenAllowance =
-    liquidityAmount && formattedTokenAllowance >= 0
-      ? Number.parseFloat(liquidityAmount) > formattedTokenAllowance
-      : false;
-
-  const isLiquidityAmountGtPoolCap =
-    liquidityAmount && formattedTotalLiquidity && formattedTokenTotalCap
-      ? Number.parseFloat(liquidityAmount) + formattedTotalLiquidity >
-        formattedTokenTotalCap
-      : false;
+        return fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+        ).then(res => res.json());
+      },
+      {
+        enabled: !!rewardToken,
+      },
+    );
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
@@ -454,6 +389,114 @@ function AddLiquidity() {
 
     handleTokenChange();
   }, [accounts, chainId, isLoggedIn, liquidityProvidersAddress, tokenSymbol]);
+
+  const formattedTotalLiquidity =
+    totalLiquidity && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
+        )
+      : 0;
+
+  const formattedTokenTotalCap =
+    tokenTotalCap && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
+        )
+      : 0;
+
+  const formattedTokenAllowance =
+    tokenAllowance && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
+        )
+      : 0;
+
+  const rewardRatePerSecondInUSD =
+    rewardsRatePerSecond && rewardTokenPriceInUSD && chain && rewardToken
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(
+            rewardsRatePerSecond,
+            rewardToken[chain.chainId].decimal,
+          ),
+        ) * rewardTokenPriceInUSD[rewardToken.coinGeckoId as string].usd
+      : 0;
+
+  const totalValueLockedInUSD =
+    suppliedLiquidityByToken && tokenPriceInUSD && token && tokenDecimals
+      ? Number.parseFloat(
+          ethers.utils.formatUnits(suppliedLiquidityByToken, tokenDecimals),
+        ) * tokenPriceInUSD[token.coinGeckoId as string].usd
+      : 0;
+
+  const secondsInYear = 31536000;
+  const rewardAPY =
+    rewardRatePerSecondInUSD && totalValueLockedInUSD
+      ? (Math.pow(
+          1 + rewardRatePerSecondInUSD / totalValueLockedInUSD,
+          secondsInYear,
+        ) -
+          1) *
+        100
+      : 0;
+
+  const feeAPY = feeAPYData
+    ? Number.parseFloat(Number.parseFloat(feeAPYData.apy).toFixed(2))
+    : 0;
+  const APY = rewardAPY + feeAPY;
+
+  // Check if there's an error in queries or mutations.
+  const isError =
+    totalLiquidityError ||
+    tokenTotalCapError ||
+    tokenWalletCapError ||
+    feeAPYDataError ||
+    tokenAllowanceError ||
+    totalLiquidityByLPError ||
+    suppliedLiquidityByTokenError ||
+    tokenPriceInUSDError ||
+    rewardsRatePerSecondError ||
+    rewardTokenAddressError ||
+    rewardTokenPriceInUSDError ||
+    approveTokenError ||
+    addLiquidityError;
+
+  const isDataLoading =
+    !liquidityBalance || approveTokenLoading || addLiquidityLoading;
+
+  if (isError) {
+    return (
+      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
+        <div className="flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            {approveTokenError
+              ? 'Something went wrong while approving this token, please try again later.'
+              : addLiquidityError
+              ? 'Something went wrong while adding liquidity, please try again later.'
+              : 'We could not get the necessary information, please try again later.'}
+          </span>
+        </div>
+      </article>
+    );
+  }
+
+  const isNativeToken = selectedTokenAddress === NATIVE_ADDRESS;
+
+  const isLiquidityAmountGtWalletBalance =
+    liquidityAmount && walletBalance
+      ? Number.parseFloat(liquidityAmount) > Number.parseFloat(walletBalance)
+      : false;
+
+  const isLiquidityAmountGtTokenAllowance =
+    liquidityAmount && formattedTokenAllowance >= 0
+      ? Number.parseFloat(liquidityAmount) > formattedTokenAllowance
+      : false;
+
+  const isLiquidityAmountGtPoolCap =
+    liquidityAmount && formattedTotalLiquidity && formattedTokenTotalCap
+      ? Number.parseFloat(liquidityAmount) + formattedTotalLiquidity >
+        formattedTokenTotalCap
+      : false;
 
   function reset() {
     setLiquidityAmount('');
@@ -830,22 +873,12 @@ function AddLiquidity() {
               <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
                 <span>Pool cap</span>
                 <span className="flex">
-                  {formattedTotalLiquidity >= 0 &&
-                  formattedTokenTotalCap >= 0 ? (
-                    <>
-                      {makeNumberCompact(formattedTotalLiquidity)}{' '}
-                      {selectedToken?.name} /{' '}
-                      {makeNumberCompact(formattedTokenTotalCap)}{' '}
-                      {selectedToken?.name}
-                    </>
-                  ) : (
-                    <Skeleton
-                      baseColor="#615ccd20"
-                      enableAnimation
-                      highlightColor="#615ccd05"
-                      className="!mx-1 !w-20"
-                    />
-                  )}
+                  <>
+                    {makeNumberCompact(formattedTotalLiquidity)}{' '}
+                    {selectedToken?.name} /{' '}
+                    {makeNumberCompact(formattedTokenTotalCap)}{' '}
+                    {selectedToken?.name}
+                  </>
                 </span>
               </div>
             </div>

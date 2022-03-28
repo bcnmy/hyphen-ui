@@ -51,7 +51,88 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                   </p>
                 </article>
               ) : null}
+
               <article className="flex items-center justify-between font-medium">
+                <div className="flex items-center">
+                  <HiInformationCircle
+                    data-tip
+                    data-for="lpFee"
+                    className="mr-2"
+                  />
+                  {transactionFee ? (
+                    <CustomTooltip id="lpFee">
+                      <div>
+                        <span>
+                          LP fee ({transactionFee.transferFeePercentage}%):{' '}
+                        </span>
+                        {fetchTransactionFeeStatus === Status.SUCCESS &&
+                        transactionFee ? (
+                          <>{`${transactionFee.lpFeeProcessedString} ${selectedToken?.symbol}`}</>
+                        ) : (
+                          <Skeleton
+                            baseColor="#ffffff10"
+                            enableAnimation
+                            highlightColor="#615ccd05"
+                            className="!w-32"
+                          />
+                        )}
+                      </div>
+                      <div>
+                        <span>Reward amount: </span>
+                        {fetchTransactionFeeStatus === Status.SUCCESS &&
+                        transactionFee ? (
+                          <>{`${transactionFee.rewardAmountString} ${selectedToken?.symbol}`}</>
+                        ) : (
+                          <Skeleton
+                            baseColor="#ffffff10"
+                            enableAnimation
+                            highlightColor="#615ccd05"
+                            className="!w-32"
+                          />
+                        )}
+                      </div>
+                      <div>
+                        <span>Transaction fee: </span>
+                        {fetchTransactionFeeStatus === Status.SUCCESS &&
+                        transactionFee ? (
+                          <>{`${transactionFee.transactionFeeProcessedString} ${selectedToken?.symbol}`}</>
+                        ) : (
+                          <Skeleton
+                            baseColor="#ffffff10"
+                            enableAnimation
+                            highlightColor="#615ccd05"
+                            className="!w-32"
+                          />
+                        )}
+                      </div>
+                    </CustomTooltip>
+                  ) : null}
+                  Total fee
+                </div>
+                <div className="text-right font-mono">
+                  {fetchTransactionFeeStatus === Status.SUCCESS &&
+                  transactionFee ? (
+                    <>{`${
+                      Number.parseFloat(transactionFee.lpFeeProcessedString) +
+                      Number.parseFloat(
+                        transactionFee.transactionFeeProcessedString,
+                      ) -
+                      Number.parseFloat(
+                        transactionFee.rewardAmountString || '0',
+                      )
+                    } ${selectedToken?.symbol}`}</>
+                  ) : (
+                    <Skeleton
+                      baseColor="#ffffff10"
+                      enableAnimation
+                      highlightColor="#615ccd05"
+                      className="!w-32"
+                    />
+                  )}
+                </div>
+              </article>
+
+              {/* <article className="flex items-center justify-between font-medium">
                 <div className="flex items-center">
                   <HiInformationCircle
                     data-tip
@@ -145,7 +226,7 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                     />
                   )}
                 </div>
-              </article>
+              </article> */}
               <article className="flex items-center justify-between font-medium">
                 <div className="flex items-center">
                   <HiInformationCircle

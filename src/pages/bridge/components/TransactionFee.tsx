@@ -16,7 +16,6 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
   const {
     transactionFee,
     fetchTransactionFeeStatus,
-    transferAmountInputValue,
     transactionAmountValidationErrors,
   } = useTransaction()!;
   const { selectedToken } = useToken()!;

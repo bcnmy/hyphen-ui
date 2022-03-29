@@ -16,6 +16,7 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
   const {
     transactionFee,
     fetchTransactionFeeStatus,
+    transferAmountInputValue,
     transactionAmountValidationErrors,
   } = useTransaction()!;
   const { selectedToken } = useToken()!;
@@ -23,6 +24,12 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
   const showEthereumDisclaimer = toChain
     ? isToChainEthereum(toChain.chainId)
     : false;
+
+  const totalFee = transactionFee
+    ? Number.parseFloat(transactionFee.lpFeeProcessedString) +
+      Number.parseFloat(transactionFee.transactionFeeProcessedString) -
+      Number.parseFloat(transactionFee.rewardAmountString || '0')
+    : undefined;
 
   return (
     <Transition
@@ -73,24 +80,26 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                             baseColor="#ffffff10"
                             enableAnimation
                             highlightColor="#615ccd05"
-                            className="!w-32"
+                            className="!w-12"
                           />
                         )}
                       </div>
-                      <div>
-                        <span>Reward amount: </span>
-                        {fetchTransactionFeeStatus === Status.SUCCESS &&
-                        transactionFee ? (
-                          <>{`${transactionFee.rewardAmountString} ${selectedToken?.symbol}`}</>
-                        ) : (
-                          <Skeleton
-                            baseColor="#ffffff10"
-                            enableAnimation
-                            highlightColor="#615ccd05"
-                            className="!w-32"
-                          />
-                        )}
-                      </div>
+                      {transactionFee && transactionFee.rewardAmountString ? (
+                        <div>
+                          <span>Reward amount: </span>
+                          {fetchTransactionFeeStatus === Status.SUCCESS &&
+                          transactionFee ? (
+                            <>{`${transactionFee.rewardAmountString} ${selectedToken?.symbol}`}</>
+                          ) : (
+                            <Skeleton
+                              baseColor="#ffffff10"
+                              enableAnimation
+                              highlightColor="#615ccd05"
+                              className="!w-12"
+                            />
+                          )}
+                        </div>
+                      ) : null}
                       <div>
                         <span>Transaction fee: </span>
                         {fetchTransactionFeeStatus === Status.SUCCESS &&
@@ -101,7 +110,7 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                             baseColor="#ffffff10"
                             enableAnimation
                             highlightColor="#615ccd05"
-                            className="!w-32"
+                            className="!w-12"
                           />
                         )}
                       </div>
@@ -112,15 +121,7 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                 <div className="text-right font-mono">
                   {fetchTransactionFeeStatus === Status.SUCCESS &&
                   transactionFee ? (
-                    <>{`${
-                      Number.parseFloat(transactionFee.lpFeeProcessedString) +
-                      Number.parseFloat(
-                        transactionFee.transactionFeeProcessedString,
-                      ) -
-                      Number.parseFloat(
-                        transactionFee.rewardAmountString || '0',
-                      )
-                    } ${selectedToken?.symbol}`}</>
+                    <>{`${totalFee?.toFixed(3)} ${selectedToken?.symbol}`}</>
                   ) : (
                     <Skeleton
                       baseColor="#ffffff10"
@@ -132,101 +133,6 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
                 </div>
               </article>
 
-              {/* <article className="flex items-center justify-between font-medium">
-                <div className="flex items-center">
-                  <HiInformationCircle
-                    data-tip
-                    data-for="lpFee"
-                    className="mr-2"
-                  />
-                  {transactionFee ? (
-                    <CustomTooltip id="lpFee">
-                      <span>
-                        {transactionFee.transferFeePercentage}% fee to be given
-                        to liquidity providers
-                      </span>
-                    </CustomTooltip>
-                  ) : null}
-                  Liquidity Provider Fee
-                </div>
-                <div className="text-right font-mono">
-                  {fetchTransactionFeeStatus === Status.SUCCESS &&
-                  transactionFee ? (
-                    <>{`${transactionFee.lpFeeProcessedString} ${selectedToken?.symbol}`}</>
-                  ) : (
-                    <Skeleton
-                      baseColor="#ffffff10"
-                      enableAnimation
-                      highlightColor="#615ccd05"
-                      className="!w-32"
-                    />
-                  )}
-                </div>
-              </article>
-
-              {transactionFee && transactionFee.rewardAmountString ? (
-                <article className="flex items-center justify-between font-medium">
-                  <div className="flex items-center">
-                    <HiInformationCircle
-                      data-tip
-                      data-for="reward-fee"
-                      className="mr-2"
-                    />
-                    <CustomTooltip id="reward-fee">
-                      <span>
-                        Reward amount for filling up the pool close to supplied
-                        liquidity
-                      </span>
-                    </CustomTooltip>
-                    Reward Amount
-                  </div>
-                  <div className="text-right font-mono">
-                    {fetchTransactionFeeStatus === Status.SUCCESS &&
-                    transactionFee ? (
-                      <>{`${transactionFee.rewardAmountString} ${selectedToken?.symbol}`}</>
-                    ) : (
-                      <Skeleton
-                        baseColor="#ffffff10"
-                        enableAnimation
-                        highlightColor="#615ccd05"
-                        className="!w-32"
-                      />
-                    )}
-                  </div>
-                </article>
-              ) : null}
-              <article className="flex items-center justify-between font-medium">
-                <div className="flex items-center">
-                  <HiInformationCircle
-                    data-tip
-                    data-for="transactionFee"
-                    className="mr-2"
-                  />
-                  {toChain ? (
-                    <CustomTooltip id="transactionFee">
-                      <span>
-                        Fee corresponding to the transaction done by Biconomy to
-                        transfer funds on {toChain.name}. It varies as per the
-                        market gas price on {toChain.name}.
-                      </span>
-                    </CustomTooltip>
-                  ) : null}
-                  Transaction Fee
-                </div>
-                <div className="text-right font-mono">
-                  {fetchTransactionFeeStatus === Status.SUCCESS &&
-                  transactionFee ? (
-                    <>{`${transactionFee.transactionFeeProcessedString} ${selectedToken?.symbol}`}</>
-                  ) : (
-                    <Skeleton
-                      baseColor="#ffffff10"
-                      enableAnimation
-                      highlightColor="#615ccd05"
-                      className="!w-32"
-                    />
-                  )}
-                </div>
-              </article> */}
               <article className="flex items-center justify-between font-medium">
                 <div className="flex items-center">
                   <HiInformationCircle

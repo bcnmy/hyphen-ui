@@ -15,7 +15,7 @@ import Spinner from 'components/Buttons/Spinner';
 import AnimateHeight from 'react-animate-height';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
-import { HiOutlineArrowSmRight } from 'react-icons/hi';
+import { HiExclamation, HiOutlineArrowSmRight } from 'react-icons/hi';
 import SpinnerDark from 'components/Buttons/SpinnerDark';
 import {
   ITransferRecord,
@@ -269,9 +269,15 @@ const ReceivalStep: React.FC<
   useEffect(() => {
     try {
       if (!toChainRpcUrlProvider) {
-        console.error('Something has gone wrong, please try again later.');
-        setReceivalError('Something has gone wrong, please try again later.');
-        throw new Error('Something has gone wrong, please try again later.');
+        console.error(
+          'We were not able to fetch the details, please refresh and try again later.',
+        );
+        setReceivalError(
+          'We were not able to fetch the details, please refresh and try again later.',
+        );
+        throw new Error(
+          'We were not able to fetch the details, please refresh and try again later.',
+        );
       } else if (exitHash && executed && active) {
         setReceivalState(Status.PENDING);
         (async () => {
@@ -564,6 +570,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
             </div>
           </div>
         </div>
+
         <TransitionReact in={isBottomTrayOpen} timeout={300}>
           {state => (
             <div
@@ -575,9 +582,16 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
             >
               <div className="relative mx-10">
                 <div className="absolute -inset-[2px] -z-10 bg-gradient-to-br from-white/10 to-hyphen-purple/30 opacity-80 blur-md"></div>
-                <div className="relative z-0 rounded-b-md border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker shadow-lg backdrop-blur">
+                <div className="relative z-0 rounded-b-md border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker p-4 shadow-lg backdrop-blur">
+                  <article className="mb-4 flex items-start rounded-xl bg-red-100 p-2 text-sm text-red-600">
+                    <HiExclamation className="mr-2 h-6 w-auto" />
+                    <p>
+                      Please do not change your wallet's network while the
+                      transaction is going through.
+                    </p>
+                  </article>
                   <div
-                    className="grid gap-y-2 p-6 text-white/75"
+                    className="grid gap-y-2 text-white/75"
                     style={{ gridTemplateColumns: '1fr auto' }}
                   >
                     <span className="flex items-center gap-3 font-normal">

@@ -27,24 +27,32 @@ import CustomTooltip from '../../../../components/CustomTooltip';
 export interface ITransferModalProps {
   isVisible: boolean;
   onClose: () => void;
+  transferModalData: any;
 }
 
 interface Step {
   currentStepNumber: number;
   onNextStep: () => void;
   stepNumber: number;
+  transferModalData: any;
 }
 
 const PreDepositStep: React.FC<
   Step & { setModalErrored: (modalErrored: boolean) => void }
-> = ({ currentStepNumber, stepNumber, onNextStep, setModalErrored }) => {
+> = ({
+  currentStepNumber,
+  stepNumber,
+  onNextStep,
+  setModalErrored,
+  transferModalData,
+}) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
   // we set this to true after this step is executed
   // this is done so that stale values of value and error are not used
   const [executed, setExecuted] = useState(false);
-  const { toChain } = useChains()!;
+  const { toChain } = transferModalData;
 
   const {
     executePreDepositCheck,
@@ -112,18 +120,17 @@ const DepositStep: React.FC<
   setDepositState,
   onNextStep,
   setModalErrored,
+  transferModalData,
 }) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
   const {
-    transferAmount,
     executeDeposit,
     executeDepositStatus,
     executeDepositValue,
     executeDepositError,
   } = useTransaction()!;
-  const { selectedToken } = useToken()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, selectedToken, transferAmount } = transferModalData;
   const {
     receiver: { receiverAddress },
   } = useTransaction()!;
@@ -211,14 +218,14 @@ const ReceivalStep: React.FC<
   setReceivalState,
   // showManualExit,
   stepNumber,
+  transferModalData,
 }) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
-  const { selectedToken } = useToken()!;
   const { checkReceival, exitHash, setExitHash, transactionFee } =
     useTransaction()!;
-  const { toChainRpcUrlProvider, toChain } = useChains()!;
+  const { selectedToken, toChainRpcUrlProvider, toChain } = transferModalData;
 
   const [receivalError, setReceivalError] = useState<any>();
   const [executed, setExecuted] = useState(false);
@@ -326,11 +333,12 @@ const ReceivalStep: React.FC<
 export const TransferModal: React.FC<ITransferModalProps> = ({
   isVisible,
   onClose,
+  transferModalData,
 }) => {
+  const { fromChain, toChain, transferAmount } = transferModalData;
+
   const { refreshSelectedTokenBalance, selectedToken } = useToken()!;
-  const { transferAmount, executeDepositValue, exitHash, transactionFee } =
-    useTransaction()!;
-  const { fromChain, toChain } = useChains()!;
+  const { executeDepositValue, exitHash, transactionFee } = useTransaction()!;
   // const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
@@ -499,6 +507,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 stepNumber={1}
                 onNextStep={nextStep}
                 setModalErrored={setModalErrored}
+                transferModalData={transferModalData}
               />
               <DepositStep
                 currentStepNumber={activeStep}
@@ -506,6 +515,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 onNextStep={nextStep}
                 setModalErrored={setModalErrored}
                 setDepositState={setDepositState}
+                transferModalData={transferModalData}
               />
               <ReceivalStep
                 currentStepNumber={activeStep}
@@ -516,6 +526,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 setReceivalState={setReceivalState}
                 // showManualExit={showManualExit}
                 stepNumber={3}
+                transferModalData={transferModalData}
               />
             </div>
             <div className="mt-4 flex justify-center pt-3 pb-2">

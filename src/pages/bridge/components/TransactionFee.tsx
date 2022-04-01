@@ -14,6 +14,7 @@ interface ITransactionFeeProps {}
 
 const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
   const {
+    transferAmountInputValue,
     transactionFee,
     fetchTransactionFeeStatus,
     transactionAmountValidationErrors,
@@ -35,7 +36,7 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
       in={
         (fetchTransactionFeeStatus === Status.PENDING ||
           fetchTransactionFeeStatus === Status.SUCCESS) &&
-        transactionAmountValidationErrors.length === 0
+        transferAmountInputValue !== ''
       }
       timeout={300}
     >

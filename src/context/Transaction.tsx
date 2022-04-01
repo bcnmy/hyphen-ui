@@ -243,7 +243,10 @@ const TransactionProvider: React.FC = props => {
       }
       let tokenAddress = selectedToken[toChain.chainId].address;
       let tokenDecimal = selectedToken[toChain.chainId].decimal;
-      let rawTransferAmount = ethers.utils.parseUnits(transferAmount.toString(), tokenDecimal);
+      let rawTransferAmount = ethers.utils.parseUnits(
+        transferAmount.toString(),
+        tokenDecimal,
+      );
 
       let transferFee = await getTransferFee(
         tokenAddress,
@@ -434,7 +437,7 @@ const TransactionProvider: React.FC = props => {
   }, [poolInfo, selectedTokenBalance, transferAmount, validateTransferAmount]);
 
   useEffect(() => {
-    if (errors.length === 0 && transferAmount) {
+    if (transferAmount) {
       fetchTransactionFee();
     }
   }, [errors, fetchTransactionFee, transferAmount]);

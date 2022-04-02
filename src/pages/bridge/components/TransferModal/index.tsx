@@ -586,8 +586,8 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                   <article className="mb-4 flex items-start rounded-xl bg-red-100 p-2 text-sm text-red-600">
                     <HiExclamation className="mr-2 h-6 w-auto" />
                     <p>
-                      Please do not change your wallet's network while the
-                      transaction is going through.
+                      Please do not refresh or change network while the
+                      transaction is in progress.
                     </p>
                   </article>
                   <div

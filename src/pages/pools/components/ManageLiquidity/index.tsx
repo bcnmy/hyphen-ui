@@ -334,8 +334,7 @@ function ManagePosition() {
             >
               <span className="text-hyphen-gray-400">Input</span>
               <span className="flex items-center text-hyphen-gray-300">
-                Liquidity Balance: {formattedSuppliedLiquidity}
-                {token?.symbol}
+                Liquidity Balance: {formattedSuppliedLiquidity} {token?.symbol}
               </span>
             </label>
 

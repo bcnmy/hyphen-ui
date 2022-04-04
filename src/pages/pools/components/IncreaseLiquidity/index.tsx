@@ -55,9 +55,6 @@ function IncreaseLiquidity() {
   const { getTokenTotalCap, getTotalLiquidityByLp, getTokenWalletCap } =
     useWhitelistPeriodManager(chain);
 
-  const [liquidityBalance, setLiquidityBalance] = useState<
-    string | undefined
-  >();
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
   const [liquidityIncreaseAmount, setLiquidityIncreaseAmount] =
     useState<string>('');
@@ -106,15 +103,6 @@ function IncreaseLiquidity() {
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
     ['tokenTotalCap', tokenAddress],
     () => getTokenTotalCap(tokenAddress),
-    {
-      // Execute only when tokenAddress is available.
-      enabled: !!tokenAddress,
-    },
-  );
-
-  const { data: tokenWalletCap, isError: tokenWalletCapError } = useQuery(
-    ['tokenWalletCap', tokenAddress],
-    () => getTokenWalletCap(tokenAddress),
     {
       // Execute only when tokenAddress is available.
       enabled: !!tokenAddress,
@@ -204,17 +192,6 @@ function IncreaseLiquidity() {
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
-    if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
-      const balance = ethers.utils.formatUnits(
-        tokenWalletCap.sub(totalLiquidityByLP),
-        tokenDecimals,
-      );
-      setLiquidityBalance(balance);
-    }
-  }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
     async function getWalletBalance() {
       if (!accounts || !chain || !token) return;
       const { displayBalance } =
@@ -268,17 +245,13 @@ function IncreaseLiquidity() {
     positionMetadataError ||
     totalLiquidityError ||
     tokenTotalCapError ||
-    tokenWalletCapError ||
     totalLiquidityByLPError ||
     tokenAllowanceError ||
     approveTokenError ||
     increaseLiquidityError;
 
   const isDataLoading =
-    !isLoggedIn ||
-    !liquidityBalance ||
-    approveTokenLoading ||
-    increaseLiquidityLoading;
+    !isLoggedIn || approveTokenLoading || increaseLiquidityLoading;
 
   if (isError) {
     return (
@@ -451,11 +424,11 @@ function IncreaseLiquidity() {
   function onIncreaseLiquiditySuccess() {
     queryClient.invalidateQueries();
 
-    const updatedWalletBalance = liquidityBalance
-      ? Number.parseFloat(liquidityBalance) -
+    const updatedWalletBalance = walletBalance
+      ? Number.parseFloat(walletBalance) -
         Number.parseFloat(liquidityIncreaseAmount)
       : undefined;
-    setLiquidityBalance(updatedWalletBalance?.toString());
+    setWalletBalance(updatedWalletBalance?.toString());
     setLiquidityIncreaseAmount('');
     setSliderValue(0);
   }
@@ -607,7 +580,7 @@ function IncreaseLiquidity() {
                       }
                       onClick={handleConfirmSupplyClick}
                     >
-                      {!liquidityBalance
+                      {!walletBalance
                         ? 'Getting your balance'
                         : liquidityIncreaseAmount === '' ||
                           Number.parseFloat(liquidityIncreaseAmount) === 0

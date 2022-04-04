@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import { useChains } from 'context/Chains';
+import { HiOutlineXCircle } from 'react-icons/hi';
 
 function LiquidityPositions() {
   const navigate = useNavigate();
@@ -18,7 +19,11 @@ function LiquidityPositions() {
   const { getUserPositions } = useLPToken(selectedNetwork);
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
 
-  const { isLoading, data: userPositions } = useQuery(
+  const {
+    isError: userPositionsError,
+    isLoading,
+    data: userPositions,
+  } = useQuery(
     ['userPositions', accounts],
     () => {
       if (!isLoggedIn || !accounts) return;
@@ -46,6 +51,22 @@ function LiquidityPositions() {
     );
 
     navigate(`add-liquidity/${chainId}/${tokenSymbol}`);
+  }
+
+  if (userPositionsError) {
+    return (
+      <article className="5 5 mb-2 rounded-10 bg-white p-2">
+        <section className="flex h-auto items-start justify-center">
+          <div className="my-16 flex items-center">
+            <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+            <span className="text-hyphen-gray-400">
+              Something went wrong while we were fetching your positions, please
+              try again later.
+            </span>
+          </div>
+        </section>
+      </article>
+    );
   }
 
   return (

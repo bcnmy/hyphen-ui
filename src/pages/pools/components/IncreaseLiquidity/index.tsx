@@ -9,7 +9,7 @@ import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { useEffect, useState } from 'react';
-import { HiArrowSmLeft } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import getTokenBalance from 'utils/getTokenBalance';
@@ -55,14 +55,11 @@ function IncreaseLiquidity() {
   const { getTokenTotalCap, getTotalLiquidityByLp, getTokenWalletCap } =
     useWhitelistPeriodManager(chain);
 
-  const [liquidityBalance, setLiquidityBalance] = useState<
-    string | undefined
-  >();
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
   const [liquidityIncreaseAmount, setLiquidityIncreaseAmount] =
     useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
-  const [poolShare, setPoolShare] = useState<number>();
+  const [poolShare, setPoolShare] = useState<number>(0);
 
   const {
     isVisible: isApprovalModalVisible,
@@ -70,7 +67,7 @@ function IncreaseLiquidity() {
     showModal: showApprovalModal,
   } = useModal();
 
-  const { data: positionMetadata } = useQuery(
+  const { data: positionMetadata, isError: positionMetadataError } = useQuery(
     ['positionMetadata', positionId],
     () => getPositionMetadata(BigNumber.from(positionId)),
     {
@@ -94,7 +91,7 @@ function IncreaseLiquidity() {
   const tokenDecimals =
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;
 
-  const { data: totalLiquidity } = useQuery(
+  const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
     ['totalLiquidity', tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
@@ -103,7 +100,7 @@ function IncreaseLiquidity() {
     },
   );
 
-  const { data: tokenTotalCap } = useQuery(
+  const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
     ['tokenTotalCap', tokenAddress],
     () => getTokenTotalCap(tokenAddress),
     {
@@ -112,25 +109,21 @@ function IncreaseLiquidity() {
     },
   );
 
-  const { data: tokenWalletCap } = useQuery(
-    ['tokenWalletCap', tokenAddress],
-    () => getTokenWalletCap(tokenAddress),
-    {
-      // Execute only when tokenAddress is available.
-      enabled: !!tokenAddress,
-    },
-  );
+  const { data: totalLiquidityByLP, isError: totalLiquidityByLPError } =
+    useQuery(
+      ['totalLiquidityByLP', tokenAddress],
+      () => getTotalLiquidityByLp(tokenAddress, accounts),
+      {
+        // Execute only when tokenAddress is available.
+        enabled: !!(tokenAddress && accounts),
+      },
+    );
 
-  const { data: totalLiquidityByLP } = useQuery(
-    ['totalLiquidityByLP', tokenAddress],
-    () => getTotalLiquidityByLp(tokenAddress, accounts),
-    {
-      // Execute only when tokenAddress is available.
-      enabled: !!(tokenAddress && accounts),
-    },
-  );
-
-  const { data: tokenAllowance, refetch: refetchTokenAllowance } = useQuery(
+  const {
+    data: tokenAllowance,
+    isError: tokenAllowanceError,
+    refetch: refetchTokenAllowance,
+  } = useQuery(
     'tokenAllowance',
     () => {
       if (
@@ -155,9 +148,8 @@ function IncreaseLiquidity() {
   );
 
   const {
+    isError: approveTokenError,
     isLoading: approveTokenLoading,
-    isSuccess: approveTokenSuccess,
-    data: approveTokenTx,
     mutate: approveTokenMutation,
   } = useMutation(
     ({
@@ -170,8 +162,8 @@ function IncreaseLiquidity() {
   );
 
   const {
+    isError: increaseLiquidityError,
     isLoading: increaseLiquidityLoading,
-    isSuccess: increaseLiquiditySuccess,
     mutate: increaseLiquidityMutation,
   } = useMutation(
     async ({
@@ -198,38 +190,85 @@ function IncreaseLiquidity() {
     },
   );
 
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  useEffect(() => {
+    async function getWalletBalance() {
+      if (!accounts || !chain || !token) return;
+      const { displayBalance } =
+        (await getTokenBalance(accounts[0], chain, token)) || {};
+      setWalletBalance(displayBalance);
+    }
+    getWalletBalance();
+  }, [accounts, chain, token]);
+
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(totalLiquidity, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedTokenTotalCap =
     tokenTotalCap && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenTotalCap, tokenDecimals),
         )
-      : -1;
+      : 0;
 
   const formattedSuppliedLiquidity = tokenDecimals
     ? Number.parseFloat(
         ethers.utils.formatUnits(suppliedLiquidity, tokenDecimals),
       )
-    : -1;
+    : 0;
 
   const formattedTokenAllowance =
     tokenAllowance && tokenDecimals
       ? Number.parseFloat(
           ethers.utils.formatUnits(tokenAllowance, tokenDecimals),
         )
-      : -1;
+      : 0;
+
+  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
+  useEffect(() => {
+    const initialPoolShare =
+      formattedSuppliedLiquidity && formattedTotalLiquidity
+        ? Math.round(
+            (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
+          ) / 100
+        : 0;
+
+    setPoolShare(initialPoolShare);
+  }, [formattedSuppliedLiquidity, formattedTotalLiquidity]);
+
+  // Check if there's an error in queries or mutations.
+  const isError =
+    positionMetadataError ||
+    totalLiquidityError ||
+    tokenTotalCapError ||
+    totalLiquidityByLPError ||
+    tokenAllowanceError ||
+    approveTokenError ||
+    increaseLiquidityError;
 
   const isDataLoading =
-    !isLoggedIn ||
-    !liquidityBalance ||
-    approveTokenLoading ||
-    increaseLiquidityLoading;
+    !isLoggedIn || approveTokenLoading || increaseLiquidityLoading;
+
+  if (isError) {
+    return (
+      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
+        <div className="flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            {approveTokenError
+              ? 'Something went wrong while approving this token, please try again later.'
+              : increaseLiquidityError
+              ? 'Something went wrong while increasing liquidity, please try again later.'
+              : 'We could not get the necessary information, please try again later.'}
+          </span>
+        </div>
+      </article>
+    );
+  }
 
   const isNativeToken =
     chain && token ? token[chain.chainId].address === NATIVE_ADDRESS : false;
@@ -250,40 +289,6 @@ function IncreaseLiquidity() {
       ? Number.parseFloat(liquidityIncreaseAmount) + formattedTotalLiquidity >
         formattedTokenTotalCap
       : false;
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
-    if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
-      const balance = ethers.utils.formatUnits(
-        tokenWalletCap.sub(totalLiquidityByLP),
-        tokenDecimals,
-      );
-      setLiquidityBalance(balance);
-    }
-  }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
-    async function getWalletBalance() {
-      if (!accounts || !chain || !token) return;
-      const { displayBalance } =
-        (await getTokenBalance(accounts[0], chain, token)) || {};
-      setWalletBalance(displayBalance);
-    }
-    getWalletBalance();
-  }, [accounts, chain, token]);
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
-    if (formattedSuppliedLiquidity && formattedTotalLiquidity) {
-      const initialPoolShare =
-        Math.round(
-          (formattedSuppliedLiquidity / formattedTotalLiquidity) * 100 * 100,
-        ) / 100;
-
-      setPoolShare(initialPoolShare);
-    }
-  }, [formattedSuppliedLiquidity, formattedTotalLiquidity]);
 
   function reset() {
     setLiquidityIncreaseAmount('');
@@ -419,11 +424,11 @@ function IncreaseLiquidity() {
   function onIncreaseLiquiditySuccess() {
     queryClient.invalidateQueries();
 
-    const updatedWalletBalance = liquidityBalance
-      ? Number.parseFloat(liquidityBalance) -
+    const updatedWalletBalance = walletBalance
+      ? Number.parseFloat(walletBalance) -
         Number.parseFloat(liquidityIncreaseAmount)
       : undefined;
-    setLiquidityBalance(updatedWalletBalance?.toString());
+    setWalletBalance(updatedWalletBalance?.toString());
     setLiquidityIncreaseAmount('');
     setSliderValue(0);
   }
@@ -479,22 +484,11 @@ function IncreaseLiquidity() {
               <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
                 <span>Pool cap</span>
                 <span className="flex">
-                  {formattedTotalLiquidity >= 0 &&
-                  formattedTokenTotalCap >= 0 ? (
-                    <>
-                      {makeNumberCompact(formattedTotalLiquidity)}{' '}
-                      {token?.symbol} /{' '}
-                      {makeNumberCompact(formattedTokenTotalCap)}{' '}
-                      {token?.symbol}
-                    </>
-                  ) : (
-                    <Skeleton
-                      baseColor="#615ccd20"
-                      enableAnimation
-                      highlightColor="#615ccd05"
-                      className="!mx-1 !w-20"
-                    />
-                  )}
+                  <>
+                    {makeNumberCompact(formattedTotalLiquidity)} {token?.symbol}{' '}
+                    / {makeNumberCompact(formattedTokenTotalCap)}{' '}
+                    {token?.symbol}
+                  </>
                 </span>
               </div>
             </div>
@@ -539,7 +533,6 @@ function IncreaseLiquidity() {
               >
                 MAX
               </button>
-
             </div>
 
             <StepSlider
@@ -587,7 +580,7 @@ function IncreaseLiquidity() {
                       }
                       onClick={handleConfirmSupplyClick}
                     >
-                      {!liquidityBalance
+                      {!walletBalance
                         ? 'Getting your balance'
                         : liquidityIncreaseAmount === '' ||
                           Number.parseFloat(liquidityIncreaseAmount) === 0
@@ -626,7 +619,7 @@ function IncreaseLiquidity() {
                   Updated pool share
                 </span>
                 <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
-                  {poolShare || '...'}%
+                  {poolShare}%
                 </div>
               </div>
             </div>

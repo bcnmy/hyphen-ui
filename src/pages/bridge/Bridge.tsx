@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { useWalletProvider } from '../../context/WalletProvider';
 import { useNavigate } from 'react-router-dom';
@@ -25,9 +25,11 @@ import { useToken } from 'context/Token';
 interface BridgeProps {}
 
 const Bridge: React.FC<BridgeProps> = () => {
-  const { fromChain, areChainsReady } = useChains()!;
+  const { areChainsReady, fromChain, toChain, toChainRpcUrlProvider } =
+    useChains()!;
   const { selectedToken } = useToken()!;
-  const { transferAmount, changeTransferAmountInputValue } = useTransaction()!;
+  const { changeTransferAmountInputValue, transferAmount, transactionFee } =
+    useTransaction()!;
   const { isBiconomyAllowed, setIsBiconomyToggledOn, isBiconomyEnabled } =
     useBiconomy()!;
   const { isLoggedIn, connect } = useWalletProvider()!;
@@ -43,6 +45,13 @@ const Bridge: React.FC<BridgeProps> = () => {
   } = useModal();
   const { executeApproveTokenError, executeApproveToken } = useTokenApproval()!;
 
+  // Save a snapshot of all the data required by TransferModal pass it down to TransferModal,
+  // this is done to avoid re-rendering TransferModal when the context changes.
+  // Context can change when the user switches to a different network, their wallet disconnects etc.
+  // after the transfer has been initiated. These changes in context will cause errors and show
+  // inconsistent or no data in the transaction modal.
+  const [transferModalData, setTransferModalData] = useState<any>();
+
   useEffect(() => {
     (async () => {
       await connect().catch(e => {
@@ -50,6 +59,20 @@ const Bridge: React.FC<BridgeProps> = () => {
       });
     })();
   }, [isLoggedIn, connect]);
+
+  function handleTransferButtonClick() {
+    const updatedTransferModalData = {
+      fromChain,
+      selectedToken,
+      toChain,
+      toChainRpcUrlProvider,
+      transferAmount,
+      transactionFee,
+    };
+
+    setTransferModalData(updatedTransferModalData);
+    showTransferModal();
+  }
 
   return (
     <>
@@ -63,13 +86,17 @@ const Bridge: React.FC<BridgeProps> = () => {
           transferAmount={transferAmount}
         />
       ) : null}
-      <TransferModal
-        isVisible={isTransferModalVisible}
-        onClose={() => {
-          changeTransferAmountInputValue('');
-          hideTransferlModal();
-        }}
-      />
+
+      {isTransferModalVisible ? (
+        <TransferModal
+          isVisible={isTransferModalVisible}
+          onClose={() => {
+            changeTransferAmountInputValue('');
+            hideTransferlModal();
+          }}
+          transferModalData={transferModalData}
+        />
+      ) : null}
       <ErrorModal error={executeApproveTokenError} title={'Approval Error'} />
       <div className="my-24">
         <div className="mx-auto max-w-xl">
@@ -122,7 +149,7 @@ const Bridge: React.FC<BridgeProps> = () => {
 
               <CallToAction
                 onApproveButtonClick={showApprovalModal}
-                onTransferButtonClick={showTransferModal}
+                onTransferButtonClick={handleTransferButtonClick}
               />
             </div>
           </div>

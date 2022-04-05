@@ -15,7 +15,7 @@ import Spinner from 'components/Buttons/Spinner';
 import AnimateHeight from 'react-animate-height';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
-import { HiOutlineArrowSmRight } from 'react-icons/hi';
+import { HiExclamation, HiOutlineArrowSmRight } from 'react-icons/hi';
 import SpinnerDark from 'components/Buttons/SpinnerDark';
 import {
   ITransferRecord,
@@ -27,24 +27,32 @@ import CustomTooltip from '../../../../components/CustomTooltip';
 export interface ITransferModalProps {
   isVisible: boolean;
   onClose: () => void;
+  transferModalData: any;
 }
 
 interface Step {
   currentStepNumber: number;
   onNextStep: () => void;
   stepNumber: number;
+  transferModalData: any;
 }
 
 const PreDepositStep: React.FC<
   Step & { setModalErrored: (modalErrored: boolean) => void }
-> = ({ currentStepNumber, stepNumber, onNextStep, setModalErrored }) => {
+> = ({
+  currentStepNumber,
+  stepNumber,
+  onNextStep,
+  setModalErrored,
+  transferModalData,
+}) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
   // we set this to true after this step is executed
   // this is done so that stale values of value and error are not used
   const [executed, setExecuted] = useState(false);
-  const { toChain } = useChains()!;
+  const { toChain } = transferModalData;
 
   const {
     executePreDepositCheck,
@@ -112,18 +120,17 @@ const DepositStep: React.FC<
   setDepositState,
   onNextStep,
   setModalErrored,
+  transferModalData,
 }) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
   const {
-    transferAmount,
     executeDeposit,
     executeDepositStatus,
     executeDepositValue,
     executeDepositError,
   } = useTransaction()!;
-  const { selectedToken } = useToken()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, selectedToken, transferAmount } = transferModalData;
   const {
     receiver: { receiverAddress },
   } = useTransaction()!;
@@ -211,14 +218,14 @@ const ReceivalStep: React.FC<
   setReceivalState,
   // showManualExit,
   stepNumber,
+  transferModalData,
 }) => {
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
-  const { selectedToken } = useToken()!;
-  const { checkReceival, exitHash, setExitHash, transactionFee } =
-    useTransaction()!;
-  const { toChainRpcUrlProvider, toChain } = useChains()!;
+  const { checkReceival, exitHash, setExitHash } = useTransaction()!;
+  const { selectedToken, toChainRpcUrlProvider, toChain, transactionFee } =
+    transferModalData;
 
   const [receivalError, setReceivalError] = useState<any>();
   const [executed, setExecuted] = useState(false);
@@ -262,9 +269,15 @@ const ReceivalStep: React.FC<
   useEffect(() => {
     try {
       if (!toChainRpcUrlProvider) {
-        console.error('Something has gone wrong, please try again later.');
-        setReceivalError('Something has gone wrong, please try again later.');
-        throw new Error('Something has gone wrong, please try again later.');
+        console.error(
+          'We were not able to fetch the details, please refresh and try again later.',
+        );
+        setReceivalError(
+          'We were not able to fetch the details, please refresh and try again later.',
+        );
+        throw new Error(
+          'We were not able to fetch the details, please refresh and try again later.',
+        );
       } else if (exitHash && executed && active) {
         setReceivalState(Status.PENDING);
         (async () => {
@@ -326,11 +339,13 @@ const ReceivalStep: React.FC<
 export const TransferModal: React.FC<ITransferModalProps> = ({
   isVisible,
   onClose,
+  transferModalData,
 }) => {
-  const { refreshSelectedTokenBalance, selectedToken } = useToken()!;
-  const { transferAmount, executeDepositValue, exitHash, transactionFee } =
-    useTransaction()!;
-  const { fromChain, toChain } = useChains()!;
+  const { fromChain, selectedToken, toChain, transferAmount, transactionFee } =
+    transferModalData;
+
+  const { refreshSelectedTokenBalance } = useToken()!;
+  const { executeDepositValue, exitHash } = useTransaction()!;
   // const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
@@ -414,6 +429,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
       toChain,
       lpFee: transactionFee.lpFeeProcessedString,
       rewardAmount: transactionFee.rewardAmountString,
+      transferredAmount: transactionFee.amountToGetProcessedString,
       transactionFee: transactionFee.transactionFeeProcessedString,
       transferTime: formatDistanceStrict(endTime, startTime),
     };
@@ -499,6 +515,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 stepNumber={1}
                 onNextStep={nextStep}
                 setModalErrored={setModalErrored}
+                transferModalData={transferModalData}
               />
               <DepositStep
                 currentStepNumber={activeStep}
@@ -506,6 +523,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 onNextStep={nextStep}
                 setModalErrored={setModalErrored}
                 setDepositState={setDepositState}
+                transferModalData={transferModalData}
               />
               <ReceivalStep
                 currentStepNumber={activeStep}
@@ -516,6 +534,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 setReceivalState={setReceivalState}
                 // showManualExit={showManualExit}
                 stepNumber={3}
+                transferModalData={transferModalData}
               />
             </div>
             <div className="mt-4 flex justify-center pt-3 pb-2">
@@ -553,6 +572,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
             </div>
           </div>
         </div>
+
         <TransitionReact in={isBottomTrayOpen} timeout={300}>
           {state => (
             <div
@@ -564,9 +584,16 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
             >
               <div className="relative mx-10">
                 <div className="absolute -inset-[2px] -z-10 bg-gradient-to-br from-white/10 to-hyphen-purple/30 opacity-80 blur-md"></div>
-                <div className="relative z-0 rounded-b-md border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker shadow-lg backdrop-blur">
+                <div className="relative z-0 rounded-b-md border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker p-4 shadow-lg backdrop-blur">
+                  <article className="mb-4 flex items-start rounded-xl bg-red-100 p-2 text-sm text-red-600">
+                    <HiExclamation className="mr-2 h-6 w-auto" />
+                    <p>
+                      Please do not refresh or change network while the
+                      transaction is in progress.
+                    </p>
+                  </article>
                   <div
-                    className="grid gap-y-2 p-6 text-white/75"
+                    className="grid gap-y-2 text-white/75"
                     style={{ gridTemplateColumns: '1fr auto' }}
                   >
                     <span className="flex items-center gap-3 font-normal">

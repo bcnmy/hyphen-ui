@@ -70,8 +70,7 @@ function AddLiquidity() {
     getSuppliedLiquidityByToken,
     getTotalLiquidity,
   } = useLiquidityProviders(chain);
-  const { getTokenTotalCap, getTokenWalletCap, getTotalLiquidityByLp } =
-    useWhitelistPeriodManager(chain);
+  const { getTokenTotalCap } = useWhitelistPeriodManager(chain);
   const { getRewardRatePerSecond, getRewardTokenAddress } =
     useLiquidityFarming(chain);
 
@@ -97,9 +96,6 @@ function AddLiquidity() {
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
 
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<
-    string | undefined
-  >();
-  const [liquidityBalance, setLiquidityBalance] = useState<
     string | undefined
   >();
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
@@ -132,15 +128,6 @@ function AddLiquidity() {
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
     ['tokenTotalCap', selectedTokenAddress],
     () => getTokenTotalCap(selectedTokenAddress),
-    {
-      // Execute only when selectedTokenAddress is available.
-      enabled: !!selectedTokenAddress,
-    },
-  );
-
-  const { data: tokenWalletCap, isError: tokenWalletCapError } = useQuery(
-    ['tokenWalletCap', selectedTokenAddress],
-    () => getTokenWalletCap(selectedTokenAddress),
     {
       // Execute only when selectedTokenAddress is available.
       enabled: !!selectedTokenAddress,
@@ -251,16 +238,6 @@ function AddLiquidity() {
     },
   );
 
-  const { data: totalLiquidityByLP, isError: totalLiquidityByLPError } =
-    useQuery(
-      ['totalLiquidityByLP', selectedTokenAddress],
-      () => getTotalLiquidityByLp(selectedTokenAddress, accounts),
-      {
-        // Execute only when selectedTokenAddress and accounts are available.
-        enabled: !!(selectedTokenAddress && accounts),
-      },
-    );
-
   const {
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
@@ -355,17 +332,6 @@ function AddLiquidity() {
   }, [chainId, chainOptions, tokenOptions, tokenSymbol]);
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
-  useEffect(() => {
-    if (tokenWalletCap && totalLiquidityByLP && tokenDecimals) {
-      const balance = ethers.utils.formatUnits(
-        tokenWalletCap.sub(totalLiquidityByLP),
-        tokenDecimals,
-      );
-      setLiquidityBalance(balance);
-    }
-  }, [tokenDecimals, tokenWalletCap, totalLiquidityByLP]);
-
-  // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   // Refactor tokenApproval using useQuery (see IncreaseLiquidity component.)
   useEffect(() => {
     async function handleTokenChange() {
@@ -448,10 +414,8 @@ function AddLiquidity() {
   const isError =
     totalLiquidityError ||
     tokenTotalCapError ||
-    tokenWalletCapError ||
     feeAPYDataError ||
     tokenAllowanceError ||
-    totalLiquidityByLPError ||
     suppliedLiquidityByTokenError ||
     tokenPriceInUSDError ||
     rewardsRatePerSecondError ||
@@ -460,8 +424,7 @@ function AddLiquidity() {
     approveTokenError ||
     addLiquidityError;
 
-  const isDataLoading =
-    !liquidityBalance || approveTokenLoading || addLiquidityLoading;
+  const isDataLoading = approveTokenLoading || addLiquidityLoading;
 
   if (isError) {
     return (
@@ -500,7 +463,6 @@ function AddLiquidity() {
 
   function reset() {
     setLiquidityAmount('');
-    setLiquidityBalance(undefined);
     setSelectedTokenAddress(undefined);
     setSliderValue(0);
     setWalletBalance(undefined);
@@ -810,7 +772,7 @@ function AddLiquidity() {
                         isLiquidityAmountGtPoolCap
                       }
                     >
-                      {!liquidityBalance
+                      {!walletBalance
                         ? 'Getting your balance'
                         : liquidityAmount === '' ||
                           Number.parseFloat(liquidityAmount) === 0

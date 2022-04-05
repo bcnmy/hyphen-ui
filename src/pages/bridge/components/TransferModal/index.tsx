@@ -223,9 +223,9 @@ const ReceivalStep: React.FC<
   const active = currentStepNumber === stepNumber;
   const completed = currentStepNumber > stepNumber;
 
-  const { checkReceival, exitHash, setExitHash, transactionFee } =
-    useTransaction()!;
-  const { selectedToken, toChainRpcUrlProvider, toChain } = transferModalData;
+  const { checkReceival, exitHash, setExitHash } = useTransaction()!;
+  const { selectedToken, toChainRpcUrlProvider, toChain, transactionFee } =
+    transferModalData;
 
   const [receivalError, setReceivalError] = useState<any>();
   const [executed, setExecuted] = useState(false);
@@ -341,10 +341,11 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   onClose,
   transferModalData,
 }) => {
-  const { fromChain, toChain, transferAmount } = transferModalData;
+  const { fromChain, selectedToken, toChain, transferAmount, transactionFee } =
+    transferModalData;
 
-  const { refreshSelectedTokenBalance, selectedToken } = useToken()!;
-  const { executeDepositValue, exitHash, transactionFee } = useTransaction()!;
+  const { refreshSelectedTokenBalance } = useToken()!;
+  const { executeDepositValue, exitHash } = useTransaction()!;
   // const { hyphen } = useHyphen()!;
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
@@ -428,6 +429,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
       toChain,
       lpFee: transactionFee.lpFeeProcessedString,
       rewardAmount: transactionFee.rewardAmountString,
+      transferredAmount: transactionFee.amountToGetProcessedString,
       transactionFee: transactionFee.transactionFeeProcessedString,
       transferTime: formatDistanceStrict(endTime, startTime),
     };

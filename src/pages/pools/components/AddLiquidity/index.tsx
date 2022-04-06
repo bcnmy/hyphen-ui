@@ -639,7 +639,7 @@ function AddLiquidity() {
         />
       ) : null}
       <article className="my-12 rounded-10 bg-white p-0 py-2 xl:my-24 xl:p-12.5 xl:pt-2.5">
-        <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr_1fr] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
+        <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr_4rem] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
           <div>
             <button
               className="flex items-center rounded text-hyphen-gray-400"

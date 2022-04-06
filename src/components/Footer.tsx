@@ -3,6 +3,9 @@ import { useLocation } from 'react-router-dom';
 import poweredByBiconomy from '../assets/images/powered-by-biconomy.svg';
 import NetworkSelector from './NetworkSelector';
 
+import discordLogoLight from '../assets/images/discord-logo-light.svg';
+import emailLogoLight from '../assets/images/email-logo-light.svg';
+
 interface IFooterProps {
   showUserInfoModal: () => void;
 }
@@ -21,32 +24,46 @@ function Footer({ showUserInfoModal }: IFooterProps) {
 
   return (
     <footer className="sticky bottom-0 z-20 grid h-auto w-full grid-cols-1 items-center bg-black px-0 xl:grid-cols-3 xl:px-6">
-      <a
-        target="_blank"
-        href="https://biconomy.io/"
-        rel="noreferrer"
-        className="mb-2 justify-self-center xl:mb-0 xl:justify-self-start"
-      >
-        <img src={poweredByBiconomy} alt="Powered by Biconomy" />
-      </a>
-      <div className="mb-4 flex justify-self-center text-[#808080] xl:mb-0">
+      <div className="col-span-2 grid h-12 grid-cols-2 items-center px-6 xl:h-auto xl:px-0">
         <a
-          href="https://discord.com/channels/692403655474937856/947490096075141150"
           target="_blank"
+          href="https://biconomy.io/"
           rel="noreferrer"
-          className="hover:text-white"
+          className="justify-self-center xl:justify-self-start"
         >
-          Join our Discord
+          <img src={poweredByBiconomy} alt="Powered by Biconomy" />
         </a>
-        <p className="mx-2">|</p>
-        <a
-          href="mailto:hyphen-support@biconomy.io"
-          className="hover:text-white"
-        >
-          Email Us
-        </a>
+        <div className="flex justify-self-end xl:justify-self-center">
+          <a
+            href="https://discord.com/channels/692403655474937856/947490096075141150"
+            target="_blank"
+            rel="noreferrer"
+            className="hover:text-white"
+          >
+            <span className="hidden text-[#808080] xl:flex">
+              Join our Discord
+            </span>
+            <img
+              src={discordLogoLight}
+              alt="Join our Discord"
+              className="mr-2.5 flex xl:hidden"
+            />
+          </a>
+          <p className="mx-2 hidden text-[#808080] xl:flex">|</p>
+          <a
+            href="mailto:hyphen-support@biconomy.io"
+            className="hover:text-white"
+          >
+            <span className="hidden text-[#808080] xl:flex">Email Us</span>
+            <img
+              src={emailLogoLight}
+              alt="Email Us"
+              className="flex xl:hidden"
+            />
+          </a>
+        </div>
       </div>
-      <div className="flex h-[3.5rem] w-full items-center justify-center bg-[#2e2c62] xl:mb-0 xl:hidden">
+      <div className="flex h-[3.5rem] w-full items-center justify-between bg-[#2e2c62] px-6 xl:hidden">
         {showNetworkSelector ? <NetworkSelector /> : null}
         <button
           className="font-base ml-2.5 cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 px-4 py-1 font-mono text-white"

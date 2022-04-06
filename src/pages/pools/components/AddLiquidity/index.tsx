@@ -666,7 +666,7 @@ function AddLiquidity() {
         </header>
 
         <section className="grid grid-cols-2">
-          <div className="max-h-104.5 h-104.5 border-r pr-12.5">
+          <div className="h-[25.5rem] max-h-[25.5rem] border-r pr-12.5">
             <div className="mb-6 grid grid-cols-2 gap-2.5">
               <Select
                 options={tokenOptions}
@@ -713,7 +713,7 @@ function AddLiquidity() {
                 placeholder="0.000"
                 type="number"
                 inputMode="decimal"
-                className="mb-2 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
                 value={liquidityAmount}
                 onChange={handleLiquidityAmountChange}
                 disabled={isDataLoading || !totalLiquidity}
@@ -740,7 +740,7 @@ function AddLiquidity() {
                 {currentChainId === chain?.chainId ? (
                   <>
                     <button
-                      className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                      className="mt-12 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
                       disabled={
                         isDataLoading ||
                         isNativeToken ||
@@ -805,7 +805,7 @@ function AddLiquidity() {
               </button>
             ) : null}
           </div>
-          <div className="max-h-104.5 h-104.5 pl-12.5">
+          <div className="max-h-102 h-102 pl-12.5">
             <div className="mb-12 grid grid-cols-2 gap-2.5">
               <div className="flex flex-col">
                 <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
@@ -827,7 +827,7 @@ function AddLiquidity() {
               </div>
             </div>
 
-            <div className="mb-[5.5rem]">
+            <div className="mb-[4.75rem]">
               <ProgressBar
                 currentProgress={formattedTotalLiquidity}
                 totalProgress={formattedTokenTotalCap}

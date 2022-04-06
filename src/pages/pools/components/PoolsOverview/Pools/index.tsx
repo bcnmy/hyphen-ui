@@ -41,14 +41,14 @@ function Pools() {
 
       {!isLoading ? (
         <section className="grid grid-cols-1 gap-1">
-          <div className="relative mb-1 mt-2 flex justify-center">
-            <h3 className="absolute left-[3.125rem] text-xxs font-semibold uppercase text-hyphen-gray-400">
+          <div className="mb-1 mt-2 grid grid-cols-2 px-[2.375rem] xl:grid-cols-3 xl:px-[3.125rem]">
+            <h3 className="text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:text-xxs">
               Asset
             </h3>
-            <h3 className="text-xxs font-semibold uppercase text-hyphen-gray-400">
+            <h3 className="justify-self-end text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:justify-self-center xl:text-xxs">
               APY
             </h3>
-            <h3 className="absolute right-[3.125rem] text-xxs font-semibold uppercase text-hyphen-gray-400">
+            <h3 className="hidden justify-self-end text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:flex xl:text-xxs">
               Pool Capacity
             </h3>
           </div>
@@ -79,7 +79,7 @@ function Pools() {
             : null}
         </section>
       ) : (
-        <section className="flex h-40 items-start justify-center pt-12">
+        <section className="flex items-center justify-center px-7 pt-16 pb-24">
           <svg
             role="status"
             className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"
@@ -96,9 +96,9 @@ function Pools() {
               fill="currentFill"
             />
           </svg>
-          <span className="text-hyphen-gray-400">
+          <p className="text-hyphen-gray-400">
             Getting Hyphen liquidity pools.
-          </span>
+          </p>
         </section>
       )}
     </article>

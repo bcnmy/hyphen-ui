@@ -71,9 +71,9 @@ function LiquidityPositions() {
 
   return (
     <article className="mb-2.5 rounded-10 bg-white p-2.5">
-      <header className="relative my-6 flex items-center justify-center px-10">
+      <header className="my-6 grid grid-cols-2 items-center px-7 xl:grid-cols-3 xl:px-10">
         {isLoggedIn ? (
-          <div className="absolute left-10">
+          <div className="hidden xl:flex">
             <button
               className={`mr-7 text-xs  ${
                 hideClosedPositions
@@ -97,10 +97,12 @@ function LiquidityPositions() {
           </div>
         ) : null}
 
-        <h2 className="text-xl text-hyphen-purple">Your Positions</h2>
+        <h2 className="justify-self-start text-sm text-hyphen-purple xl:justify-self-center xl:text-xl">
+          Your Positions
+        </h2>
 
         <button
-          className="absolute right-10 flex h-9 w-28 items-center justify-center rounded-xl bg-hyphen-purple text-xs text-white"
+          className="h-9 w-28 justify-self-end rounded-xl bg-hyphen-purple text-xs text-white"
           onClick={handleAddLiquidity}
         >
           + Add Liquidity

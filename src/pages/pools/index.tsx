@@ -15,7 +15,7 @@ function Pools() {
 
   return (
     <main className="mx-auto w-full max-w-5xl md:w-256">
-      {/* <Outlet /> */}
+      <Outlet />
     </main>
   );
 }

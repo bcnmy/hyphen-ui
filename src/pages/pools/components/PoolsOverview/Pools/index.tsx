@@ -19,15 +19,13 @@ function Pools() {
 
   if (isError) {
     return (
-      <article className="5 5 mb-2 rounded-10 bg-white p-2">
-        <section className="flex h-auto items-start justify-center">
-          <div className="my-16 flex items-center">
-            <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
-            <span className="text-hyphen-gray-400">
-              Something went wrong while we were fetching the list of pools,
-              please try again later.
-            </span>
-          </div>
+      <article className="rounded-10 bg-white p-2.5">
+        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
+          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
+          <p className="text-hyphen-gray-400">
+            Something went wrong while we were fetching the list of pools,
+            please try again later.
+          </p>
         </section>
       </article>
     );

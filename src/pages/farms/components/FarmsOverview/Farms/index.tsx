@@ -79,7 +79,7 @@ function Farms() {
             : null}
         </section>
       ) : (
-        <section className="flex h-40 items-start justify-center pt-12">
+        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
           <svg
             role="status"
             className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"
@@ -96,7 +96,7 @@ function Farms() {
               fill="currentFill"
             />
           </svg>
-          <span className="text-hyphen-gray-400">Getting Hyphen farms.</span>
+          <p className="text-hyphen-gray-400">Getting Hyphen farms.</p>
         </section>
       )}
     </article>

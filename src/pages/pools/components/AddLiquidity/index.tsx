@@ -428,9 +428,9 @@ function AddLiquidity() {
 
   if (isError) {
     return (
-      <article className="mb-2.5 rounded-10 bg-white p-2.5">
+      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
         <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
-          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
           <p className="text-hyphen-gray-400">
             {approveTokenError
               ? 'Something went wrong while approving this token, please try again later.'

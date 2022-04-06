@@ -336,6 +336,7 @@ function LiquidityPositionOverview({
           Pool Share: {poolShare}%
         </span>
       </div>
+
       <div className="flex flex-col items-end">
         <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs ">
           APY

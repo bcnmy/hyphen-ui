@@ -305,7 +305,7 @@ function LiquidityPositionOverview({
 
   return (
     <section
-      className={`grid h-37.5 grid-cols-2 items-center rounded-7.5 border px-7 py-6 text-hyphen-gray-400 xl:px-10 ${
+      className={`grid h-37.5 grid-cols-2 items-center rounded-7.5 border px-[1.875rem] py-6 text-hyphen-gray-400 xl:px-10 ${
         formattedSuppliedLiquidity > 0 && isUserOnPools
           ? 'cursor-pointer'
           : 'cursor-not-allowed'

@@ -71,7 +71,7 @@ function Footer({ showUserInfoModal }: IFooterProps) {
         {showNetworkSelector ? <NetworkSelector /> : null}
         <button
           className={`${
-            showNetworkSelector ? 'ml-2.5' : ''
+            showNetworkSelector ? 'ml-2.5' : 'w-full'
           } font-base cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 px-4 py-1 font-mono text-white`}
           onClick={isLoggedIn ? showUserInfoModal : connect}
         >

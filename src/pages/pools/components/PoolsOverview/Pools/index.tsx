@@ -79,7 +79,7 @@ function Pools() {
             : null}
         </section>
       ) : (
-        <section className="flex items-center justify-center px-7 pt-16 pb-24">
+        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
           <svg
             role="status"
             className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"

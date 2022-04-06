@@ -428,17 +428,17 @@ function AddLiquidity() {
 
   if (isError) {
     return (
-      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
-        <div className="flex items-center">
+      <article className="mb-2.5 rounded-10 bg-white p-2.5">
+        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
           <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
-          <span className="text-hyphen-gray-400">
+          <p className="text-hyphen-gray-400">
             {approveTokenError
               ? 'Something went wrong while approving this token, please try again later.'
               : addLiquidityError
               ? 'Something went wrong while adding liquidity, please try again later.'
               : 'We could not get the necessary information, please try again later.'}
-          </span>
-        </div>
+          </p>
+        </section>
       </article>
     );
   }

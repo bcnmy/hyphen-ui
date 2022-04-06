@@ -230,10 +230,10 @@ function LiquidityPositionOverview({
       <section className="flex h-37.5 items-center justify-center rounded-7.5 border bg-white px-10 py-6 text-hyphen-gray-400">
         <div className="my-16 flex items-center">
           <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
-          <span className="text-hyphen-gray-400">
+          <p className="text-hyphen-gray-400">
             Something went wrong while we were fetching this position, please
             try again later.
-          </span>
+          </p>
         </div>
       </section>
     );
@@ -338,7 +338,7 @@ function LiquidityPositionOverview({
       </div>
 
       <div className="flex flex-col items-end">
-        <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs ">
+        <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs">
           APY
         </span>
         <div className="mb-5">

@@ -34,7 +34,7 @@ function Pools() {
   return (
     <article className="overflow-hidden rounded-10 bg-white pt-2.5">
       <header className="relative my-6 flex items-center justify-center px-10">
-        <h2 className="text-xl text-hyphen-purple">Pools</h2>
+        <h2 className="text-sm text-hyphen-purple xl:text-xl">Pools</h2>
       </header>
 
       {!isLoading ? (

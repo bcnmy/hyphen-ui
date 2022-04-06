@@ -15,14 +15,14 @@ function Layout({ children }: LayoutProps) {
   } = useModal();
 
   return (
-    <div className="grid min-h-screen w-full grid-rows-[3.5rem_1fr_3rem]">
+    <div className="grid min-h-screen w-full grid-rows-[3.5rem_1fr_auto] xl:grid-rows-[3.5rem_1fr_4rem]">
       <Header showUserInfoModal={showUserInfoModal} />
       <UserInfoModal
         isVisible={isUserInfoModalVisible}
         onClose={hideUserInfoModal}
       />
       {children}
-      <Footer />
+      <Footer showUserInfoModal={showUserInfoModal} />
     </div>
   );
 }

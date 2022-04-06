@@ -14,8 +14,8 @@ function Pools() {
   }, [isLoggedIn, connect]);
 
   return (
-    <main className="mx-auto w-256 max-w-5xl">
-      <Outlet />
+    <main className="mx-auto w-full max-w-5xl md:w-256">
+      {/* <Outlet /> */}
     </main>
   );
 }

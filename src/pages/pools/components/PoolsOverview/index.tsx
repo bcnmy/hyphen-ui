@@ -3,7 +3,7 @@ import LiquidityPositions from './LiquidityPositions';
 
 function PoolsOverview() {
   return (
-    <article className="my-12 px-6 xl:my-24 xl:px-0">
+    <article className="my-12 xl:my-24">
       <LiquidityPositions />
       <Pools />
     </article>

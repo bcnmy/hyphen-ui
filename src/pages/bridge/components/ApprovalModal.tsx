@@ -28,7 +28,7 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className="mb-14">
+      <div className="mx-auto mb-14 w-[calc(100%-1.5rem)] xl:w-auto">
         <div className="relative rounded-3xl bg-white p-6 shadow-2xl">
           <div className="absolute -inset-2 -z-10 rounded-3xl bg-white/60 opacity-50 blur-lg"></div>
           <div className="flex flex-col">

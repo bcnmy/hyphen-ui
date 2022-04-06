@@ -63,10 +63,16 @@ function Footer({ showUserInfoModal }: IFooterProps) {
           </a>
         </div>
       </div>
-      <div className="flex h-[3.5rem] w-full items-center justify-between bg-[#2e2c62] px-6 xl:hidden">
+      <div
+        className={`${
+          showNetworkSelector ? 'justify-between' : 'justify-end'
+        } flex h-[3.5rem] w-full items-center bg-[#2e2c62] px-6 xl:hidden`}
+      >
         {showNetworkSelector ? <NetworkSelector /> : null}
         <button
-          className="font-base ml-2.5 cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 px-4 py-1 font-mono text-white"
+          className={`${
+            showNetworkSelector ? 'ml-2.5' : ''
+          } font-base cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 px-4 py-1 font-mono text-white`}
           onClick={isLoggedIn ? showUserInfoModal : connect}
         >
           {isLoggedIn

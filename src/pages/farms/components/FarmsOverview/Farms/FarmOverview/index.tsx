@@ -168,7 +168,11 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       onClick={handleFarmOverviewClick}
     >
       <div className="flex items-center">
-        <img src={tokenImage} alt={symbol} className="mr-2 h-8 w-8" />
+        <img
+          src={tokenImage}
+          alt={symbol}
+          className="mr-2 h-6 w-6 xl:h-8 xl:w-8"
+        />
         <div className="flex flex-col">
           <span className="font-mono text-sm xl:text-2xl">{symbol}</span>
           <span className="text-xxxs font-bold uppercase text-hyphen-gray-300 xl:text-xxs">

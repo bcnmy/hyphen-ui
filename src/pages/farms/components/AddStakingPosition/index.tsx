@@ -308,9 +308,9 @@ function AddStakingPosition() {
   }
 
   return (
-    <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
-      <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
-        <div className="absolute left-0">
+    <article className="my-12 rounded-10 bg-white p-0 py-2 xl:my-24 xl:p-12.5 xl:pt-2.5">
+      <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
+        <div>
           <button
             className="flex items-center rounded text-hyphen-gray-400"
             onClick={() => navigate('/farms')}
@@ -319,7 +319,9 @@ function AddStakingPosition() {
           </button>
         </div>
 
-        <h2 className="text-xl text-hyphen-purple">Add Staking Position</h2>
+        <h2 className="text-sm text-hyphen-purple xl:justify-self-center xl:text-xl">
+          Add Staking Position
+        </h2>
       </header>
 
       {!isLoggedIn ? (
@@ -348,10 +350,10 @@ function AddStakingPosition() {
           filteredUserPositions.length > 0 &&
           firstPositionMetadataStatus === 'success' ? (
             <>
-              <section className="grid grid-cols-1">
+              <section className="grid grid-cols-1 px-2.5 xl:px-0">
                 <div className="relative mb-8">
                   <button
-                    className="absolute top-[60px] left-[-15px] flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100"
+                    className="absolute top-[60px] left-[-10px] flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100 xl:left-[-15px] xl:h-7.5 xl:w-7.5"
                     onClick={handlePrevPositionClick}
                   >
                     <HiOutlineChevronLeft />
@@ -368,7 +370,7 @@ function AddStakingPosition() {
                     },
                   )}
                   <button
-                    className="absolute top-[60px] right-[-15px] flex h-7.5 w-7.5 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100"
+                    className="absolute top-[60px] right-[-10px] flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-hyphen-gray-100 xl:right-[-15px] xl:h-7.5 xl:w-7.5"
                     onClick={handleNextPositionClick}
                   >
                     <HiOutlineChevronRight />
@@ -380,10 +382,10 @@ function AddStakingPosition() {
                       return (
                         <button
                           key={`${chainId}-${userPosition.toString()}`}
-                          className={`mx-1 h-2.5 rounded-full ${
+                          className={`mx-1 h-2 rounded-full xl:h-2.5 ${
                             currentPosition === index
-                              ? 'w-14'
-                              : 'w-2.5 bg-hyphen-gray-100'
+                              ? 'w-12 xl:w-14'
+                              : 'w-2 bg-hyphen-gray-100 xl:w-2.5'
                           }`}
                           onClick={() => setCurrentPosition(index)}
                           style={{
@@ -397,9 +399,9 @@ function AddStakingPosition() {
                 </div>
               </section>
 
-              <section className="grid grid-cols-2">
-                <div className="flex h-[612px] max-h-[612px] flex-col border-r pr-12.5 pt-2">
-                  <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+              <section className="grid grid-cols-1 px-10 xl:grid-cols-2 xl:px-0">
+                <div className="mb-12 flex flex-col pt-2 xl:mb-0 xl:h-[38.25rem] xl:max-h-[38.25rem] xl:border-r xl:pr-12.5">
+                  <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
                     Your Position NFT
                   </span>
 
@@ -464,14 +466,14 @@ function AddStakingPosition() {
                   ) : null}
                 </div>
 
-                <div className="flex h-[612px] max-h-[612px] flex-col justify-between pl-12.5 pt-2">
+                <div className="flex flex-col justify-between pt-2 xl:h-[38.25rem] xl:max-h-[38.25rem] xl:pl-12.5">
                   <div className="grid grid-cols-1">
                     <div className="flex flex-col">
-                      <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                      <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
                         Unclaimed {rewardToken?.symbol}
                       </span>
 
-                      <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                      <div className="mt-2 mb-[3.125rem] flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-sm text-hyphen-gray-400 xl:mb-0 xl:text-2xl">
                         0 {rewardToken?.symbol}
                       </div>
                     </div>
@@ -484,8 +486,8 @@ function AddStakingPosition() {
             filteredUserPositions &&
             filteredUserPositions.length === 0 ? (
             <section className="flex h-auto items-start justify-center">
-              <div className="mt-12 mb-16 flex items-center">
-                <HiOutlineSearch className="mr-4 h-6 w-6 text-hyphen-gray-200" />
+              <div className="mt-12 mb-16 flex items-center justify-center">
+                <HiOutlineSearch className="mr-4 min-h-[1.5rem] min-w-[1.5rem] text-hyphen-gray-200" />
                 <span className="text-hyphen-gray-400">
                   You have no liquidity positions for this farm.
                 </span>
@@ -497,7 +499,7 @@ function AddStakingPosition() {
             <div className="mt-12 mb-16 flex items-center">
               <svg
                 role="status"
-                className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"
+                className="mr-4 h-6 min-h-[1.5rem] w-6 min-w-[1.5rem] animate-spin fill-hyphen-purple text-gray-200"
                 viewBox="0 0 100 101"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"

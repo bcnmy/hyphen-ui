@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 
 import { useWalletProvider } from '../../context/WalletProvider';
-import { useNavigate } from 'react-router-dom';
 import { useChains } from '../../context/Chains';
 
 import NetworkSelectors from './components/NetworkSelectors';
@@ -21,6 +20,8 @@ import { useBiconomy } from 'context/Biconomy';
 import CustomTooltip from '../../components/CustomTooltip';
 import { HiInformationCircle } from 'react-icons/hi';
 import { useToken } from 'context/Token';
+import { useHyphen } from 'context/Hyphen';
+import { Status } from 'hooks/useLoading';
 
 interface BridgeProps {}
 
@@ -30,6 +31,8 @@ const Bridge: React.FC<BridgeProps> = () => {
   const { transferAmount, changeTransferAmountInputValue } = useTransaction()!;
   const { isBiconomyAllowed, setIsBiconomyToggledOn, isBiconomyEnabled } =
     useBiconomy()!;
+  const { poolInfo } = useHyphen()!;
+
   const { isLoggedIn, connect } = useWalletProvider()!;
   const {
     isVisible: isApprovalModalVisible,
@@ -114,8 +117,20 @@ const Bridge: React.FC<BridgeProps> = () => {
                 <NetworkSelectors />
               </div>
               <div className="grid grid-cols-2 items-center gap-12 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 hover:border-opacity-30">
-                <AmountInput disabled={!areChainsReady} />
-                <TokenSelector disabled={!areChainsReady} />
+                <AmountInput
+                  disabled={
+                    !areChainsReady ||
+                    !poolInfo?.minDepositAmount ||
+                    !poolInfo?.maxDepositAmount
+                  }
+                />
+                <TokenSelector
+                  disabled={
+                    !areChainsReady ||
+                    !poolInfo?.minDepositAmount ||
+                    !poolInfo?.maxDepositAmount
+                  }
+                />
               </div>
 
               <ChangeReceiverAddress />

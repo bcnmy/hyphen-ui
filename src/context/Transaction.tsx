@@ -288,9 +288,9 @@ const TransactionProvider: React.FC = props => {
         );
       }
 
-      console.log(
-        `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
-      );
+      // console.log(
+      //   `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
+      // );
 
       let tokenGasPrice = response.tokenGasPrice;
 
@@ -311,7 +311,7 @@ const TransactionProvider: React.FC = props => {
         rawTransferAmount.toString(),
       );
 
-      console.log('************** REWARD AMOUNT  *********', rewardAmount);
+      // console.log('************** REWARD AMOUNT  *********', rewardAmount);
       if (rewardAmount !== undefined && rewardAmount.gt && rewardAmount.gt(0)) {
         rewardAmount = formatRawEthValue(rewardAmount, decimal);
         rewardAmountString = toFixed(rewardAmount, fixedDecimalPoint);

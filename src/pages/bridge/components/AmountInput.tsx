@@ -70,7 +70,9 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
               <>
                 <Skeleton
                   baseColor="#615ccd20"
-                  enableAnimation={!disabled}
+                  enableAnimation={
+                    !disabled || getPoolInfoStatus === Status.PENDING
+                  }
                   highlightColor="#615ccd05"
                 />
               </>
@@ -99,7 +101,9 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
               <>
                 <Skeleton
                   baseColor="#615ccd20"
-                  enableAnimation={!disabled}
+                  enableAnimation={
+                    !disabled || getPoolInfoStatus === Status.PENDING
+                  }
                   highlightColor="#615ccd05"
                 />
               </>

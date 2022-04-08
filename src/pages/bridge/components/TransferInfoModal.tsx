@@ -82,19 +82,8 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Received</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {getExitInfoStatus === Status.SUCCESS && exitInfo ? (
-                    <>
-                      {exitInfo} {transferRecord.token.symbol}
-                    </>
-                  ) : (
-                    <>
-                      <Skeleton
-                        baseColor="#625ccd28"
-                        highlightColor="#625ccd0c"
-                        width={100}
-                      />
-                    </>
-                  )}
+                  {transferRecord.transferredAmount}{' '}
+                  {transferRecord.token.symbol}
                 </span>
                 <a
                   target="_blank"

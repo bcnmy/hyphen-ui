@@ -9,6 +9,7 @@ import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { Decimal } from 'decimal.js';
+import { HiOutlineXCircle } from 'react-icons/hi';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -39,12 +40,18 @@ function StakingPositionOverview({
     getTotalSharesStaked,
   } = useLiquidityFarming(chain);
 
-  const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
-    useQuery(['positionMetadata', positionId], () =>
-      getPositionMetadata(positionId),
-    );
+  const {
+    data: positionMetadata,
+    isError: positionMetadataError,
+    isLoading: isPositionMetadataLoading,
+  } = useQuery(['positionMetadata', positionId], () =>
+    getPositionMetadata(positionId),
+  );
 
-  const { data: baseDivisor } = useQuery('baseDivisor', () => getBaseDivisor());
+  const { data: baseDivisor, isError: baseDivisorError } = useQuery(
+    'baseDivisor',
+    () => getBaseDivisor(),
+  );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
@@ -60,16 +67,20 @@ function StakingPositionOverview({
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
-  const { data: tokenPriceInLPShares } = useQuery(
-    ['tokenPriceInLPShares', tokenAddress],
-    () => getTokenPriceInLPShares(tokenAddress),
-    {
-      // Execute only when address is available.
-      enabled: !!tokenAddress,
-    },
-  );
+  const { data: tokenPriceInLPShares, isError: tokenPriceInLPSharesError } =
+    useQuery(
+      ['tokenPriceInLPShares', tokenAddress],
+      () => getTokenPriceInLPShares(tokenAddress),
+      {
+        // Execute only when address is available.
+        enabled: !!tokenAddress,
+      },
+    );
 
-  const { data: suppliedLiquidityByToken } = useQuery(
+  const {
+    data: suppliedLiquidityByToken,
+    isError: suppliedLiquidityByTokenError,
+  } = useQuery(
     ['suppliedLiquidityByToken', tokenAddress],
     () => getSuppliedLiquidityByToken(tokenAddress),
     {
@@ -78,7 +89,7 @@ function StakingPositionOverview({
     },
   );
 
-  const { data: tokenPriceInUSD } = useQuery(
+  const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
     ['tokenPriceInUSD', token?.coinGeckoId],
     () =>
       fetch(
@@ -89,37 +100,40 @@ function StakingPositionOverview({
     },
   );
 
-  const { data: pendingToken } = useQuery(['pendingToken', positionId], () =>
-    getPendingToken(positionId),
+  const { data: pendingToken, isError: pendingTokenError } = useQuery(
+    ['pendingToken', positionId],
+    () => getPendingToken(positionId),
   );
 
-  const { data: rewardsRatePerSecond } = useQuery(
-    ['rewardsRatePerSecond', token],
-    () => {
-      if (!chain || !token) return;
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', token],
+      () => {
+        if (!chain || !token) return;
 
-      return getRewardRatePerSecond(token[chain.chainId].address);
-    },
-    {
-      // Execute only when address is available.
-      enabled: !!(chain && token),
-    },
-  );
+        return getRewardRatePerSecond(token[chain.chainId].address);
+      },
+      {
+        // Execute only when address is available.
+        enabled: !!(chain && token),
+      },
+    );
 
-  const { data: rewardTokenAddress } = useQuery(
-    ['rewardTokenAddress', token],
-    () => {
-      if (!chain || !token) return;
+  const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
+    useQuery(
+      ['rewardTokenAddress', token],
+      () => {
+        if (!chain || !token) return;
 
-      return getRewardTokenAddress(token[chain.chainId].address);
-    },
-    {
-      // Execute only when address is available.
-      enabled: !!(chain && token),
-    },
-  );
+        return getRewardTokenAddress(token[chain.chainId].address);
+      },
+      {
+        // Execute only when address is available.
+        enabled: !!(chain && token),
+      },
+    );
 
-  const { data: totalSharesStaked } = useQuery(
+  const { data: totalSharesStaked, isError: totalSharesStakedError } = useQuery(
     ['totalSharesStaked', token],
     () => {
       if (!chain || !token) return;
@@ -145,21 +159,49 @@ function StakingPositionOverview({
   const rewardTokenDecimals =
     chain && rewardToken ? rewardToken[chain.chainId].decimal : null;
 
-  const { data: rewardTokenPriceInUSD } = useQuery(
-    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
-    () => {
-      if (!rewardToken) return;
+  const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
+    useQuery(
+      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      () => {
+        if (!rewardToken) return;
 
-      return fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
-      ).then(res => res.json());
-    },
-    {
-      enabled: !!rewardToken,
-    },
-  );
+        return fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+        ).then(res => res.json());
+      },
+      {
+        enabled: !!rewardToken,
+      },
+    );
+
+  // Check if there's an error in queries or mutations.
+  const isError =
+    positionMetadataError ||
+    baseDivisorError ||
+    tokenPriceInLPSharesError ||
+    suppliedLiquidityByTokenError ||
+    tokenPriceInUSDError ||
+    pendingTokenError ||
+    rewardsRatePerSecondError ||
+    rewardTokenAddressError ||
+    rewardTokenPriceInUSDError ||
+    totalSharesStakedError;
 
   const isDataLoading = isPositionMetadataLoading;
+
+  if (isError) {
+    return (
+      <section className="flex h-37.5 items-center justify-center rounded-7.5 border bg-white px-10 py-6 text-hyphen-gray-400">
+        <div className="my-16 flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            Something went wrong while we were fetching this staked position,
+            please try again later.
+          </span>
+        </div>
+      </section>
+    );
+  }
 
   if (isDataLoading || !token || !chain) {
     return (

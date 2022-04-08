@@ -3,18 +3,21 @@ import { useWalletProvider } from 'context/WalletProvider';
 import { BigNumber } from 'ethers';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useQuery } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import StakingPositionOverview from '../../StakingPositionOverview';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
+import { HiOutlineXCircle } from 'react-icons/hi';
 
 function FarmPositions() {
-  const navigate = useNavigate();
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
   const { selectedNetwork } = useChains()!;
 
   const { getStakedUserPositions } = useLiquidityFarming(selectedNetwork);
 
-  const { isLoading, data: stakedUserPositions } = useQuery(
+  const {
+    data: stakedUserPositions,
+    isError: stakedUserPositionsError,
+    isLoading,
+  } = useQuery(
     ['stakedUserPositions', accounts],
     () => {
       if (!isLoggedIn || !accounts) return;
@@ -28,6 +31,22 @@ function FarmPositions() {
       refetchOnReconnect: true,
     },
   );
+
+  if (stakedUserPositionsError) {
+    return (
+      <article className="5 5 mb-2 rounded-10 bg-white p-2">
+        <section className="flex h-auto items-start justify-center">
+          <div className="my-16 flex items-center">
+            <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+            <span className="text-hyphen-gray-400">
+              Something went wrong while we were fetching your staked positions,
+              please try again later.
+            </span>
+          </div>
+        </section>
+      </article>
+    );
+  }
 
   return (
     <article className="mb-2.5 rounded-10 bg-white p-2.5">

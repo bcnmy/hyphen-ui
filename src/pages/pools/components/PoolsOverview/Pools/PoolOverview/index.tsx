@@ -2,9 +2,9 @@ import { ethers } from 'ethers';
 import { useQuery } from 'react-query';
 import { request, gql } from 'graphql-request';
 import Skeleton from 'react-loading-skeleton';
-import { HiInformationCircle } from 'react-icons/hi';
-import { ChainConfig, chains } from 'config/chains';
-import tokens, { TokenConfig } from 'config/tokens';
+import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
+import { ChainConfig } from 'config/chains';
+import tokens from 'config/tokens';
 import CustomTooltip from 'components/CustomTooltip';
 import ProgressBar from 'components/ProgressBar';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
@@ -12,7 +12,6 @@ import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
-import useLPToken from 'hooks/contracts/useLPToken';
 
 interface IPoolOverview {
   chain: ChainConfig;
@@ -31,7 +30,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   const { getRewardRatePerSecond, getRewardTokenAddress } =
     useLiquidityFarming(chain);
 
-  const { data: totalLiquidity } = useQuery(
+  const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
     ['totalLiquidity', address],
     () => getTotalLiquidity(address),
     {
@@ -40,7 +39,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: tokenTotalCap } = useQuery(
+  const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
     ['tokenTotalCap', address],
     () => getTokenTotalCap(address),
     {
@@ -49,7 +48,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: feeAPYData } = useQuery(
+  const { data: feeAPYData, isError: feeAPYDataError } = useQuery(
     ['apy', address],
     async () => {
       if (!v2GraphEndpoint || !address) return;
@@ -72,7 +71,10 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: suppliedLiquidityByToken } = useQuery(
+  const {
+    data: suppliedLiquidityByToken,
+    isError: suppliedLiquidityByTokenError,
+  } = useQuery(
     ['suppliedLiquidityByToken', address],
     () => getSuppliedLiquidityByToken(address),
     {
@@ -81,7 +83,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: tokenPriceInUSD } = useQuery(
+  const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
     ['tokenPriceInUSD', coinGeckoId],
     () =>
       fetch(
@@ -92,23 +94,25 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: rewardsRatePerSecond } = useQuery(
-    ['rewardsRatePerSecond', address],
-    () => getRewardRatePerSecond(address),
-    {
-      // Execute only when address is available.
-      enabled: !!address,
-    },
-  );
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', address],
+      () => getRewardRatePerSecond(address),
+      {
+        // Execute only when address is available.
+        enabled: !!address,
+      },
+    );
 
-  const { data: rewardTokenAddress } = useQuery(
-    ['rewardTokenAddress', address],
-    () => getRewardTokenAddress(address),
-    {
-      // Execute only when address is available.
-      enabled: !!address,
-    },
-  );
+  const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
+    useQuery(
+      ['rewardTokenAddress', address],
+      () => getRewardTokenAddress(address),
+      {
+        // Execute only when address is available.
+        enabled: !!address,
+      },
+    );
 
   const rewardToken = rewardTokenAddress
     ? tokens.find(tokenObj => {
@@ -119,19 +123,45 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       })
     : undefined;
 
-  const { data: rewardTokenPriceInUSD } = useQuery(
-    ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
-    () => {
-      if (!rewardToken) return;
+  const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
+    useQuery(
+      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      () => {
+        if (!rewardToken) return;
 
-      return fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
-      ).then(res => res.json());
-    },
-    {
-      enabled: !!rewardToken,
-    },
-  );
+        return fetch(
+          `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+        ).then(res => res.json());
+      },
+      {
+        enabled: !!rewardToken,
+      },
+    );
+
+  // Check if there's an error in queries or mutations.
+  const isError =
+    totalLiquidityError ||
+    tokenTotalCapError ||
+    feeAPYDataError ||
+    suppliedLiquidityByTokenError ||
+    tokenPriceInUSDError ||
+    rewardsRatePerSecondError ||
+    rewardTokenAddressError ||
+    rewardTokenPriceInUSDError;
+
+  if (isError) {
+    return (
+      <section className="flex h-37.5 items-center justify-center border bg-white px-10 py-6 text-hyphen-gray-400">
+        <div className="my-16 flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            Something went wrong while we were fetching this pool, please try
+            again later.
+          </span>
+        </div>
+      </section>
+    );
+  }
 
   const rewardRatePerSecondInUSD =
     rewardsRatePerSecond && rewardToken && rewardTokenPriceInUSD

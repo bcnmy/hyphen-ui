@@ -6,6 +6,7 @@ import {
   HiArrowSmLeft,
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
+  HiOutlineXCircle,
 } from 'react-icons/hi';
 import { useMutation, useQueries, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -39,15 +40,18 @@ function ManageStakingPosition() {
   const { claimFee, getPendingToken, getRewardTokenAddress, unstakeNFT } =
     useLiquidityFarming(chain);
 
-  const { isLoading: isPositionMetadataLoading, data: positionMetadata } =
-    useQuery(
-      ['positionMetadata', positionId],
-      () => getPositionMetadata(BigNumber.from(positionId)),
-      {
-        // Execute only when positionid is available.
-        enabled: !!positionId,
-      },
-    );
+  const {
+    data: positionMetadata,
+    isError: positionMetadataError,
+    isLoading: isPositionMetadataLoading,
+  } = useQuery(
+    ['positionMetadata', positionId],
+    () => getPositionMetadata(BigNumber.from(positionId)),
+    {
+      // Execute only when positionid is available.
+      enabled: !!positionId,
+    },
+  );
 
   const [tokenAddress] = positionMetadata || [];
 
@@ -64,15 +68,18 @@ function ManageStakingPosition() {
   const tokenDecimals =
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;
 
-  const { isLoading: isPositionNFTDataLoading, data: positionNFTData } =
-    useQuery(
-      ['positionNFT', positionId],
-      () => getTokenURI(BigNumber.from(positionId)),
-      {
-        // Execute only when positionid is available.
-        enabled: !!positionId,
-      },
-    );
+  const {
+    data: positionNFTData,
+    isError: positionNFTDataError,
+    isLoading: isPositionNFTDataLoading,
+  } = useQuery(
+    ['positionNFT', positionId],
+    () => getTokenURI(BigNumber.from(positionId)),
+    {
+      // Execute only when positionid is available.
+      enabled: !!positionId,
+    },
+  );
 
   const nftJsonManifestString = positionNFTData
     ? atob(positionNFTData.substring(29))
@@ -81,19 +88,22 @@ function ManageStakingPosition() {
     ? JSON.parse(nftJsonManifestString)
     : {};
 
-  const { isLoading: rewardTokenAddressLoading, data: rewardTokenAddress } =
-    useQuery(
-      'rewardTokenAddress',
-      () => {
-        if (!chain || !token) return;
+  const {
+    data: rewardTokenAddress,
+    isError: rewardTokenAddressError,
+    isLoading: rewardTokenAddressLoading,
+  } = useQuery(
+    'rewardTokenAddress',
+    () => {
+      if (!chain || !token) return;
 
-        return getRewardTokenAddress(token[chain.chainId].address);
-      },
-      {
-        // Execute only when address is available.
-        enabled: !!(chain && token),
-      },
-    );
+      return getRewardTokenAddress(token[chain.chainId].address);
+    },
+    {
+      // Execute only when address is available.
+      enabled: !!(chain && token),
+    },
+  );
 
   const rewardToken =
     rewardTokenAddress && chain
@@ -108,9 +118,12 @@ function ManageStakingPosition() {
   const rewardTokenDecimals =
     chain && rewardToken ? rewardToken[chain.chainId].decimal : null;
 
-  const { isLoading: pendingTokenLoading, data: pendingToken } = useQuery(
-    ['pendingToken', positionId],
-    () => getPendingToken(BigNumber.from(positionId)),
+  const {
+    data: pendingToken,
+    isError: pendingTokenError,
+    isLoading: pendingTokenLoading,
+  } = useQuery(['pendingToken', positionId], () =>
+    getPendingToken(BigNumber.from(positionId)),
   );
 
   const unclaimedRewardToken =
@@ -120,26 +133,33 @@ function ManageStakingPosition() {
         )
       : 0;
 
-  const { isLoading: unstakeNFTLoading, mutate: unstakeNFTMutation } =
-    useMutation(
-      async ({
-        positionId,
-        accounts,
-      }: {
-        positionId: BigNumber;
-        accounts: string[];
-      }) => {
-        const unstakeNFTTx = await unstakeNFT(positionId, accounts);
-        addTxNotification(
-          unstakeNFTTx,
-          'Unstake NFT',
-          `${chain?.explorerUrl}/tx/${unstakeNFTTx.hash}`,
-        );
-        return await unstakeNFTTx.wait(1);
-      },
-    );
+  const {
+    isError: unstakeNFTError,
+    isLoading: unstakeNFTLoading,
+    mutate: unstakeNFTMutation,
+  } = useMutation(
+    async ({
+      positionId,
+      accounts,
+    }: {
+      positionId: BigNumber;
+      accounts: string[];
+    }) => {
+      const unstakeNFTTx = await unstakeNFT(positionId, accounts);
+      addTxNotification(
+        unstakeNFTTx,
+        'Unstake NFT',
+        `${chain?.explorerUrl}/tx/${unstakeNFTTx.hash}`,
+      );
+      return await unstakeNFTTx.wait(1);
+    },
+  );
 
-  const { isLoading: claimFeeLoading, mutate: claimFeeMutation } = useMutation(
+  const {
+    isError: claimFeeError,
+    isLoading: claimFeeLoading,
+    mutate: claimFeeMutation,
+  } = useMutation(
     async ({
       positionId,
       accounts,
@@ -157,6 +177,15 @@ function ManageStakingPosition() {
     },
   );
 
+  // Check if there's an error in queries or mutations.
+  const isError =
+    positionMetadataError ||
+    positionNFTDataError ||
+    rewardTokenAddressError ||
+    pendingTokenError ||
+    unstakeNFTError ||
+    claimFeeError;
+
   const isDataLoading =
     isPositionMetadataLoading ||
     isPositionNFTDataLoading ||
@@ -164,6 +193,23 @@ function ManageStakingPosition() {
     pendingTokenLoading ||
     unstakeNFTLoading ||
     claimFeeLoading;
+
+  if (isError) {
+    return (
+      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
+        <div className="flex items-center">
+          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <span className="text-hyphen-gray-400">
+            {claimFeeError
+              ? 'Something went wrong while claiming fees for this NFT, please try again later.'
+              : unstakeNFTError
+              ? 'Something went wrong while unstaking this NFT, please try again later.'
+              : 'We could not get the necessary information, please try again later.'}
+          </span>
+        </div>
+      </article>
+    );
+  }
 
   function handleNetworkChange() {
     if (!walletProvider || !chain) return;

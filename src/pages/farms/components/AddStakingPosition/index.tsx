@@ -485,8 +485,8 @@ function AddStakingPosition() {
           ) : !isUserPositionsLoading &&
             filteredUserPositions &&
             filteredUserPositions.length === 0 ? (
-            <section className="flex h-auto items-start justify-center">
-              <div className="mt-12 mb-16 flex items-center justify-center">
+            <section className="mt-20 mb-12 flex h-auto items-start justify-center px-[1.875rem]">
+              <div className="flex items-center justify-center">
                 <HiOutlineSearch className="mr-4 min-h-[1.5rem] min-w-[1.5rem] text-hyphen-gray-200" />
                 <span className="text-hyphen-gray-400">
                   You have no liquidity positions for this farm.
@@ -495,7 +495,7 @@ function AddStakingPosition() {
             </section>
           ) : null
         ) : (
-          <section className="mt-16 mb-24 flex items-center justify-center px-[1.875rem]">
+          <section className="mt-20 mb-12 flex items-center justify-center px-[1.875rem]">
             <svg
               role="status"
               className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"

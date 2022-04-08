@@ -144,7 +144,7 @@ function LiquidityPositions() {
           </section>
         )
       ) : (
-        <section className="my-16 flex items-center justify-center px-[1.875rem]">
+        <section className="my-20 flex items-center justify-center px-[1.875rem]">
           <svg
             role="status"
             className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"

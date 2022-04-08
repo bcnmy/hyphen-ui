@@ -20,7 +20,7 @@ function Farms() {
   if (isError) {
     return (
       <article className="rounded-10 bg-white p-2.5">
-        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
+        <section className="my-16 flex items-center justify-center px-[1.875rem]">
           <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
           <p className="text-hyphen-gray-400">
             Something went wrong while we were fetching the list of farms,
@@ -77,7 +77,7 @@ function Farms() {
             : null}
         </section>
       ) : (
-        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
+        <section className="mt-16 mb-24 flex items-center justify-center px-[1.875rem]">
           <svg
             role="status"
             className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"

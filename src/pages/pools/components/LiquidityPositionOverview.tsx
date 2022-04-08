@@ -229,7 +229,7 @@ function LiquidityPositionOverview({
     return (
       <section className="flex h-37.5 items-center justify-center rounded-7.5 border bg-white px-10 py-6 text-hyphen-gray-400">
         <div className="my-16 flex items-center">
-          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
+          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
           <p className="text-hyphen-gray-400">
             Something went wrong while we were fetching this position, please
             try again later.

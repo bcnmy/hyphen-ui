@@ -56,7 +56,7 @@ function LiquidityPositions() {
   if (userPositionsError) {
     return (
       <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
-        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
+        <section className="my-16 flex items-center justify-center px-[1.875rem]">
           <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
           <p className="text-hyphen-gray-400">
             Something went wrong while we were fetching your positions, please
@@ -69,7 +69,7 @@ function LiquidityPositions() {
 
   return (
     <article className="mb-2.5 rounded-10 bg-white p-2.5">
-      <header className="my-6 grid grid-cols-2 items-center px-[1.875rem] xl:grid-cols-3 xl:px-10">
+      <header className="my-6 grid h-9 grid-cols-2 items-center px-[1.875rem] xl:grid-cols-3 xl:px-10">
         {isLoggedIn ? (
           <div className="hidden xl:flex">
             <button
@@ -122,8 +122,8 @@ function LiquidityPositions() {
             })}
           </section>
         ) : (
-          <section className="flex h-auto flex-col items-center justify-start">
-            <div className="mt-12 mb-16 flex items-center">
+          <section className="my-16 flex flex-col items-center justify-start px-[1.875rem]">
+            <div className="flex items-center">
               <img
                 src={emptyPositionsIcon}
                 alt="No positions"
@@ -144,7 +144,7 @@ function LiquidityPositions() {
           </section>
         )
       ) : (
-        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
+        <section className="my-16 flex items-center justify-center px-[1.875rem]">
           <svg
             role="status"
             className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"

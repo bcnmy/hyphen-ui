@@ -196,17 +196,17 @@ function ManageStakingPosition() {
 
   if (isError) {
     return (
-      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
-        <div className="flex items-center">
-          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
-          <span className="text-hyphen-gray-400">
+      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
+        <section className="my-16 flex items-center justify-center px-[1.875rem]">
+          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
+          <p className="text-hyphen-gray-400">
             {claimFeeError
               ? 'Something went wrong while claiming fees for this NFT, please try again later.'
               : unstakeNFTError
               ? 'Something went wrong while unstaking this NFT, please try again later.'
               : 'We could not get the necessary information, please try again later.'}
-          </span>
-        </div>
+          </p>
+        </section>
       </article>
     );
   }
@@ -292,7 +292,7 @@ function ManageStakingPosition() {
               baseColor="#615ccd20"
               enableAnimation
               highlightColor="#615ccd05"
-              className="!mt-2 !h-[411px] !w-[411px] !rounded-7.5"
+              className="!xl:w-[411px] !mt-2 aspect-square !w-full !rounded-7.5"
               containerClassName="block leading-none"
             />
           )}

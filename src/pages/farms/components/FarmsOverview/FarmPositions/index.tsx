@@ -34,15 +34,13 @@ function FarmPositions() {
 
   if (stakedUserPositionsError) {
     return (
-      <article className="5 5 mb-2 rounded-10 bg-white p-2">
-        <section className="flex h-37.5 items-center justify-center rounded-7.5 border bg-white px-10 py-6 text-hyphen-gray-400">
-          <div className="my-16 flex items-center">
-            <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
-            <span className="text-hyphen-gray-400">
-              Something went wrong while we were fetching your staked positions,
-              please try again later.
-            </span>
-          </div>
+      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
+        <section className="my-16 flex items-center justify-center px-[1.875rem]">
+          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
+          <p className="text-hyphen-gray-400">
+            Something went wrong while we were fetching your staked positions,
+            please try again later.
+          </p>
         </section>
       </article>
     );
@@ -70,8 +68,8 @@ function FarmPositions() {
             })}
           </section>
         ) : (
-          <section className="flex h-auto flex-col items-center justify-start">
-            <div className="mt-12 mb-16 flex items-center">
+          <section className="my-16 flex flex-col items-center justify-start px-[1.875rem]">
+            <div className="flex items-center">
               <img
                 src={emptyPositionsIcon}
                 alt="No positions"
@@ -92,7 +90,7 @@ function FarmPositions() {
           </section>
         )
       ) : (
-        <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">
+        <section className="mt-16 mb-24 flex items-center justify-center px-[1.875rem]">
           <svg
             role="status"
             className="mr-4 h-6 w-6 animate-spin fill-hyphen-purple text-gray-200"
@@ -109,7 +107,9 @@ function FarmPositions() {
               fill="currentFill"
             />
           </svg>
-          <p className="text-hyphen-gray-400">Getting your staked positions.</p>
+          <p className="text-hyphen-gray-400">
+            Getting your Hyphen staked positions.
+          </p>
         </section>
       )}
     </article>

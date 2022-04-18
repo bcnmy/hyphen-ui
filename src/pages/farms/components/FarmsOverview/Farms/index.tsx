@@ -9,7 +9,7 @@ function Farms() {
     'tokens',
     () =>
       fetch(
-        'https://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/tokens',
+        'https://hyphen-v2-api.biconomy.io/api/v1/configuration/tokens',
       ).then(res => res.json()),
     {
       enabled: !!chains,

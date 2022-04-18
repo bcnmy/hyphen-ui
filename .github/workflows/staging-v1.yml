@@ -1,4 +1,4 @@
-name: Staging Deployment - Hyphen UI
+name: Staging V1 Deployment - Hyphen UI
 
 on:
   push:
@@ -38,5 +38,5 @@ jobs:
       # publish to staging environment
       - name: Deploy to S3
         run: |
-          aws s3 sync build s3://${{ secrets.S3_STAGING_BUCKET_NAME }}
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_STAGING_CF_ID }} --paths /
+          aws s3 sync build s3://${{ secrets.S3_STAGING_V1_BUCKET_NAME }}
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_STAGING_V1_CF_ID }} --paths /

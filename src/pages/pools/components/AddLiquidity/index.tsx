@@ -768,7 +768,7 @@ function AddLiquidity() {
                         liquidityAmount === '' ||
                         Number.parseFloat(liquidityAmount) === 0 ||
                         isLiquidityAmountGtWalletBalance ||
-                        isLiquidityAmountGtTokenAllowance ||
+                        (!isNativeToken && isLiquidityAmountGtTokenAllowance) ||
                         isLiquidityAmountGtPoolCap
                       }
                     >

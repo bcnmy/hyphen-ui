@@ -8,7 +8,8 @@ export const POLYGON: ChainConfig = {
   subText: 'Polygon Mainnet',
   chainId: 137,
   chainColor: '#8247E51A',
-  rpcUrl: 'https://polygon-rpc.com/',
+  rpcUrl:
+    'https://polygon-mainnet.g.alchemy.com/v2/SsLbrjcZfm-DHu3sWWw08_LjlIiRDdcH',
   currency: 'MATIC',
   nativeToken: NATIVE_ADDRESS,
   nativeDecimal: 18,

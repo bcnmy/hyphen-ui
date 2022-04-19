@@ -73,7 +73,7 @@ const WalletProviderProvider: React.FC = props => {
               rpc: {
                 1: 'https://eth-mainnet.alchemyapi.io/v2/wO7WAmNPAsZFhRlpd-xYjM-5Pl5Dx8-G',
                 5: 'https://eth-goerli.alchemyapi.io/v2/mtR7c3X54OxnXVf_npwUrdNC57aIghCp',
-                137: 'https://polygon-rpc.com/',
+                137: 'https://polygon-mainnet.g.alchemy.com/v2/SsLbrjcZfm-DHu3sWWw08_LjlIiRDdcH',
                 43113: 'https://api.avax-test.network/ext/bc/C/rpc',
                 43114: 'https://api.avax.network/ext/bc/C/rpc',
                 80001:

@@ -243,7 +243,10 @@ const TransactionProvider: React.FC = props => {
       }
       let tokenAddress = selectedToken[toChain.chainId].address;
       let tokenDecimal = selectedToken[toChain.chainId].decimal;
-      let rawTransferAmount = ethers.utils.parseUnits(transferAmount.toString(), tokenDecimal);
+      let rawTransferAmount = ethers.utils.parseUnits(
+        transferAmount.toString(),
+        tokenDecimal,
+      );
 
       let transferFee = await getTransferFee(
         tokenAddress,
@@ -285,9 +288,9 @@ const TransactionProvider: React.FC = props => {
         );
       }
 
-      console.log(
-        `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
-      );
+      // console.log(
+      //   `Token gas price for ${selectedToken.symbol} is ${response.tokenGasPrice}`,
+      // );
 
       let tokenGasPrice = response.tokenGasPrice;
 
@@ -308,7 +311,7 @@ const TransactionProvider: React.FC = props => {
         rawTransferAmount.toString(),
       );
 
-      console.log('************** REWARD AMOUNT  *********', rewardAmount);
+      // console.log('************** REWARD AMOUNT  *********', rewardAmount);
       if (rewardAmount !== undefined && rewardAmount.gt && rewardAmount.gt(0)) {
         rewardAmount = formatRawEthValue(rewardAmount, decimal);
         rewardAmountString = toFixed(rewardAmount, fixedDecimalPoint);
@@ -434,7 +437,7 @@ const TransactionProvider: React.FC = props => {
   }, [poolInfo, selectedTokenBalance, transferAmount, validateTransferAmount]);
 
   useEffect(() => {
-    if (errors.length === 0 && transferAmount) {
+    if (transferAmount) {
       fetchTransactionFee();
     }
   }, [errors, fetchTransactionFee, transferAmount]);

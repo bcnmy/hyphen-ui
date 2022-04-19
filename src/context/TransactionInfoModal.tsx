@@ -1,8 +1,8 @@
-import { ChainConfig } from "config/chains";
-import { TokenConfig } from "config/tokens";
-import useModal from "hooks/useModal";
-import TransferInfoModal from "pages/bridge/components/TransferInfoModal";
-import { createContext, useCallback, useContext, useState } from "react";
+import { ChainConfig } from 'config/chains';
+import { TokenConfig } from 'config/tokens';
+import useModal from 'hooks/useModal';
+import TransferInfoModal from 'pages/bridge/components/TransferInfoModal';
+import { createContext, useCallback, useContext, useState } from 'react';
 
 export interface ITransferRecord {
   depositHash: string;
@@ -12,6 +12,7 @@ export interface ITransferRecord {
   fromChain: ChainConfig;
   toChain: ChainConfig;
   lpFee: string;
+  transferredAmount: string;
   transactionFee: string;
   transferTime: string;
   rewardAmount?: string;
@@ -43,7 +44,7 @@ const TransactionInfoModalProvider: React.FC = ({ children, ...props }) => {
       setTransferRecord(transferRecord);
       showModal();
     },
-    [showModal]
+    [showModal],
   );
 
   return (

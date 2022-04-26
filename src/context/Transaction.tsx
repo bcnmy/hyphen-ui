@@ -1,6 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { BigNumber, ethers } from 'ethers';
-import { useQuery } from 'react-query';
 import {
   createContext,
   FormEvent,
@@ -19,7 +18,6 @@ import { RESPONSE_CODES } from '@biconomy/hyphen-staging';
 import {
   BASE_DIVISOR,
   DEFAULT_FIXED_DECIMAL_POINT,
-  LP_FEE_FRACTION,
   NATIVE_ADDRESS,
 } from 'config/constants';
 import { useChains } from './Chains';
@@ -627,7 +625,7 @@ const TransactionProvider: React.FC = props => {
       let lpManagerInterface = new ethers.utils.Interface(lpmanagerABI);
 
       let tokenReceipt = receipt.logs.find(
-        receiptLog => receiptLog.topics[0] === toChain.assetSentTopicId,
+        receiptLog => receiptLog.topics[0] === toChain.topicIds.assetSent,
       );
       try {
         if (!tokenReceipt) {

@@ -21,6 +21,7 @@ import TransactionDetailModal from '../TransactionDetailModal';
 import useModal from 'hooks/useModal';
 import { twMerge } from 'tailwind-merge';
 import { useHyphen } from 'context/Hyphen';
+import { Network } from 'hooks/useNetworks';
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
@@ -119,7 +120,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
     }
 
     async function getUserTransactions(
-      fromChain: ChainConfig,
+      fromChain: Network,
       userDeposits: IUserDeposits[],
     ) {
       let transformedTransactions = [];
@@ -190,7 +191,9 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
         const formattedTransactionFee = Number.parseFloat(
           ethers.utils.formatUnits(
-            BigNumber.from(transferFee).sub(BigNumber.from(lpFee)).add(BigNumber.from(gasFee)),
+            BigNumber.from(transferFee)
+              .sub(BigNumber.from(lpFee))
+              .add(BigNumber.from(gasFee)),
             tokenDecimals,
           ),
         ).toFixed(3);

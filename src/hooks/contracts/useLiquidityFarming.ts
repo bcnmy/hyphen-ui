@@ -2,22 +2,22 @@ import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityFarmingABI from 'abis/LiquidityFarming.abi.json';
 import { LiquidityFarming } from 'config/liquidityContracts/LiquidityFarming';
-import { ChainConfig } from 'config/chains';
+import { Network } from 'hooks/useNetworks';
 import { useWalletProvider } from 'context/WalletProvider';
 
-function useLiquidityFarming(chain: ChainConfig | undefined) {
+function useLiquidityFarming(chain: Network | undefined) {
   const { signer } = useWalletProvider()!;
   const contractAddress = chain
     ? LiquidityFarming[chain.chainId].address
     : undefined;
 
   const liquidityFarmingContract = useMemo(() => {
-    if (!chain || !contractAddress) return;
+    if (!chain || !contractAddress || !chain.rpc) return;
 
     return new ethers.Contract(
       contractAddress,
       liquidityFarmingABI,
-      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+      new ethers.providers.JsonRpcProvider(chain.rpc),
     );
   }, [chain, contractAddress]);
 

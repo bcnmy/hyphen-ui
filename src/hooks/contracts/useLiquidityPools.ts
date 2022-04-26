@@ -2,22 +2,22 @@ import { useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
 import liquidityPoolABI from 'abis/LiquidityPools.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
-import { ChainConfig } from 'config/chains';
 import { LiquidityPool } from 'config/liquidityContracts/LiquidityPool';
+import { Network } from 'hooks/useNetworks';
 
-function useLiquidityPools(chain: ChainConfig | undefined) {
+function useLiquidityPools(chain: Network | undefined) {
   const { isLoggedIn, signer } = useWalletProvider()!;
   const contractAddress = chain
     ? LiquidityPool[chain.chainId].address
     : undefined;
 
   const liquidityPoolsContract = useMemo(() => {
-    if (!contractAddress || !isLoggedIn || !chain) return;
+    if (!contractAddress || !isLoggedIn || !chain || !chain.rpc) return;
 
     return new ethers.Contract(
       contractAddress,
       liquidityPoolABI,
-      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+      new ethers.providers.JsonRpcProvider(chain.rpc),
     );
   }, [chain, contractAddress, isLoggedIn]);
 

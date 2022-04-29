@@ -1,13 +1,12 @@
 import { Fragment } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { HiOutlineChevronDown } from 'react-icons/hi';
-import { ChainConfig, chains } from 'config/chains';
 import { useChains } from 'context/Chains';
 import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
 import { useQueryClient } from 'react-query';
 import CustomTooltip from './CustomTooltip';
-import useNetworks, { Network } from 'hooks/useNetworks';
+import { Network } from 'hooks/useNetworks';
 
 function NetworkSelector() {
   const queryClient = useQueryClient();

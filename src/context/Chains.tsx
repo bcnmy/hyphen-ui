@@ -79,16 +79,15 @@ const ChainsProvider: React.FC = props => {
     }
   }, [currentChainId, networks]);
 
-  // TODO: Check if this is needed.
-  // useEffect(() => {
-  //   const network = networks?.find(
-  //     chainObj => chainObj.chainId === currentChainId,
-  //   );
+  useEffect(() => {
+    const network = networks?.find(
+      chainObj => chainObj.chainId === currentChainId,
+    );
 
-  //   if (network) {
-  //     setSelectedNetwork(network);
-  //   }
-  // }, [currentChainId, networks]);
+    if (network) {
+      setSelectedNetwork(network);
+    }
+  }, [currentChainId, networks]);
 
   useEffect(() => {
     (async () => {

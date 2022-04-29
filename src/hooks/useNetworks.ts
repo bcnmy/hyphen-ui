@@ -19,7 +19,7 @@ export type Network = {
   currency: string;
   gasless: {
     enable: boolean;
-    apiKey: string | null;
+    apiKey: string;
   };
   topicIds: {
     deposit: string;
@@ -29,20 +29,20 @@ export type Network = {
   graphUrl: string;
   v2GraphUrl: string;
   explorerUrl: string;
-  rpc: string | null;
+  rpc: string;
   contracts: {
     uniswapRouter: string;
     hyphen: {
-      tokenManager: string | null;
-      liquidityPool: string | null;
-      executorManager: string | null;
-      lpToken: string | null;
-      liquidityProviders: string | null;
-      liquidityFarming: string | null;
-      whitelistPeriodManager: string | null;
+      tokenManager: string;
+      liquidityPool: string;
+      executorManager: string;
+      lpToken: string;
+      liquidityProviders: string;
+      liquidityFarming: string;
+      whitelistPeriodManager: string;
     };
     biconomyForwarders: [string];
-    gnosisMasterAccount: string | null;
+    gnosisMasterAccount: string;
     whiteListedExternalContracts: [string];
   };
 };
@@ -52,14 +52,7 @@ function fetchNetworks(): Promise<Network[]> {
     'http://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/networks',
   )
     .then(res => res.json())
-    .then(data =>
-      Object.entries(data.message)
-        .map(entry => {
-          const [, value] = entry;
-          return value as Network;
-        })
-        .filter(network => network.enabled),
-    );
+    .then(data => data.message.filter((network: Network) => network.enabled));
 }
 
 function useNetworks() {

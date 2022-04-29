@@ -31,7 +31,7 @@ function LiquidityPositions() {
       return getUserPositions(accounts);
     },
     {
-      enabled: !!(isLoggedIn && accounts),
+      enabled: !!(isLoggedIn && accounts && selectedNetwork),
       refetchOnWindowFocus: true,
       refetchOnMount: true,
       refetchOnReconnect: true,

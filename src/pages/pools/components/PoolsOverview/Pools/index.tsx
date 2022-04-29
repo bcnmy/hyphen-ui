@@ -3,8 +3,11 @@ import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import PoolOverview from './PoolOverview';
 import { HiOutlineXCircle } from 'react-icons/hi';
+import { useChains } from 'context/Chains';
 
 function Pools() {
+  const { networks } = useChains()!;
+
   const { isError, isLoading, data } = useQuery(
     'tokens',
     () =>
@@ -53,24 +56,24 @@ function Pools() {
             </h3>
           </div>
 
-          {chains && tokensObject
-            ? chains.map(chainObj => {
+          {networks && tokensObject
+            ? networks.map(networkObj => {
                 return Object.keys(tokensObject).map((tokenSymbol: any) => {
                   const token = tokens.find(
                     tokenObj => tokenObj.symbol === tokenSymbol,
                   )!;
-                  const tokenObj = token[chainObj.chainId]
+                  const tokenObj = token[networkObj.chainId]
                     ? {
                         coinGeckoId: token.coinGeckoId,
                         tokenImage: token.image,
-                        ...token[chainObj.chainId],
+                        ...token[networkObj.chainId],
                       }
                     : null;
 
                   return tokenObj ? (
                     <PoolOverview
-                      key={`pool-${chainObj.name}-${tokenSymbol}`}
-                      chain={chainObj}
+                      key={`pool-${networkObj.name}-${tokenSymbol}`}
+                      chain={networkObj}
                       token={tokenObj}
                     />
                   ) : null;

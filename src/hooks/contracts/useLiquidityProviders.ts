@@ -4,20 +4,21 @@ import liquidityProvidersABI from 'abis/LiquidityProviders.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
 import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 import { ChainConfig } from 'config/chains';
+import { Network } from 'hooks/useNetworks';
 
-function useLiquidityProviders(chain: ChainConfig | undefined) {
+function useLiquidityProviders(chain: Network | undefined) {
   const { signer } = useWalletProvider()!;
   const contractAddress = chain
     ? LiquidityProviders[chain.chainId].address
     : undefined;
 
   const liquidityProvidersContract = useMemo(() => {
-    if (!chain || !contractAddress) return;
+    if (!chain || !contractAddress || !chain.rpc) return;
 
     return new ethers.Contract(
       contractAddress,
       liquidityProvidersABI,
-      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+      new ethers.providers.JsonRpcProvider(chain.rpc),
     );
   }, [chain, contractAddress]);
 

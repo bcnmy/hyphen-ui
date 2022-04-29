@@ -12,9 +12,10 @@ import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
+import { Network } from 'hooks/useNetworks';
 
 interface IFarmOverview {
-  chain: ChainConfig;
+  chain: Network;
   token: any;
 }
 

@@ -3,13 +3,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { request, gql } from 'graphql-request';
 import tokens from 'config/tokens';
-import { chains } from 'config/chains';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
 import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
 import CustomTooltip from 'components/CustomTooltip';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import { useChains } from 'context/Chains';
 
 interface ILiquidityPositionOverview {
   chainId: number;
@@ -25,11 +25,13 @@ function LiquidityPositionOverview({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const chain = chains.find(chainObj => {
-    return chainObj.chainId === chainId;
+  const { networks } = useChains()!;
+
+  const chain = networks?.find(networkObj => {
+    return networkObj.chainId === chainId;
   })!;
 
-  const v2GraphEndpoint = chain.v2GraphURL;
+  const v2GraphEndpoint = chain.v2GraphUrl;
 
   const { getPositionMetadata } = useLPToken(chain);
   const { getSuppliedLiquidityByToken, getTokenAmount, getTotalLiquidity } =

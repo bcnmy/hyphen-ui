@@ -40,12 +40,12 @@ function AddLiquidity() {
     signer,
     walletProvider,
   } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, networks } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
   // States
   const chainOptions = useMemo(() => {
-    return chains.map(chainObj => {
+    return networks?.map(chainObj => {
       return {
         id: chainObj.chainId,
         name: chainObj.name,
@@ -53,12 +53,12 @@ function AddLiquidity() {
         symbol: chainObj.currency,
       };
     });
-  }, []);
+  }, [networks]);
   const [selectedChain, setSelectedChain] = useState<Option | undefined>();
   const chain = selectedChain
-    ? chains.find(chainObj => chainObj.chainId === selectedChain.id)
+    ? networks?.find(networkObj => networkObj.chainId === selectedChain.id)
     : undefined;
-  const v2GraphEndpoint = chain?.v2GraphURL;
+  const v2GraphEndpoint = chain?.v2GraphUrl;
 
   // Liquidity Contracts
   const liquidityProvidersAddress = chain
@@ -167,6 +167,7 @@ function AddLiquidity() {
       if (
         !accounts ||
         !chain ||
+        !chain.rpc ||
         !liquidityProvidersAddress ||
         !selectedTokenAddress ||
         selectedTokenAddress === NATIVE_ADDRESS
@@ -175,7 +176,7 @@ function AddLiquidity() {
 
       return getTokenAllowance(
         accounts[0],
-        new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+        new ethers.providers.JsonRpcProvider(chain.rpc),
         liquidityProvidersAddress,
         selectedTokenAddress,
       );
@@ -321,8 +322,8 @@ function AddLiquidity() {
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     const chain = chainId
-      ? chainOptions.find(chainObj => chainObj.id === Number.parseInt(chainId))
-      : chainOptions[0];
+      ? chainOptions?.find(chainObj => chainObj.id === Number.parseInt(chainId))
+      : undefined;
     const token = tokenSymbol
       ? tokenOptions.find(tokenObj => tokenObj.id === tokenSymbol)
       : tokenOptions[0];
@@ -339,8 +340,8 @@ function AddLiquidity() {
         return null;
       }
 
-      const chain = chains.find(
-        chainObj => chainObj.chainId === Number.parseInt(chainId),
+      const chain = networks?.find(
+        networkObj => networkObj.chainId === Number.parseInt(chainId),
       )!;
       const token = tokens.find(tokenObj => tokenObj.symbol === tokenSymbol)!;
 
@@ -354,7 +355,14 @@ function AddLiquidity() {
     }
 
     handleTokenChange();
-  }, [accounts, chainId, isLoggedIn, liquidityProvidersAddress, tokenSymbol]);
+  }, [
+    accounts,
+    chainId,
+    isLoggedIn,
+    liquidityProvidersAddress,
+    networks,
+    tokenSymbol,
+  ]);
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals

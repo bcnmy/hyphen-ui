@@ -2,20 +2,20 @@ import { useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
 import whitelistPeriodManagerABI from 'abis/WhitelistPeriodManager.abi.json';
 import { WhitelistPeriodManager } from 'config/liquidityContracts/WhitelistPeriodManager';
-import { ChainConfig } from 'config/chains';
+import { Network } from 'hooks/useNetworks';
 
-function useWhitelistPeriodManager(chain: ChainConfig | undefined) {
+function useWhitelistPeriodManager(chain: Network | undefined) {
   const contractAddress = chain
     ? WhitelistPeriodManager[chain.chainId].address
     : undefined;
 
   const whitelistPeriodManagerContract = useMemo(() => {
-    if (!chain || !contractAddress) return;
+    if (!chain || !contractAddress || !chain.rpc) return;
 
     return new ethers.Contract(
       contractAddress,
       whitelistPeriodManagerABI,
-      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+      new ethers.providers.JsonRpcProvider(chain.rpc),
     );
   }, [chain, contractAddress]);
 

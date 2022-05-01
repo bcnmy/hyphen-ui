@@ -298,7 +298,7 @@ function ManageStakingPosition() {
               {currentChainId === chain?.chainId ? (
                 <button
                   className="mt-10 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={isDataLoading}
+                  disabled={true}
                   onClick={handleUnstakeNFTClick}
                 >
                   {unstakeNFTLoading
@@ -341,7 +341,7 @@ function ManageStakingPosition() {
                   {currentChainId === chain?.chainId ? (
                     <button
                       className="mt-10 flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                      disabled={isDataLoading}
+                      disabled={true}
                       onClick={handleClaimFeeClick}
                     >
                       {unclaimedRewardToken <= 0 ? (

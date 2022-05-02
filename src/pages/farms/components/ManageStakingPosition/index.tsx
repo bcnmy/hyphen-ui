@@ -5,7 +5,6 @@ import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import StakingPositionOverview from '../StakingPositionOverview';
-import tokens from 'config/tokens';
 import FarmsInfo from 'pages/farms/FarmsInfo';
 import Skeleton from 'react-loading-skeleton';
 import switchNetwork from 'utils/switchNetwork';
@@ -13,6 +12,7 @@ import { useNotifications } from 'context/Notifications';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function ManageStakingPosition() {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ function ManageStakingPosition() {
   const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
     useWalletProvider()!;
   const { networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
@@ -49,15 +50,17 @@ function ManageStakingPosition() {
 
   const [tokenAddress] = positionMetadata || [];
 
-  const token =
-    chainId && tokenAddress
-      ? tokens.find(tokenObj => {
+  const tokenSymbol =
+    chainId && tokens && tokenAddress
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return (
             tokenObj[Number.parseInt(chainId)]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })
-      : null;
+      : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
 
   const {
     data: positionNFTData,
@@ -96,15 +99,18 @@ function ManageStakingPosition() {
     },
   );
 
-  const rewardToken =
-    rewardTokenAddress && chain
-      ? tokens.find(tokenObj => {
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens && chain
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
             ? tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
       : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const rewardTokenDecimals =
     chain && rewardToken ? rewardToken[chain.chainId].decimal : null;

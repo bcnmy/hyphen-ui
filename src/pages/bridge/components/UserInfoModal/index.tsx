@@ -20,12 +20,13 @@ import {
 import Modal from '../../../../components/Modal';
 import { getProviderInfo } from 'web3modal';
 import { useChains } from 'context/Chains';
-import { TokenConfig, tokens } from '../../../../config/tokens';
 import TransactionDetailModal from '../TransactionDetailModal';
 import useModal from 'hooks/useModal';
 import { twMerge } from 'tailwind-merge';
 import { useHyphen } from 'context/Hyphen';
 import { Network } from 'hooks/useNetworks';
+import { Token } from 'hooks/useTokens';
+import { useToken } from 'context/Token';
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
@@ -55,7 +56,7 @@ export interface ITransactionDetails {
   startTimestamp: number;
   toChain: Network;
   toChainExplorerUrl: string;
-  token: TokenConfig;
+  token: Token;
   transactionFee: string;
 }
 
@@ -91,6 +92,7 @@ const FEE_INFO = gql`
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const { accounts, disconnect, rawEthereumProvider } = useWalletProvider()!;
   const { fromChain, networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { hyphen } = useHyphen()!;
 
   const [loading, setLoading] = useState(true);
@@ -150,12 +152,17 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         )!;
         const fromChainExplorerUrl = `${fromChain.explorerUrl}/tx/${depositHash}`;
         const toChainExplorerUrl = `${toChain.explorerUrl}/tx/${exitHash}`;
-        const token = tokens.find(
-          tokenObj =>
-            tokenObj[fromChain.chainId]?.address.toLowerCase() ===
-            tokenAddress.toLowerCase(),
-        )!;
-        const tokenDecimals = token[fromChain.chainId].decimal;
+        const tokenSymbol = tokens
+          ? Object.keys(tokens).find(tokenSymbol => {
+              const tokenObj = tokens[tokenSymbol];
+              return (
+                tokenObj[fromChain.chainId]?.address.toLowerCase() ===
+                tokenAddress.toLowerCase()
+              );
+            })
+          : undefined;
+        const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
+        const tokenDecimals = token ? token[fromChain.chainId].decimal : 18;
 
         const { assetSentToUserLogEntries } = await getFeeInfo(
           exitHash,

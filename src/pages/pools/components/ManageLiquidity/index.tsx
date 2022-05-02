@@ -9,7 +9,6 @@ import { BigNumber, ethers } from 'ethers';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
-import tokens from 'config/tokens';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useState } from 'react';
@@ -17,6 +16,7 @@ import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function ManagePosition() {
   const navigate = useNavigate();
@@ -26,6 +26,7 @@ function ManagePosition() {
   const { connect, currentChainId, isLoggedIn, walletProvider } =
     useWalletProvider()!;
   const { networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
@@ -58,15 +59,17 @@ function ManagePosition() {
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
-  const token =
-    chainId && tokenAddress
-      ? tokens.find(tokenObj => {
+  const tokenSymbol =
+    chainId && tokens && tokenAddress
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return (
             tokenObj[Number.parseInt(chainId)]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })
-      : null;
+      : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
 
   const tokenDecimals =
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;

@@ -1,15 +1,16 @@
 import config from 'config';
-import { TokenConfig } from 'config/tokens';
 import { BigNumber, ethers } from 'ethers';
 import formatRawEthValue from './formatRawEthValue';
 import toFixed from './toFixed';
 import erc20ABI from 'abis/erc20.abi.json';
 import { Network } from 'hooks/useNetworks';
+import { Token } from 'hooks/useTokens';
+import { DEFAULT_FIXED_DECIMAL_POINT } from 'config/constants';
 
 async function getTokenBalance(
   accountAddress: string,
   chain: Network,
-  token: TokenConfig,
+  token: Token | undefined,
 ) {
   if (!accountAddress || !chain || !token || !chain.rpc) return;
 
@@ -35,10 +36,7 @@ async function getTokenBalance(
 
     formattedBalance = formatRawEthValue(userRawBalance.toString(), decimals);
   }
-  const displayBalance = toFixed(
-    formattedBalance,
-    token[chainId].fixedDecimalPoint || 4,
-  );
+  const displayBalance = toFixed(formattedBalance, DEFAULT_FIXED_DECIMAL_POINT);
 
   return {
     displayBalance,

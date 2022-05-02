@@ -2,12 +2,12 @@ import { ethers } from 'ethers';
 import { useQuery, useQueryClient } from 'react-query';
 import Skeleton from 'react-loading-skeleton';
 import { HiOutlineXCircle } from 'react-icons/hi';
-import tokens from 'config/tokens';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import { Network } from 'hooks/useNetworks';
+import { useToken } from 'context/Token';
 
 interface IFarmOverview {
   chain: Network;
@@ -19,6 +19,8 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   const queryClient = useQueryClient();
   const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
     token;
+
+  const { tokens } = useToken()!;
 
   const { getSuppliedLiquidityByToken } = useLiquidityProviders(chain);
   const { getRewardRatePerSecond, getRewardTokenAddress } =
@@ -67,14 +69,18 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       },
     );
 
-  const rewardToken = rewardTokenAddress
-    ? tokens.find(tokenObj => {
-        return tokenObj[chain.chainId]
-          ? tokenObj[chain.chainId].address.toLowerCase() ===
-              rewardTokenAddress.toLowerCase()
-          : false;
-      })
-    : undefined;
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return tokenObj[chain.chainId]
+            ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress.toLowerCase()
+            : false;
+        })
+      : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(

@@ -49,7 +49,7 @@ export type Network = {
 
 function fetchNetworks(): Promise<Network[]> {
   return fetch(
-    'http://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/networks',
+    'https://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/networks',
   )
     .then(res => res.json())
     .then(data => data.message.filter((network: Network) => network.enabled));

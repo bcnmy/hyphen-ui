@@ -13,13 +13,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import StakingPositionOverview from '../StakingPositionOverview';
 import emptyPositionsIcon from '../../../../assets/images/empty-positions-icon.svg';
 import { useState } from 'react';
-import tokens from 'config/tokens';
 import FarmsInfo from 'pages/farms/FarmsInfo';
 import Skeleton from 'react-loading-skeleton';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useNotifications } from 'context/Notifications';
 import switchNetwork from 'utils/switchNetwork';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function AddStakingPosition() {
   const navigate = useNavigate();
@@ -29,6 +29,7 @@ function AddStakingPosition() {
   const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
     useWalletProvider()!;
   const { networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
@@ -37,11 +38,7 @@ function AddStakingPosition() {
       })!
     : undefined;
 
-  const token = tokenSymbol
-    ? tokens.find(tokenObj => {
-        return tokenObj.symbol === tokenSymbol;
-      })
-    : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
 
   const chainColor = chain && token ? token[chain.chainId].chainColor : '';
 
@@ -89,15 +86,18 @@ function AddStakingPosition() {
       },
     );
 
-  const rewardToken =
-    rewardTokenAddress && chain
-      ? tokens.find(tokenObj => {
+  const rewardTokenSymbol =
+    rewardTokenAddress && chain && tokens
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
             ? tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
       : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const {
     isError: approveNFTError,

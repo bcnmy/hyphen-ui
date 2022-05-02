@@ -1,6 +1,5 @@
 import ProgressBar from 'components/ProgressBar';
 import { NATIVE_ADDRESS } from 'config/constants';
-import tokens from 'config/tokens';
 import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
 import { BigNumber, ethers } from 'ethers';
@@ -23,6 +22,7 @@ import giveTokenAllowance from 'utils/giveTokenAllowance';
 import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
@@ -38,6 +38,7 @@ function IncreaseLiquidity() {
     walletProvider,
   } = useWalletProvider()!;
   const { networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
@@ -78,15 +79,17 @@ function IncreaseLiquidity() {
 
   const [tokenAddress, suppliedLiquidity] = positionMetadata || [];
 
-  const token =
-    chainId && tokenAddress
-      ? tokens.find(tokenObj => {
+  const tokenSymbol =
+    chainId && tokens && tokenAddress
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return (
             tokenObj[Number.parseInt(chainId)]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })
-      : null;
+      : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
 
   const tokenDecimals =
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;

@@ -1,8 +1,5 @@
-import { GOERLI } from "../config/chains/constants/Goerli";
-import { RINKEBY } from "../config/chains/constants/Rinkeby";
-import { ETHEREUM } from "../config/chains/constants/Ethereum";
+const ETH_CHAIN_IDS = [1, 5];
 
 export default function isToChainEthereum(chainId: number): boolean {
-  const ethereumChains = [GOERLI.chainId, RINKEBY.chainId, ETHEREUM.chainId];
-  return ethereumChains.includes(chainId);
+  return ETH_CHAIN_IDS.includes(chainId);
 }

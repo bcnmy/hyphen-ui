@@ -22,8 +22,8 @@ import useModal from 'hooks/useModal';
 import giveTokenAllowance from 'utils/giveTokenAllowance';
 import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import tokens from 'config/tokens';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import { useToken } from 'context/Token';
 
 function AddLiquidity() {
   const navigate = useNavigate();
@@ -39,6 +39,7 @@ function AddLiquidity() {
     walletProvider,
   } = useWalletProvider()!;
   const { fromChain, networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
   // States
@@ -73,24 +74,37 @@ function AddLiquidity() {
     useLiquidityFarming(chain);
 
   const tokenOptions = useMemo(() => {
+    if (!tokens) {
+      return [];
+    }
+
     return selectedChain
-      ? tokens
-          .filter(
-            tokenObj =>
+      ? Object.keys(tokens)
+          .filter(tokenSymbol => {
+            const tokenObj = tokens[tokenSymbol];
+            return (
               tokenObj[selectedChain.id] &&
-              tokenObj[selectedChain.id].isSupported,
-          )
-          .map(tokenObj => ({
+              (tokenObj[selectedChain.id].isSupported ||
+                tokenObj[selectedChain.id].isSupported === undefined)
+            );
+          })
+          .map(tokenSymbol => {
+            const tokenObj = tokens[tokenSymbol];
+            return {
+              id: tokenObj.symbol,
+              name: tokenObj.symbol,
+              image: tokenObj.image,
+            };
+          })
+      : Object.keys(tokens).map(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return {
             id: tokenObj.symbol,
             name: tokenObj.symbol,
             image: tokenObj.image,
-          }))
-      : tokens.map(tokenObj => ({
-          id: tokenObj.symbol,
-          name: tokenObj.symbol,
-          image: tokenObj.image,
-        }));
-  }, [selectedChain]);
+          };
+        });
+  }, [selectedChain, tokens]);
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
 
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<
@@ -101,9 +115,7 @@ function AddLiquidity() {
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [poolShare, setPoolShare] = useState<number>(0);
 
-  const token = tokenSymbol
-    ? tokens.find(token => token.symbol === tokenSymbol)
-    : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
   const tokenDecimals =
     chain && token ? token[chain.chainId].decimal : undefined;
 
@@ -220,12 +232,10 @@ function AddLiquidity() {
         return;
       }
 
-      const token = tokens.find(
-        tokenObj => tokenObj.symbol === selectedToken.id,
-      )!;
+      const token = tokens ? tokens[selectedToken.id] : undefined;
 
       const addLiquidityTx =
-        token[currentChainId].address === NATIVE_ADDRESS
+        token && token[currentChainId].address === NATIVE_ADDRESS
           ? await addNativeLiquidity(amount)
           : await addLiquidity(tokenAddress, amount);
       addTxNotification(
@@ -292,15 +302,18 @@ function AddLiquidity() {
       },
     );
 
-  const rewardToken =
-    rewardTokenAddress && chain
-      ? tokens.find(tokenObj => {
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens && chain
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
             ? tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
       : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
@@ -341,7 +354,7 @@ function AddLiquidity() {
       const chain = networks?.find(
         networkObj => networkObj.chainId === Number.parseInt(chainId),
       )!;
-      const token = tokens.find(tokenObj => tokenObj.symbol === tokenSymbol)!;
+      const token = tokens ? tokens[tokenSymbol] : undefined;
 
       if (isLoggedIn && accounts) {
         const { displayBalance } =
@@ -349,7 +362,9 @@ function AddLiquidity() {
         setWalletBalance(displayBalance);
       }
 
-      setSelectedTokenAddress(token[chain.chainId].address);
+      if (token) {
+        setSelectedTokenAddress(token[chain.chainId].address);
+      }
     }
 
     handleTokenChange();
@@ -360,6 +375,7 @@ function AddLiquidity() {
     liquidityProvidersAddress,
     networks,
     tokenSymbol,
+    tokens,
   ]);
 
   const formattedTotalLiquidity =
@@ -476,9 +492,7 @@ function AddLiquidity() {
   }
 
   function handleTokenChange(selectedToken: Option) {
-    const { symbol: newTokenSymbol } = tokens.find(
-      tokenObj => tokenObj.symbol === selectedToken.id,
-    )!;
+    const { symbol: newTokenSymbol } = tokens?.[selectedToken.id] ?? {};
 
     if (newTokenSymbol !== tokenSymbol) {
       queryClient.removeQueries();
@@ -491,9 +505,12 @@ function AddLiquidity() {
     const { chainId: newChainId } = networks?.find(
       networkObj => networkObj.chainId === selectedChain.id,
     )!;
-    const [{ symbol: newTokenSymbol }] = tokens.filter(
-      tokenObj => tokenObj[newChainId] && tokenObj[newChainId].isSupported,
-    );
+    const newTokenSymbol = tokens
+      ? Object.keys(tokens).filter(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return tokenObj[newChainId] && tokenObj[newChainId].isSupported;
+        })
+      : [{}];
 
     if (chainId && newChainId !== Number.parseInt(chainId, 10)) {
       queryClient.removeQueries();

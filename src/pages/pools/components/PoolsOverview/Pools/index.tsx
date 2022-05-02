@@ -1,25 +1,13 @@
-import { useQuery } from 'react-query';
-import tokens from 'config/tokens';
 import PoolOverview from './PoolOverview';
 import { HiOutlineXCircle } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function Pools() {
   const { networks } = useChains()!;
+  const { tokens, isTokensLoading, isTokensError } = useToken()!;
 
-  const { isError, isLoading, data } = useQuery(
-    'tokens',
-    () =>
-      fetch(
-        'https://hyphen-v2-api.biconomy.io/api/v1/configuration/tokens',
-      ).then(res => res.json()),
-    {
-      enabled: !!networks,
-    },
-  );
-  const { message: tokensObject } = data || {};
-
-  if (isError) {
+  if (isTokensError) {
     return (
       <article className="5 5 mb-2 rounded-10 bg-white p-2">
         <section className="flex h-auto items-start justify-center">
@@ -41,7 +29,7 @@ function Pools() {
         <h2 className="text-xl text-hyphen-purple">Pools</h2>
       </header>
 
-      {!isLoading ? (
+      {!isTokensLoading ? (
         <section className="grid grid-cols-1 gap-1">
           <div className="relative mb-1 mt-2 flex justify-center">
             <h3 className="absolute left-[3.125rem] text-xxs font-semibold uppercase text-hyphen-gray-400">
@@ -55,12 +43,10 @@ function Pools() {
             </h3>
           </div>
 
-          {networks && tokensObject
+          {networks && tokens
             ? networks.map(networkObj => {
-                return Object.keys(tokensObject).map((tokenSymbol: any) => {
-                  const token = tokens.find(
-                    tokenObj => tokenObj.symbol === tokenSymbol,
-                  )!;
+                return Object.keys(tokens).map((tokenSymbol: any) => {
+                  const token = tokens[tokenSymbol];
                   const tokenObj = token[networkObj.chainId]
                     ? {
                         coinGeckoId: token.coinGeckoId,

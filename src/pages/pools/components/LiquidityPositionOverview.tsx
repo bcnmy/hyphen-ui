@@ -2,7 +2,6 @@ import { BigNumber, ethers } from 'ethers';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { request, gql } from 'graphql-request';
-import tokens from 'config/tokens';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import Skeleton from 'react-loading-skeleton';
@@ -10,6 +9,7 @@ import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
 import CustomTooltip from 'components/CustomTooltip';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 interface ILiquidityPositionOverview {
   chainId: number;
@@ -26,6 +26,7 @@ function LiquidityPositionOverview({
   const navigate = useNavigate();
 
   const { networks } = useChains()!;
+  const { tokens } = useToken()!;
 
   const chain = networks?.find(networkObj => {
     return networkObj.chainId === chainId;
@@ -49,15 +50,17 @@ function LiquidityPositionOverview({
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
-  const token =
-    chain && tokenAddress
-      ? tokens.find(tokenObj => {
+  const tokenSymbol =
+    chainId && tokens && tokenAddress
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return (
             tokenObj[chainId]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })
-      : null;
+      : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
@@ -153,14 +156,18 @@ function LiquidityPositionOverview({
       },
     );
 
-  const rewardToken = rewardTokenAddress
-    ? tokens.find(tokenObj => {
-        return tokenObj[chain.chainId]
-          ? tokenObj[chain.chainId].address.toLowerCase() ===
-              rewardTokenAddress.toLowerCase()
-          : false;
-      })
-    : undefined;
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens && chain
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return tokenObj[chain.chainId]
+            ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress.toLowerCase()
+            : false;
+        })
+      : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const { isError: rewardTokenPriceInUSDError, data: rewardTokenPriceInUSD } =
     useQuery(
@@ -278,7 +285,6 @@ function LiquidityPositionOverview({
   const { name: chainName } = chain;
   const {
     image: tokenImage,
-    symbol: tokenSymbol,
     [chain.chainId]: { chainColor },
   } = token;
   const poolShare =

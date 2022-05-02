@@ -2,14 +2,12 @@ import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityProvidersABI from 'abis/LiquidityProviders.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
-import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
-import { ChainConfig } from 'config/chains';
 import { Network } from 'hooks/useNetworks';
 
 function useLiquidityProviders(chain: Network | undefined) {
   const { signer } = useWalletProvider()!;
   const contractAddress = chain
-    ? LiquidityProviders[chain.chainId].address
+    ? chain.contracts.hyphen.liquidityProviders
     : undefined;
 
   const liquidityProvidersContract = useMemo(() => {

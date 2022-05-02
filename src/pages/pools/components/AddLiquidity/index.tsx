@@ -22,9 +22,7 @@ import useModal from 'hooks/useModal';
 import giveTokenAllowance from 'utils/giveTokenAllowance';
 import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { chains } from 'config/chains';
 import tokens from 'config/tokens';
-import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 
 function AddLiquidity() {
@@ -62,7 +60,7 @@ function AddLiquidity() {
 
   // Liquidity Contracts
   const liquidityProvidersAddress = chain
-    ? LiquidityProviders[chain.chainId].address
+    ? chain.contracts.hyphen.liquidityProviders
     : undefined;
   const {
     addLiquidity,
@@ -490,8 +488,8 @@ function AddLiquidity() {
   }
 
   function handleChainChange(selectedChain: Option) {
-    const { chainId: newChainId } = chains.find(
-      chainObj => chainObj.chainId === selectedChain.id,
+    const { chainId: newChainId } = networks?.find(
+      networkObj => networkObj.chainId === selectedChain.id,
     )!;
     const [{ symbol: newTokenSymbol }] = tokens.filter(
       tokenObj => tokenObj[newChainId] && tokenObj[newChainId].isSupported,

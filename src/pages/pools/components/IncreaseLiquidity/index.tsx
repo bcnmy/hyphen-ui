@@ -1,5 +1,4 @@
 import ProgressBar from 'components/ProgressBar';
-import { chains } from 'config/chains';
 import { NATIVE_ADDRESS } from 'config/constants';
 import tokens from 'config/tokens';
 import { useNotifications } from 'context/Notifications';
@@ -20,7 +19,6 @@ import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
 import switchNetwork from 'utils/switchNetwork';
 import getTokenAllowance from 'utils/getTokenAllowance';
-import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 import giveTokenAllowance from 'utils/giveTokenAllowance';
 import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
@@ -49,7 +47,7 @@ function IncreaseLiquidity() {
     : undefined;
 
   const liquidityProvidersAddress = chain
-    ? LiquidityProviders[chain.chainId].address
+    ? chain.contracts.hyphen.liquidityProviders
     : undefined;
   const { getPositionMetadata } = useLPToken(chain);
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =

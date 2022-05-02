@@ -1,4 +1,3 @@
-import { ChainConfig } from 'config/chains';
 import { ethers } from 'ethers';
 import { Network } from 'hooks/useNetworks';
 

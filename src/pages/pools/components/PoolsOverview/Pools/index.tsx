@@ -1,5 +1,4 @@
 import { useQuery } from 'react-query';
-import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import PoolOverview from './PoolOverview';
 import { HiOutlineXCircle } from 'react-icons/hi';
@@ -15,7 +14,7 @@ function Pools() {
         'https://hyphen-v2-api.biconomy.io/api/v1/configuration/tokens',
       ).then(res => res.json()),
     {
-      enabled: !!chains,
+      enabled: !!networks,
     },
   );
   const { message: tokensObject } = data || {};

@@ -1,4 +1,3 @@
-import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import { BigNumber, ethers } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';

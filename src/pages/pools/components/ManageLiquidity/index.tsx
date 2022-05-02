@@ -12,11 +12,9 @@ import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import tokens from 'config/tokens';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { chains } from 'config/chains';
 import { useState } from 'react';
 import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
-import Skeleton from 'react-loading-skeleton';
 import switchNetwork from 'utils/switchNetwork';
 import { useChains } from 'context/Chains';
 

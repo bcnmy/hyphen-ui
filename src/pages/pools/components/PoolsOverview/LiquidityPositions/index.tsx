@@ -6,7 +6,6 @@ import { useWalletProvider } from 'context/WalletProvider';
 import useLPToken from 'hooks/contracts/useLPToken';
 import emptyPositionsIcon from '../../../../../assets/images/empty-positions-icon.svg';
 import { useState } from 'react';
-import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import { useChains } from 'context/Chains';
 import { HiOutlineXCircle } from 'react-icons/hi';
@@ -14,7 +13,7 @@ import { HiOutlineXCircle } from 'react-icons/hi';
 function LiquidityPositions() {
   const navigate = useNavigate();
   const { accounts, connect, isLoggedIn } = useWalletProvider()!;
-  const { selectedNetwork } = useChains()!;
+  const { networks, selectedNetwork } = useChains()!;
 
   const { getUserPositions } = useLPToken(selectedNetwork);
   const [hideClosedPositions, setHideClosedPositions] = useState(true);
@@ -40,17 +39,22 @@ function LiquidityPositions() {
 
   function handleAddLiquidity() {
     const isSelectedNetworkSupported = selectedNetwork
-      ? chains.find(chainObj => chainObj.chainId === selectedNetwork?.chainId)
+      ? networks?.find(
+          networkObj => networkObj.chainId === selectedNetwork?.chainId,
+        )
       : false;
-    const { chainId } =
+    const network =
       isSelectedNetworkSupported && selectedNetwork
         ? selectedNetwork
-        : chains[0];
-    const [{ symbol: tokenSymbol }] = tokens.filter(
-      tokenObj => tokenObj[chainId],
-    );
+        : networks?.[0];
+    const token = network
+      ? tokens.filter(tokenObj => tokenObj[network.chainId])
+      : undefined;
+    const [{ symbol: tokenSymbol }] = token ?? [{}];
 
-    navigate(`add-liquidity/${chainId}/${tokenSymbol}`);
+    if (network && token) {
+      navigate(`add-liquidity/${network.chainId}/${tokenSymbol}`);
+    }
   }
 
   if (userPositionsError) {

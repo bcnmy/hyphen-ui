@@ -9,8 +9,6 @@ import {
 
 // @ts-ignore
 import { ethers } from 'ethers';
-import { ChainConfig } from '../config/chains';
-import { config } from '../config';
 import { useWalletProvider } from './WalletProvider';
 import useNetworks, { Network } from 'hooks/useNetworks';
 
@@ -20,7 +18,6 @@ interface IChainsContext {
   toChainRpcUrlProvider: undefined | ethers.providers.JsonRpcProvider;
   fromChain: undefined | Network;
   toChain: undefined | Network;
-  compatibleToChainsForCurrentFromChain: undefined | ChainConfig[];
   changeFromChain: (chain: Network) => void;
   changeToChain: (chain: Network) => void;
   switchChains: () => void;
@@ -30,8 +27,6 @@ interface IChainsContext {
   selectedNetwork: Network | undefined;
   changeSelectedNetwork: (network: Network) => void;
 }
-
-// const chainsList = config.chains;
 
 const ChainsContext = createContext<IChainsContext | null>(null);
 
@@ -107,16 +102,6 @@ const ChainsProvider: React.FC = props => {
     })();
   });
 
-  const compatibleToChainsForCurrentFromChain = useMemo(() => {
-    if (!fromChain) return undefined;
-    return config.chainMap[fromChain.chainId].map(
-      compatibleChainId =>
-        config.chains.find(
-          chain => chain.chainId === compatibleChainId,
-        ) as ChainConfig,
-    );
-  }, [fromChain]);
-
   const changeFromChain = useCallback((chain: Network) => {
     setToChain(undefined);
     setFromChain(chain);
@@ -151,7 +136,6 @@ const ChainsProvider: React.FC = props => {
         changeToChain,
         fromChainRpcUrlProvider,
         toChainRpcUrlProvider,
-        compatibleToChainsForCurrentFromChain,
         fromChain,
         toChain,
         networks,

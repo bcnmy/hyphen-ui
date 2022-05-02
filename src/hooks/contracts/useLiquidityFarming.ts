@@ -1,14 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityFarmingABI from 'abis/LiquidityFarming.abi.json';
-import { LiquidityFarming } from 'config/liquidityContracts/LiquidityFarming';
 import { Network } from 'hooks/useNetworks';
 import { useWalletProvider } from 'context/WalletProvider';
 
 function useLiquidityFarming(chain: Network | undefined) {
   const { signer } = useWalletProvider()!;
   const contractAddress = chain
-    ? LiquidityFarming[chain.chainId].address
+    ? chain.contracts.hyphen.liquidityFarming
     : undefined;
 
   const liquidityFarmingContract = useMemo(() => {

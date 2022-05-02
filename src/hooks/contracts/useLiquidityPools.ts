@@ -2,13 +2,12 @@ import { useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
 import liquidityPoolABI from 'abis/LiquidityPools.abi.json';
 import { useWalletProvider } from 'context/WalletProvider';
-import { LiquidityPool } from 'config/liquidityContracts/LiquidityPool';
 import { Network } from 'hooks/useNetworks';
 
 function useLiquidityPools(chain: Network | undefined) {
   const { isLoggedIn, signer } = useWalletProvider()!;
   const contractAddress = chain
-    ? LiquidityPool[chain.chainId].address
+    ? chain.contracts.hyphen.liquidityPool
     : undefined;
 
   const liquidityPoolsContract = useMemo(() => {

@@ -1,12 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { ethers } from 'ethers';
 import whitelistPeriodManagerABI from 'abis/WhitelistPeriodManager.abi.json';
-import { WhitelistPeriodManager } from 'config/liquidityContracts/WhitelistPeriodManager';
 import { Network } from 'hooks/useNetworks';
 
 function useWhitelistPeriodManager(chain: Network | undefined) {
   const contractAddress = chain
-    ? WhitelistPeriodManager[chain.chainId].address
+    ? chain.contracts.hyphen.whitelistPeriodManager
     : undefined;
 
   const whitelistPeriodManagerContract = useMemo(() => {

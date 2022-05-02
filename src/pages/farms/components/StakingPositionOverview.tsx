@@ -1,4 +1,3 @@
-import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import { BigNumber, ethers } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';
@@ -10,6 +9,7 @@ import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { Decimal } from 'decimal.js';
 import { HiOutlineXCircle } from 'react-icons/hi';
+import { useChains } from 'context/Chains';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -23,8 +23,10 @@ function StakingPositionOverview({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const chain = chains.find(chainObj => {
-    return chainObj.chainId === chainId;
+  const { networks } = useChains()!;
+
+  const chain = networks?.find(networkObj => {
+    return networkObj.chainId === chainId;
   })!;
 
   const { getPositionMetadata } = useLPToken(chain);

@@ -1,20 +1,16 @@
 import { ethers } from 'ethers';
 import { useQuery, useQueryClient } from 'react-query';
-import { request, gql } from 'graphql-request';
 import Skeleton from 'react-loading-skeleton';
-import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
-import { ChainConfig, chains } from 'config/chains';
-import tokens, { TokenConfig } from 'config/tokens';
-import CustomTooltip from 'components/CustomTooltip';
-import ProgressBar from 'components/ProgressBar';
+import { HiOutlineXCircle } from 'react-icons/hi';
+import tokens from 'config/tokens';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
-import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
+import { Network } from 'hooks/useNetworks';
 
 interface IFarmOverview {
-  chain: ChainConfig;
+  chain: Network;
   token: any;
 }
 

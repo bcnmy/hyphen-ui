@@ -12,12 +12,11 @@ import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import tokens from 'config/tokens';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { chains } from 'config/chains';
 import { useState } from 'react';
 import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
-import Skeleton from 'react-loading-skeleton';
 import switchNetwork from 'utils/switchNetwork';
+import { useChains } from 'context/Chains';
 
 function ManagePosition() {
   const navigate = useNavigate();
@@ -26,11 +25,12 @@ function ManagePosition() {
 
   const { connect, currentChainId, isLoggedIn, walletProvider } =
     useWalletProvider()!;
+  const { networks } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === Number.parseInt(chainId);
+    ? networks?.find(networkObj => {
+        return networkObj.chainId === Number.parseInt(chainId);
       })!
     : undefined;
 

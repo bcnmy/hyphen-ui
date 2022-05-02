@@ -7,7 +7,6 @@ import {
   useState,
 } from 'react';
 
-import { ChainConfig } from 'config/chains';
 import { config } from 'config';
 import { TokenConfig } from 'config/tokens';
 import { useChains } from 'context/Chains';
@@ -18,6 +17,7 @@ import erc20ABI from 'abis/erc20.abi.json';
 import toFixed from 'utils/toFixed';
 import useAsync, { Status } from 'hooks/useLoading';
 import formatRawEthValue from 'utils/formatRawEthValue';
+import { Network } from 'hooks/useNetworks';
 
 interface ITokenBalance {
   formattedBalance: string;
@@ -41,8 +41,8 @@ const TokenContext = createContext<ITokenContext | null>(null);
 
 function isTokenValidForChains(
   token: TokenConfig,
-  fromChain: ChainConfig,
-  toChain: ChainConfig,
+  fromChain: Network,
+  toChain: Network,
 ) {
   // return true if token has config available for both from and to chains
   // else return false

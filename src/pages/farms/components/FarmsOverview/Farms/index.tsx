@@ -1,10 +1,12 @@
 import { useQuery } from 'react-query';
-import { chains } from 'config/chains';
 import tokens from 'config/tokens';
 import FarmOverview from './FarmOverview';
 import { HiOutlineXCircle } from 'react-icons/hi';
+import { useChains } from 'context/Chains';
 
 function Farms() {
+  const { networks } = useChains()!;
+
   const { data, isError, isLoading } = useQuery(
     'tokens',
     () =>
@@ -12,7 +14,7 @@ function Farms() {
         'https://hyphen-v2-api.biconomy.io/api/v1/configuration/tokens',
       ).then(res => res.json()),
     {
-      enabled: !!chains,
+      enabled: !!networks,
     },
   );
   const { message: tokensObject } = data || {};
@@ -53,24 +55,24 @@ function Farms() {
             </h3>
           </div>
 
-          {chains && tokensObject
-            ? chains.map(chainObj => {
+          {networks && tokensObject
+            ? networks.map(networkObj => {
                 return Object.keys(tokensObject).map((tokenSymbol: any) => {
                   const token = tokens.find(
                     tokenObj => tokenObj.symbol === tokenSymbol,
                   )!;
-                  const tokenObj = token[chainObj.chainId]
+                  const tokenObj = token[networkObj.chainId]
                     ? {
                         coinGeckoId: token.coinGeckoId,
                         tokenImage: token.image,
-                        ...token[chainObj.chainId],
+                        ...token[networkObj.chainId],
                       }
                     : null;
 
                   return tokenObj ? (
                     <FarmOverview
-                      key={`farm-${chainObj.name}-${tokenSymbol}`}
-                      chain={chainObj}
+                      key={`farm-${networkObj.name}-${tokenSymbol}`}
+                      chain={networkObj}
                       token={tokenObj}
                     />
                   ) : null;

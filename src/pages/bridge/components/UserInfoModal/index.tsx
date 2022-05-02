@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
-import { gql, NetworkStatus, useQuery } from '@apollo/client';
+import {
+  ApolloClient,
+  gql,
+  InMemoryCache,
+  NetworkStatus,
+  useQuery,
+} from '@apollo/client';
 import { BigNumber, ethers } from 'ethers';
 import { Dialog } from '@headlessui/react';
 import Skeleton from 'react-loading-skeleton';
 import { useWalletProvider } from 'context/WalletProvider';
-import { apolloClients } from 'context/GraphQL';
 import { IoMdClose } from 'react-icons/io';
 import {
   HiOutlineClipboardCopy,
@@ -16,11 +21,11 @@ import Modal from '../../../../components/Modal';
 import { getProviderInfo } from 'web3modal';
 import { useChains } from 'context/Chains';
 import { TokenConfig, tokens } from '../../../../config/tokens';
-import { ChainConfig, chains } from '../../../../config/chains';
 import TransactionDetailModal from '../TransactionDetailModal';
 import useModal from 'hooks/useModal';
 import { twMerge } from 'tailwind-merge';
 import { useHyphen } from 'context/Hyphen';
+import { Network } from 'hooks/useNetworks';
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
@@ -42,13 +47,13 @@ export interface ITransactionDetails {
   depositHash: string;
   endTimestamp: number;
   exitHash: string;
-  fromChain: ChainConfig;
+  fromChain: Network;
   fromChainExplorerUrl: string;
   gasFee: string;
   lpFee: string;
   rewardAmount: string;
   startTimestamp: number;
-  toChain: ChainConfig;
+  toChain: Network;
   toChainExplorerUrl: string;
   token: TokenConfig;
   transactionFee: string;
@@ -85,7 +90,7 @@ const FEE_INFO = gql`
 
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   const { accounts, disconnect, rawEthereumProvider } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, networks } = useChains()!;
   const { hyphen } = useHyphen()!;
 
   const [loading, setLoading] = useState(true);
@@ -108,8 +113,11 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
   });
 
   useEffect(() => {
-    async function getFeeInfo(exitHash: string, toChain: ChainConfig) {
-      const apolloClient = apolloClients[toChain.chainId];
+    async function getFeeInfo(exitHash: string, toChain: Network) {
+      const apolloClient = new ApolloClient({
+        uri: toChain.v2GraphUrl,
+        cache: new InMemoryCache(),
+      });
       const { data: feeInfo } = await apolloClient.query({
         query: FEE_INFO,
         variables: { exitHash: exitHash },
@@ -119,7 +127,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
     }
 
     async function getUserTransactions(
-      fromChain: ChainConfig,
+      fromChain: Network,
       userDeposits: IUserDeposits[],
     ) {
       let transformedTransactions = [];
@@ -137,8 +145,8 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           depositHash,
           fromChainId: fromChain.chainId,
         });
-        const toChain = chains.find(
-          chainObj => chainObj.chainId === Number.parseInt(toChainID, 10),
+        const toChain = networks?.find(
+          networkObj => networkObj.chainId === Number.parseInt(toChainID, 10),
         )!;
         const fromChainExplorerUrl = `${fromChain.explorerUrl}/tx/${depositHash}`;
         const toChainExplorerUrl = `${toChain.explorerUrl}/tx/${exitHash}`;
@@ -190,7 +198,9 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
         const formattedTransactionFee = Number.parseFloat(
           ethers.utils.formatUnits(
-            BigNumber.from(transferFee).sub(BigNumber.from(lpFee)).add(BigNumber.from(gasFee)),
+            BigNumber.from(transferFee)
+              .sub(BigNumber.from(lpFee))
+              .add(BigNumber.from(gasFee)),
             tokenDecimals,
           ),
         ).toFixed(3);
@@ -220,11 +230,11 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
       setLoading(false);
     }
 
-    if (fromChain && userDepositsData) {
+    if (fromChain && networks && userDepositsData) {
       const { deposits: userDeposits } = userDepositsData;
       getUserTransactions(fromChain, userDeposits);
     }
-  }, [fromChain, hyphen, userDepositsData]);
+  }, [fromChain, hyphen, networks, userDepositsData]);
 
   const {
     isVisible: isTransactionDetailModalVisible,

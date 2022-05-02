@@ -1,6 +1,5 @@
-import { chains } from 'config/chains';
 import { useWalletProvider } from 'context/WalletProvider';
-import { BigNumber, ethers } from 'ethers';
+import { BigNumber } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';
 import {
   HiArrowSmLeft,
@@ -18,9 +17,9 @@ import tokens from 'config/tokens';
 import FarmsInfo from 'pages/farms/FarmsInfo';
 import Skeleton from 'react-loading-skeleton';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
-import { LiquidityFarming } from 'config/liquidityContracts/LiquidityFarming';
 import { useNotifications } from 'context/Notifications';
 import switchNetwork from 'utils/switchNetwork';
+import { useChains } from 'context/Chains';
 
 function AddStakingPosition() {
   const navigate = useNavigate();
@@ -29,11 +28,12 @@ function AddStakingPosition() {
 
   const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
     useWalletProvider()!;
+  const { networks } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === Number.parseInt(chainId);
+    ? networks?.find(network => {
+        return network.chainId === Number.parseInt(chainId);
       })!
     : undefined;
 
@@ -245,7 +245,7 @@ function AddStakingPosition() {
   const isNFTApproved =
     NFTApprovalAddress && chain
       ? NFTApprovalAddress.toLowerCase() ===
-        LiquidityFarming[chain.chainId].address.toLowerCase()
+        chain.contracts.hyphen.liquidityFarming.toLowerCase()
       : false;
 
   function handlePrevPositionClick() {
@@ -274,7 +274,7 @@ function AddStakingPosition() {
 
     approveNFTMutation(
       {
-        address: LiquidityFarming[chain.chainId].address,
+        address: chain.contracts.hyphen.liquidityFarming,
         positionId: filteredUserPositions[currentPosition],
       },
       {

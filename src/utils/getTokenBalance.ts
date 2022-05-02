@@ -1,24 +1,24 @@
 import config from 'config';
-import { ChainConfig } from 'config/chains';
 import { TokenConfig } from 'config/tokens';
 import { BigNumber, ethers } from 'ethers';
 import formatRawEthValue from './formatRawEthValue';
 import toFixed from './toFixed';
 import erc20ABI from 'abis/erc20.abi.json';
+import { Network } from 'hooks/useNetworks';
 
 async function getTokenBalance(
   accountAddress: string,
-  chain: ChainConfig,
+  chain: Network,
   token: TokenConfig,
 ) {
-  if (!accountAddress || !chain || !token) return;
+  if (!accountAddress || !chain || !token || !chain.rpc) return;
 
-  const { chainId, nativeDecimal, rpcUrl } = chain;
+  const { chainId, nativeDecimal, rpc } = chain;
   const {
     [chainId]: { address: tokenAddress },
   } = token;
 
-  const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const provider = new ethers.providers.JsonRpcProvider(rpc);
   const tokenContract = new ethers.Contract(tokenAddress, erc20ABI, provider);
 
   let formattedBalance: string;

@@ -1,5 +1,4 @@
 import ProgressBar from 'components/ProgressBar';
-import { chains } from 'config/chains';
 import { NATIVE_ADDRESS } from 'config/constants';
 import tokens from 'config/tokens';
 import { useNotifications } from 'context/Notifications';
@@ -20,10 +19,10 @@ import StepSlider from '../StepSlider';
 import Skeleton from 'react-loading-skeleton';
 import switchNetwork from 'utils/switchNetwork';
 import getTokenAllowance from 'utils/getTokenAllowance';
-import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 import giveTokenAllowance from 'utils/giveTokenAllowance';
 import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
+import { useChains } from 'context/Chains';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
@@ -38,16 +37,17 @@ function IncreaseLiquidity() {
     signer,
     walletProvider,
   } = useWalletProvider()!;
+  const { networks } = useChains()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === Number.parseInt(chainId);
+    ? networks?.find(networkObj => {
+        return networkObj.chainId === Number.parseInt(chainId);
       })!
     : undefined;
 
   const liquidityProvidersAddress = chain
-    ? LiquidityProviders[chain.chainId].address
+    ? chain.contracts.hyphen.liquidityProviders
     : undefined;
   const { getPositionMetadata } = useLPToken(chain);
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
@@ -129,6 +129,7 @@ function IncreaseLiquidity() {
       if (
         !accounts ||
         !chain ||
+        !chain.rpc ||
         !liquidityProvidersAddress ||
         !token ||
         token[chain.chainId].address === NATIVE_ADDRESS
@@ -137,7 +138,7 @@ function IncreaseLiquidity() {
 
       return getTokenAllowance(
         accounts[0],
-        new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+        new ethers.providers.JsonRpcProvider(chain.rpc),
         liquidityProvidersAddress,
         token[chain.chainId].address,
       );

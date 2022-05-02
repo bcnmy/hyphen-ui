@@ -3,7 +3,6 @@ import { useQuery } from 'react-query';
 import { request, gql } from 'graphql-request';
 import Skeleton from 'react-loading-skeleton';
 import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
-import { ChainConfig } from 'config/chains';
 import tokens from 'config/tokens';
 import CustomTooltip from 'components/CustomTooltip';
 import ProgressBar from 'components/ProgressBar';
@@ -12,9 +11,10 @@ import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import { Network } from 'hooks/useNetworks';
 
 interface IPoolOverview {
-  chain: ChainConfig;
+  chain: Network;
   token: any;
 }
 
@@ -22,7 +22,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   const navigate = useNavigate();
   const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
     token;
-  const { v2GraphURL: v2GraphEndpoint } = chain;
+  const { v2GraphUrl: v2GraphEndpoint } = chain;
 
   const { getSuppliedLiquidityByToken, getTotalLiquidity } =
     useLiquidityProviders(chain);

@@ -339,8 +339,6 @@ function AddLiquidity() {
       ? tokenOptions.find(tokenObj => tokenObj.id === tokenSymbol)
       : tokenOptions[0];
 
-    console.log(tokenOptions);
-
     setSelectedChain(chain);
     setSelectedToken(token);
   }, [chainId, chainOptions, tokenOptions, tokenSymbol]);

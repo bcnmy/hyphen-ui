@@ -11,7 +11,6 @@ import {
 import { ethers } from 'ethers';
 import { useWalletProvider } from './WalletProvider';
 import useNetworks, { Network } from 'hooks/useNetworks';
-import useTokens, { Token } from 'hooks/useTokens';
 
 interface IChainsContext {
   areChainsReady: boolean;
@@ -25,9 +24,6 @@ interface IChainsContext {
   networks: Network[] | undefined;
   isNetworksLoading: boolean;
   isNetworksError: boolean;
-  tokens: Token[] | undefined;
-  isTokensLoading: boolean;
-  isTokensError: boolean;
   selectedNetwork: Network | undefined;
   changeSelectedNetwork: (network: Network) => void;
 }
@@ -41,12 +37,6 @@ const ChainsProvider: React.FC = props => {
     isLoading: isNetworksLoading,
     isError: isNetworksError,
   } = useNetworks();
-
-  const {
-    data: tokens,
-    isLoading: isTokensLoading,
-    isError: isTokensError,
-  } = useTokens();
 
   const [fromChain, setFromChain] = useState<Network>();
   const [toChain, setToChain] = useState<Network>();
@@ -151,9 +141,6 @@ const ChainsProvider: React.FC = props => {
         networks,
         isNetworksLoading,
         isNetworksError,
-        tokens,
-        isTokensLoading,
-        isTokensError,
         selectedNetwork,
         changeSelectedNetwork,
       }}

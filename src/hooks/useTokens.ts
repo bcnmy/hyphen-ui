@@ -29,7 +29,9 @@ const tokensEndpoint =
     ? 'https://hyphen-v2-api.biconomy.io/api/v1/configuration/tokens'
     : 'https://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/tokens';
 
-function fetchTokens(): Promise<Token[]> {
+function fetchTokens(): Promise<{
+  [key: string]: Token;
+}> {
   return fetch(tokensEndpoint)
     .then(res => res.json())
     .then(data =>
@@ -46,7 +48,12 @@ function fetchTokens(): Promise<Token[]> {
 function useTokens() {
   const { data: networks } = useNetworks();
 
-  return useQuery<Token[], Error>('tokens', fetchTokens, {
+  return useQuery<
+    {
+      [key: string]: Token;
+    },
+    Error
+  >('tokens', fetchTokens, {
     enabled: !!networks,
   });
 }

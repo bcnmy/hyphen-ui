@@ -1,9 +1,11 @@
 import PoolOverview from './PoolOverview';
 import { HiOutlineXCircle } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function Pools() {
-  const { networks, tokens, isTokensLoading, isTokensError } = useChains()!;
+  const { networks } = useChains()!;
+  const { tokens, isTokensLoading, isTokensError } = useToken()!;
 
   if (isTokensError) {
     return (

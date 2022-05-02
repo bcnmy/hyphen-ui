@@ -233,9 +233,7 @@ const TransactionProvider: React.FC = props => {
       if (isNaN(transferAmount)) throw new Error('Transfer amount is invalid');
       console.log('calculate fee for amount', transferAmount);
 
-      let fixedDecimalPoint =
-        selectedToken[fromChain.chainId].fixedDecimalPoint ||
-        DEFAULT_FIXED_DECIMAL_POINT;
+      let fixedDecimalPoint = DEFAULT_FIXED_DECIMAL_POINT;
       if (!selectedToken || !toChain || !transferAmount) {
         return;
       }
@@ -638,11 +636,7 @@ const TransactionProvider: React.FC = props => {
           amount,
           selectedToken[fromChain.chainId].decimal,
         );
-        processedAmount = toFixed(
-          processedAmount,
-          selectedToken[fromChain.chainId].fixedDecimalPoint ||
-            DEFAULT_FIXED_DECIMAL_POINT,
-        );
+        processedAmount = toFixed(processedAmount, DEFAULT_FIXED_DECIMAL_POINT);
         return processedAmount;
       } catch (error) {
         console.log(error);

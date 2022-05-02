@@ -1,9 +1,11 @@
 import FarmOverview from './FarmOverview';
 import { HiOutlineXCircle } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function Farms() {
-  const { networks, tokens, isTokensLoading, isTokensError } = useChains()!;
+  const { networks } = useChains()!;
+  const { tokens, isTokensLoading, isTokensError } = useToken()!;
 
   if (isTokensError) {
     return (

@@ -94,7 +94,7 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
             </div>
 
             <span className="text-center text-gray-500">
-              Tranfer completed in{' '}
+              Transfer completed in{' '}
               <span className="text-hyphen-purple">
                 {transferRecord.transferTime}
               </span>

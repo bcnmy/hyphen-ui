@@ -84,7 +84,8 @@ function AddLiquidity() {
             const tokenObj = tokens[tokenSymbol];
             return (
               tokenObj[selectedChain.id] &&
-              tokenObj[selectedChain.id].isSupported
+              (tokenObj[selectedChain.id].isSupported ||
+                tokenObj[selectedChain.id].isSupported === undefined)
             );
           })
           .map(tokenSymbol => {
@@ -337,6 +338,8 @@ function AddLiquidity() {
     const token = tokenSymbol
       ? tokenOptions.find(tokenObj => tokenObj.id === tokenSymbol)
       : tokenOptions[0];
+
+    console.log(tokenOptions);
 
     setSelectedChain(chain);
     setSelectedToken(token);

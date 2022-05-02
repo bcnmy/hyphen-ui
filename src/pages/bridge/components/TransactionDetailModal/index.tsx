@@ -93,7 +93,7 @@ function TransactionDetailModal({
             </div>
 
             <span className="text-center text-gray-500">
-              Tranfer completed in{' '}
+              Transfer completed in{' '}
               <span className="text-hyphen-purple">{transactionTime}</span>
             </span>
           </div>

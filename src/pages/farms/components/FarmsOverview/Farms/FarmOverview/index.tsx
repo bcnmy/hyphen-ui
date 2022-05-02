@@ -192,7 +192,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       </div>
       <div className="absolute right-12.5 flex h-12 w-[250px] flex-col items-end justify-end">
         <span className="font-mono text-2xl">
-          {rewardsPerDay ? (
+          {rewardsPerDay >= 0 ? (
             <div className="flex items-center">
               <img
                 src={rewardToken?.image}

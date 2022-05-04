@@ -3,8 +3,6 @@ import { useQuery } from 'react-query';
 import { request, gql } from 'graphql-request';
 import Skeleton from 'react-loading-skeleton';
 import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
-import { ChainConfig } from 'config/chains';
-import tokens from 'config/tokens';
 import CustomTooltip from 'components/CustomTooltip';
 import ProgressBar from 'components/ProgressBar';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
@@ -12,9 +10,11 @@ import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import { Network } from 'hooks/useNetworks';
+import { useToken } from 'context/Token';
 
 interface IPoolOverview {
-  chain: ChainConfig;
+  chain: Network;
   token: any;
 }
 
@@ -22,7 +22,9 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   const navigate = useNavigate();
   const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
     token;
-  const { v2GraphURL: v2GraphEndpoint } = chain;
+  const { v2GraphUrl: v2GraphEndpoint } = chain;
+
+  const { tokens } = useToken()!;
 
   const { getSuppliedLiquidityByToken, getTotalLiquidity } =
     useLiquidityProviders(chain);
@@ -114,14 +116,18 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       },
     );
 
-  const rewardToken = rewardTokenAddress
-    ? tokens.find(tokenObj => {
-        return tokenObj[chain.chainId]
-          ? tokenObj[chain.chainId].address.toLowerCase() ===
-              rewardTokenAddress.toLowerCase()
-          : false;
-      })
-    : undefined;
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens && chain
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return tokenObj[chain.chainId]
+            ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress.toLowerCase()
+            : false;
+        })
+      : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(

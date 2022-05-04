@@ -22,10 +22,8 @@ import useModal from 'hooks/useModal';
 import giveTokenAllowance from 'utils/giveTokenAllowance';
 import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { chains } from 'config/chains';
-import tokens from 'config/tokens';
-import { LiquidityProviders } from 'config/liquidityContracts/LiquidityProviders';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
+import { useToken } from 'context/Token';
 
 function AddLiquidity() {
   const navigate = useNavigate();
@@ -40,12 +38,13 @@ function AddLiquidity() {
     signer,
     walletProvider,
   } = useWalletProvider()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
   // States
   const chainOptions = useMemo(() => {
-    return chains.map(chainObj => {
+    return networks?.map(chainObj => {
       return {
         id: chainObj.chainId,
         name: chainObj.name,
@@ -53,16 +52,16 @@ function AddLiquidity() {
         symbol: chainObj.currency,
       };
     });
-  }, []);
+  }, [networks]);
   const [selectedChain, setSelectedChain] = useState<Option | undefined>();
   const chain = selectedChain
-    ? chains.find(chainObj => chainObj.chainId === selectedChain.id)
+    ? networks?.find(networkObj => networkObj.chainId === selectedChain.id)
     : undefined;
-  const v2GraphEndpoint = chain?.v2GraphURL;
+  const v2GraphEndpoint = chain?.v2GraphUrl;
 
   // Liquidity Contracts
   const liquidityProvidersAddress = chain
-    ? LiquidityProviders[chain.chainId].address
+    ? chain.contracts.hyphen.liquidityProviders
     : undefined;
   const {
     addLiquidity,
@@ -75,24 +74,37 @@ function AddLiquidity() {
     useLiquidityFarming(chain);
 
   const tokenOptions = useMemo(() => {
+    if (!tokens) {
+      return [];
+    }
+
     return selectedChain
-      ? tokens
-          .filter(
-            tokenObj =>
+      ? Object.keys(tokens)
+          .filter(tokenSymbol => {
+            const tokenObj = tokens[tokenSymbol];
+            return (
               tokenObj[selectedChain.id] &&
-              tokenObj[selectedChain.id].isSupported,
-          )
-          .map(tokenObj => ({
+              (tokenObj[selectedChain.id].isSupported ||
+                tokenObj[selectedChain.id].isSupported === undefined)
+            );
+          })
+          .map(tokenSymbol => {
+            const tokenObj = tokens[tokenSymbol];
+            return {
+              id: tokenObj.symbol,
+              name: tokenObj.symbol,
+              image: tokenObj.image,
+            };
+          })
+      : Object.keys(tokens).map(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return {
             id: tokenObj.symbol,
             name: tokenObj.symbol,
             image: tokenObj.image,
-          }))
-      : tokens.map(tokenObj => ({
-          id: tokenObj.symbol,
-          name: tokenObj.symbol,
-          image: tokenObj.image,
-        }));
-  }, [selectedChain]);
+          };
+        });
+  }, [selectedChain, tokens]);
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
 
   const [selectedTokenAddress, setSelectedTokenAddress] = useState<
@@ -103,9 +115,7 @@ function AddLiquidity() {
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [poolShare, setPoolShare] = useState<number>(0);
 
-  const token = tokenSymbol
-    ? tokens.find(token => token.symbol === tokenSymbol)
-    : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
   const tokenDecimals =
     chain && token ? token[chain.chainId].decimal : undefined;
 
@@ -167,6 +177,7 @@ function AddLiquidity() {
       if (
         !accounts ||
         !chain ||
+        !chain.rpc ||
         !liquidityProvidersAddress ||
         !selectedTokenAddress ||
         selectedTokenAddress === NATIVE_ADDRESS
@@ -175,7 +186,7 @@ function AddLiquidity() {
 
       return getTokenAllowance(
         accounts[0],
-        new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+        new ethers.providers.JsonRpcProvider(chain.rpc),
         liquidityProvidersAddress,
         selectedTokenAddress,
       );
@@ -221,12 +232,10 @@ function AddLiquidity() {
         return;
       }
 
-      const token = tokens.find(
-        tokenObj => tokenObj.symbol === selectedToken.id,
-      )!;
+      const token = tokens ? tokens[selectedToken.id] : undefined;
 
       const addLiquidityTx =
-        token[currentChainId].address === NATIVE_ADDRESS
+        token && token[currentChainId].address === NATIVE_ADDRESS
           ? await addNativeLiquidity(amount)
           : await addLiquidity(tokenAddress, amount);
       addTxNotification(
@@ -293,15 +302,18 @@ function AddLiquidity() {
       },
     );
 
-  const rewardToken =
-    rewardTokenAddress && chain
-      ? tokens.find(tokenObj => {
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens && chain
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
             ? tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
       : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
@@ -321,8 +333,8 @@ function AddLiquidity() {
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     const chain = chainId
-      ? chainOptions.find(chainObj => chainObj.id === Number.parseInt(chainId))
-      : chainOptions[0];
+      ? chainOptions?.find(chainObj => chainObj.id === Number.parseInt(chainId))
+      : undefined;
     const token = tokenSymbol
       ? tokenOptions.find(tokenObj => tokenObj.id === tokenSymbol)
       : tokenOptions[0];
@@ -339,10 +351,10 @@ function AddLiquidity() {
         return null;
       }
 
-      const chain = chains.find(
-        chainObj => chainObj.chainId === Number.parseInt(chainId),
+      const chain = networks?.find(
+        networkObj => networkObj.chainId === Number.parseInt(chainId),
       )!;
-      const token = tokens.find(tokenObj => tokenObj.symbol === tokenSymbol)!;
+      const token = tokens ? tokens[tokenSymbol] : undefined;
 
       if (isLoggedIn && accounts) {
         const { displayBalance } =
@@ -350,11 +362,21 @@ function AddLiquidity() {
         setWalletBalance(displayBalance);
       }
 
-      setSelectedTokenAddress(token[chain.chainId].address);
+      if (token) {
+        setSelectedTokenAddress(token[chain.chainId].address);
+      }
     }
 
     handleTokenChange();
-  }, [accounts, chainId, isLoggedIn, liquidityProvidersAddress, tokenSymbol]);
+  }, [
+    accounts,
+    chainId,
+    isLoggedIn,
+    liquidityProvidersAddress,
+    networks,
+    tokenSymbol,
+    tokens,
+  ]);
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
@@ -470,9 +492,7 @@ function AddLiquidity() {
   }
 
   function handleTokenChange(selectedToken: Option) {
-    const { symbol: newTokenSymbol } = tokens.find(
-      tokenObj => tokenObj.symbol === selectedToken.id,
-    )!;
+    const { symbol: newTokenSymbol } = tokens?.[selectedToken.id] ?? {};
 
     if (newTokenSymbol !== tokenSymbol) {
       queryClient.removeQueries();
@@ -482,12 +502,15 @@ function AddLiquidity() {
   }
 
   function handleChainChange(selectedChain: Option) {
-    const { chainId: newChainId } = chains.find(
-      chainObj => chainObj.chainId === selectedChain.id,
+    const { chainId: newChainId } = networks?.find(
+      networkObj => networkObj.chainId === selectedChain.id,
     )!;
-    const [{ symbol: newTokenSymbol }] = tokens.filter(
-      tokenObj => tokenObj[newChainId] && tokenObj[newChainId].isSupported,
-    );
+    const newTokenSymbol = tokens
+      ? Object.keys(tokens).filter(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return tokenObj[newChainId] && tokenObj[newChainId].isSupported;
+        })
+      : [{}];
 
     if (chainId && newChainId !== Number.parseInt(chainId, 10)) {
       queryClient.removeQueries();

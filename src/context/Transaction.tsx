@@ -1,6 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise';
 import { BigNumber, ethers } from 'ethers';
-import { useQuery } from 'react-query';
 import {
   createContext,
   FormEvent,
@@ -14,12 +13,11 @@ import {
 import lpmanagerABI from 'abis/LiquidityPools.abi.json';
 
 // @ts-ignore
-import { RESPONSE_CODES } from '@biconomy/hyphen-staging';
+import { RESPONSE_CODES } from '@biconomy/hyphen';
 
 import {
   BASE_DIVISOR,
   DEFAULT_FIXED_DECIMAL_POINT,
-  LP_FEE_FRACTION,
   NATIVE_ADDRESS,
 } from 'config/constants';
 import { useChains } from './Chains';
@@ -235,9 +233,7 @@ const TransactionProvider: React.FC = props => {
       if (isNaN(transferAmount)) throw new Error('Transfer amount is invalid');
       console.log('calculate fee for amount', transferAmount);
 
-      let fixedDecimalPoint =
-        selectedToken[fromChain.chainId].fixedDecimalPoint ||
-        DEFAULT_FIXED_DECIMAL_POINT;
+      let fixedDecimalPoint = DEFAULT_FIXED_DECIMAL_POINT;
       if (!selectedToken || !toChain || !transferAmount) {
         return;
       }
@@ -627,7 +623,7 @@ const TransactionProvider: React.FC = props => {
       let lpManagerInterface = new ethers.utils.Interface(lpmanagerABI);
 
       let tokenReceipt = receipt.logs.find(
-        receiptLog => receiptLog.topics[0] === toChain.assetSentTopicId,
+        receiptLog => receiptLog.topics[0] === toChain.topicIds.assetSent,
       );
       try {
         if (!tokenReceipt) {
@@ -640,11 +636,7 @@ const TransactionProvider: React.FC = props => {
           amount,
           selectedToken[fromChain.chainId].decimal,
         );
-        processedAmount = toFixed(
-          processedAmount,
-          selectedToken[fromChain.chainId].fixedDecimalPoint ||
-            DEFAULT_FIXED_DECIMAL_POINT,
-        );
+        processedAmount = toFixed(processedAmount, DEFAULT_FIXED_DECIMAL_POINT);
         return processedAmount;
       } catch (error) {
         console.log(error);

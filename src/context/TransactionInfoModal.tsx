@@ -1,6 +1,6 @@
-import { ChainConfig } from 'config/chains';
-import { TokenConfig } from 'config/tokens';
 import useModal from 'hooks/useModal';
+import { Network } from 'hooks/useNetworks';
+import { Token } from 'hooks/useTokens';
 import TransferInfoModal from 'pages/bridge/components/TransferInfoModal';
 import { createContext, useCallback, useContext, useState } from 'react';
 
@@ -8,9 +8,9 @@ export interface ITransferRecord {
   depositHash: string;
   depositAmount: string;
   exitHash: string;
-  token: TokenConfig;
-  fromChain: ChainConfig;
-  toChain: ChainConfig;
+  token: Token;
+  fromChain: Network;
+  toChain: Network;
   lpFee: string;
   transferredAmount: string;
   transactionFee: string;

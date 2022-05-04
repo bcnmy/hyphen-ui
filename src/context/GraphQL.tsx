@@ -1,28 +1,31 @@
-import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
-import { useChains } from "./Chains";
-import { chains } from "../config/chains";
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { useChains } from './Chains';
+import { Network } from 'hooks/useNetworks';
 
 type clientInstance = { [chainId: number]: InstanceType<typeof ApolloClient> };
 
-export const apolloClients = chains.reduce((accumulator, currentValue) => {
-  accumulator[currentValue.chainId] = new ApolloClient({
-    uri: currentValue.v2GraphURL,
-    cache: new InMemoryCache(),
-  });
-  return accumulator;
-}, {} as clientInstance);
+function constructApolloClients(networks: Network[] | undefined) {
+  return networks?.reduce((accumulator, currentValue) => {
+    accumulator[currentValue.chainId] = new ApolloClient({
+      uri: currentValue.v2GraphUrl,
+      cache: new InMemoryCache(),
+    });
+    return accumulator;
+  }, {} as clientInstance);
+}
 
 const GraphQLProvider: React.FC = ({ children, ...props }) => {
-  const { fromChain } = useChains()!;
-  const fromChainClient = fromChain
-    ? apolloClients[fromChain.chainId]
-    : apolloClients[chains[0].chainId];
+  const { fromChain, networks } = useChains()!;
+  const apolloClients = constructApolloClients(networks);
 
-  return (
+  const fromChainClient =
+    fromChain && apolloClients ? apolloClients[fromChain?.chainId] : undefined;
+
+  return fromChainClient ? (
     <ApolloProvider client={fromChainClient} {...props}>
       {children}
     </ApolloProvider>
-  );
+  ) : null;
 };
 
 export { GraphQLProvider };

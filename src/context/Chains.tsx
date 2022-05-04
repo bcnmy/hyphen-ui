@@ -9,47 +9,50 @@ import {
 
 // @ts-ignore
 import { ethers } from 'ethers';
-import { ChainConfig } from '../config/chains';
-import { config } from '../config';
 import { useWalletProvider } from './WalletProvider';
+import useNetworks, { Network } from 'hooks/useNetworks';
 
 interface IChainsContext {
   areChainsReady: boolean;
   fromChainRpcUrlProvider: undefined | ethers.providers.JsonRpcProvider;
   toChainRpcUrlProvider: undefined | ethers.providers.JsonRpcProvider;
-  fromChain: undefined | ChainConfig;
-  toChain: undefined | ChainConfig;
-  compatibleToChainsForCurrentFromChain: undefined | ChainConfig[];
-  changeFromChain: (chain: ChainConfig) => void;
-  changeToChain: (chain: ChainConfig) => void;
+  fromChain: undefined | Network;
+  toChain: undefined | Network;
+  changeFromChain: (chain: Network) => void;
+  changeToChain: (chain: Network) => void;
   switchChains: () => void;
-  chainsList: ChainConfig[];
-  selectedNetwork: ChainConfig | undefined;
-  changeSelectedNetwork: (network: ChainConfig) => void;
+  networks: Network[] | undefined;
+  isNetworksLoading: boolean;
+  isNetworksError: boolean;
+  selectedNetwork: Network | undefined;
+  changeSelectedNetwork: (network: Network) => void;
 }
-
-const chainsList = config.chains;
 
 const ChainsContext = createContext<IChainsContext | null>(null);
 
 const ChainsProvider: React.FC = props => {
   const { currentChainId } = useWalletProvider()!;
+  const {
+    data: networks,
+    isLoading: isNetworksLoading,
+    isError: isNetworksError,
+  } = useNetworks();
 
-  const [fromChain, setFromChain] = useState<ChainConfig>();
-  const [toChain, setToChain] = useState<ChainConfig>();
+  const [fromChain, setFromChain] = useState<Network>();
+  const [toChain, setToChain] = useState<Network>();
 
-  const [selectedNetwork, setSelectedNetwork] = useState<ChainConfig>();
+  const [selectedNetwork, setSelectedNetwork] = useState<Network>();
 
   const [areChainsReady, setAreChainsReady] = useState(false);
 
   const fromChainRpcUrlProvider = useMemo(() => {
-    if (!fromChain) return undefined;
-    return new ethers.providers.JsonRpcProvider(fromChain.rpcUrl);
+    if (!fromChain || !fromChain.rpc) return undefined;
+    return new ethers.providers.JsonRpcProvider(fromChain.rpc);
   }, [fromChain]);
 
   const toChainRpcUrlProvider = useMemo(() => {
-    if (!toChain) return undefined;
-    return new ethers.providers.JsonRpcProvider(toChain.rpcUrl);
+    if (!toChain || !toChain.rpc) return undefined;
+    return new ethers.providers.JsonRpcProvider(toChain.rpc);
   }, [toChain]);
 
   // default from chain to current metamak chain on startup
@@ -57,29 +60,29 @@ const ChainsProvider: React.FC = props => {
   useEffect(() => {
     setToChain(undefined);
     if (!currentChainId) {
-      setFromChain(chainsList[0]);
+      setFromChain(networks?.[0]);
       return;
     }
-    let currentMetamaskChain = chainsList.find(
-      chain => chain.chainId === currentChainId,
+    let currentMetamaskChain = networks?.find(
+      network => network.chainId === currentChainId,
     );
 
     if (currentMetamaskChain) {
       setFromChain(currentMetamaskChain);
     } else {
-      setFromChain(chainsList[0]);
+      setFromChain(networks?.[0]);
     }
-  }, [currentChainId]);
+  }, [currentChainId, networks]);
 
   useEffect(() => {
-    const network = chainsList.find(
+    const network = networks?.find(
       chainObj => chainObj.chainId === currentChainId,
     );
 
     if (network) {
       setSelectedNetwork(network);
     }
-  }, [currentChainId]);
+  }, [currentChainId, networks]);
 
   useEffect(() => {
     (async () => {
@@ -99,30 +102,15 @@ const ChainsProvider: React.FC = props => {
     })();
   });
 
-  const compatibleToChainsForCurrentFromChain = useMemo(() => {
-    if (!fromChain) return undefined;
-    return config.chainMap[fromChain.chainId].map(
-      compatibleChainId =>
-        config.chains.find(
-          chain => chain.chainId === compatibleChainId,
-        ) as ChainConfig,
-    );
-  }, [fromChain]);
-
-  const changeFromChain = useCallback((chain: ChainConfig) => {
+  const changeFromChain = useCallback((chain: Network) => {
     setToChain(undefined);
     setFromChain(chain);
   }, []);
 
   const changeToChain = useCallback(
-    (chain: ChainConfig) => {
-      if (
-        fromChain &&
-        config.chainMap[fromChain.chainId].includes(chain.chainId)
-      ) {
+    (chain: Network) => {
+      if (fromChain) {
         setToChain(chain);
-      } else {
-        throw new Error('To Chain not supported for current from chain');
       }
     },
     [fromChain],
@@ -135,7 +123,7 @@ const ChainsProvider: React.FC = props => {
     }
   }, [toChain, fromChain]);
 
-  const changeSelectedNetwork = useCallback((network: ChainConfig) => {
+  const changeSelectedNetwork = useCallback((network: Network) => {
     setSelectedNetwork(network);
   }, []);
 
@@ -148,10 +136,11 @@ const ChainsProvider: React.FC = props => {
         changeToChain,
         fromChainRpcUrlProvider,
         toChainRpcUrlProvider,
-        compatibleToChainsForCurrentFromChain,
         fromChain,
         toChain,
-        chainsList,
+        networks,
+        isNetworksLoading,
+        isNetworksError,
         selectedNetwork,
         changeSelectedNetwork,
       }}

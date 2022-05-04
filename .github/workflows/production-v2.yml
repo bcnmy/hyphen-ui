@@ -40,3 +40,4 @@ jobs:
         run: |
           aws s3 sync build s3://${{ secrets.S3_PROD_V2_BUCKET_NAME }}
           aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_PROD_V2_CF_ID }} --paths /
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_PROD_V2_CF_ID_2 }} --paths /

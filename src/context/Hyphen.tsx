@@ -7,7 +7,7 @@ import {
 } from 'react';
 
 // @ts-ignore
-import { Hyphen, SIGNATURE_TYPES } from '@biconomy/hyphen-staging';
+import { Hyphen, SIGNATURE_TYPES } from '@biconomy/hyphen';
 
 import { useWalletProvider } from './WalletProvider';
 import { useChains } from './Chains';

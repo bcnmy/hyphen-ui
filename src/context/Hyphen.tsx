@@ -92,55 +92,6 @@ const HyphenProvider: React.FC = props => {
     walletProvider,
   ]);
 
-  // reinitialize hyphen everytime conditions change
-  // TODO: Because of bug in Biconomy SDK, fallback provider is not picked up automatically
-  // So we need to redeclare Hyphen with biconomy disabled if we want hypen to work properly
-  // const hyphen = useMemo(() => {
-  //   if (!rawEthereumProvider || !walletProvider || !fromChainRpcUrlProvider)
-  //     return;
-
-  //   let hyphen;
-  //   if (isBiconomyEnabled) {
-  //     hyphen = new Hyphen(fromChainRpcUrlProvider, {
-  //       debug: true,
-  //       infiniteApproval: true,
-  //       environment: {
-  //         [ENV.production]: 'prod',
-  //         [ENV.test]: 'test',
-  //         [ENV.staging]: 'staging',
-  //         local: '',
-  //       }[process.env.REACT_APP_ENV] as Environment,
-  //       biconomy: {
-  //         enable: isBiconomyEnabled,
-  //         apiKey: fromChain?.gasless.apiKey ?? '',
-  //         debug: false,
-  //       },
-  //       signatureType: SIGNATURE_TYPES.EIP712,
-  //       walletProvider: rawEthereumProvider,
-  //     });
-  //   } else {
-  //     hyphen = new Hyphen(rawEthereumProvider, {
-  //       debug: true,
-  //       infiniteApproval: true,
-  //       environment: {
-  //         [ENV.production]: 'prod',
-  //         [ENV.test]: 'test',
-  //         [ENV.staging]: 'staging',
-  //         local: '',
-  //       }[process.env.REACT_APP_ENV] as Environment,
-  //       signatureType: SIGNATURE_TYPES.EIP712,
-  //     });
-  //   }
-
-  //   return hyphen;
-  // }, [
-  //   fromChain,
-  //   rawEthereumProvider,
-  //   isBiconomyEnabled,
-  //   walletProvider,
-  //   fromChainRpcUrlProvider,
-  // ]);
-
   // recreate the async pool info getter everytime pool conditions change
   const getPoolInfo: () => Promise<PoolInfo> = useCallback(() => {
     if (

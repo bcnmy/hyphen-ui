@@ -78,7 +78,7 @@ function TransactionDetailModal({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Received</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {amountReceived} {token.symbol}
+                  ~{amountReceived} {token.symbol}
                 </span>
                 <a
                   target="_blank"

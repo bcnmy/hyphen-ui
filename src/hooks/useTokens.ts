@@ -1,5 +1,5 @@
+import config from 'config';
 import { useQuery } from 'react-query';
-import { ENV } from 'types/environment';
 import useNetworks from './useNetworks';
 
 export type Token = {
@@ -24,10 +24,7 @@ export type Token = {
   };
 };
 
-const tokensEndpoint =
-  process.env.REACT_APP_ENV === ENV.production
-    ? 'https://hyphen-v2-api.biconomy.io/api/v1/configuration/tokens'
-    : 'https://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/tokens';
+const tokensEndpoint = `${config.hyphen.baseURL}/api/v1/configuration/tokens`;
 
 function fetchTokens(): Promise<{
   [key: string]: Token;

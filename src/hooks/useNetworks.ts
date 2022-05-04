@@ -1,5 +1,5 @@
+import { config } from 'config';
 import { useQuery } from 'react-query';
-import { ENV } from 'types/environment';
 
 export type Network = {
   enabled: boolean;
@@ -48,10 +48,7 @@ export type Network = {
   };
 };
 
-const networksEndpoint =
-  process.env.REACT_APP_ENV === ENV.production
-    ? 'https://hyphen-v2-api.biconomy.io/api/v1/configuration/networks'
-    : 'https://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/networks';
+const networksEndpoint = `${config.hyphen.baseURL}/api/v1/configuration/networks`;
 
 function fetchNetworks(): Promise<Network[]> {
   return fetch(networksEndpoint)

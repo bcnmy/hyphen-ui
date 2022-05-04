@@ -13,7 +13,7 @@ import {
 import lpmanagerABI from 'abis/LiquidityPools.abi.json';
 
 // @ts-ignore
-import { RESPONSE_CODES } from '@biconomy/hyphen-staging';
+import { RESPONSE_CODES } from '@biconomy/hyphen';
 
 import {
   BASE_DIVISOR,

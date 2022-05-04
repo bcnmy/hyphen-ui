@@ -1,5 +1,4 @@
 import Select from 'components/Select';
-import { ChainConfig } from 'config/chains';
 import { useChains } from 'context/Chains';
 import { useWalletProvider } from 'context/WalletProvider';
 import React, { useMemo } from 'react';
@@ -11,61 +10,71 @@ interface INetworkSelectorsProps {}
 const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
   const { isLoggedIn } = useWalletProvider()!;
   const {
-    chainsList,
+    networks,
     fromChain,
     toChain,
     changeFromChain,
     changeToChain,
     switchChains,
-    compatibleToChainsForCurrentFromChain,
   } = useChains()!;
 
   const fromChainOptions = useMemo(
     () =>
-      chainsList.map(chain => ({
-        id: chain.chainId,
-        name: chain.name,
-        image: chain.image,
-      })),
-    [chainsList],
+      networks
+        // temporary filtering for BNB network 56 chain.
+        ?.filter(network => network.chainId !== 56)
+        .map(network => ({
+          id: network.chainId,
+          name: network.name,
+          image: network.image,
+        })),
+    [networks],
   );
 
   const toChainOptions = useMemo(() => {
-    if (!compatibleToChainsForCurrentFromChain) return [];
-    else
-      return compatibleToChainsForCurrentFromChain.map(chain => ({
-        id: chain.chainId,
-        name: chain.name,
-        image: chain.image,
-      }));
-  }, [compatibleToChainsForCurrentFromChain]);
+    return (
+      networks
+        // temporary filtering for BNB network 56 chainId.
+        ?.filter(
+          network =>
+            network.chainId !== fromChain?.chainId && network.chainId !== 56,
+        )
+        .map(network => ({
+          id: network.chainId,
+          name: network.name,
+          image: network.image,
+        }))
+    );
+  }, [fromChain?.chainId, networks]);
 
   const selectedFromChain = useMemo(() => {
     if (!fromChain) return undefined;
-    else return fromChainOptions.find(opt => opt.id === fromChain.chainId);
+    else return fromChainOptions?.find(opt => opt.id === fromChain.chainId);
   }, [fromChain, fromChainOptions]);
 
   const selectedToChain = useMemo(() => {
     if (!toChain) return undefined;
-    else return toChainOptions.find(opt => opt.id === toChain.chainId);
+    else return toChainOptions?.find(opt => opt.id === toChain.chainId);
   }, [toChain, toChainOptions]);
 
   return (
     <>
       <div>
-        <Select
-          options={fromChainOptions}
-          selected={selectedFromChain}
-          setSelected={opt => {
-            chainsList &&
-              changeFromChain(
-                chainsList.find(
-                  chain => chain.chainId === opt.id,
-                ) as ChainConfig,
-              );
-          }}
-          label={'source'}
-        />
+        {fromChainOptions ? (
+          <Select
+            options={fromChainOptions}
+            selected={selectedFromChain}
+            setSelected={opt => {
+              networks &&
+                changeFromChain(
+                  networks.find(network => network.chainId === opt.id)!,
+                );
+            }}
+            label={'source'}
+          />
+        ) : (
+          '...'
+        )}
       </div>
       <div className="mb-3 flex items-end">
         <button
@@ -76,20 +85,22 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
         </button>
       </div>
       <div data-tip data-for="networkSelect">
-        <Select
-          disabled={!isLoggedIn}
-          options={toChainOptions}
-          selected={selectedToChain}
-          setSelected={opt => {
-            chainsList &&
-              changeToChain(
-                chainsList.find(
-                  chain => chain.chainId === opt.id,
-                ) as ChainConfig,
-              );
-          }}
-          label={'destination'}
-        />
+        {toChainOptions ? (
+          <Select
+            disabled={!isLoggedIn}
+            options={toChainOptions}
+            selected={selectedToChain}
+            setSelected={opt => {
+              networks &&
+                changeToChain(
+                  networks.find(network => network.chainId === opt.id)!,
+                );
+            }}
+            label={'destination'}
+          />
+        ) : (
+          '...'
+        )}
         {!isLoggedIn && (
           <CustomTooltip id="networkSelect">
             <span>Please connect your wallet</span>

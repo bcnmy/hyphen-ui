@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-  HiArrowSmLeft,
-  HiOutlineEmojiSad,
-  HiOutlineXCircle,
-  HiX,
-} from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineEmojiSad, HiX } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
 import Select, { Option } from 'components/Select';

@@ -20,31 +20,22 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
 
   const fromChainOptions = useMemo(
     () =>
-      networks
-        // temporary filtering for BNB network 56 chain.
-        ?.filter(network => network.chainId !== 56)
-        .map(network => ({
-          id: network.chainId,
-          name: network.name,
-          image: network.image,
-        })),
+      networks?.map(network => ({
+        id: network.chainId,
+        name: network.name,
+        image: network.image,
+      })),
     [networks],
   );
 
   const toChainOptions = useMemo(() => {
-    return (
-      networks
-        // temporary filtering for BNB network 56 chainId.
-        ?.filter(
-          network =>
-            network.chainId !== fromChain?.chainId && network.chainId !== 56,
-        )
-        .map(network => ({
-          id: network.chainId,
-          name: network.name,
-          image: network.image,
-        }))
-    );
+    return networks
+      ?.filter(network => network.chainId !== fromChain?.chainId)
+      .map(network => ({
+        id: network.chainId,
+        name: network.name,
+        image: network.image,
+      }));
   }, [fromChain?.chainId, networks]);
 
   const selectedFromChain = useMemo(() => {

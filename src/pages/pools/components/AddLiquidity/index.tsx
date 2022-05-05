@@ -881,7 +881,7 @@ function AddLiquidity() {
         </section>
 
         {isError && showError ? (
-          <article className="relative mt-6 flex h-20 items-center justify-center rounded-xl bg-red-100 p-2 text-sm text-red-600">
+          <article className="relative mt-6 flex  h-12 items-center justify-center rounded-xl bg-red-100 p-2 text-sm text-red-600">
             <div className="flex items-center">
               <HiOutlineEmojiSad className="mr-4 h-6 w-6 text-red-400" />
               <span className="text-hyphen-gray-400">
@@ -897,10 +897,10 @@ function AddLiquidity() {
               </span>
             </div>
             <button
-              className="absolute top-3 right-3"
+              className="absolute right-4"
               onClick={() => setShowError(false)}
             >
-              <HiX className="h-4 w-4 text-red-400" />
+              <HiX className="h-5 w-5 text-red-400" />
             </button>
           </article>
         ) : null}

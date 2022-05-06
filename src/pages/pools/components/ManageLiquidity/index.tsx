@@ -1,5 +1,5 @@
 import ProgressBar from 'components/ProgressBar';
-import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineEmojiSad, HiX } from 'react-icons/hi';
 import { useNavigate, useParams } from 'react-router-dom';
 import LiquidityPositionOverview from '../LiquidityPositionOverview';
 import StepSlider from '../StepSlider';
@@ -11,7 +11,7 @@ import useLPToken from 'hooks/contracts/useLPToken';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNotifications } from 'context/Notifications';
 import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
@@ -43,6 +43,7 @@ function ManagePosition() {
   const [liquidityRemovalAmount, setLiquidityRemovalAmount] =
     useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
+  const [showError, setShowError] = useState<boolean>(false);
 
   const {
     data: positionMetadata,
@@ -102,7 +103,7 @@ function ManagePosition() {
   );
 
   const {
-    isError: removeLiquidityError,
+    error: removeLiquidityError,
     isLoading: removeLiquidityLoading,
     mutate: removeLiquidityMutation,
   } = useMutation(
@@ -124,7 +125,7 @@ function ManagePosition() {
   );
 
   const {
-    isError: claimFeeError,
+    error: claimFeeError,
     isLoading: claimFeeLoading,
     mutate: claimFeeMutation,
   } = useMutation(async ({ positionId }: { positionId: BigNumber }) => {
@@ -168,6 +169,19 @@ function ManagePosition() {
       ? formattedTokenAmount - formattedSuppliedLiquidity
       : 0;
 
+  const { code: removeLiquidityErrorCode } =
+    (removeLiquidityError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+  const { code: claimFeeErrorCode } =
+    (claimFeeError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+
   // Check if there's an error in queries or mutations.
   const isError =
     positionMetadataError ||
@@ -177,28 +191,17 @@ function ManagePosition() {
     removeLiquidityError ||
     claimFeeError;
 
+  useEffect(() => {
+    if (isError) {
+      setShowError(true);
+    }
+  }, [isError]);
+
   const isDataLoading =
     !isLoggedIn ||
     isPositionMetadataLoading ||
     removeLiquidityLoading ||
     claimFeeLoading;
-
-  if (isError) {
-    return (
-      <article className="my-24 flex h-100 items-center justify-center rounded-10 bg-white p-12.5">
-        <div className="flex items-center">
-          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
-          <span className="text-hyphen-gray-400">
-            {removeLiquidityError
-              ? 'Something went wrong while removing liquidity, please try again later.'
-              : claimFeeError
-              ? 'Something went wrong while claiming fees, please try again later.'
-              : 'We could not get the necessary information, please try again later.'}
-          </span>
-        </div>
-      </article>
-    );
-  }
 
   const isRemovalAmountGtSuppliedLiquidity =
     Number.parseFloat(liquidityRemovalAmount) > formattedSuppliedLiquidity;
@@ -471,6 +474,31 @@ function ManagePosition() {
           <LiquidityInfo />
         </div>
       </section>
+
+      {isError && showError ? (
+        <article className="relative mt-6 flex  h-12 items-center justify-center rounded-xl bg-red-100 p-2 text-sm text-red-600">
+          <div className="flex items-center">
+            <HiOutlineEmojiSad className="mr-4 h-6 w-6 text-red-400" />
+            <span className="text-hyphen-gray-400">
+              {removeLiquidityError && removeLiquidityErrorCode !== 4001
+                ? 'Something went wrong while removing liquidity, please try again later.'
+                : removeLiquidityError && removeLiquidityErrorCode === 4001
+                ? 'User rejected the transaction'
+                : claimFeeError && claimFeeErrorCode !== 4001
+                ? 'Something went wrong while claiming fees, please try again later.'
+                : claimFeeError && claimFeeErrorCode === 4001
+                ? 'User rejected the transaction'
+                : 'We could not get the necessary information, please try again later.'}
+            </span>
+          </div>
+          <button
+            className="absolute right-4"
+            onClick={() => setShowError(false)}
+          >
+            <HiX className="h-5 w-5 text-red-400" />
+          </button>
+        </article>
+      ) : null}
     </article>
   );
 }

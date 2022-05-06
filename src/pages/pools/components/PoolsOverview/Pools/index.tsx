@@ -1,23 +1,13 @@
-import { useQuery } from 'react-query';
-import { chains } from 'config/chains';
-import tokens from 'config/tokens';
 import PoolOverview from './PoolOverview';
 import { HiOutlineXCircle } from 'react-icons/hi';
+import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function Pools() {
-  const { isError, isLoading, data } = useQuery(
-    'tokens',
-    () =>
-      fetch(
-        'https://hyphen-v2-staging-api.biconomy.io/api/v1/configuration/tokens',
-      ).then(res => res.json()),
-    {
-      enabled: !!chains,
-    },
-  );
-  const { message: tokensObject } = data || {};
+  const { networks } = useChains()!;
+  const { tokens, isTokensLoading, isTokensError } = useToken()!;
 
-  if (isError) {
+  if (isTokensError) {
     return (
       <article className="rounded-10 bg-white p-2.5">
         <section className="my-16 flex items-center justify-center px-[1.875rem]">
@@ -37,7 +27,7 @@ function Pools() {
         <h2 className="text-sm text-hyphen-purple xl:text-xl">Pools</h2>
       </header>
 
-      {!isLoading ? (
+      {!isTokensLoading ? (
         <section className="grid grid-cols-1 gap-1">
           <div className="mb-1 mt-2 grid grid-cols-2 px-[2.375rem] xl:grid-cols-3 xl:px-[3.125rem]">
             <h3 className="text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:text-xxs">
@@ -51,24 +41,22 @@ function Pools() {
             </h3>
           </div>
 
-          {chains && tokensObject
-            ? chains.map(chainObj => {
-                return Object.keys(tokensObject).map((tokenSymbol: any) => {
-                  const token = tokens.find(
-                    tokenObj => tokenObj.symbol === tokenSymbol,
-                  )!;
-                  const tokenObj = token[chainObj.chainId]
+          {networks && tokens
+            ? networks.map(networkObj => {
+                return Object.keys(tokens).map((tokenSymbol: any) => {
+                  const token = tokens[tokenSymbol];
+                  const tokenObj = token[networkObj.chainId]?.isSupported
                     ? {
                         coinGeckoId: token.coinGeckoId,
                         tokenImage: token.image,
-                        ...token[chainObj.chainId],
+                        ...token[networkObj.chainId],
                       }
                     : null;
 
                   return tokenObj ? (
                     <PoolOverview
-                      key={`pool-${chainObj.name}-${tokenSymbol}`}
-                      chain={chainObj}
+                      key={`pool-${networkObj.name}-${tokenSymbol}`}
+                      chain={networkObj}
                       token={tokenObj}
                     />
                   ) : null;

@@ -1,21 +1,20 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import lpTokenABI from 'abis/LPToken.abi.json';
-import { LPToken } from 'config/liquidityContracts/LPToken';
-import { ChainConfig } from 'config/chains';
+import { Network } from 'hooks/useNetworks';
 import { useWalletProvider } from 'context/WalletProvider';
 
-function useLPToken(chain: ChainConfig | undefined) {
+function useLPToken(chain: Network | undefined) {
   const { signer } = useWalletProvider()!;
-  const contractAddress = chain ? LPToken[chain.chainId].address : undefined;
+  const contractAddress = chain ? chain.contracts.hyphen.lpToken : undefined;
 
   const lpTokenContract = useMemo(() => {
-    if (!contractAddress || !chain) return;
+    if (!contractAddress || !chain || !chain.rpc) return;
 
     return new ethers.Contract(
       contractAddress,
       lpTokenABI,
-      new ethers.providers.JsonRpcProvider(chain.rpcUrl),
+      new ethers.providers.JsonRpcProvider(chain.rpc),
     );
   }, [chain, contractAddress]);
 

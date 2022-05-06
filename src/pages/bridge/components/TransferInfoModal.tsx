@@ -1,11 +1,10 @@
 import React, { useEffect } from 'react';
 import { IoMdClose } from 'react-icons/io';
-import Skeleton from 'react-loading-skeleton';
 
 import { Dialog } from '@headlessui/react';
 import Modal from 'components/Modal';
 import { useTransaction } from 'context/Transaction';
-import useAsync, { Status } from 'hooks/useLoading';
+import useAsync from 'hooks/useLoading';
 import { ITransferRecord } from 'context/TransactionInfoModal';
 import {
   HiOutlineArrowNarrowRight,
@@ -25,23 +24,20 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
   onClose,
 }) => {
   const { getExitInfoFromHash } = useTransaction()!;
-  const { chainsList } = useChains()!;
+  const { networks } = useChains()!;
 
-  const {
-    value: exitInfo,
-    execute: getExitInfo,
-    status: getExitInfoStatus,
-    error: getExitInfoError,
-  } = useAsync(getExitInfoFromHash);
+  const { execute: getExitInfo } = useAsync(getExitInfoFromHash);
 
   const fromChainExplorerUrl = `${
-    chainsList.find(
-      chain => chain.chainId === transferRecord.fromChain.chainId,
+    networks?.find(
+      network => network.chainId === transferRecord.fromChain.chainId,
     )!.explorerUrl
   }/tx/${transferRecord.depositHash}`;
+
   const toChainExplorerUrl = `${
-    chainsList.find(chain => chain.chainId === transferRecord.toChain.chainId)!
-      .explorerUrl
+    networks?.find(
+      network => network.chainId === transferRecord.toChain.chainId,
+    )!.explorerUrl
   }/tx/${transferRecord.exitHash}`;
 
   useEffect(() => {
@@ -82,19 +78,8 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Received</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {getExitInfoStatus === Status.SUCCESS && exitInfo ? (
-                    <>
-                      {exitInfo} {transferRecord.token.symbol}
-                    </>
-                  ) : (
-                    <>
-                      <Skeleton
-                        baseColor="#625ccd28"
-                        highlightColor="#625ccd0c"
-                        width={100}
-                      />
-                    </>
-                  )}
+                  ~{transferRecord.transferredAmount}{' '}
+                  {transferRecord.token.symbol}
                 </span>
                 <a
                   target="_blank"
@@ -109,7 +94,7 @@ export const TransferInfoModal: React.FC<ITransferInfoModal> = ({
             </div>
 
             <span className="text-center text-gray-500">
-              Tranfer completed in{' '}
+              Transfer completed in{' '}
               <span className="text-hyphen-purple">
                 {transferRecord.transferTime}
               </span>

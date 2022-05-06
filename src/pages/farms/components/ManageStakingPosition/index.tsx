@@ -1,25 +1,18 @@
-import { chains } from 'config/chains';
 import { useWalletProvider } from 'context/WalletProvider';
 import { BigNumber, ethers } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';
-import {
-  HiArrowSmLeft,
-  HiOutlineChevronLeft,
-  HiOutlineChevronRight,
-  HiOutlineXCircle,
-} from 'react-icons/hi';
-import { useMutation, useQueries, useQuery, useQueryClient } from 'react-query';
+import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import StakingPositionOverview from '../StakingPositionOverview';
-import emptyPositionsIcon from '../../../../assets/images/empty-positions-icon.svg';
-import { useState } from 'react';
-import tokens from 'config/tokens';
 import FarmsInfo from 'pages/farms/FarmsInfo';
 import Skeleton from 'react-loading-skeleton';
 import switchNetwork from 'utils/switchNetwork';
 import { useNotifications } from 'context/Notifications';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
+import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 function ManageStakingPosition() {
   const navigate = useNavigate();
@@ -28,11 +21,13 @@ function ManageStakingPosition() {
 
   const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
     useWalletProvider()!;
+  const { networks } = useChains()!;
+  const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
   const chain = chainId
-    ? chains.find(chainObj => {
-        return chainObj.chainId === Number.parseInt(chainId);
+    ? networks?.find(networkObj => {
+        return networkObj.chainId === Number.parseInt(chainId);
       })!
     : undefined;
 
@@ -55,18 +50,17 @@ function ManageStakingPosition() {
 
   const [tokenAddress] = positionMetadata || [];
 
-  const token =
-    chainId && tokenAddress
-      ? tokens.find(tokenObj => {
+  const tokenSymbol =
+    chainId && tokens && tokenAddress
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return (
             tokenObj[Number.parseInt(chainId)]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })
-      : null;
-
-  const tokenDecimals =
-    chainId && token ? token[Number.parseInt(chainId)].decimal : null;
+      : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
 
   const {
     data: positionNFTData,
@@ -105,15 +99,18 @@ function ManageStakingPosition() {
     },
   );
 
-  const rewardToken =
-    rewardTokenAddress && chain
-      ? tokens.find(tokenObj => {
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens && chain
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
             ? tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
       : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const rewardTokenDecimals =
     chain && rewardToken ? rewardToken[chain.chainId].decimal : null;

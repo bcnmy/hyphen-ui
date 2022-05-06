@@ -78,7 +78,7 @@ function TransactionDetailModal({
               <div className="flex flex-col">
                 <span className="text-xs text-gray-400">Received</span>
                 <span className="text-xl font-semibold text-gray-700">
-                  {amountReceived} {token.symbol}
+                  ~{amountReceived} {token.symbol}
                 </span>
                 <a
                   target="_blank"
@@ -93,7 +93,7 @@ function TransactionDetailModal({
             </div>
 
             <span className="text-center text-gray-500">
-              Tranfer completed in{' '}
+              Transfer completed in{' '}
               <span className="text-hyphen-purple">{transactionTime}</span>
             </span>
           </div>

@@ -1,20 +1,16 @@
 import { ethers } from 'ethers';
 import { useQuery, useQueryClient } from 'react-query';
-import { request, gql } from 'graphql-request';
 import Skeleton from 'react-loading-skeleton';
-import { HiInformationCircle, HiOutlineXCircle } from 'react-icons/hi';
-import { ChainConfig, chains } from 'config/chains';
-import tokens, { TokenConfig } from 'config/tokens';
-import CustomTooltip from 'components/CustomTooltip';
-import ProgressBar from 'components/ProgressBar';
+import { HiOutlineXCircle } from 'react-icons/hi';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
-import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { useNavigate } from 'react-router-dom';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
+import { Network } from 'hooks/useNetworks';
+import { useToken } from 'context/Token';
 
 interface IFarmOverview {
-  chain: ChainConfig;
+  chain: Network;
   token: any;
 }
 
@@ -23,6 +19,8 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   const queryClient = useQueryClient();
   const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
     token;
+
+  const { tokens } = useToken()!;
 
   const { getSuppliedLiquidityByToken } = useLiquidityProviders(chain);
   const { getRewardRatePerSecond, getRewardTokenAddress } =
@@ -71,14 +69,18 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       },
     );
 
-  const rewardToken = rewardTokenAddress
-    ? tokens.find(tokenObj => {
-        return tokenObj[chain.chainId]
-          ? tokenObj[chain.chainId].address.toLowerCase() ===
-              rewardTokenAddress.toLowerCase()
-          : false;
-      })
-    : undefined;
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
+          return tokenObj[chain.chainId]
+            ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress.toLowerCase()
+            : false;
+        })
+      : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
@@ -194,7 +196,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       </div>
       <div className="hidden h-12 w-[250px] flex-col items-end justify-self-end xl:flex">
         <span className="font-mono text-2xl">
-          {rewardsPerDay ? (
+          {rewardsPerDay >= 0 ? (
             <div className="flex items-center">
               <img
                 src={rewardToken?.image}

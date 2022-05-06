@@ -1,5 +1,3 @@
-import { chains } from 'config/chains';
-import tokens from 'config/tokens';
 import { BigNumber, ethers } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';
 import { useQuery } from 'react-query';
@@ -10,6 +8,8 @@ import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import { Decimal } from 'decimal.js';
 import { HiOutlineXCircle } from 'react-icons/hi';
+import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -23,8 +23,11 @@ function StakingPositionOverview({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const chain = chains.find(chainObj => {
-    return chainObj.chainId === chainId;
+  const { networks } = useChains()!;
+  const { tokens } = useToken()!;
+
+  const chain = networks?.find(networkObj => {
+    return networkObj.chainId === chainId;
   })!;
 
   const { getPositionMetadata } = useLPToken(chain);
@@ -55,15 +58,17 @@ function StakingPositionOverview({
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
 
-  const token =
-    chain && tokenAddress
-      ? tokens.find(tokenObj => {
+  const tokenSymbol =
+    chainId && tokens && tokenAddress
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return (
             tokenObj[chainId]?.address.toLowerCase() ===
             tokenAddress.toLowerCase()
           );
         })
-      : null;
+      : undefined;
+  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
@@ -146,15 +151,18 @@ function StakingPositionOverview({
     },
   );
 
-  const rewardToken =
-    rewardTokenAddress && chain
-      ? tokens.find(tokenObj => {
+  const rewardTokenSymbol =
+    rewardTokenAddress && tokens && chain
+      ? Object.keys(tokens).find(tokenSymbol => {
+          const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
             ? tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
       : undefined;
+  const rewardToken =
+    tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const rewardTokenDecimals =
     chain && rewardToken ? rewardToken[chain.chainId].decimal : null;
@@ -232,7 +240,6 @@ function StakingPositionOverview({
   const { name: chainName } = chain;
   const {
     image: tokenImage,
-    symbol: tokenSymbol,
     [chain.chainId]: { chainColor },
   } = token;
 

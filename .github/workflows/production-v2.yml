@@ -1,9 +1,9 @@
-name: Production Deployment - Hyphen UI
+name: Production V2 Deployment - Hyphen UI
 
 on:
   push:
     branches:
-      - master
+      - master-v2
 
 jobs:
   build:
@@ -38,5 +38,6 @@ jobs:
       # publish to production environment
       - name: Deploy to S3
         run: |
-          aws s3 sync build s3://${{ secrets.S3_BUCKET_NAME }}
-          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_CF_ID }} --paths /
+          aws s3 sync build s3://${{ secrets.S3_PROD_V2_BUCKET_NAME }}
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_PROD_V2_CF_ID }} --paths /
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.S3_PROD_V2_CF_ID_2 }} --paths /

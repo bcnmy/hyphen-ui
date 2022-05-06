@@ -323,7 +323,7 @@ const TransactionProvider: React.FC = props => {
 
       let transactionFee = formatRawEthValue(
         transactionFeeRaw.toString(),
-        decimal,
+        tokenDecimal,
       );
 
       let transactionFeeProcessedString = toFixed(

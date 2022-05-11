@@ -5,14 +5,15 @@ import {
   HiArrowSmLeft,
   HiOutlineChevronLeft,
   HiOutlineChevronRight,
+  HiOutlineEmojiSad,
   HiOutlineSearch,
-  HiOutlineXCircle,
+  HiX,
 } from 'react-icons/hi';
 import { useMutation, useQueries, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import StakingPositionOverview from '../StakingPositionOverview';
 import emptyPositionsIcon from '../../../../assets/images/empty-positions-icon.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FarmsInfo from 'pages/farms/FarmsInfo';
 import Skeleton from 'react-loading-skeleton';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
@@ -52,6 +53,7 @@ function AddStakingPosition() {
   const { getRewardTokenAddress, stakeNFT } = useLiquidityFarming(chain);
 
   const [currentPosition, setCurrentPosition] = useState<number>(0);
+  const [showError, setShowError] = useState<boolean>(false);
 
   const {
     data: userPositions,
@@ -100,7 +102,7 @@ function AddStakingPosition() {
     tokens && rewardTokenSymbol ? tokens[rewardTokenSymbol] : undefined;
 
   const {
-    isError: approveNFTError,
+    error: approveNFTError,
     isLoading: approveNFTLoading,
     mutate: approveNFTMutation,
   } = useMutation(
@@ -122,7 +124,7 @@ function AddStakingPosition() {
   );
 
   const {
-    isError: stakeNFTError,
+    error: stakeNFTError,
     isLoading: stakeNFTLoading,
     mutate: stakeNFTMutation,
   } = useMutation(
@@ -209,6 +211,19 @@ function AddStakingPosition() {
   const { status: firstPositionMetadataStatus } = firstPositionMetadata || {};
   const { status: firstPositionNFTStatus } = firstPositionNFT || {};
 
+  const { code: approveNFTErrorCode } =
+    (approveNFTError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+  const { code: stakeNFTErrorCode } =
+    (stakeNFTError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+
   // Check if there's an error in queries or mutations.
   const isError =
     userPositionsError ||
@@ -217,6 +232,12 @@ function AddStakingPosition() {
     stakeNFTError ||
     NFTApprovalAddressError;
 
+  useEffect(() => {
+    if (isError) {
+      setShowError(true);
+    }
+  }, [isError]);
+
   const isDataLoading =
     isUserPositionsLoading ||
     isNFTApprovalAddressLoading ||
@@ -224,23 +245,6 @@ function AddStakingPosition() {
     stakeNFTLoading ||
     firstPositionMetadataStatus === 'loading' ||
     firstPositionNFTStatus === 'loading';
-
-  if (isError) {
-    return (
-      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
-        <section className="my-16 flex items-center justify-center px-[1.875rem]">
-          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
-          <p className="text-hyphen-gray-400">
-            {approveNFTError
-              ? 'Something went wrong while approving this NFT, please try again later.'
-              : stakeNFTError
-              ? 'Something went wrong while staking this NFT, please try again later.'
-              : 'We could not get the necessary information, please try again later.'}
-          </p>
-        </section>
-      </article>
-    );
-  }
 
   const isNFTApproved =
     NFTApprovalAddress && chain
@@ -517,6 +521,31 @@ function AddStakingPosition() {
             </p>
           </section>
         )
+      ) : null}
+
+      {isError && showError ? (
+        <article className="relative mt-6 flex  h-12 items-center justify-center rounded-xl bg-red-100 p-2 text-sm text-red-600">
+          <div className="flex items-center">
+            <HiOutlineEmojiSad className="mr-4 h-6 w-6 text-red-400" />
+            <span className="text-hyphen-gray-400">
+              {approveNFTError && approveNFTErrorCode !== 4001
+                ? 'Something went wrong while approving this NFT, please try again later.'
+                : approveNFTError && approveNFTErrorCode === 4001
+                ? 'User rejected the transaction'
+                : stakeNFTError && stakeNFTErrorCode !== 4001
+                ? 'Something went wrong while staking this NFT, please try again later.'
+                : stakeNFTError && stakeNFTErrorCode === 4001
+                ? 'User rejected the transaction'
+                : 'We could not get the necessary information, please try again later.'}
+            </span>
+          </div>
+          <button
+            className="absolute right-4"
+            onClick={() => setShowError(false)}
+          >
+            <HiX className="h-5 w-5 text-red-400" />
+          </button>
+        </article>
       ) : null}
     </article>
   );

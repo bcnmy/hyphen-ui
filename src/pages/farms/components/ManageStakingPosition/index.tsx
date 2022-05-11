@@ -1,7 +1,7 @@
 import { useWalletProvider } from 'context/WalletProvider';
 import { BigNumber, ethers } from 'ethers';
 import useLPToken from 'hooks/contracts/useLPToken';
-import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineEmojiSad, HiX } from 'react-icons/hi';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import StakingPositionOverview from '../StakingPositionOverview';
@@ -13,6 +13,7 @@ import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
+import { useEffect, useState } from 'react';
 
 function ManageStakingPosition() {
   const navigate = useNavigate();
@@ -34,6 +35,8 @@ function ManageStakingPosition() {
   const { getPositionMetadata, getTokenURI } = useLPToken(chain);
   const { claimFee, getPendingToken, getRewardTokenAddress, unstakeNFT } =
     useLiquidityFarming(chain);
+
+  const [showError, setShowError] = useState<boolean>(false);
 
   const {
     data: positionMetadata,
@@ -131,7 +134,7 @@ function ManageStakingPosition() {
       : 0;
 
   const {
-    isError: unstakeNFTError,
+    error: unstakeNFTError,
     isLoading: unstakeNFTLoading,
     mutate: unstakeNFTMutation,
   } = useMutation(
@@ -153,7 +156,7 @@ function ManageStakingPosition() {
   );
 
   const {
-    isError: claimFeeError,
+    error: claimFeeError,
     isLoading: claimFeeLoading,
     mutate: claimFeeMutation,
   } = useMutation(
@@ -174,6 +177,19 @@ function ManageStakingPosition() {
     },
   );
 
+  const { code: unstakeNFTErrorCode } =
+    (unstakeNFTError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+  const { code: claimFeeErrorCode } =
+    (claimFeeError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+
   // Check if there's an error in queries or mutations.
   const isError =
     positionMetadataError ||
@@ -183,6 +199,12 @@ function ManageStakingPosition() {
     unstakeNFTError ||
     claimFeeError;
 
+  useEffect(() => {
+    if (isError) {
+      setShowError(true);
+    }
+  }, [isError]);
+
   const isDataLoading =
     isPositionMetadataLoading ||
     isPositionNFTDataLoading ||
@@ -190,23 +212,6 @@ function ManageStakingPosition() {
     pendingTokenLoading ||
     unstakeNFTLoading ||
     claimFeeLoading;
-
-  if (isError) {
-    return (
-      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
-        <section className="my-16 flex items-center justify-center px-[1.875rem]">
-          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
-          <p className="text-hyphen-gray-400">
-            {claimFeeError
-              ? 'Something went wrong while claiming fees for this NFT, please try again later.'
-              : unstakeNFTError
-              ? 'Something went wrong while unstaking this NFT, please try again later.'
-              : 'We could not get the necessary information, please try again later.'}
-          </p>
-        </section>
-      </article>
-    );
-  }
 
   function handleNetworkChange() {
     if (!walletProvider || !chain) return;
@@ -342,7 +347,7 @@ function ManageStakingPosition() {
                   {currentChainId === chain?.chainId ? (
                     <button
                       className="mt-10 mb-[3.125rem] flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300 xl:mb-0"
-                      disabled={isDataLoading}
+                      disabled={isDataLoading || unclaimedRewardToken <= 0}
                       onClick={handleClaimFeeClick}
                     >
                       {unclaimedRewardToken <= 0 ? (
@@ -383,6 +388,31 @@ function ManageStakingPosition() {
           <FarmsInfo />
         </div>
       </section>
+
+      {isError && showError ? (
+        <article className="relative mt-6 flex  h-12 items-center justify-center rounded-xl bg-red-100 p-2 text-sm text-red-600">
+          <div className="flex items-center">
+            <HiOutlineEmojiSad className="mr-4 h-6 w-6 text-red-400" />
+            <span className="text-hyphen-gray-400">
+              {unstakeNFTError && unstakeNFTErrorCode !== 4001
+                ? 'Something went wrong while unstaking this NFT, please try again later.'
+                : unstakeNFTError && unstakeNFTErrorCode === 4001
+                ? 'User rejected the transaction'
+                : claimFeeError && claimFeeErrorCode !== 4001
+                ? 'Something went wrong while claiming fees for this NFT, please try again later.'
+                : claimFeeError && claimFeeErrorCode === 4001
+                ? 'User rejected the transaction'
+                : 'We could not get the necessary information, please try again later.'}
+            </span>
+          </div>
+          <button
+            className="absolute right-4"
+            onClick={() => setShowError(false)}
+          >
+            <HiX className="h-5 w-5 text-red-400" />
+          </button>
+        </article>
+      ) : null}
     </article>
   );
 }

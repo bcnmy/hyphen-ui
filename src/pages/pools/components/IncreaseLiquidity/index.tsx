@@ -7,7 +7,7 @@ import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useLPToken from 'hooks/contracts/useLPToken';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
 import { useEffect, useState } from 'react';
-import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineEmojiSad, HiX } from 'react-icons/hi';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import getTokenBalance from 'utils/getTokenBalance';
@@ -61,6 +61,7 @@ function IncreaseLiquidity() {
     useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [poolShare, setPoolShare] = useState<number>(0);
+  const [showError, setShowError] = useState<boolean>(false);
 
   const {
     isVisible: isApprovalModalVisible,
@@ -152,7 +153,7 @@ function IncreaseLiquidity() {
   );
 
   const {
-    isError: approveTokenError,
+    error: approveTokenError,
     isLoading: approveTokenLoading,
     mutate: approveTokenMutation,
   } = useMutation(
@@ -166,7 +167,7 @@ function IncreaseLiquidity() {
   );
 
   const {
-    isError: increaseLiquidityError,
+    error: increaseLiquidityError,
     isLoading: increaseLiquidityLoading,
     mutate: increaseLiquidityMutation,
   } = useMutation(
@@ -244,6 +245,19 @@ function IncreaseLiquidity() {
     setPoolShare(initialPoolShare);
   }, [formattedSuppliedLiquidity, formattedTotalLiquidity]);
 
+  const { code: approveTokenErrorCode } =
+    (approveTokenError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+  const { code: increaseLiquidityErrorCode } =
+    (increaseLiquidityError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+
   // Check if there's an error in queries or mutations.
   const isError =
     positionMetadataError ||
@@ -254,25 +268,14 @@ function IncreaseLiquidity() {
     approveTokenError ||
     increaseLiquidityError;
 
+  useEffect(() => {
+    if (isError) {
+      setShowError(true);
+    }
+  }, [isError]);
+
   const isDataLoading =
     !isLoggedIn || approveTokenLoading || increaseLiquidityLoading;
-
-  if (isError) {
-    return (
-      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
-        <section className="my-16 flex items-center justify-center px-[1.875rem]">
-          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
-          <p className="text-hyphen-gray-400">
-            {approveTokenError
-              ? 'Something went wrong while approving this token, please try again later.'
-              : increaseLiquidityError
-              ? 'Something went wrong while increasing liquidity, please try again later.'
-              : 'We could not get the necessary information, please try again later.'}
-          </p>
-        </section>
-      </article>
-    );
-  }
 
   const isNativeToken =
     chain && token ? token[chain.chainId].address === NATIVE_ADDRESS : false;
@@ -634,6 +637,33 @@ function IncreaseLiquidity() {
             <LiquidityInfo />
           </div>
         </section>
+
+        {isError && showError ? (
+          <article className="relative mt-6 flex  h-12 items-center justify-center rounded-xl bg-red-100 p-2 text-sm text-red-600">
+            <div className="flex items-center">
+              <HiOutlineEmojiSad className="mr-4 h-6 w-6 text-red-400" />
+              <span className="text-hyphen-gray-400">
+                {approveTokenError && approveTokenErrorCode !== 4001
+                  ? 'Something went wrong while approving this token, please try again later.'
+                  : approveTokenError && approveTokenErrorCode === 4001
+                  ? 'User rejected the transaction'
+                  : increaseLiquidityError &&
+                    increaseLiquidityErrorCode !== 4001
+                  ? 'Something went wrong while increasing liquidity, please try again later.'
+                  : increaseLiquidityError &&
+                    increaseLiquidityErrorCode === 4001
+                  ? 'User rejected the transaction'
+                  : 'We could not get the necessary information, please try again later.'}
+              </span>
+            </div>
+            <button
+              className="absolute right-4"
+              onClick={() => setShowError(false)}
+            >
+              <HiX className="h-5 w-5 text-red-400" />
+            </button>
+          </article>
+        ) : null}
       </article>
     </>
   );

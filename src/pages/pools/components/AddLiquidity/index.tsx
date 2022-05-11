@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { HiArrowSmLeft, HiOutlineXCircle } from 'react-icons/hi';
+import { HiArrowSmLeft, HiOutlineEmojiSad, HiX } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import ProgressBar from 'components/ProgressBar';
 import Select, { Option } from 'components/Select';
@@ -114,6 +114,7 @@ function AddLiquidity() {
   const [liquidityAmount, setLiquidityAmount] = useState<string>('');
   const [sliderValue, setSliderValue] = useState<number>(0);
   const [poolShare, setPoolShare] = useState<number>(0);
+  const [showError, setShowError] = useState<boolean>(true);
 
   const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
   const tokenDecimals =
@@ -203,7 +204,7 @@ function AddLiquidity() {
 
   // Mutations
   const {
-    isError: approveTokenError,
+    error: approveTokenError,
     isLoading: approveTokenLoading,
     mutate: approveTokenMutation,
   } = useMutation(
@@ -217,7 +218,7 @@ function AddLiquidity() {
   );
 
   const {
-    isError: addLiquidityError,
+    error: addLiquidityError,
     isLoading: addLiquidityLoading,
     mutate: addLiquidityMutation,
   } = useMutation(
@@ -432,6 +433,19 @@ function AddLiquidity() {
     : 0;
   const APY = rewardAPY + feeAPY;
 
+  const { code: approveTokenErrorCode } =
+    (approveTokenError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+  const { code: addLiquidityErrorCode } =
+    (addLiquidityError as {
+      code: number;
+      message: string;
+      stack: string;
+    }) ?? {};
+
   // Check if there's an error in queries or mutations.
   const isError =
     totalLiquidityError ||
@@ -446,24 +460,13 @@ function AddLiquidity() {
     approveTokenError ||
     addLiquidityError;
 
-  const isDataLoading = approveTokenLoading || addLiquidityLoading;
+  useEffect(() => {
+    if (isError) {
+      setShowError(true);
+    }
+  }, [isError]);
 
-  if (isError) {
-    return (
-      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
-        <section className="my-16 flex items-center justify-center px-[1.875rem]">
-          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
-          <p className="text-hyphen-gray-400">
-            {approveTokenError
-              ? 'Something went wrong while approving this token, please try again later.'
-              : addLiquidityError
-              ? 'Something went wrong while adding liquidity, please try again later.'
-              : 'We could not get the necessary information, please try again later.'}
-          </p>
-        </section>
-      </article>
-    );
-  }
+  const isDataLoading = approveTokenLoading || addLiquidityLoading;
 
   const isNativeToken = selectedTokenAddress === NATIVE_ADDRESS;
 
@@ -873,6 +876,31 @@ function AddLiquidity() {
             <LiquidityInfo />
           </div>
         </section>
+
+        {isError && showError ? (
+          <article className="relative mt-6 flex  h-12 items-center justify-center rounded-xl bg-red-100 p-2 text-sm text-red-600">
+            <div className="flex items-center">
+              <HiOutlineEmojiSad className="mr-4 h-6 w-6 text-red-400" />
+              <span className="text-hyphen-gray-400">
+                {approveTokenError && approveTokenErrorCode !== 4001
+                  ? 'Something went wrong while approving this token, please try again later.'
+                  : approveTokenError && approveTokenErrorCode === 4001
+                  ? 'User rejected the transaction'
+                  : addLiquidityError && addLiquidityErrorCode !== 4001
+                  ? 'Something went wrong while adding liquidity, please try again later.'
+                  : addLiquidityError && addLiquidityErrorCode === 4001
+                  ? 'User rejected the transaction'
+                  : 'We could not get the necessary information, please try again later.'}
+              </span>
+            </div>
+            <button
+              className="absolute right-4"
+              onClick={() => setShowError(false)}
+            >
+              <HiX className="h-5 w-5 text-red-400" />
+            </button>
+          </article>
+        ) : null}
       </article>
     </>
   );

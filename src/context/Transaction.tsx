@@ -238,15 +238,20 @@ const TransactionProvider: React.FC = props => {
         return;
       }
       let tokenAddress = selectedToken[toChain.chainId].address;
-      let tokenDecimal = selectedToken[toChain.chainId].decimal;
-      let rawTransferAmount = ethers.utils.parseUnits(
+      let fromChainTokenDecimal = selectedToken[fromChain.chainId].decimal;
+      let toChainTokenDecimal = selectedToken[toChain.chainId].decimal;
+      let fromChainRawTransferAmount = ethers.utils.parseUnits(
         transferAmount.toString(),
-        tokenDecimal,
+        fromChainTokenDecimal,
+      );
+      let toChainRawTransferAmount = ethers.utils.parseUnits(
+        transferAmount.toString(),
+        toChainTokenDecimal,
       );
 
       let transferFee = await getTransferFee(
         tokenAddress,
-        rawTransferAmount.toString(),
+        toChainRawTransferAmount.toString(),
       );
       if (!transferFee) {
         return;
@@ -304,8 +309,9 @@ const TransactionProvider: React.FC = props => {
 
       let rewardAmount = await getRewardAmount(
         tokenAddressFromChain,
-        rawTransferAmount.toString(),
+        fromChainRawTransferAmount.toString(),
       );
+
 
       // console.log('************** REWARD AMOUNT  *********', rewardAmount);
       if (rewardAmount !== undefined && rewardAmount.gt && rewardAmount.gt(0)) {
@@ -323,7 +329,7 @@ const TransactionProvider: React.FC = props => {
 
       let transactionFee = formatRawEthValue(
         transactionFeeRaw.toString(),
-        tokenDecimal,
+        toChainTokenDecimal,
       );
 
       let transactionFeeProcessedString = toFixed(

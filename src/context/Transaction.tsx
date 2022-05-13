@@ -240,6 +240,7 @@ const TransactionProvider: React.FC = props => {
       let tokenAddress = selectedToken[toChain.chainId].address;
       let fromChainTokenDecimal = selectedToken[fromChain.chainId].decimal;
       let toChainTokenDecimal = selectedToken[toChain.chainId].decimal;
+      let fromChainRawTransferAmount = ethers.utils.parseUnits(
         transferAmount.toString(),
         fromChainTokenDecimal,
       );

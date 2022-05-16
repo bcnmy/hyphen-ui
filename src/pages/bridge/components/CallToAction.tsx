@@ -38,7 +38,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isLoggedIn) {
     return (
-      <div className="mt-4 flex justify-center gap-8">
+      <div className="flex justify-center gap-8">
         <PrimaryButtonLight onClick={() => connect()}>
           Connect Wallet
         </PrimaryButtonLight>
@@ -48,7 +48,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isBiconomyEnabled && fromChain?.chainId !== currentChainId) {
     return (
-      <div className="mt-4 flex justify-center gap-8">
+      <div className="flex justify-center gap-8">
         <PrimaryButtonLight
           onClick={() => {
             if (!walletProvider || !fromChain)
@@ -64,7 +64,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isReceiverValid) {
     return (
-      <div className="mt-4 flex justify-center gap-8">
+      <div className="flex justify-center gap-8">
         <span data-tip data-for="invalidReceiverAddress">
           <PrimaryButtonLight disabled>
             Invalid receiver address
@@ -81,7 +81,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   }
 
   return (
-    <div className="mt-4 flex justify-center gap-8">
+    <div className="flex justify-center gap-8">
       {fetchSelectedTokenApprovalStatus === Status.IDLE ||
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (

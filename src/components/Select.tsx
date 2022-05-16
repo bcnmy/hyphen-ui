@@ -76,8 +76,9 @@ export const Select: React.FC<ISelectProps> = ({
         <div className="relative mt-2 h-15">
           <Listbox.Button
             className={twMerge(
-              'relative h-full w-full cursor-pointer rounded-2.5 border bg-white py-2 pl-4 pr-10 text-left text-sm focus:outline-none xl:text-base',
-              disabled && 'cursor-not-allowed bg-gray-200 text-gray-900/80',
+              'relative h-full w-full cursor-pointer rounded-2.5 border border-hyphen-gray-100 bg-white py-2 pl-4 pr-10 text-left text-sm focus:outline-none xl:text-base',
+              disabled &&
+                'cursor-not-allowed bg-hyphen-gray-100 text-gray-900/80',
             )}
           >
             <span className="flex items-center truncate">
@@ -109,7 +110,7 @@ export const Select: React.FC<ISelectProps> = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute z-10 mt-2 max-h-60 min-w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="absolute z-10 mt-2 max-h-60 min-w-full overflow-auto rounded-2.5 bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {options?.map(option => (
                 <Listbox.Option
                   key={option.id}

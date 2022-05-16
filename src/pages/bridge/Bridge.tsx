@@ -21,7 +21,6 @@ import CustomTooltip from '../../components/CustomTooltip';
 import { HiInformationCircle } from 'react-icons/hi';
 import { useToken } from 'context/Token';
 import { useHyphen } from 'context/Hyphen';
-import { Status } from 'hooks/useLoading';
 
 interface BridgeProps {}
 
@@ -31,8 +30,6 @@ const Bridge: React.FC<BridgeProps> = () => {
   const { selectedToken } = useToken()!;
   const { changeTransferAmountInputValue, transferAmount, transactionFee } =
     useTransaction()!;
-  const { isBiconomyAllowed, setIsBiconomyToggledOn, isBiconomyEnabled } =
-    useBiconomy()!;
   const { poolInfo } = useHyphen()!;
 
   const { isLoggedIn, connect } = useWalletProvider()!;
@@ -102,56 +99,21 @@ const Bridge: React.FC<BridgeProps> = () => {
       ) : null}
       <ErrorModal error={executeApproveTokenError} title={'Approval Error'} />
       <div className="my-24">
-        <div className="mx-auto max-w-xl">
+        <div className="mx-auto w-full px-6 md:max-w-170 xl:px-0">
           <div className="relative z-10">
-            <div className="flex flex-col gap-2 rounded-10 bg-white p-6 shadow-lg">
-              <div className="mb-2 flex items-center justify-end">
-                <div className="flex items-center">
-                  <HiInformationCircle
-                    data-tip
-                    data-for="gaslessMode"
-                    className="mr-2 text-gray-500"
-                  />
-                  <CustomTooltip id="gaslessMode">
-                    <span>This transaction is sponsored by Biconomy</span>
-                  </CustomTooltip>
-                  <div
-                    className={
-                      !isBiconomyAllowed
-                        ? 'flex cursor-not-allowed opacity-50'
-                        : 'flex'
-                    }
-                    data-tip
-                    data-for="whyGaslessDisabled"
-                  >
-                    <span className="mr-2 text-base font-semibold text-gray-500">
-                      Gasless Mode
-                    </span>
-                    <Toggle
-                      label="Gasless Mode"
-                      enabled={isBiconomyEnabled}
-                      onToggle={enabled => setIsBiconomyToggledOn(enabled)}
-                    />
-                  </div>
-                </div>
-                {!isBiconomyAllowed && (
-                  <CustomTooltip id="whyGaslessDisabled">
-                    <span>Disabled for selected chain</span>
-                  </CustomTooltip>
-                )}
-              </div>
-              <div className="grid grid-cols-[1fr_34px_1fr] gap-2 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 hover:border-opacity-30">
+            <div className="flex flex-col gap-12.5 rounded-10 bg-white p-12.5 shadow-lg">
+              <div className="grid grid-cols-[1fr_40px_1fr] gap-5">
                 <NetworkSelectors />
               </div>
-              <div className="grid grid-cols-2 items-center gap-12 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 hover:border-opacity-30">
-                <AmountInput
+              <div className="grid h-[7.125rem] grid-cols-2 items-start gap-20">
+                <TokenSelector
                   disabled={
                     !areChainsReady ||
                     !poolInfo?.minDepositAmount ||
                     !poolInfo?.maxDepositAmount
                   }
                 />
-                <TokenSelector
+                <AmountInput
                   disabled={
                     !areChainsReady ||
                     !poolInfo?.minDepositAmount ||

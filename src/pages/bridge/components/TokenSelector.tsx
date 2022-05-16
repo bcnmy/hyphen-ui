@@ -1,6 +1,5 @@
 import Select from 'components/Select';
 import { useChains } from 'context/Chains';
-import { useHyphen } from 'context/Hyphen';
 import { useToken } from 'context/Token';
 import { useTransaction, ValidationErrors } from 'context/Transaction';
 import { Status } from 'hooks/useLoading';
@@ -24,10 +23,8 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
     selectedToken,
     getSelectedTokenBalanceStatus,
   } = useToken()!;
-  const { poolInfo } = useHyphen()!;
 
-  const { changeTransferAmountInputValue, transactionAmountValidationErrors } =
-    useTransaction()!;
+  const { transactionAmountValidationErrors } = useTransaction()!;
   const { fromChain } = useChains()!;
 
   const tokenOptions = useMemo(() => {
@@ -47,8 +44,12 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
   }, [compatibleTokensForCurrentChains, fromChain, tokens]);
 
   return (
-    <div className="flex flex-col justify-between">
-      <div data-tip data-for="tokenSelect">
+    <div className="relative flex flex-col items-center justify-between">
+      <div
+        data-tip
+        data-for="tokenSelect"
+        className="absolute top-[-1px] z-[1] w-[calc(100%-2px)]"
+      >
         <Select
           options={tokenOptions}
           selected={
@@ -75,24 +76,27 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           </CustomTooltip>
         )}
       </div>
-
-      <div className="my-2 flex items-center justify-between gap-4 pl-2 text-xs text-hyphen-purple-dark">
-        <span className="flex flex-grow items-baseline">
-          <span
-            className={twMerge(
-              'mr-1',
-              transactionAmountValidationErrors.includes(
-                ValidationErrors.INADEQUATE_BALANCE,
-              ) && 'text-red-600',
-              'transition-colors',
-            )}
-          >
-            Balance:
-          </span>
-          <span className="flex-grow font-mono">
-            {getSelectedTokenBalanceStatus &&
-            getSelectedTokenBalanceStatus === Status.SUCCESS &&
-            selectedTokenBalance?.displayBalance ? (
+      <div
+        className={`${
+          disabled ? 'bg-hyphen-gray-100' : 'bg-[#50AF95]'
+        } absolute top-[21px] flex h-[5.75rem] w-full items-end justify-center rounded-2.5 text-xxs text-hyphen-purple-dark`}
+      >
+        {getSelectedTokenBalanceStatus &&
+        getSelectedTokenBalanceStatus === Status.SUCCESS &&
+        selectedTokenBalance?.displayBalance ? (
+          <div className="mb-2 flex w-full items-center justify-between px-[18px] text-xxs font-bold uppercase text-white">
+            <span
+              className={twMerge(
+                'mr-1',
+                transactionAmountValidationErrors.includes(
+                  ValidationErrors.INADEQUATE_BALANCE,
+                ) && 'text-red-600',
+                'transition-colors',
+              )}
+            >
+              Balance
+            </span>
+            <span className="font-mono">
               <span
                 className={twMerge(
                   transactionAmountValidationErrors.includes(
@@ -103,35 +107,9 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
               >
                 {selectedTokenBalance?.displayBalance || ''}
               </span>
-            ) : (
-              <Skeleton
-                baseColor="#615ccd20"
-                enableAnimation={!!selectedToken}
-                highlightColor="#615ccd05"
-              />
-            )}
-          </span>
-        </span>
-        <button
-          className="flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
-          onClick={() => {
-            selectedTokenBalance &&
-              poolInfo &&
-              parseFloat(selectedTokenBalance.formattedBalance) &&
-              changeTransferAmountInputValue(
-                (
-                  Math.trunc(
-                    Math.min(
-                      parseFloat(selectedTokenBalance?.displayBalance),
-                      poolInfo?.maxDepositAmount,
-                    ) * 1000,
-                  ) / 1000
-                ).toString(),
-              );
-          }}
-        >
-          MAX
-        </button>
+            </span>
+          </div>
+        ) : null}
       </div>
     </div>
   );

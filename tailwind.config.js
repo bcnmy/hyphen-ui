@@ -28,6 +28,9 @@ module.exports = {
           300: '#c1c1c1',
           400: '#545757',
         },
+        'hyphen-yellow': {
+          100: '#ccba5c',
+        },
       },
       fontSize: {
         xxxs: '0.5rem',
@@ -47,8 +50,12 @@ module.exports = {
       width: {
         7.5: '1.875rem'
       },
+      maxWidth: {
+        170: '42.5rem'
+      },
       spacing: {
         12.5: '3.125rem',
+        170: '42.5rem',
         256: '64rem',
       },
     },

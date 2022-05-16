@@ -2,8 +2,9 @@ import Select from 'components/Select';
 import { useChains } from 'context/Chains';
 import { useWalletProvider } from 'context/WalletProvider';
 import React, { useMemo } from 'react';
-import { HiArrowRight } from 'react-icons/hi';
 import CustomTooltip from '../../../components/CustomTooltip';
+import transferArrow from 'assets/images/transfer-arrow.svg';
+import GaslessToggle from './GaslessToggle';
 
 interface INetworkSelectorsProps {}
 
@@ -50,7 +51,7 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
 
   return (
     <>
-      <div>
+      <div className="relative">
         {fromChainOptions ? (
           <Select
             options={fromChainOptions}
@@ -66,13 +67,13 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
         ) : (
           '...'
         )}
+        <div className="absolute top-0 right-4">
+          <GaslessToggle />
+        </div>
       </div>
       <div className="mb-3 flex items-end">
-        <button
-          className="rounded-full border border-hyphen-purple/10 bg-hyphen-purple bg-opacity-20 p-2 text-hyphen-purple transition-all"
-          onClick={switchChains}
-        >
-          <HiArrowRight />
+        <button onClick={switchChains}>
+          <img src={transferArrow} alt="Transfer" />
         </button>
       </div>
       <div data-tip data-for="networkSelect">

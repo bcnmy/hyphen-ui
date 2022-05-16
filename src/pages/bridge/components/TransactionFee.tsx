@@ -46,11 +46,11 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
             (state === 'exiting' || state === 'exited') && '-translate-y-full',
           )}
         >
-          <div className="mx-10 rounded-b-lg border-x border-b border-white/10 bg-white bg-opacity-10">
-            <div className="flex flex-col gap-y-2 p-4 text-sm text-white/75">
+          <div className="mx-12.5 rounded-b-10 border-x border-b border-white/10 bg-hyphen-purple bg-opacity-25">
+            <div className="flex flex-col gap-y-2 p-8 text-xxs uppercase text-white/75">
               {showEthereumDisclaimer ? (
-                <article className="mb-2 flex items-start rounded-xl bg-red-100 p-2 text-sm text-red-600">
-                  <HiExclamation className="mr-2 h-6 w-auto" />
+                <article className="mb-2 flex items-center rounded-2.5 bg-red-100 p-4 text-xs normal-case text-red-600">
+                  <HiExclamation className="mr-2 h-4 w-auto" />
                   <p>
                     The received amount may differ due to gas price fluctuations
                     on Ethereum.

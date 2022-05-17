@@ -25,7 +25,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
   return (
     <div className="flex flex-col justify-end text-hyphen-purple-dark">
       <div
-        className="flex flex-col items-center"
+        className="relative flex flex-col items-center"
         data-tip
         data-for="transferAmount"
       >

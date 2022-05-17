@@ -29,7 +29,7 @@ function Footer({ showUserInfoModal }: IFooterProps) {
           target="_blank"
           href="https://biconomy.io/"
           rel="noreferrer"
-          className="justify-self-center xl:justify-self-start"
+          className="justify-self-start"
         >
           <img src={poweredByBiconomy} alt="Powered by Biconomy" />
         </a>

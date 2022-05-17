@@ -26,7 +26,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
       : 'https://hyphen-stats-staging.biconomy.io/';
 
   return (
-    <header className="sticky top-0 z-20 grid w-full grid-flow-col items-center bg-[#2e2c62] px-6 text-white xl:grid-cols-3">
+    <header className="sticky top-0 z-20 grid w-full grid-flow-col items-center bg-[#2e2c62] pl-6 pr-8 text-white xl:grid-cols-3 xl:px-6">
       <Link to="/bridge">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
@@ -39,7 +39,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
           alt="Hyphen Logo"
         />
       </Link>
-      <nav className="flex items-center gap-7 justify-self-center text-white">
+      <nav className="flex items-center gap-7 justify-self-end text-white xl:justify-self-center">
         <NavLink to="/bridge">
           {({ isActive }) => (
             <span

@@ -99,7 +99,7 @@ const Bridge: React.FC<BridgeProps> = () => {
       ) : null}
       <ErrorModal error={executeApproveTokenError} title={'Approval Error'} />
       <div className="my-24">
-        <div className="mx-auto w-full px-6 md:max-w-170 xl:px-0">
+        <div className="mx-auto w-full px-6 xl:max-w-170 xl:px-0">
           <div className="flex flex-col gap-8 rounded-10 bg-white p-7.5 shadow-lg xl:gap-12.5 xl:p-12.5">
             <NetworkSelectors />
 

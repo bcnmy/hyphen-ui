@@ -82,7 +82,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2 xl:gap-20">
       {fetchSelectedTokenApprovalStatus === Status.IDLE ||
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (

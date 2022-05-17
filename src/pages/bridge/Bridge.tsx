@@ -100,35 +100,32 @@ const Bridge: React.FC<BridgeProps> = () => {
       <ErrorModal error={executeApproveTokenError} title={'Approval Error'} />
       <div className="my-24">
         <div className="mx-auto w-full px-6 md:max-w-170 xl:px-0">
-          <div className="relative z-10">
-            <div className="flex flex-col gap-12.5 rounded-10 bg-white p-12.5 shadow-lg">
-              <div className="grid grid-cols-[1fr_40px_1fr] gap-5">
-                <NetworkSelectors />
-              </div>
-              <div className="grid h-[7.125rem] grid-cols-2 items-start gap-20">
-                <TokenSelector
-                  disabled={
-                    !areChainsReady ||
-                    !poolInfo?.minDepositAmount ||
-                    !poolInfo?.maxDepositAmount
-                  }
-                />
-                <AmountInput
-                  disabled={
-                    !areChainsReady ||
-                    !poolInfo?.minDepositAmount ||
-                    !poolInfo?.maxDepositAmount
-                  }
-                />
-              </div>
+          <div className="flex flex-col gap-8 rounded-10 bg-white p-7.5 shadow-lg xl:gap-12.5 xl:p-12.5">
+            <NetworkSelectors />
 
-              <ChangeReceiverAddress />
-
-              <CallToAction
-                onApproveButtonClick={showApprovalModal}
-                onTransferButtonClick={handleTransferButtonClick}
+            <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-2 xl:gap-20">
+              <TokenSelector
+                disabled={
+                  !areChainsReady ||
+                  !poolInfo?.minDepositAmount ||
+                  !poolInfo?.maxDepositAmount
+                }
+              />
+              <AmountInput
+                disabled={
+                  !areChainsReady ||
+                  !poolInfo?.minDepositAmount ||
+                  !poolInfo?.maxDepositAmount
+                }
               />
             </div>
+
+            <ChangeReceiverAddress />
+
+            <CallToAction
+              onApproveButtonClick={showApprovalModal}
+              onTransferButtonClick={handleTransferButtonClick}
+            />
           </div>
           <TransactionFee />
         </div>

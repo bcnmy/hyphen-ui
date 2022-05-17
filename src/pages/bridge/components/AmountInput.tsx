@@ -23,7 +23,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
   } = useTransaction()!;
 
   return (
-    <div className="relative flex flex-col justify-end text-hyphen-purple-dark">
+    <div className="flex flex-col justify-end text-hyphen-purple-dark">
       <div
         className="flex flex-col items-center"
         data-tip
@@ -39,7 +39,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           value={transferAmountInputValue}
           onChange={e => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(
-            'z-[1] mt-2 inline-block h-15 w-[calc(100%-4px)] rounded-2.5 bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
+            'mt-2 inline-block h-15 w-full rounded-2.5 border border-hyphen-gray-100 bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
             disabled && 'cursor-not-allowed bg-hyphen-gray-100',
           )}
           disabled={disabled}
@@ -70,51 +70,49 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           <span>Select source & destination chains</span>
         </CustomTooltip>
       )}
-      <div className="absolute top-[21px] flex h-[5.75rem] w-full items-end justify-center rounded-2.5 bg-hyphen-gray-100 text-xxs text-hyphen-purple-dark">
-        <div className="mb-2 flex w-[calc(100%-4px)] justify-between px-4">
-          {getPoolInfoStatus === Status.SUCCESS &&
-          poolInfo?.minDepositAmount &&
-          poolInfo?.maxDepositAmount ? (
-            <>
-              <button
-                className={twMerge(
-                  'flex items-center font-bold uppercase transition-colors',
-                  transactionAmountValidationErrors.includes(
-                    ValidationErrors.AMOUNT_LT_MIN,
-                  ) && 'text-red-600',
-                )}
-                onClick={() =>
-                  changeTransferAmountInputValue(
-                    poolInfo?.minDepositAmount.toString() || '',
-                  )
-                }
-              >
-                Min:
-                <span className="ml-1 text-left">
-                  {Math.trunc(poolInfo.minDepositAmount * 100000) / 100000}
-                </span>
-              </button>
-              <button
-                className={twMerge(
-                  'transition-color flex items-center justify-end font-bold uppercase',
-                  transactionAmountValidationErrors.includes(
-                    ValidationErrors.AMOUNT_GT_MAX,
-                  ) && 'text-red-600',
-                )}
-                onClick={() =>
-                  changeTransferAmountInputValue(
-                    poolInfo?.maxDepositAmount.toString() || '',
-                  )
-                }
-              >
-                Max:
-                <span className="ml-1 text-right">
-                  {Math.trunc(poolInfo.maxDepositAmount * 100000) / 100000}
-                </span>
-              </button>
-            </>
-          ) : null}
-        </div>
+      <div className="mt-2 flex h-[30px] w-full items-center justify-between rounded-2.5 bg-hyphen-gray-100 px-[18px] text-xxs text-hyphen-purple-dark">
+        {getPoolInfoStatus === Status.SUCCESS &&
+        poolInfo?.minDepositAmount &&
+        poolInfo?.maxDepositAmount ? (
+          <>
+            <button
+              className={twMerge(
+                'flex items-center font-bold uppercase transition-colors',
+                transactionAmountValidationErrors.includes(
+                  ValidationErrors.AMOUNT_LT_MIN,
+                ) && 'text-red-600',
+              )}
+              onClick={() =>
+                changeTransferAmountInputValue(
+                  poolInfo?.minDepositAmount.toString() || '',
+                )
+              }
+            >
+              Min:
+              <span className="ml-1 text-left">
+                {Math.trunc(poolInfo.minDepositAmount * 100000) / 100000}
+              </span>
+            </button>
+            <button
+              className={twMerge(
+                'transition-color flex items-center justify-end font-bold uppercase',
+                transactionAmountValidationErrors.includes(
+                  ValidationErrors.AMOUNT_GT_MAX,
+                ) && 'text-red-600',
+              )}
+              onClick={() =>
+                changeTransferAmountInputValue(
+                  poolInfo?.maxDepositAmount.toString() || '',
+                )
+              }
+            >
+              Max:
+              <span className="ml-1 text-right">
+                {Math.trunc(poolInfo.maxDepositAmount * 100000) / 100000}
+              </span>
+            </button>
+          </>
+        ) : null}
       </div>
     </div>
   );

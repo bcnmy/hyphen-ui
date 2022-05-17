@@ -44,12 +44,8 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
   }, [compatibleTokensForCurrentChains, fromChain, tokens]);
 
   return (
-    <div className="relative flex flex-col items-center justify-between">
-      <div
-        data-tip
-        data-for="tokenSelect"
-        className="absolute top-[-1px] z-[1] w-[calc(100%-2px)]"
-      >
+    <div className="flex flex-col items-center justify-between">
+      <div data-tip data-for="tokenSelect" className="w-full">
         <Select
           options={tokenOptions}
           selected={
@@ -79,7 +75,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
       <div
         className={`${
           disabled ? 'bg-hyphen-gray-100' : 'bg-[#50AF95]'
-        } absolute top-[21px] flex h-[5.75rem] w-full items-end justify-center rounded-2.5 text-xxs text-hyphen-purple-dark`}
+        } mt-2 flex h-[30px] w-full items-end justify-center rounded-2.5 text-xxs text-hyphen-purple-dark`}
       >
         {getSelectedTokenBalanceStatus &&
         getSelectedTokenBalanceStatus === Status.SUCCESS &&

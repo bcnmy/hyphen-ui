@@ -15,7 +15,7 @@ const PrimaryButtonLight: React.FunctionComponent<IPrimaryButtonLightProps> = ({
   return (
     <button
       className={twMerge(
-        `flex h-[3.75rem] w-[15.625rem] items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300`,
+        `flex h-[3.75rem] w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300 xl:w-[15.625rem]`,
         className || '',
       )}
       {...props}

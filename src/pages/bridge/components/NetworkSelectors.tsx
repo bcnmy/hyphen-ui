@@ -50,7 +50,7 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
   }, [toChain, toChainOptions]);
 
   return (
-    <>
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1fr_40px_1fr]">
       <div className="relative">
         {fromChainOptions ? (
           <Select
@@ -71,9 +71,13 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
           <GaslessToggle />
         </div>
       </div>
-      <div className="mb-3 flex items-end">
+      <div className="flex items-end justify-center xl:mb-3">
         <button onClick={switchChains}>
-          <img src={transferArrow} alt="Transfer" />
+          <img
+            src={transferArrow}
+            alt="Transfer"
+            className="h-7.5 w-7.5 rotate-90 xl:h-auto xl:w-auto xl:rotate-0"
+          />
         </button>
       </div>
       <div data-tip data-for="networkSelect">
@@ -99,7 +103,7 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
           </CustomTooltip>
         )}
       </div>
-    </>
+    </div>
   );
 };
 

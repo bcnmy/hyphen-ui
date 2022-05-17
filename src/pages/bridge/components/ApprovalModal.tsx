@@ -55,12 +55,11 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
                   {selectedChainName}
                 </Dialog.Description>
                 <div className="flex items-center justify-center gap-4 p-4">
-                  <span className="text-base font-semibold text-hyphen-purple-dark/70">
-                    <div className="flex items-center gap-2">
-                      <FaInfoCircle />
-                      Infinite Approval
-                    </div>
+                  <span className="flex items-center gap-2 text-xxs uppercase text-hyphen-yellow-100">
+                    <FaInfoCircle />
+                    Infinite Approval
                   </span>
+
                   <Toggle
                     label="Infinite Approval"
                     enabled={infiniteApproval}

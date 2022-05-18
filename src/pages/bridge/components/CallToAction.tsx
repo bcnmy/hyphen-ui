@@ -94,19 +94,10 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
         <>
           {fetchSelectedTokenApprovalStatus === Status.PENDING && (
             <>
-              <div
-                data-tip
-                data-for="whyTransferDisabled"
-                className="flex w-full justify-between"
-              >
-                <PrimaryButtonLight disabled className="mr-8">
-                  Approve {selectedToken?.symbol}
-                </PrimaryButtonLight>
-                <PrimaryButtonLight disabled>Bridge Tokens</PrimaryButtonLight>
-              </div>
-              <CustomTooltip id="whyTransferDisabled">
-                <span>Approval loading</span>
-              </CustomTooltip>
+              <PrimaryButtonLight disabled className="mr-8">
+                Loading Approval
+              </PrimaryButtonLight>
+              <PrimaryButtonLight disabled>Bridge Tokens</PrimaryButtonLight>
             </>
           )}
 

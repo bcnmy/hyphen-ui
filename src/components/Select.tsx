@@ -34,10 +34,14 @@ const OptionContent: React.FC<IOptionContentProps> = ({
       <span
         className={`${
           selected ? 'font-medium' : 'font-normal'
-        } flex items-center truncate`}
+        } flex items-center truncate text-sm xl:text-base`}
       >
         {option.image ? (
-          <img className="mr-2 h-5 w-5" src={option.image} alt={option.name} />
+          <img
+            className="mr-2 h-4 w-4 xl:h-5 xl:w-5"
+            src={option.image}
+            alt={option.name}
+          />
         ) : null}
         {option.name}
       </span>
@@ -66,14 +70,15 @@ export const Select: React.FC<ISelectProps> = ({
   return (
     <div className="flex flex-col">
       <Listbox value={selected} onChange={setSelected} disabled={disabled}>
-        <Listbox.Label className="pl-5 text-xxs font-semibold uppercase text-hyphen-gray-400">
+        <Listbox.Label className="pl-5 text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:text-xxs">
           {label}
         </Listbox.Label>
         <div className="relative mt-2 h-15">
           <Listbox.Button
             className={twMerge(
-              'relative h-full w-full cursor-pointer rounded-2.5 border bg-white py-2 pl-4 pr-10 text-left focus:outline-none',
-              disabled && 'cursor-not-allowed bg-gray-200 text-gray-900/80',
+              'relative h-full w-full cursor-pointer rounded-2.5 border border-hyphen-gray-100 bg-white py-2 pl-4 pr-10 text-left text-sm focus:outline-none xl:text-base',
+              disabled &&
+                'cursor-not-allowed bg-hyphen-gray-100 text-gray-900/80',
             )}
           >
             <span className="flex items-center truncate">
@@ -81,7 +86,7 @@ export const Select: React.FC<ISelectProps> = ({
                 <>
                   {selected.image ? (
                     <img
-                      className="mr-2 h-5 w-5"
+                      className="mr-2 h-4 w-4 xl:h-5 xl:w-5"
                       src={selected.image}
                       alt={selected.name}
                     />
@@ -105,7 +110,7 @@ export const Select: React.FC<ISelectProps> = ({
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute z-10 mt-2 max-h-60 min-w-full overflow-auto bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            <Listbox.Options className="absolute z-10 mt-2 max-h-60 min-w-full overflow-auto rounded-2.5 bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {options?.map(option => (
                 <Listbox.Option
                   key={option.id}

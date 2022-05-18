@@ -42,15 +42,18 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
       {state => (
         <div
           className={twMerge(
-            'transform-gpu transition-transform',
-            (state === 'exiting' || state === 'exited') && '-translate-y-full',
+            'invisible transition-opacity',
+            state === 'entering' && 'visible opacity-100',
+            state === 'entered' && 'visible opacity-100',
+            state === 'exiting' && 'visible opacity-0',
+            state === 'exited' && 'invisible opacity-0',
           )}
         >
-          <div className="mx-10 rounded-b-lg border-x border-b border-white/10 bg-white bg-opacity-10">
-            <div className="flex flex-col gap-y-2 p-4 text-sm text-white/75">
+          <div className="mt-2.5 rounded-10 border-x border-b border-white/10 bg-hyphen-purple bg-opacity-25">
+            <div className="flex flex-col gap-y-2 p-7.5 text-xxxs uppercase text-white/75 xl:p-12.5 xl:text-xxs">
               {showEthereumDisclaimer ? (
-                <article className="mb-2 flex items-start rounded-xl bg-red-100 p-2 text-sm text-red-600">
-                  <HiExclamation className="mr-2 h-6 w-auto" />
+                <article className="mb-2 flex items-center rounded-2.5 bg-red-100 p-4 text-xxxs uppercase text-red-600 xl:text-xxs">
+                  <HiExclamation className="mr-2 h-4 w-auto" />
                   <p>
                     The received amount may differ due to gas price fluctuations
                     on Ethereum.

@@ -3,9 +3,9 @@ import liquidityGuideIcon from '../../assets/images/liquidity-guide.svg';
 
 function FarmsInfo() {
   return (
-    <section className="grid grid-cols-2 gap-2.5">
+    <section className="mb-6 grid grid-cols-1 gap-2.5 xl:mb-0 xl:grid-cols-2">
       <div>
-        <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+        <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
           Top pools
         </span>
         <a

@@ -1,4 +1,3 @@
-import { HiOutlineArrowSmRight } from 'react-icons/hi';
 import poweredByBiconomy from '../assets/images/powered-by-biconomy.svg';
 
 function Footer() {

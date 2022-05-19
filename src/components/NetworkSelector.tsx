@@ -52,7 +52,7 @@ function NetworkSelector() {
     <div className="w-[146px]">
       <Listbox value={selectedNetwork} onChange={handleNetworkChange}>
         <div className="relative">
-          <Listbox.Button className="relative h-8 w-full cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 pl-3 pr-10 text-left text-white focus:outline-none sm:text-sm">
+          <Listbox.Button className="relative h-8 w-full cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 pl-3 pr-10 text-left focus:outline-none sm:text-sm">
             <span className="flex items-center truncate">
               {selectedNetwork.name}
             </span>
@@ -69,8 +69,9 @@ function NetworkSelector() {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <Listbox.Options className="absolute top-[-8.625rem] mt-1 max-h-60 w-full overflow-auto rounded-xl bg-hyphen-purple py-1 text-base focus:outline-none sm:text-sm xl:top-auto">
+            <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-xl bg-hyphen-purple py-1 text-base focus:outline-none sm:text-sm">
               {isNetworksLoading ? '...' : null}
+
               {networks &&
                 networks.map(network => (
                   <Listbox.Option

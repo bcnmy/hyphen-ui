@@ -28,7 +28,7 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className="mx-auto mb-14 w-[calc(100%-1.5rem)] xl:w-auto">
+      <div className="mb-14">
         <div className="relative rounded-3xl bg-white p-6 shadow-2xl">
           <div className="absolute -inset-2 -z-10 rounded-3xl bg-white/60 opacity-50 blur-lg"></div>
           <div className="flex flex-col">
@@ -55,11 +55,12 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
                   {selectedChainName}
                 </Dialog.Description>
                 <div className="flex items-center justify-center gap-4 p-4">
-                  <span className="flex items-center gap-2 text-xxs uppercase text-hyphen-yellow-100">
-                    <FaInfoCircle />
-                    Infinite Approval
+                  <span className="text-base font-semibold text-hyphen-purple-dark/70">
+                    <div className="flex items-center gap-2">
+                      <FaInfoCircle />
+                      Infinite Approval
+                    </div>
                   </span>
-
                   <Toggle
                     label="Infinite Approval"
                     enabled={infiniteApproval}

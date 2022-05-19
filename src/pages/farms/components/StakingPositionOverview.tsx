@@ -326,37 +326,33 @@ function StakingPositionOverview({
 
   return (
     <section
-      className={`grid h-37.5 grid-cols-2 items-center rounded-7.5 border px-[1.875rem] py-6 text-hyphen-gray-400 xl:grid-cols-3 xl:px-10 ${
+      className={`grid h-37.5 grid-cols-3 rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
         isUserOnFarms ? 'cursor-pointer' : ''
       }`}
       onClick={handleStakingPositionClick}
       style={{ backgroundColor: chainColor }}
     >
       <div className="flex flex-col">
-        <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs">
+        <span className="mb-2.5 text-xxs font-bold uppercase">
           Asset supplied
         </span>
         <div className="mb-5 flex items-center">
-          <img
-            src={tokenImage}
-            alt={tokenSymbol}
-            className="mr-2 h-2.5 w-2.5 xl:h-8 xl:w-8"
-          />
+          <img src={tokenImage} alt={tokenSymbol} className="mr-2 h-8 w-8" />
           <div className="flex flex-col">
-            <span className="truncate font-mono text-sm xl:text-2xl">
+            <span className="font-mono text-2xl ">
               {formattedSuppliedLiquidity} {tokenSymbol}
             </span>
-            <span className="hidden text-xxs font-bold uppercase text-hyphen-gray-300 xl:flex">
+            <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
               {chainName}
             </span>
           </div>
         </div>
-        <span className="font-mono text-xxxs xl:text-xs">
+        <span className="font-mono text-xs">
           TVL: ${makeNumberCompact(tvl, 3)}
         </span>
       </div>
 
-      <div className="hidden flex-col items-center xl:flex">
+      <div className="flex flex-col items-center">
         <span className="mb-2.5 text-xxs font-bold uppercase ">Reward APY</span>
         <div className="mb-5">
           <div className="flex flex-col items-center">
@@ -391,20 +387,20 @@ function StakingPositionOverview({
       </div>
 
       <div className="flex flex-col items-end">
-        <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs">
+        <span className="mb-2.5 text-xxs font-bold uppercase ">
           Your Reward Rate
         </span>
         <div className="mb-5">
           <div className="flex flex-col items-end">
             <div className="flex items-center">
-              <span className="font-mono text-sm xl:text-2xl">
+              <span className="font-mono text-2xl">
                 {' '}
                 {yourRewardRate >= 0 && rewardToken ? (
                   <div className="flex items-center">
                     <img
                       src={rewardToken.image}
                       alt={rewardToken.symbol}
-                      className="mr-2.5 h-2.5 w-2.5 xl:h-8 xl:w-8"
+                      className="mr-2.5 h-5 w-5"
                     />
                     {makeNumberCompact(
                       Number.parseFloat(yourRewardRate.toFixed(3)),
@@ -422,12 +418,12 @@ function StakingPositionOverview({
                 )}
               </span>
             </div>
-            <span className="hidden text-xxs font-bold uppercase text-hyphen-gray-300 xl:flex">
+            <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
               Per Day
             </span>
           </div>
         </div>
-        <span className="font-mono text-xxxs xl:text-xs">
+        <span className="font-mono text-xs">
           {rewardToken && unclaimedRewardToken >= 0 ? (
             `Unclaimed ${rewardToken.symbol}: ${
               unclaimedRewardToken > 0

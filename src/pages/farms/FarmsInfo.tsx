@@ -2,9 +2,9 @@ import hyphenStatsIcon from '../../assets/images/hyphen-stats.svg';
 
 function FarmsInfo() {
   return (
-    <section className="mb-6 grid grid-cols-1 gap-2.5 xl:mb-0 xl:grid-cols-2">
+    <section className="grid grid-cols-2 gap-2.5">
       <div>
-        <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
+        <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
           Top pools
         </span>
         <a

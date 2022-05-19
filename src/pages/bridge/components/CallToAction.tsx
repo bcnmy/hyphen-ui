@@ -1,4 +1,6 @@
 import PrimaryButtonLight from 'components/Buttons/PrimaryButtonLight';
+import SecondaryButtonLight from 'components/Buttons/SecondaryButtonLight';
+import Spinner from 'components/Buttons/Spinner';
 import { useBiconomy } from 'context/Biconomy';
 import { useChains } from 'context/Chains';
 import { useTokenApproval } from 'context/TokenApproval';
@@ -8,8 +10,6 @@ import { Status } from 'hooks/useLoading';
 import * as React from 'react';
 import switchNetwork from 'utils/switchNetwork';
 import CustomTooltip from '../../../components/CustomTooltip';
-import arrowRight from 'assets/images/arrow-right.svg';
-import { useToken } from 'context/Token';
 
 export interface ICallToActionProps {
   onApproveButtonClick: () => void;
@@ -27,10 +27,9 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     fetchSelectedTokenApprovalValue,
   } = useTokenApproval()!;
 
+  const { fromChain } = useChains()!;
   const { walletProvider, currentChainId, connect, isLoggedIn } =
     useWalletProvider()!;
-  const { fromChain } = useChains()!;
-  const { selectedToken } = useToken()!;
   const {
     receiver: { isReceiverValid },
     transactionAmountValidationErrors,
@@ -39,7 +38,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isLoggedIn) {
     return (
-      <div className="flex justify-center">
+      <div className="mt-4 flex justify-center gap-8">
         <PrimaryButtonLight onClick={() => connect()}>
           Connect Wallet
         </PrimaryButtonLight>
@@ -49,7 +48,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isBiconomyEnabled && fromChain?.chainId !== currentChainId) {
     return (
-      <div className="flex justify-center">
+      <div className="mt-4 flex justify-center gap-8">
         <PrimaryButtonLight
           onClick={() => {
             if (!walletProvider || !fromChain)
@@ -65,7 +64,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   if (!isReceiverValid) {
     return (
-      <div className="flex justify-center">
+      <div className="mt-4 flex justify-center gap-8">
         <span data-tip data-for="invalidReceiverAddress">
           <PrimaryButtonLight disabled>
             Invalid receiver address
@@ -82,41 +81,67 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2 xl:gap-20">
+    <div className="mt-4 flex justify-center gap-8">
       {fetchSelectedTokenApprovalStatus === Status.IDLE ||
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (
         <>
-          <PrimaryButtonLight disabled>Enter a valid amount</PrimaryButtonLight>
-          <PrimaryButtonLight disabled>Bridge Tokens</PrimaryButtonLight>
+          <span data-tip data-for="whyTransferDisabled">
+            <PrimaryButtonLight disabled>Transfer</PrimaryButtonLight>
+          </span>
+          <CustomTooltip id="whyTransferDisabled">
+            {fetchSelectedTokenApprovalError &&
+            transactionAmountValidationErrors.length === 0 ? (
+              <span>Error trying to fetch token approval</span>
+            ) : (
+              <span>Enter a valid transfer amount</span>
+            )}
+          </CustomTooltip>
         </>
       ) : (
         <>
           {fetchSelectedTokenApprovalStatus === Status.PENDING && (
             <>
-              <PrimaryButtonLight disabled className="mr-8">
-                Loading Approval
-              </PrimaryButtonLight>
-              <PrimaryButtonLight disabled>Bridge Tokens</PrimaryButtonLight>
+              <div
+                data-tip
+                data-for="whyTransferDisabled"
+                className="flex items-center"
+              >
+                {fetchSelectedTokenApprovalValue === false ? (
+                  <SecondaryButtonLight disabled className="mr-8">
+                    Approve
+                  </SecondaryButtonLight>
+                ) : null}
+                <PrimaryButtonLight
+                  disabled
+                  className="flex items-center gap-2"
+                >
+                  <Spinner />
+                  Transfer
+                </PrimaryButtonLight>
+              </div>
+              <CustomTooltip id="whyTransferDisabled">
+                <span>Approval loading</span>
+              </CustomTooltip>
             </>
           )}
-
           {fetchSelectedTokenApprovalStatus === Status.SUCCESS &&
             fetchSelectedTokenApprovalValue === false && (
               <>
                 {executeApproveTokenStatus === Status.PENDING ? (
-                  <PrimaryButtonLight disabled>
-                    Approving {selectedToken?.symbol}
-                  </PrimaryButtonLight>
+                  <SecondaryButtonLight disabled>
+                    <span className="flex items-center gap-2">
+                      <Spinner />
+                      <span>Approve</span>
+                    </span>
+                  </SecondaryButtonLight>
                 ) : (
-                  <PrimaryButtonLight onClick={onApproveButtonClick}>
-                    Approve {selectedToken?.symbol}
-                  </PrimaryButtonLight>
+                  <SecondaryButtonLight onClick={onApproveButtonClick}>
+                    Approve
+                  </SecondaryButtonLight>
                 )}
                 <span data-tip data-for="whyTransferDisabled">
-                  <PrimaryButtonLight disabled>
-                    Bridge Tokens
-                  </PrimaryButtonLight>
+                  <PrimaryButtonLight disabled>Transfer</PrimaryButtonLight>
                 </span>
                 <CustomTooltip id="whyTransferDisabled">
                   <span>Approve token to enable token transfers</span>
@@ -126,19 +151,9 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
           {fetchSelectedTokenApprovalStatus === Status.SUCCESS &&
             fetchSelectedTokenApprovalValue === true && (
-              <>
-                <PrimaryButtonLight disabled>
-                  {selectedToken?.symbol} Approved
-                </PrimaryButtonLight>
-                <PrimaryButtonLight onClick={onTransferButtonClick}>
-                  Bridge Tokens
-                  <img
-                    src={arrowRight}
-                    alt="Bridge Tokens"
-                    className="ml-2.5"
-                  />
-                </PrimaryButtonLight>
-              </>
+              <PrimaryButtonLight onClick={onTransferButtonClick}>
+                Transfer
+              </PrimaryButtonLight>
             )}
         </>
       )}

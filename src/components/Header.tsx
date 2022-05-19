@@ -26,20 +26,15 @@ function Header({ showUserInfoModal }: IHeaderProps) {
       : 'https://hyphen-stats-staging.biconomy.io/';
 
   return (
-    <header className="sticky top-0 z-20 grid w-full grid-flow-col items-center bg-[#2e2c62] pl-6 pr-8 text-white xl:grid-cols-3 xl:px-6">
-      <Link to="/bridge">
+    <header className="sticky top-0 z-20 flex w-full items-center justify-center bg-[#2e2c62] text-white">
+      <Link to="/bridge" className="absolute left-6">
         <img
           src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
-          className="hidden h-8 w-auto xl:flex"
-          alt="Hyphen Logo"
-        />
-        <img
-          src={`${process.env.PUBLIC_URL}/hyphen-logo-small.svg`}
-          className="flex h-8 w-auto xl:hidden"
+          className="h-8 w-auto"
           alt="Hyphen Logo"
         />
       </Link>
-      <nav className="flex items-center gap-7 justify-self-end text-white xl:justify-self-center">
+      <nav className="flex gap-7 text-white">
         <NavLink to="/bridge">
           {({ isActive }) => (
             <span
@@ -119,7 +114,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
           <HiOutlineArrowSmRight className="absolute top-[2px] right-[-12px] h-3 w-3 -rotate-45" />
         </a>
       </nav>
-      <div className="hidden items-center justify-self-end xl:flex">
+      <div className="absolute right-6 flex items-center">
         {showNetworkSelector ? <NetworkSelector /> : null}
         <button
           className="font-base ml-2.5 cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 px-4 py-1 font-mono text-white"

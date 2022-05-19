@@ -21,7 +21,6 @@ import CustomTooltip from '../../components/CustomTooltip';
 import { HiInformationCircle } from 'react-icons/hi';
 import { useToken } from 'context/Token';
 import { useHyphen } from 'context/Hyphen';
-import { Status } from 'hooks/useLoading';
 
 interface BridgeProps {}
 

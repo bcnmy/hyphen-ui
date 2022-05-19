@@ -5,9 +5,7 @@ import Skeleton from 'react-loading-skeleton';
 import React from 'react';
 import { useTransaction, ValidationErrors } from 'context/Transaction';
 import { twMerge } from 'tailwind-merge';
-import { useChains } from 'context/Chains';
 import CustomTooltip from '../../../components/CustomTooltip';
-import { Listbox } from '@headlessui/react';
 
 interface IAmountInputProps {
   disabled?: boolean;

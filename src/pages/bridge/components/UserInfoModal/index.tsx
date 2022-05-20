@@ -279,8 +279,8 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className="relative z-20 rounded-3xl border border-hyphen-purple-darker/50 bg-white p-6 shadow-lg">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="relative z-20 overflow-hidden rounded-10 border border-hyphen-purple-darker/50 bg-white shadow-lg">
+        <div className="mb-7.5 flex items-center justify-between px-7.5 pt-7.5 xl:px-12.5 xl:pt-12.5">
           <Dialog.Title as="h1" className="text-xl font-semibold text-gray-700">
             Account
           </Dialog.Title>
@@ -289,45 +289,36 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
           </button>
         </div>
 
-        <article className="mb-6 rounded-2xl border border-gray-200 p-4">
-          <header className="mb-3 flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              Connected with {providerName}
+        <aside className="px-7.5 xl:px-12.5">
+          <div className="h-[5.625rem] rounded-2.5 border-2 border-[#F6851B] bg-[#F6851B]">
+            <p className="relative flex h-15 w-full items-center rounded-t-2.5 bg-white px-5 font-mono text-xl text-hyphen-gray-400">
+              {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
+              <button
+                className="absolute top-[1.375rem] right-5 z-[2] flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs uppercase text-white"
+                onClick={handleUserAddressCopy}
+              >
+                {addressCopied ? 'Copied' : 'Copy'}
+              </button>
             </p>
-            <button
-              className="text-sm font-medium text-red-600"
-              onClick={handleWalletDisconnect}
-            >
-              Disconnect
-            </button>
-          </header>
-          <p className="mb-2 text-lg text-gray-700">
-            {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
-          </p>
-          <button className="flex items-center" onClick={handleUserAddressCopy}>
-            {addressCopied ? (
-              <HiOutlineClipboardCheck className="mr-1 h-4 w-auto text-green-400" />
-            ) : (
-              <HiOutlineClipboardCopy className="mr-1 h-4 w-auto text-gray-500" />
-            )}
-            <span
-              className={`text-sm ${
-                addressCopied ? 'text-green-400' : 'text-gray-500'
-              }`}
-            >
-              {addressCopied ? 'Copied!' : 'Copy Address'}
-            </span>
-          </button>
-        </article>
+            <p className="flex h-7 items-center justify-between px-5 text-xxs font-bold uppercase text-white">
+              Connected with {providerName}
+              <button
+                className="rounded-full bg-[#FF000080] px-2 text-xxs font-bold uppercase text-white"
+                onClick={handleWalletDisconnect}
+              >
+                Disconnect
+              </button>
+            </p>
+          </div>
+        </aside>
 
-        <article>
+        <aside className="mt-7.5 bg-[#F1F0FF] p-7.5 xl:mt-12.5 xl:p-12.5">
           <div className="mb-4 flex items-center justify-between">
             <h2 className="text-lg text-gray-700">Recent Transactions</h2>
             <button
               onClick={handleTransactionsRefetch}
               className="flex items-center rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100"
             >
-              Refresh
               <HiOutlineRefresh
                 className={twMerge(
                   'ml-1 h-4 w-4 text-gray-500',
@@ -418,7 +409,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
               })}
             </ul>
           ) : null}
-        </article>
+        </aside>
       </div>
 
       <TransactionDetailModal

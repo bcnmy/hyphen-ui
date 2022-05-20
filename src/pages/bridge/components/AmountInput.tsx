@@ -39,7 +39,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           value={transferAmountInputValue}
           onChange={e => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(
-            'mt-2 inline-block h-15 w-full rounded-2.5 border border-hyphen-gray-100 bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
+            'mt-2 inline-block h-15 w-full rounded-t-2.5 border border-hyphen-gray-100 bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
             disabled && 'cursor-not-allowed bg-hyphen-gray-100',
           )}
           disabled={disabled}
@@ -70,7 +70,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           <span>Select source & destination chains</span>
         </CustomTooltip>
       )}
-      <div className="mt-2 flex h-[30px] w-full items-center justify-between rounded-2.5 bg-hyphen-gray-100 px-[18px] text-xxs text-hyphen-purple-dark">
+      <div className="flex h-[30px] w-full items-center justify-between rounded-b-2.5 bg-hyphen-gray-100 px-[18px] text-xxs text-hyphen-purple-dark">
         {getPoolInfoStatus === Status.SUCCESS &&
         poolInfo?.minDepositAmount &&
         poolInfo?.maxDepositAmount ? (

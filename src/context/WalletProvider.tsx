@@ -8,6 +8,8 @@ import {
 import { ethers } from "ethers";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
+import * as UAuthWeb3Modal from '@uauth/web3modal'
+import UAuthSPA from '@uauth/js'
 
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
@@ -61,20 +63,30 @@ const WalletProviderProvider: React.FC = (props) => {
   }, [walletProvider]);
 
   useEffect(() => {
-    setWeb3Modal(
-      new Web3Modal({
-        // network: "mumbai", // optional
-        cacheProvider: true, // optional
-        providerOptions: {
-          walletconnect: {
-            package: WalletConnectProvider, // required
-            options: {
-              infuraId: process.env.REACT_APP_INFURA_ID, // required
-            },
+    let _web3Modal = new Web3Modal({
+      // network: "mumbai", // optional
+      cacheProvider: true, // optional
+      providerOptions: {
+        'custom-uauth': {
+          display: UAuthWeb3Modal.display,
+          connector: UAuthWeb3Modal.connector,
+          package: UAuthSPA,
+          options: {
+            clientID: process.env.REACT_APP_UAUTH_ID,
+            redirectUri: 'http://127.0.0.1',
+            scope: 'openid wallet',
           },
         },
-      })
-    );
+        walletconnect: {
+          package: WalletConnectProvider, // required
+          options: {
+            infuraId: process.env.REACT_APP_INFURA_ID, // required
+          },
+        },
+      },
+    })
+    UAuthWeb3Modal.registerWeb3Modal(_web3Modal)
+    setWeb3Modal(_web3Modal);
   }, []);
 
   // because provider does not fire events initially, we need to fetch initial values for current chain from walletProvider

@@ -28,7 +28,55 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
 
   return (
     <Modal isVisible={isVisible} onClose={onClose}>
-      <div className="mb-14">
+      <div className="relative z-20 mx-auto w-full overflow-hidden rounded-10 border border-hyphen-purple-darker/50 bg-white shadow-lg xl:w-[21.875rem]">
+        <div className="mb-7.5 flex items-center justify-between px-7.5 pt-7.5 xl:px-12.5 xl:pt-12.5">
+          <Dialog.Title as="h1" className="text-xl font-semibold text-gray-700">
+            Token Approval
+          </Dialog.Title>
+          <button onClick={onClose} className="rounded hover:bg-gray-100">
+            <IoMdClose className="h-6 w-auto text-gray-500" />
+          </button>
+        </div>
+
+        <aside className="flex flex-col items-start px-7.5 pb-7.5 xl:px-12.5 xl:pb-12.5">
+          <p className="mb-7.5 text-base text-hyphen-purple">
+            Allow Hyphen to spend {selectedTokenName} on {selectedChainName}
+          </p>
+
+          <div className="mb-7.5 flex items-center justify-center gap-4">
+            <span className="flex items-center gap-2 text-xxs font-bold uppercase text-hyphen-purple">
+              <FaInfoCircle />
+              Infinite Approval
+            </span>
+
+            <Toggle
+              enabled={infiniteApproval}
+              label="Infinite Approval"
+              onToggle={setInfiniteApproval}
+              switchClass="bg-[#00D28F]"
+              variant="large"
+            />
+          </div>
+
+          <p className="mb-7.5 text-base text-hyphen-gray-300">
+            Note: This approval will only be used when you deposit your{' '}
+            {selectedTokenName} in Hyphen contracts on {selectedChainName} for
+            cross chain transfers.
+          </p>
+
+          <PrimaryButtonLight
+            className="px-8"
+            onClick={() => {
+              if (!transferAmount) throw new Error('Transfer Amount Invalid');
+              executeTokenApproval(infiniteApproval, transferAmount);
+              onClose();
+            }}
+          >
+            Proceed
+          </PrimaryButtonLight>
+        </aside>
+      </div>
+      {/* <div className="mx-auto mb-14 w-[calc(100%-1.5rem)] xl:w-auto">
         <div className="relative rounded-3xl bg-white p-6 shadow-2xl">
           <div className="absolute -inset-2 -z-10 rounded-3xl bg-white/60 opacity-50 blur-lg"></div>
           <div className="flex flex-col">
@@ -39,11 +87,9 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
               >
                 Token Approval
               </Dialog.Title>
-              <div className="hover ml-auto text-hyphen-purple-dark/80">
-                <button onClick={onClose}>
-                  <IoMdClose className="h-6 w-auto" />
-                </button>
-              </div>
+              <button onClick={onClose} className="rounded hover:bg-gray-100">
+                <IoMdClose className="h-6 w-auto text-gray-500" />
+              </button>
             </div>
             <div className="rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 transition-colors hover:border-opacity-30">
               <div className="flex flex-col gap-4">
@@ -55,12 +101,11 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
                   {selectedChainName}
                 </Dialog.Description>
                 <div className="flex items-center justify-center gap-4 p-4">
-                  <span className="text-base font-semibold text-hyphen-purple-dark/70">
-                    <div className="flex items-center gap-2">
-                      <FaInfoCircle />
-                      Infinite Approval
-                    </div>
+                  <span className="flex items-center gap-2 text-xxs uppercase text-hyphen-yellow-100">
+                    <FaInfoCircle />
+                    Infinite Approval
                   </span>
+
                   <Toggle
                     label="Infinite Approval"
                     enabled={infiniteApproval}
@@ -89,7 +134,7 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </Modal>
   );
 };

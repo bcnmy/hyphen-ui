@@ -64,7 +64,7 @@ function LiquidityPositions() {
 
   if (userPositionsError) {
     return (
-      <article className="my-12 mb-2.5 rounded-10 bg-white p-2.5 xl:my-24">
+      <article className="my-12.5 mb-2.5 rounded-10 bg-white p-2.5">
         <section className="my-16 flex items-center justify-center px-[1.875rem]">
           <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
           <p className="text-hyphen-gray-400">

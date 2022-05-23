@@ -11,11 +11,12 @@ export interface Option {
   tooltip?: string;
 }
 export interface ISelectProps {
+  className?: string;
+  disabled?: boolean;
   options: Option[] | undefined;
+  label: string;
   selected?: Option;
   setSelected: (option: Option) => void;
-  label: string;
-  disabled?: boolean;
 }
 
 interface IOptionContentProps {
@@ -60,12 +61,14 @@ const OptionContent: React.FC<IOptionContentProps> = ({
   );
 };
 
+// TODO: Change this to compound component so that it's easier to use.
 export const Select: React.FC<ISelectProps> = ({
-  selected,
-  setSelected,
+  className,
+  disabled,
   options,
   label,
-  disabled,
+  selected,
+  setSelected,
 }) => {
   return (
     <div className="flex flex-col">
@@ -79,6 +82,7 @@ export const Select: React.FC<ISelectProps> = ({
               'relative h-full w-full cursor-pointer rounded-2.5 border border-hyphen-gray-100 bg-white py-2 pl-4 pr-10 text-left text-sm focus:outline-none xl:text-base',
               disabled &&
                 'cursor-not-allowed bg-hyphen-gray-100 text-gray-900/80',
+              className,
             )}
           >
             <span className="flex items-center truncate">

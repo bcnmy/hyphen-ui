@@ -98,9 +98,13 @@ const Bridge: React.FC<BridgeProps> = () => {
         />
       ) : null}
       <ErrorModal error={executeApproveTokenError} title={'Approval Error'} />
-      <div className="my-24">
+      <div className="my-12.5">
         <div className="mx-auto w-full px-6 xl:max-w-170 xl:px-0">
-          <div className="flex flex-col gap-8 rounded-10 bg-white p-7.5 shadow-lg xl:gap-12.5 xl:p-12.5">
+          <div
+            className={`flex flex-col gap-8 rounded-10 bg-white p-7.5 shadow-lg xl:p-12.5 ${
+              transferAmount ? 'rounded-b-none' : ''
+            }`}
+          >
             <NetworkSelectors />
 
             <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-2 xl:gap-20">

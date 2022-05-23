@@ -28,7 +28,7 @@ function GaslessToggle() {
           data-for="whyGaslessDisabled"
           onClick={() => setIsBiconomyToggledOn(!isBiconomyEnabled)}
         >
-          <span className="mr-2 text-xxxs font-semibold uppercase text-hyphen-yellow-100 xl:text-xxs">
+          <span className="mr-2 text-xxxs font-bold uppercase text-hyphen-yellow-100 xl:text-xxs">
             Go Gasless
           </span>
           <Toggle

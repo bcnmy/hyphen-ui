@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import useModal from "./useModal";
+import { useEffect, useRef } from 'react';
+import useModal from './useModal';
 
 export default function useErrorModal(error: any) {
   const {

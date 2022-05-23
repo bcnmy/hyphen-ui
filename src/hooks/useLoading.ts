@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from 'react';
 
 export enum Status {
-  IDLE = "idle",
-  PENDING = "pending",
-  SUCCESS = "success",
-  ERROR = "error",
+  IDLE = 'idle',
+  PENDING = 'pending',
+  SUCCESS = 'success',
+  ERROR = 'error',
 }
 
 type ReplaceReturnType<T extends (...a: any) => any, TNewReturn> = (
@@ -12,7 +12,7 @@ type ReplaceReturnType<T extends (...a: any) => any, TNewReturn> = (
 ) => TNewReturn;
 
 export default function useAsync<T>(
-  asyncFunction: (...args: any[]) => Promise<T>
+  asyncFunction: (...args: any[]) => Promise<T>,
 ): {
   value: T | undefined; // this is the output of the asyncFunction
   error: undefined | Error; // error, if any, during execution of the asyncFunciton
@@ -45,13 +45,13 @@ export default function useAsync<T>(
           setValue(value as T);
           setStatus(Status.SUCCESS);
         })
-        .catch((e) => {
+        .catch(e => {
           setStatus(Status.ERROR);
           setValue(undefined);
           setError(e);
         });
     },
-    [asyncFunction]
+    [asyncFunction],
   );
 
   return { value, status, error, execute };

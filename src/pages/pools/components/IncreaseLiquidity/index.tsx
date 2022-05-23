@@ -53,7 +53,7 @@ function IncreaseLiquidity() {
   const { getPositionMetadata } = useLPToken(chain);
   const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
     useLiquidityProviders(chain);
-  const { getTokenTotalCap, getTotalLiquidityByLp, getTokenWalletCap } =
+  const { getTokenTotalCap, getTotalLiquidityByLp } =
     useWhitelistPeriodManager(chain);
 
   const [walletBalance, setWalletBalance] = useState<string | undefined>();
@@ -113,15 +113,14 @@ function IncreaseLiquidity() {
     },
   );
 
-  const { data: totalLiquidityByLP, isError: totalLiquidityByLPError } =
-    useQuery(
-      ['totalLiquidityByLP', tokenAddress],
-      () => getTotalLiquidityByLp(tokenAddress, accounts),
-      {
-        // Execute only when tokenAddress is available.
-        enabled: !!(tokenAddress && accounts),
-      },
-    );
+  const { isError: totalLiquidityByLPError } = useQuery(
+    ['totalLiquidityByLP', tokenAddress],
+    () => getTotalLiquidityByLp(tokenAddress, accounts),
+    {
+      // Execute only when tokenAddress is available.
+      enabled: !!(tokenAddress && accounts),
+    },
+  );
 
   const {
     data: tokenAllowance,

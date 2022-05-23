@@ -1,6 +1,5 @@
-import { createContext, useContext, useEffect } from "react";
-import { ToastContainer, toast } from "react-toastify";
-import { ethers } from "ethers";
+import { createContext, useContext } from 'react';
+import { toast } from 'react-toastify';
 
 interface INotificationsContext {
   addTxNotification: (tx: any, type: string, explorerUrl: string) => void;
@@ -8,7 +7,7 @@ interface INotificationsContext {
 
 const NotificationsContext = createContext<INotificationsContext | null>(null);
 
-const NotificationsProvider: React.FC = (props) => {
+const NotificationsProvider: React.FC = props => {
   // useEffect(() => {
   //   toast(<p className="font-sans">This works somehow</p>, {
   //     position: toast.POSITION.BOTTOM_RIGHT,
@@ -25,11 +24,11 @@ const NotificationsProvider: React.FC = (props) => {
       },
       {
         onClick: () => {
-          window.open(explorerUrl, "_blank");
+          window.open(explorerUrl, '_blank');
         },
         position: toast.POSITION.BOTTOM_RIGHT,
-        className: "font-sans font-medium",
-      }
+        className: 'font-sans font-medium',
+      },
     );
   };
 

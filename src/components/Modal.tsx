@@ -15,7 +15,7 @@ const Modal: React.FunctionComponent<IModalProps> = ({
     <Transition appear show={isVisible} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-20 flex justify-center px-2"
+        className="fixed inset-0 z-20 flex justify-center"
         onClose={onClose}
       >
         <Transition.Child
@@ -38,7 +38,7 @@ const Modal: React.FunctionComponent<IModalProps> = ({
           leaveFrom="opacity-100 scale-100"
           leaveTo="opacity-0 scale-95"
         >
-          <div className="flex max-w-lg flex-grow flex-col">
+          <div className="flex max-w-full flex-grow flex-col px-6 xl:max-w-lg">
             <div className="relative my-auto">{children}</div>
           </div>
         </Transition.Child>

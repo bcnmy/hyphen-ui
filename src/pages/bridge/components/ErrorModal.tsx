@@ -1,16 +1,10 @@
-import PrimaryButtonLight from "components/Buttons/PrimaryButtonLight";
-import { Toggle } from "components/Toggle";
-import React, { Fragment, useState } from "react";
-import { FaInfoCircle } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
-import { defaultMaxListeners } from "stream";
-import { twMerge } from "tailwind-merge";
+import PrimaryButtonLight from 'components/Buttons/PrimaryButtonLight';
+import React from 'react';
+import { IoMdClose } from 'react-icons/io';
 
-import { Dialog, Transition } from "@headlessui/react";
-import Modal from "components/Modal";
-import { useTokenApproval } from "context/TokenApproval";
-import { useTransaction } from "context/Transaction";
-import useErrorModal from "hooks/useErrorModal";
+import { Dialog } from '@headlessui/react';
+import Modal from 'components/Modal';
+import useErrorModal from 'hooks/useErrorModal';
 
 export interface IErrorModalProps {
   error: any;
@@ -18,40 +12,37 @@ export interface IErrorModalProps {
 }
 
 export const ErrorModal: React.FC<IErrorModalProps> = ({ error, title }) => {
-  const {
-    isErrorModalVisible: isVisible,
-    hideErrorModal,
-    showErrorModal,
-  } = useErrorModal(error);
+  const { isErrorModalVisible: isVisible, hideErrorModal } =
+    useErrorModal(error);
 
   return (
     <Modal isVisible={isVisible} onClose={hideErrorModal}>
       <div className="mb-14">
-        <div className="relative p-6 bg-white shadow-2xl rounded-3xl">
-          <div className="absolute opacity-50 -inset-2 bg-white/60 rounded-3xl blur-lg -z-10"></div>
+        <div className="relative rounded-3xl bg-white p-6 shadow-2xl">
+          <div className="absolute -inset-2 -z-10 rounded-3xl bg-white/60 opacity-50 blur-lg"></div>
           <div className="flex flex-col">
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6 flex items-center justify-between">
               <Dialog.Title
                 as="h1"
-                className="font-semibold text-xl text-black text-opacity-[0.54] p-2"
+                className="p-2 text-xl font-semibold text-black text-opacity-[0.54]"
               >
                 {title}
               </Dialog.Title>
-              <div className="ml-auto text-hyphen-purple-dark/80 hover">
+              <div className="hover ml-auto text-hyphen-purple-dark/80">
                 <button onClick={hideErrorModal}>
-                  <IoMdClose className="w-auto h-6" />
+                  <IoMdClose className="h-6 w-auto" />
                 </button>
               </div>
             </div>
-            <div className="transition-colors px-4 py-6 rounded-xl bg-hyphen-purple bg-opacity-[0.05] border-hyphen-purple border border-opacity-10 hover:border-opacity-30">
+            <div className="rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] px-4 py-6 transition-colors hover:border-opacity-30">
               <Dialog.Description
                 as="div"
-                className="py-2 font-medium text-center text-hyphen-purple-dark/80 text"
+                className="text py-2 text-center font-medium text-hyphen-purple-dark/80"
               >
                 {error?.message}
               </Dialog.Description>
             </div>
-            <div className="flex justify-center pt-3 pb-2 mt-4">
+            <div className="mt-4 flex justify-center pt-3 pb-2">
               <PrimaryButtonLight
                 className="px-8"
                 onClick={() => {

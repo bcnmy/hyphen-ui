@@ -1,5 +1,4 @@
 import hyphenStatsIcon from '../../assets/images/hyphen-stats.svg';
-import liquidityGuideIcon from '../../assets/images/liquidity-guide.svg';
 
 function FarmsInfo() {
   return (

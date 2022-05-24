@@ -1,5 +1,4 @@
 import { Switch } from '@headlessui/react';
-
 interface IToggleProps {
   enabled: boolean;
   label: string;

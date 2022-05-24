@@ -241,7 +241,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
       const { deposits: userDeposits } = userDepositsData;
       getUserTransactions(fromChain, userDeposits);
     }
-  }, [fromChain, hyphen, networks, userDepositsData]);
+  }, [fromChain, hyphen, networks, tokens, userDepositsData]);
 
   const {
     isVisible: isTransactionDetailModalVisible,
@@ -346,21 +346,15 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
                 const {
                   amount,
                   depositHash,
-                  exitHash,
                   fromChain,
                   fromChainExplorerUrl,
-                  rewardAmount,
                   toChain,
                   toChainExplorerUrl,
                   token,
                 } = userTransaction;
-                const { chainId: fromChainId, name: fromChainName } = fromChain;
+                const { name: fromChainName } = fromChain;
                 const { name: toChainName } = toChain;
-                const {
-                  image,
-                  symbol,
-                  [fromChainId]: { decimal: tokenDecimals },
-                } = token;
+                const { image, symbol } = token;
 
                 return (
                   <li

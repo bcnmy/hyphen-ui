@@ -13,7 +13,6 @@ import { Status } from 'hooks/useLoading';
 import { PrimaryButtonDark } from 'components/Buttons/PrimaryButtonDark';
 import Spinner from 'components/Buttons/Spinner';
 import AnimateHeight from 'react-animate-height';
-import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
 import { HiExclamation, HiOutlineArrowSmRight } from 'react-icons/hi';
 import SpinnerDark from 'components/Buttons/SpinnerDark';

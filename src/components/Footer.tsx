@@ -1,10 +1,9 @@
 import { useWalletProvider } from 'context/WalletProvider';
 import { useLocation } from 'react-router-dom';
-import poweredByBiconomy from '../assets/images/powered-by-biconomy.svg';
-import NetworkSelector from './NetworkSelector';
-
 import discordLogoLight from '../assets/images/discord-logo-light.svg';
 import emailLogoLight from '../assets/images/email-logo-light.svg';
+import poweredByBiconomy from '../assets/images/powered-by-biconomy.svg';
+import NetworkSelector from './NetworkSelector';
 
 interface IFooterProps {
   showUserInfoModal: () => void;

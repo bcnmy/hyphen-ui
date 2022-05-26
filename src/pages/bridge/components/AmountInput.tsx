@@ -1,11 +1,10 @@
-import React from 'react';
 import { useHyphen } from 'context/Hyphen';
-import { Status } from 'hooks/useLoading';
-import Skeleton from 'react-loading-skeleton';
+import { useToken } from 'context/Token';
 import { useTransaction, ValidationErrors } from 'context/Transaction';
+import { Status } from 'hooks/useLoading';
+import React from 'react';
 import { twMerge } from 'tailwind-merge';
 import CustomTooltip from '../../../components/CustomTooltip';
-import { useToken } from 'context/Token';
 
 interface IAmountInputProps {
   disabled?: boolean;

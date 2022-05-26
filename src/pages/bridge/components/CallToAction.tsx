@@ -16,6 +16,7 @@ export interface ICallToActionProps {
   onTransferButtonClick: () => void;
 }
 
+// TODO: Refactor this component for better conditional logic and readability.
 export const CallToAction: React.FC<ICallToActionProps> = ({
   onApproveButtonClick,
   onTransferButtonClick,
@@ -33,6 +34,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   const { selectedToken } = useToken()!;
   const {
     receiver: { isReceiverValid },
+    transferAmountInputValue,
     transactionAmountValidationErrors,
   } = useTransaction()!;
   const { isBiconomyEnabled } = useBiconomy()!;
@@ -84,10 +86,18 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   return (
     <div className="grid grid-cols-1 gap-2.5 xl:grid-cols-2 xl:gap-20">
       {fetchSelectedTokenApprovalStatus === Status.IDLE ||
+      transferAmountInputValue === '' ||
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (
         <>
-          <PrimaryButtonLight disabled>Enter a valid amount</PrimaryButtonLight>
+          <PrimaryButtonLight disabled>
+            {fetchSelectedTokenApprovalError &&
+            transactionAmountValidationErrors.length === 0
+              ? 'Error in checking approval'
+              : transferAmountInputValue === ''
+              ? 'Enter amount'
+              : 'Check if amount is valid'}
+          </PrimaryButtonLight>
           <PrimaryButtonLight disabled>Bridge Tokens</PrimaryButtonLight>
         </>
       ) : (

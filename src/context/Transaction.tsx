@@ -141,11 +141,13 @@ const TransactionProvider: React.FC = props => {
     [transferAmountInputValue],
   );
 
+  // TODO: Make this more readible.
   // Fetch token approval when conditions change
   useEffect(() => {
     if (
-      errors.length === 0 ||
-      (executeApproveTokenStatus === Status.SUCCESS && errors.length === 0)
+      transferAmount > 0 &&
+      (errors.length === 0 ||
+        (executeApproveTokenStatus === Status.SUCCESS && errors.length === 0))
     ) {
       fetchSelectedTokenApproval(transferAmount);
     }
@@ -311,7 +313,6 @@ const TransactionProvider: React.FC = props => {
         tokenAddressFromChain,
         fromChainRawTransferAmount.toString(),
       );
-
 
       // console.log('************** REWARD AMOUNT  *********', rewardAmount);
       if (rewardAmount !== undefined && rewardAmount.gt && rewardAmount.gt(0)) {

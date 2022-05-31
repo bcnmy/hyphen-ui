@@ -14,7 +14,10 @@ import { PrimaryButtonDark } from 'components/Buttons/PrimaryButtonDark';
 import Spinner from 'components/Buttons/Spinner';
 import AnimateHeight from 'react-animate-height';
 import { useToken } from 'context/Token';
-import { HiExclamation, HiOutlineArrowSmRight } from 'react-icons/hi';
+import {
+  HiOutlineArrowSmRight,
+  HiOutlineInformationCircle,
+} from 'react-icons/hi';
 import SpinnerDark from 'components/Buttons/SpinnerDark';
 import {
   ITransferRecord,
@@ -349,10 +352,6 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   const { showTransactionInfoModal } = useTransactionInfoModal()!;
   const [modalErrored, setModalErrored] = useState(false);
 
-  useEffect(() => {
-    console.log({ modalErrored });
-  }, [modalErrored]);
-
   const [depositState, setDepositState] = useState<Status>(Status.IDLE);
   const [receivalState, setReceivalState] = useState<Status>(Status.IDLE);
   const [startTime, setStartTime] = useState<Date>();
@@ -481,7 +480,11 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
   return (
     <Modal isVisible={isVisible} onClose={() => {}}>
       <div className="mb-14">
-        <div className="relative z-20 rounded-3xl border border-hyphen-purple-darker/50 bg-white p-6 shadow-lg">
+        <div
+          className={`relative z-20 rounded-10 border border-hyphen-purple-darker/50 bg-white p-7.5 shadow-lg xl:p-12.5 ${
+            isBottomTrayOpen ? 'rounded-b-none' : ''
+          }`}
+        >
           <div className="absolute -inset-2 -z-10 rounded-3xl bg-white/60 opacity-50 blur-lg"></div>
           <div className="flex flex-col">
             <div className="mb-4 flex items-center justify-between">
@@ -508,6 +511,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 </CustomTooltip>
               )}
             </div>
+
             <div className="flex flex-col gap-2 pl-2">
               <PreDepositStep
                 currentStepNumber={activeStep}
@@ -536,6 +540,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 transferModalData={transferModalData}
               />
             </div>
+
             <div className="mt-4 flex justify-center pt-3 pb-2">
               {modalErrored ? (
                 <PrimaryButtonLight
@@ -581,21 +586,21 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                   '-translate-y-full',
               )}
             >
-              <div className="relative mx-10">
+              <div className="relative">
                 <div className="absolute -inset-[2px] -z-10 bg-gradient-to-br from-white/10 to-hyphen-purple/30 opacity-80 blur-md"></div>
-                <div className="relative z-0 rounded-b-md border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker p-4 shadow-lg backdrop-blur">
-                  <article className="mb-4 flex items-start rounded-xl bg-red-100 p-2 text-sm text-red-600">
-                    <HiExclamation className="mr-2 h-6 w-auto" />
+                <div className="relative z-0 rounded-b-10 border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker px-7.5 py-4 shadow-lg backdrop-blur xl:px-12.5 xl:py-8">
+                  <aside className="mb-4 flex h-auto items-center justify-center rounded-full bg-[#FF000040] px-8 py-2 text-xxxs font-bold uppercase text-[#FF0000] xl:h-auto xl:text-xxs">
+                    <HiOutlineInformationCircle className="mr-2 h-2.5 w-auto" />
                     <p>
                       Please do not refresh or change network while the
                       transaction is in progress.
                     </p>
-                  </article>
+                  </aside>
                   <div
                     className="grid gap-y-2 text-white/75"
                     style={{ gridTemplateColumns: '1fr auto' }}
                   >
-                    <span className="flex items-center gap-3 font-normal">
+                    <span className="flex items-center gap-3 text-xxxs font-bold uppercase xl:text-xxs">
                       Deposit on {fromChain?.name}
                     </span>
                     <span className="text-right">
@@ -613,7 +618,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                           {depositState === Status.PENDING && (
                             <div className="flex items-center gap-3">
                               <SpinnerDark />
-                              <span className="flex items-center gap-2">
+                              <span className="flex items-center gap-2 text-xxxs font-bold uppercase xl:text-xxs">
                                 <span>Pending</span>
                                 <span>
                                   <HiOutlineArrowSmRight className="h-5 w-5 -rotate-45" />
@@ -622,7 +627,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                             </div>
                           )}
                           {depositState === Status.SUCCESS && (
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 text-xxxs font-bold uppercase xl:text-xxs">
                               <span>Confirmed</span>
                               <span>
                                 <HiOutlineArrowSmRight className="h-5 w-5 -rotate-45" />
@@ -638,7 +643,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                         />
                       )}
                     </span>
-                    <span className="flex items-center gap-3 font-normal">
+                    <span className="flex items-center gap-3 text-xxxs font-bold uppercase xl:text-xxs">
                       Transfer on {toChain?.name}
                       {/* {canManualExit
                         ? "Transfer taking time?"
@@ -669,7 +674,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                             {receivalState === Status.PENDING && (
                               <div className="flex items-center gap-3">
                                 <SpinnerDark />
-                                <span className="flex items-center gap-2">
+                                <span className="flex items-center gap-2 text-xxxs font-bold uppercase xl:text-xxs">
                                   <span>Pending</span>
                                   <span>
                                     <HiOutlineArrowSmRight className="h-5 w-5 -rotate-45" />
@@ -678,7 +683,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                               </div>
                             )}
                             {receivalState === Status.SUCCESS && (
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2 text-xxxs font-bold uppercase xl:text-xxs">
                                 <span>Confirmed</span>
                                 <span>
                                   <HiOutlineArrowSmRight className="h-5 w-5 -rotate-45" />

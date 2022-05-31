@@ -92,19 +92,17 @@ const PreDepositStep: React.FC<
         <span>Checking Available Liquidity</span>
       </div>
       <AnimateHeight height={active ? 'auto' : 0}>
-        <div className="mx-10 mt-2 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 transition-colors hover:border-opacity-30">
-          <div className="text-center text-sm font-medium text-hyphen-purple-dark/60">
-            {executePreDepositCheckError ? (
-              <span className="font-semibold text-red-700/70">
-                {executePreDepositCheckError.toString()}
-              </span>
-            ) : (
-              <div className="flex items-center justify-center gap-4">
-                <Spinner />
-                <span> Checking Available liquidity on {toChain?.name}</span>
-              </div>
-            )}
-          </div>
+        <div className="my-2 rounded-lg bg-gray-100 px-10 py-4 text-sm text-hyphen-gray-400">
+          {executePreDepositCheckError ? (
+            <span className="text-red-700/70">
+              {executePreDepositCheckError.toString()}
+            </span>
+          ) : (
+            <div className="flex items-center justify-start gap-4">
+              <Spinner />
+              <span> Checking Available liquidity on {toChain?.name}</span>
+            </div>
+          )}
         </div>
       </AnimateHeight>
     </div>
@@ -181,13 +179,13 @@ const DepositStep: React.FC<
         </span>
       </div>
       <AnimateHeight height={active ? 'auto' : 0}>
-        <div className="mx-10 mt-2 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 transition-colors hover:border-opacity-30">
+        <div className="my-2 rounded-lg bg-gray-100 px-10 py-4 text-sm text-hyphen-gray-400">
           {executeDepositError ? (
-            <span className="text-sm font-medium text-red-700/70">
+            <span className="text-red-700/70">
               {executeDepositError?.message || executeDepositError.toString()}
             </span>
           ) : (
-            <div className="flex items-center justify-center gap-4 text-center text-sm font-medium text-hyphen-purple-dark/60">
+            <div className="flex items-center justify-start gap-4">
               <Spinner />
               <div>
                 {executeDepositStatus === Status.PENDING &&
@@ -318,13 +316,13 @@ const ReceivalStep: React.FC<
         </span>
       </div>
       <AnimateHeight height={active ? 'auto' : 0}>
-        <div className="mx-10 mt-2 rounded-xl border border-hyphen-purple border-opacity-10 bg-hyphen-purple bg-opacity-[0.05] p-4 transition-colors hover:border-opacity-30">
+        <div className="my-2 rounded-lg bg-gray-100 px-10 py-4 text-sm text-hyphen-gray-400">
           {receivalError ? (
-            <span className="font-medium text-red-700/70">
+            <span className="text-red-700/70">
               {receivalError?.message || receivalError.toString()}
             </span>
           ) : (
-            <div className="flex items-center justify-center gap-4 text-center text-sm font-medium text-hyphen-purple-dark/60">
+            <div className="flex items-center justify-center gap-4">
               <Spinner />
               Waiting to receive ~{
                 transactionFee?.amountToGetProcessedString
@@ -591,10 +589,7 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
                 <div className="relative z-0 rounded-b-10 border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker px-7.5 py-4 shadow-lg backdrop-blur xl:px-12.5 xl:py-8">
                   <aside className="mb-4 flex h-auto items-center justify-center rounded-full bg-[#FF000040] px-8 py-2 text-xxxs font-bold uppercase text-[#FF0000] xl:h-auto xl:text-xxs">
                     <HiOutlineInformationCircle className="mr-2 h-2.5 w-auto" />
-                    <p>
-                      Please do not refresh or change network while the
-                      transaction is in progress.
-                    </p>
+                    <p>Do not refresh or change network during transaction.</p>
                   </aside>
                   <div
                     className="grid gap-y-2 text-white/75"

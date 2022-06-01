@@ -165,32 +165,36 @@ function FarmOverview({ chain, token }: IFarmOverview) {
 
   return (
     <section
-      className="relative flex h-37.5 w-full cursor-pointer items-center justify-center text-hyphen-gray-400"
+      className="grid h-37.5 w-full cursor-pointer grid-cols-2 items-center px-[2.375rem] text-hyphen-gray-400 xl:grid-cols-3 xl:px-[3.125rem]"
       style={{ backgroundColor: chainColor }}
       onClick={handleFarmOverviewClick}
     >
-      <div className="absolute left-12.5 flex items-center">
-        <img src={tokenImage} alt={symbol} className="mr-2 h-8 w-8" />
+      <div className="flex items-center">
+        <img
+          src={tokenImage}
+          alt={symbol}
+          className="mr-2 h-6 w-6 xl:h-8 xl:w-8"
+        />
         <div className="flex flex-col">
-          <span className="font-mono text-2xl">{symbol}</span>
-          <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
+          <span className="font-mono text-sm xl:text-2xl">{symbol}</span>
+          <span className="text-xxxs font-bold uppercase text-hyphen-gray-300 xl:text-xxs">
             {chain.name}
           </span>
         </div>
       </div>
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-end justify-self-end xl:items-center xl:justify-self-center">
         <div className="flex items-center justify-center">
-          <span className="font-mono text-2xl">
+          <span className="font-mono text-sm xl:text-2xl">
             {rewardAPY > 10000
               ? '>10,000%'
               : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
           </span>
         </div>
-        <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
+        <span className="text-xxxs font-bold uppercase text-hyphen-gray-300 xl:text-xxs">
           Annualized
         </span>
       </div>
-      <div className="absolute right-12.5 flex h-12 w-[250px] flex-col items-end justify-end">
+      <div className="hidden h-12 w-[250px] flex-col items-end justify-self-end xl:flex">
         <span className="font-mono text-2xl">
           {rewardsPerDay >= 0 ? (
             <div className="flex items-center">

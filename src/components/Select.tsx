@@ -17,6 +17,7 @@ export interface ISelectProps {
   label: string;
   selected?: Option;
   setSelected: (option: Option) => void;
+  style?: React.CSSProperties;
 }
 
 interface IOptionContentProps {
@@ -69,6 +70,7 @@ export const Select: React.FC<ISelectProps> = ({
   label,
   selected,
   setSelected,
+  style,
 }) => {
   return (
     <div className="flex flex-col">
@@ -84,6 +86,7 @@ export const Select: React.FC<ISelectProps> = ({
                 'cursor-not-allowed bg-hyphen-gray-100 text-gray-900/80',
               className,
             )}
+            style={style}
           >
             <span className="flex items-center truncate">
               {selected ? (

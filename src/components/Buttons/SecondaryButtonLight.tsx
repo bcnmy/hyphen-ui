@@ -1,5 +1,5 @@
-import * as React from "react";
-import { twMerge } from "tailwind-merge";
+import * as React from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface ISecondaryButtonLightProps
   extends React.HTMLAttributes<HTMLButtonElement> {
@@ -13,9 +13,8 @@ const SecondaryButtonLight: React.FunctionComponent<
   return (
     <button
       className={twMerge(
-        `pt-3.5 pb-3 px-8 rounded-full bg-hyphen-purple bg-opacity-5 border-hyphen-purple/20 border font-medium text-hyphen-purple-dark/80 disabled:text-hyphen-purple/20 disabled:disabled:bg-opacity-5 disabled:border-hyphen-purple/5
-        disabled:cursor-not-allowed`,
-        className || ""
+        `flex h-[3.75rem] w-full items-center justify-center rounded-2.5 border border-gray-200 bg-gray-50 font-semibold text-gray-500 hover:bg-gray-100 disabled:cursor-not-allowed xl:w-[15.625rem]`,
+        className || '',
       )}
       {...props}
     >

@@ -50,10 +50,10 @@ export const ApprovalModal: React.FC<IApprovalModalProps> = ({
             </span>
 
             <Toggle
+              bgColor="#00D28F"
               enabled={infiniteApproval}
               label="Infinite Approval"
               onToggle={setInfiniteApproval}
-              switchClass="bg-[#00D28F]"
               variant="large"
             />
           </div>

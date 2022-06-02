@@ -76,12 +76,12 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
       <div
         className={`${
           disabled ? 'bg-hyphen-gray-100' : 'bg-[#50AF95]'
-        } flex h-[30px] w-full items-end justify-center rounded-b-2.5 text-xxs text-hyphen-purple-dark`}
+        } flex h-[30px] w-full items-center justify-center rounded-b-2.5 text-xxs text-hyphen-purple-dark`}
       >
         {getSelectedTokenBalanceStatus &&
         getSelectedTokenBalanceStatus === Status.SUCCESS &&
         selectedTokenBalance?.displayBalance ? (
-          <div className="mb-2 flex w-full items-center justify-between px-[18px] text-xxs font-bold uppercase text-white">
+          <div className="flex w-full items-center justify-between px-[18px] text-xxs font-bold uppercase text-white">
             <span
               className={twMerge(
                 'mr-1',
@@ -105,6 +105,27 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
                 {selectedTokenBalance?.displayBalance || ''}
               </span>
             </span>
+          </div>
+        ) : getSelectedTokenBalanceStatus &&
+          getSelectedTokenBalanceStatus === Status.PENDING ? (
+          <div className="flex w-full items-center justify-between px-[18px] text-xxs font-bold uppercase text-white">
+            <span
+              className={twMerge(
+                'mr-1',
+                transactionAmountValidationErrors.includes(
+                  ValidationErrors.INADEQUATE_BALANCE,
+                ) && 'text-red-600',
+                'transition-colors',
+              )}
+            >
+              Balance
+            </span>
+            <Skeleton
+              baseColor="#ffffff50"
+              enableAnimation
+              highlightColor="#615ccd05"
+              className="!w-28"
+            />
           </div>
         ) : null}
       </div>

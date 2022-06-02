@@ -32,6 +32,7 @@ function GaslessToggle() {
             Go Gasless
           </span>
           <Toggle
+            bgColor="#CCBA5C"
             label="Go Gasless"
             enabled={isBiconomyEnabled}
             onToggle={enabled => setIsBiconomyToggledOn(enabled)}

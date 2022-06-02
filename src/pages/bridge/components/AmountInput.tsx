@@ -3,6 +3,7 @@ import { useToken } from 'context/Token';
 import { useTransaction, ValidationErrors } from 'context/Transaction';
 import { Status } from 'hooks/useLoading';
 import React from 'react';
+import Skeleton from 'react-loading-skeleton';
 import { twMerge } from 'tailwind-merge';
 import CustomTooltip from '../../../components/CustomTooltip';
 
@@ -109,6 +110,41 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
               <span className="ml-1 text-right">
                 {Math.trunc(poolInfo.maxDepositAmount * 100000) / 100000}
               </span>
+            </button>
+          </>
+        ) : getPoolInfoStatus === Status.PENDING ? (
+          <>
+            <button
+              className={twMerge(
+                'flex items-center font-bold uppercase transition-colors',
+                transactionAmountValidationErrors.includes(
+                  ValidationErrors.AMOUNT_LT_MIN,
+                ) && 'text-red-600',
+              )}
+            >
+              Min:
+              <Skeleton
+                baseColor="#ffffff50"
+                enableAnimation
+                highlightColor="#615ccd05"
+                className="!ml-1 !w-12"
+              />
+            </button>
+            <button
+              className={twMerge(
+                'transition-color flex items-center justify-end font-bold uppercase',
+                transactionAmountValidationErrors.includes(
+                  ValidationErrors.AMOUNT_GT_MAX,
+                ) && 'text-red-600',
+              )}
+            >
+              Max:
+              <Skeleton
+                baseColor="#ffffff50"
+                enableAnimation
+                highlightColor="#615ccd05"
+                className="!ml-1 !w-12"
+              />
             </button>
           </>
         ) : null}

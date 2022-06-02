@@ -65,7 +65,10 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           }}
           label={'token'}
           disabled={disabled}
-          className={`rounded-b-none ${disabled ? '' : 'border-[#50AF95]'}`}
+          className="rounded-b-none"
+          style={{
+            borderColor: disabled ? '' : selectedToken?.color,
+          }}
         />
         {disabled && (
           <CustomTooltip id="tokenSelect">
@@ -74,9 +77,10 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
         )}
       </div>
       <div
-        className={`${
-          disabled ? 'bg-hyphen-gray-100' : 'bg-[#50AF95]'
-        } flex h-[30px] w-full items-center justify-center rounded-b-2.5 text-xxs text-hyphen-purple-dark`}
+        className={`flex h-[30px] w-full items-center justify-center rounded-b-2.5 text-xxs text-hyphen-purple-dark`}
+        style={{
+          backgroundColor: disabled ? '#E5E5E5' : selectedToken?.color,
+        }}
       >
         {getSelectedTokenBalanceStatus &&
         getSelectedTokenBalanceStatus === Status.SUCCESS &&

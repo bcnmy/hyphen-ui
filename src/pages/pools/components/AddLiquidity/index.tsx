@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { request, gql } from 'graphql-request';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
-import { NATIVE_ADDRESS } from 'config/constants';
+import { NATIVE_ADDRESS, OPTIMISM_CHAIN_ID } from 'config/constants';
 import getTokenAllowance from 'utils/getTokenAllowance';
 import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
@@ -275,20 +275,6 @@ function AddLiquidity() {
     },
   );
 
-  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
-    useQuery(
-      ['rewardsRatePerSecond', selectedTokenAddress],
-      () => {
-        if (!selectedTokenAddress) return;
-
-        return getRewardRatePerSecond(selectedTokenAddress);
-      },
-      {
-        // Execute only when selectedTokenAddress is available.
-        enabled: !!selectedTokenAddress,
-      },
-    );
-
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
       ['rewardTokenAddress', selectedTokenAddress],
@@ -300,6 +286,27 @@ function AddLiquidity() {
       {
         // Execute only when selectedTokenAddress is available.
         enabled: !!selectedTokenAddress,
+      },
+    );
+
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', selectedTokenAddress],
+      () => {
+        if (!rewardTokenAddress || !selectedTokenAddress) return;
+
+        if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(
+            selectedTokenAddress,
+            rewardTokenAddress,
+          );
+        } else {
+          return getRewardRatePerSecond(selectedTokenAddress);
+        }
+      },
+      {
+        // Execute only when chain & selectedTokenAddress are available.
+        enabled: !!(rewardTokenAddress && selectedTokenAddress),
       },
     );
 

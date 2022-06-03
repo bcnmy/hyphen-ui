@@ -10,6 +10,7 @@ import CustomTooltip from 'components/CustomTooltip';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface ILiquidityPositionOverview {
   chainId: number;
@@ -136,16 +137,6 @@ function LiquidityPositionOverview({
     },
   );
 
-  const { isError: rewardsPerSecondError, data: rewardsRatePerSecond } =
-    useQuery(
-      ['rewardsRatePerSecond', tokenAddress],
-      () => getRewardRatePerSecond(tokenAddress),
-      {
-        // Execute only when address is available.
-        enabled: !!tokenAddress,
-      },
-    );
-
   const { isError: rewardTokenAddressError, data: rewardTokenAddress } =
     useQuery(
       ['rewardTokenAddress', tokenAddress],
@@ -153,6 +144,22 @@ function LiquidityPositionOverview({
       {
         // Execute only when address is available.
         enabled: !!tokenAddress,
+      },
+    );
+
+  const { isError: rewardsPerSecondError, data: rewardsRatePerSecond } =
+    useQuery(
+      ['rewardsRatePerSecond', tokenAddress],
+      () => {
+        if (chainId === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(tokenAddress, rewardTokenAddress);
+        } else {
+          return getRewardRatePerSecond(tokenAddress);
+        }
+      },
+      {
+        // Execute only when address & rewardTokenAddress are available.
+        enabled: !!(tokenAddress && rewardTokenAddress),
       },
     );
 

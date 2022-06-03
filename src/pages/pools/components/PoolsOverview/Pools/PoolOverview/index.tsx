@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { Network } from 'hooks/useNetworks';
 import { useToken } from 'context/Token';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface IPoolOverview {
   chain: Network;
@@ -96,16 +97,6 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
-    useQuery(
-      ['rewardsRatePerSecond', address],
-      () => getRewardRatePerSecond(address),
-      {
-        // Execute only when address is available.
-        enabled: !!address,
-      },
-    );
-
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
       ['rewardTokenAddress', address],
@@ -113,6 +104,24 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       {
         // Execute only when address is available.
         enabled: !!address,
+      },
+    );
+
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', address],
+      () => {
+        const { chainId } = chain;
+
+        if (chainId === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(address, rewardTokenAddress);
+        } else {
+          return getRewardRatePerSecond(address);
+        }
+      },
+      {
+        // Execute only when address is available.
+        enabled: !!(address && rewardTokenAddress),
       },
     );
 

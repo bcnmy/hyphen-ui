@@ -10,6 +10,7 @@ import { Decimal } from 'decimal.js';
 import { HiOutlineXCircle } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface IStakingPositionOverview {
   chainId: number;
@@ -105,25 +106,6 @@ function StakingPositionOverview({
     },
   );
 
-  const { data: pendingToken, isError: pendingTokenError } = useQuery(
-    ['pendingToken', positionId],
-    () => getPendingToken(positionId),
-  );
-
-  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
-    useQuery(
-      ['rewardsRatePerSecond', token],
-      () => {
-        if (!chain || !token) return;
-
-        return getRewardRatePerSecond(token[chain.chainId].address);
-      },
-      {
-        // Execute only when address is available.
-        enabled: !!(chain && token),
-      },
-    );
-
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
       ['rewardTokenAddress', token],
@@ -138,6 +120,27 @@ function StakingPositionOverview({
       },
     );
 
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', token],
+      () => {
+        if (!token || !rewardTokenAddress) return;
+
+        if (chainId === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(
+            token[chainId].address,
+            rewardTokenAddress,
+          );
+        } else {
+          return getRewardRatePerSecond(token[chainId].address);
+        }
+      },
+      {
+        // Execute only when address is available.
+        enabled: !!(token && rewardTokenAddress),
+      },
+    );
+
   const { data: totalSharesStaked, isError: totalSharesStakedError } = useQuery(
     ['totalSharesStaked', token],
     () => {
@@ -148,6 +151,20 @@ function StakingPositionOverview({
     {
       // Execute only when address is available.
       enabled: !!(chain && token),
+    },
+  );
+
+  const { data: pendingToken, isError: pendingTokenError } = useQuery(
+    ['pendingToken', positionId],
+    () => {
+      if (chainId === OPTIMISM_CHAIN_ID) {
+        return getPendingToken(positionId, rewardTokenAddress);
+      } else {
+        return getPendingToken(positionId);
+      }
+    },
+    {
+      enabled: !!(positionId && rewardTokenAddress),
     },
   );
 

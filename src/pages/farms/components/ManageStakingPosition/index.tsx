@@ -14,6 +14,7 @@ import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
 import { useEffect, useState } from 'react';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 function ManageStakingPosition() {
   const navigate = useNavigate();
@@ -122,8 +123,18 @@ function ManageStakingPosition() {
     data: pendingToken,
     isError: pendingTokenError,
     isLoading: pendingTokenLoading,
-  } = useQuery(['pendingToken', positionId], () =>
-    getPendingToken(BigNumber.from(positionId)),
+  } = useQuery(
+    ['pendingToken', positionId],
+    () => {
+      if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+        return getPendingToken(BigNumber.from(positionId), rewardTokenAddress);
+      } else {
+        return getPendingToken(BigNumber.from(positionId));
+      }
+    },
+    {
+      enabled: !!(positionId && rewardTokenAddress),
+    },
   );
 
   const unclaimedRewardToken =

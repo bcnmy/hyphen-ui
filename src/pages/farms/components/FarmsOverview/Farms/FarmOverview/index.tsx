@@ -1,13 +1,14 @@
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
+import { useToken } from 'context/Token';
 import { ethers } from 'ethers';
-import { useQuery, useQueryClient } from 'react-query';
-import Skeleton from 'react-loading-skeleton';
-import { HiOutlineXCircle } from 'react-icons/hi';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
-import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { useNavigate } from 'react-router-dom';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import { Network } from 'hooks/useNetworks';
-import { useToken } from 'context/Token';
+import { HiOutlineXCircle } from 'react-icons/hi';
+import Skeleton from 'react-loading-skeleton';
+import { useQuery, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { makeNumberCompact } from 'utils/makeNumberCompact';
 
 interface IFarmOverview {
   chain: Network;
@@ -49,16 +50,6 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     },
   );
 
-  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
-    useQuery(
-      ['rewardsRatePerSecond', address],
-      () => getRewardRatePerSecond(address),
-      {
-        // Execute only when address is available.
-        enabled: !!address,
-      },
-    );
-
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
       ['rewardTokenAddress', address],
@@ -68,6 +59,32 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         enabled: !!address,
       },
     );
+
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', address],
+      () => {
+        const { chainId } = chain;
+
+        if (chainId === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(address, rewardTokenAddress);
+        } else {
+          return getRewardRatePerSecond(address);
+        }
+      },
+      {
+        // Execute only when address & rewardTokenAddress are available.
+        enabled: !!(address && rewardTokenAddress),
+      },
+    );
+
+  if (chain.chainId === OPTIMISM_CHAIN_ID) {
+    console.log({
+      tokenSymbol: symbol,
+      tokenAddress: address,
+      rewardTokenAddress,
+    });
+  }
 
   const rewardTokenSymbol =
     rewardTokenAddress && tokens

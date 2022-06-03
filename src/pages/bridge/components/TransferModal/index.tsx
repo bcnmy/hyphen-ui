@@ -587,10 +587,14 @@ export const TransferModal: React.FC<ITransferModalProps> = ({
               <div className="relative">
                 <div className="absolute -inset-[2px] -z-10 bg-gradient-to-br from-white/10 to-hyphen-purple/30 opacity-80 blur-md"></div>
                 <div className="relative z-0 rounded-b-10 border-x border-b border-white/20 bg-gradient-to-r from-hyphen-purple-darker via-hyphen-purple-mid to-hyphen-purple-darker px-7.5 py-4 shadow-lg backdrop-blur xl:px-12.5 xl:py-8">
-                  <aside className="mb-4 flex h-auto items-center justify-center rounded-full bg-[#FF000040] px-8 py-2 text-xxxs font-bold uppercase text-[#FF0000] xl:h-auto xl:text-xxs">
-                    <HiOutlineInformationCircle className="mr-2 h-2.5 w-auto" />
-                    <p>Do not refresh or change network during transaction.</p>
-                  </aside>
+                  {receivalState !== Status.SUCCESS ? (
+                    <aside className="mb-4 flex h-auto items-center justify-center rounded-full bg-[#FF000040] px-8 py-2 text-xxxs font-bold uppercase text-[#FF0000] xl:h-auto xl:text-xxs">
+                      <HiOutlineInformationCircle className="mr-2 h-2.5 w-auto" />
+                      <p>
+                        Do not refresh or change network during transaction.
+                      </p>
+                    </aside>
+                  ) : null}
                   <div
                     className="grid gap-y-2 text-white/75"
                     style={{ gridTemplateColumns: '1fr auto' }}

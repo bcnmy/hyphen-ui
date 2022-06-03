@@ -53,6 +53,15 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
           )}
         >
           <div className="flex flex-col gap-y-2 rounded-b-10 border border-white border-opacity-25 bg-[#615CCD40] p-8 text-xxxs uppercase text-white xl:px-12.5 xl:py-8 xl:text-xxs">
+            {showEthereumDisclaimer ? (
+              <aside className="mb-4 flex h-10 items-center justify-center rounded-full bg-[#FF000040] px-8 text-xxxs font-bold uppercase text-[#FF0000] xl:h-9 xl:text-xxs">
+                <HiOutlineInformationCircle className="mr-2 h-2.5 w-auto" />
+                <p>
+                  The received amount may differ due to gas price fluctuations
+                  on Ethereum.
+                </p>
+              </aside>
+            ) : null}
             <aside className="flex items-center justify-between font-medium">
               <div className="flex items-center">
                 <HiInformationCircle
@@ -159,16 +168,6 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
               </div>
             </aside>
           </div>
-
-          {showEthereumDisclaimer ? (
-            <aside className="mt-2 flex h-10 items-center justify-center rounded-full bg-[#FF000040] px-8 text-xxxs font-bold uppercase text-[#FF0000] xl:h-9 xl:text-xxs">
-              <HiOutlineInformationCircle className="mr-2 h-2.5 w-auto" />
-              <p>
-                The received amount may differ due to gas price fluctuations on
-                Ethereum.
-              </p>
-            </aside>
-          ) : null}
         </section>
       )}
     </Transition>

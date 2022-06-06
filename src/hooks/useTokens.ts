@@ -4,6 +4,7 @@ import useNetworks from './useNetworks';
 
 export type Token = {
   symbol: string;
+  color: string;
   image: string;
   coinGeckoId: string;
   [chainId: number]: {

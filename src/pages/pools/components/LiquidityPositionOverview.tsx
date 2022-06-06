@@ -139,7 +139,7 @@ function LiquidityPositionOverview({
 
   const { isError: rewardTokenAddressError, data: rewardTokenAddress } =
     useQuery(
-      ['rewardTokenAddress', tokenAddress],
+      ['rewardTokenAddress', chain.chainId, tokenAddress],
       () => getRewardTokenAddress(tokenAddress),
       {
         // Execute only when address is available.
@@ -149,7 +149,7 @@ function LiquidityPositionOverview({
 
   const { isError: rewardsPerSecondError, data: rewardsRatePerSecond } =
     useQuery(
-      ['rewardsRatePerSecond', tokenAddress],
+      ['rewardsRatePerSecond', chain.chainId, tokenAddress],
       () => {
         if (chainId === OPTIMISM_CHAIN_ID) {
           return getRewardRatePerSecond(tokenAddress, rewardTokenAddress);
@@ -168,7 +168,10 @@ function LiquidityPositionOverview({
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })

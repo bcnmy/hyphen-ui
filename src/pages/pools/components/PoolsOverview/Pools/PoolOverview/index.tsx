@@ -99,7 +99,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
 
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', address],
+      ['rewardTokenAddress', chain.chainId, address],
       () => getRewardTokenAddress(address),
       {
         // Execute only when address is available.
@@ -109,7 +109,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
 
   const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
     useQuery(
-      ['rewardsRatePerSecond', address],
+      ['rewardsRatePerSecond', chain.chainId, address],
       () => {
         const { chainId } = chain;
 
@@ -130,7 +130,10 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })

@@ -277,7 +277,7 @@ function AddLiquidity() {
 
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', selectedTokenAddress],
+      ['rewardTokenAddress', chain?.chainId, selectedTokenAddress],
       () => {
         if (!selectedTokenAddress) return;
 
@@ -291,7 +291,7 @@ function AddLiquidity() {
 
   const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
     useQuery(
-      ['rewardsRatePerSecond', selectedTokenAddress],
+      ['rewardsRatePerSecond', chain?.chainId, selectedTokenAddress],
       () => {
         if (!rewardTokenAddress || !selectedTokenAddress) return;
 
@@ -315,7 +315,10 @@ function AddLiquidity() {
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })

@@ -52,7 +52,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
 
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', address],
+      ['rewardTokenAddress', chain.chainId, address],
       () => getRewardTokenAddress(address),
       {
         // Execute only when address is available.
@@ -67,7 +67,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         const { chainId } = chain;
 
         if (chainId === OPTIMISM_CHAIN_ID) {
-          return getRewardRatePerSecond(address, rewardTokenAddress);
+          return getRewardRatePerSecond(address, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(address);
         }
@@ -91,7 +91,10 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })

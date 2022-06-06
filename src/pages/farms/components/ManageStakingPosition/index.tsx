@@ -254,9 +254,9 @@ function ManageStakingPosition() {
   }
 
   return (
-    <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
-      <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
-        <div className="absolute left-0">
+    <article className="my-12.5 rounded-10 bg-white p-0 py-2 xl:p-12.5 xl:pt-2.5">
+      <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
+        <div>
           <button
             className="flex items-center rounded text-hyphen-gray-400"
             onClick={() => navigate('/farms')}
@@ -265,19 +265,23 @@ function ManageStakingPosition() {
           </button>
         </div>
 
-        <h2 className="text-xl text-hyphen-purple">Manage Staking Position</h2>
+        <h2 className="text-sm text-hyphen-purple xl:justify-self-center xl:text-xl">
+          Manage Staking Position
+        </h2>
       </header>
 
       {chainId ? (
-        <StakingPositionOverview
-          chainId={Number.parseInt(chainId)}
-          positionId={BigNumber.from(positionId)}
-        />
+        <div className="px-2.5 xl:px-0">
+          <StakingPositionOverview
+            chainId={Number.parseInt(chainId)}
+            positionId={BigNumber.from(positionId)}
+          />
+        </div>
       ) : null}
 
-      <section className="mt-8 grid grid-cols-2">
-        <div className="flex h-[548px] max-h-[548px] flex-col border-r pr-12.5 pt-2">
-          <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+      <section className="mt-8 grid grid-cols-1 px-10 xl:grid-cols-2 xl:px-0">
+        <div className="mb-12 flex flex-col pt-2 xl:mb-0 xl:h-[34.25rem] xl:max-h-[34.25rem] xl:border-r xl:pr-12.5">
+          <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
             Your Position NFT
           </span>
 
@@ -288,7 +292,7 @@ function ManageStakingPosition() {
               baseColor="#615ccd20"
               enableAnimation
               highlightColor="#615ccd05"
-              className="!mt-2 !h-[411px] !w-[411px] !rounded-7.5"
+              className="!xl:w-[411px] !mt-2 aspect-square !w-full !rounded-7.5"
               containerClassName="block leading-none"
             />
           )}
@@ -325,13 +329,13 @@ function ManageStakingPosition() {
           ) : null}
         </div>
 
-        <div className="flex h-[548px] max-h-[548px] flex-col justify-between pl-12.5 pt-2">
+        <div className="flex flex-col justify-between pt-2 xl:h-[34.25rem] xl:max-h-[34.25rem] xl:pl-12.5">
           <div className="grid grid-cols-1">
             <div className="flex flex-col">
-              <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+              <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
                 Unclaimed {rewardToken?.symbol}
               </span>
-              <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+              <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-sm text-hyphen-gray-400 xl:text-2xl">
                 {unclaimedRewardToken > 0 ? unclaimedRewardToken.toFixed(5) : 0}{' '}
                 {rewardToken?.symbol}
               </div>
@@ -340,7 +344,7 @@ function ManageStakingPosition() {
                 <>
                   {currentChainId === chain?.chainId ? (
                     <button
-                      className="mt-10 flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                      className="mt-10 mb-[3.125rem] flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300 xl:mb-0"
                       disabled={isDataLoading || unclaimedRewardToken <= 0}
                       onClick={handleClaimFeeClick}
                     >

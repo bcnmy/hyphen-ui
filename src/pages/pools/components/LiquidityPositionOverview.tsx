@@ -248,11 +248,11 @@ function LiquidityPositionOverview({
     return (
       <section className="flex h-37.5 items-center justify-center rounded-7.5 border bg-white px-10 py-6 text-hyphen-gray-400">
         <div className="my-16 flex items-center">
-          <HiOutlineXCircle className="mr-4 h-6 w-6 text-red-400" />
-          <span className="text-hyphen-gray-400">
+          <HiOutlineXCircle className="mr-4 min-h-[24px] min-w-[24px] text-red-400" />
+          <p className="text-hyphen-gray-400">
             Something went wrong while we were fetching this position, please
             try again later.
-          </span>
+          </p>
         </div>
       </section>
     );
@@ -323,7 +323,7 @@ function LiquidityPositionOverview({
 
   return (
     <section
-      className={`flex h-37.5 items-center justify-between rounded-7.5 border px-10 py-6 text-hyphen-gray-400 ${
+      className={`grid h-37.5 grid-cols-2 items-center rounded-7.5 border px-[1.875rem] py-6 text-hyphen-gray-400 xl:px-10 ${
         formattedSuppliedLiquidity > 0 && isUserOnPools
           ? 'cursor-pointer'
           : 'cursor-not-allowed'
@@ -332,34 +332,43 @@ function LiquidityPositionOverview({
       style={{ backgroundColor: chainColor }}
     >
       <div className="flex flex-col">
-        <span className="mb-2.5 text-xxs font-bold uppercase">
+        <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs">
           Asset supplied
         </span>
         <div className="mb-5 flex items-center">
-          <img src={tokenImage} alt={tokenSymbol} className="mr-2 h-8 w-8" />
+          <img
+            src={tokenImage}
+            alt={tokenSymbol}
+            className="mr-2 h-2.5 w-2.5 xl:h-8 xl:w-8"
+          />
           <div className="flex flex-col">
-            <span className="font-mono text-2xl ">
+            <span className="truncate font-mono text-sm xl:text-2xl">
               {formattedSuppliedLiquidity} {tokenSymbol}
             </span>
-            <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
+            <span className="hidden text-xxs font-bold uppercase text-hyphen-gray-300 xl:flex">
               {chainName}
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">Pool Share: {poolShare}%</span>
+        <span className="font-mono text-xxxs xl:text-xs">
+          Pool Share: {poolShare}%
+        </span>
       </div>
+
       <div className="flex flex-col items-end">
-        <span className="mb-2.5 text-xxs font-bold uppercase ">APY</span>
+        <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs">
+          APY
+        </span>
         <div className="mb-5">
           <div className="flex flex-col items-end">
             <div className="flex items-center">
-              <span className="font-mono text-2xl">
+              <span className="font-mono text-sm xl:text-2xl">
                 {APY > 10000
                   ? '>10,000%'
                   : `${Number.parseFloat(APY.toFixed(3))}%`}
               </span>
               <HiInformationCircle
-                className="ml-1 h-5 w-5 cursor-default text-hyphen-gray-400"
+                className="ml-1 hidden h-5 w-5 cursor-default text-hyphen-gray-400 xl:flex"
                 data-tip
                 data-for={`${positionId}-apy`}
                 onClick={e => e.stopPropagation()}
@@ -374,13 +383,13 @@ function LiquidityPositionOverview({
                 <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
               </CustomTooltip>
             </div>
-            <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
+            <span className="hidden text-xxs font-bold uppercase text-hyphen-gray-300 xl:flex">
               Annualized
             </span>
           </div>
         </div>
-        <span className="font-mono text-xs">
-          Unclaimed Fees: ~ {unclaimedFees > 0 ? unclaimedFees.toFixed(5) : 0}{' '}
+        <span className="truncate font-mono text-xxxs xl:text-xs">
+          Unclaimed Fees: ~{unclaimedFees > 0 ? unclaimedFees.toFixed(3) : 0}{' '}
           {tokenSymbol}
         </span>
       </div>

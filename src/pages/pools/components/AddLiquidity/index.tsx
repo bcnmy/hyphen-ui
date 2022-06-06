@@ -674,9 +674,9 @@ function AddLiquidity() {
           transferAmount={parseFloat(liquidityAmount)}
         />
       ) : null}
-      <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
-        <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
-          <div className="absolute left-0">
+      <article className="my-12.5 rounded-10 bg-white p-0 py-2 xl:p-12.5 xl:pt-2.5">
+        <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr_4rem] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
+          <div>
             <button
               className="flex items-center rounded text-hyphen-gray-400"
               onClick={() => navigate('/pools')}
@@ -685,11 +685,13 @@ function AddLiquidity() {
             </button>
           </div>
 
-          <h2 className="text-xl text-hyphen-purple">Add Liquidity</h2>
+          <h2 className="justify-self-start text-sm text-hyphen-purple xl:justify-self-center xl:text-xl">
+            Add Liquidity
+          </h2>
 
-          <div className="absolute right-0 flex">
+          <div className="justify-self-end">
             <button
-              className="mr-4 text-xs text-hyphen-purple"
+              className="text-xs text-hyphen-purple"
               onClick={() => {
                 setLiquidityAmount('');
                 setSliderValue(0);
@@ -701,9 +703,9 @@ function AddLiquidity() {
           </div>
         </header>
 
-        <section className="grid grid-cols-2">
-          <div className="max-h-104.5 h-104.5 border-r pr-12.5">
-            <div className="mb-6 grid grid-cols-2 gap-2.5">
+        <section className="grid grid-cols-1 px-10 xl:grid-cols-2 xl:px-0">
+          <div className="xl:max-h-102 mb-12 xl:mb-0 xl:h-102 xl:border-r xl:pr-12.5">
+            <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-2.5">
               <Select
                 options={tokenOptions}
                 selected={selectedToken}
@@ -725,11 +727,11 @@ function AddLiquidity() {
             <div className="relative mb-6">
               <label
                 htmlFor="liquidityAmount"
-                className="mb-2 flex justify-between px-5 text-xxs font-bold uppercase"
+                className="mb-2 flex justify-between px-5 text-xxxs font-bold uppercase xl:text-xxs"
               >
                 <span className="text-hyphen-gray-400">Input</span>
                 <span className="flex items-center text-hyphen-gray-300">
-                  Wallet Balance:{' '}
+                  Balance:{' '}
                   {walletBalance ? (
                     walletBalance
                   ) : (
@@ -749,14 +751,14 @@ function AddLiquidity() {
                 placeholder="0.000"
                 type="number"
                 inputMode="decimal"
-                className="mb-2 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-sm text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200 xl:text-2xl"
                 value={liquidityAmount}
                 onChange={handleLiquidityAmountChange}
                 disabled={isDataLoading || !totalLiquidity}
               />
 
               <button
-                className="absolute right-[18px] top-[45px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                className="absolute right-[18px] top-[42px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white xl:top-[45px]"
                 onClick={handleMaxButtonClick}
                 disabled={isDataLoading}
               >
@@ -776,7 +778,7 @@ function AddLiquidity() {
                 {currentChainId === chain?.chainId ? (
                   <>
                     <button
-                      className="mt-9 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                      className="mt-12 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
                       disabled={
                         isDataLoading ||
                         isNativeToken ||
@@ -841,29 +843,29 @@ function AddLiquidity() {
               </button>
             ) : null}
           </div>
-          <div className="max-h-104.5 h-104.5 pl-12.5">
-            <div className="mb-12 grid grid-cols-2 gap-2.5">
+          <div className="xl:max-h-102 xl:h-102 xl:pl-12.5">
+            <div className="mb-12 grid grid-cols-1 gap-6 xl:grid-cols-2 xl:gap-2.5">
               <div className="flex flex-col">
-                <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
                   APY
                 </span>
-                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-sm text-hyphen-gray-400 xl:text-2xl">
                   {APY > 10000
                     ? '>10,000%'
                     : `${Number.parseFloat(APY.toFixed(3))}%`}
                 </div>
               </div>
               <div className="flex flex-col">
-                <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+                <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
                   Your pool share
                 </span>
-                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-sm text-hyphen-gray-400 xl:text-2xl">
                   {poolShare}%
                 </div>
               </div>
             </div>
 
-            <div className="mb-[5.5rem]">
+            <div className="mb-[4.75rem] hidden xl:block">
               <ProgressBar
                 currentProgress={formattedTotalLiquidity}
                 totalProgress={formattedTokenTotalCap}

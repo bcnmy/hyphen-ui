@@ -451,9 +451,9 @@ function IncreaseLiquidity() {
           transferAmount={parseFloat(liquidityIncreaseAmount)}
         />
       ) : null}
-      <article className="my-24 rounded-10 bg-white p-12.5 pt-2.5">
-        <header className="relative mt-6 mb-12 flex items-center justify-center border-b px-10 pb-6">
-          <div className="absolute left-0">
+      <article className="my-12 rounded-10 bg-white p-0 py-2 xl:my-24 xl:p-12.5 xl:pt-2.5">
+        <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr_4rem] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
+          <div>
             <button
               className="flex items-center rounded text-hyphen-gray-400"
               onClick={() =>
@@ -464,25 +464,29 @@ function IncreaseLiquidity() {
             </button>
           </div>
 
-          <h2 className="text-xl text-hyphen-purple">Increase Liquidity</h2>
+          <h2 className="justify-self-start text-sm text-hyphen-purple xl:justify-self-center xl:text-xl">
+            Increase Liquidity
+          </h2>
 
-          <div className="absolute right-0 flex">
-            <button className="mr-4 text-xs text-hyphen-purple" onClick={reset}>
+          <div className="justify-self-end">
+            <button className="text-xs text-hyphen-purple" onClick={reset}>
               Clear All
             </button>
           </div>
         </header>
 
         {chainId ? (
-          <LiquidityPositionOverview
-            chainId={Number.parseInt(chainId)}
-            positionId={BigNumber.from(positionId)}
-          />
+          <div className="px-2.5 xl:px-0">
+            <LiquidityPositionOverview
+              chainId={Number.parseInt(chainId)}
+              positionId={BigNumber.from(positionId)}
+            />
+          </div>
         ) : null}
 
-        <section className="mt-8 grid grid-cols-2">
-          <div className="max-h-104.5 h-104.5 border-r pr-12.5 pt-9">
-            <div className="mb-8">
+        <section className="mt-4 grid grid-cols-1 px-10 xl:mt-8 xl:grid-cols-2 xl:px-0">
+          <div className="xl:max-h-102 mb-12 pt-9 xl:mb-0 xl:h-102 xl:border-r xl:pr-12.5">
+            <div className="mb-9 hidden xl:block">
               <ProgressBar
                 currentProgress={formattedTotalLiquidity}
                 totalProgress={formattedTokenTotalCap}
@@ -502,11 +506,11 @@ function IncreaseLiquidity() {
             <div className="relative mb-6">
               <label
                 htmlFor="liquidityIncreaseAmount"
-                className="mb-2 flex justify-between px-5 text-xxs font-bold uppercase"
+                className="mb-2 flex justify-between px-5 text-xxxs font-bold uppercase xl:text-xxs"
               >
                 <span className="text-hyphen-gray-400">Input</span>
                 <span className="flex items-center text-hyphen-gray-300">
-                  Wallet Balance:{' '}
+                  Balance:{' '}
                   {walletBalance ? (
                     walletBalance
                   ) : (
@@ -526,14 +530,14 @@ function IncreaseLiquidity() {
                 placeholder="0.000"
                 type="number"
                 inputMode="decimal"
-                className="mb-2 h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200"
+                className="h-15 w-full rounded-2.5 border bg-white px-4 py-2 font-mono text-sm text-hyphen-gray-400 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-200 xl:text-2xl"
                 value={liquidityIncreaseAmount}
                 onChange={handleLiquidityAmountChange}
                 disabled={isDataLoading}
               />
 
               <button
-                className="absolute right-[18px] top-[45px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white"
+                className="absolute right-[18px] top-[42px] ml-2 flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs text-white xl:top-[45px]"
                 onClick={handleMaxButtonClick}
                 disabled={isDataLoading}
               >
@@ -554,7 +558,7 @@ function IncreaseLiquidity() {
                 {currentChainId === chain?.chainId ? (
                   <>
                     <button
-                      className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
+                      className="mt-12 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
                       disabled={
                         isDataLoading ||
                         isNativeToken ||
@@ -618,13 +622,13 @@ function IncreaseLiquidity() {
               </button>
             )}
           </div>
-          <div className="max-h-104.5 flex h-104.5 flex-col justify-between pl-12.5 pt-3">
-            <div className="grid grid-cols-2">
-              <div className="flex flex-col">
-                <span className="pl-5 text-xxs font-bold uppercase text-hyphen-gray-400">
+          <div className="xl:max-h-102 flex flex-col justify-between xl:h-102 xl:pt-3 xl:pl-12.5">
+            <div className="grid grid-cols-1 xl:grid-cols-2">
+              <div className="mb-[3.125rem] flex flex-col xl:mb-0">
+                <span className="pl-5 text-xxxs font-bold uppercase text-hyphen-gray-400 xl:text-xxs">
                   Updated pool share
                 </span>
-                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-2xl text-hyphen-gray-400">
+                <div className="mt-2 flex h-15 items-center rounded-2.5 bg-hyphen-purple bg-opacity-10 px-5 font-mono text-sm text-hyphen-gray-400 xl:text-2xl">
                   {poolShare}%
                 </div>
               </div>

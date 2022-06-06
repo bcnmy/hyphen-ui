@@ -50,7 +50,7 @@ function ManagePosition() {
     isError: positionMetadataError,
     isLoading: isPositionMetadataLoading,
   } = useQuery(
-    ['positionMetadata', positionId],
+    ['positionMetadata', chain?.chainId, positionId],
     () => getPositionMetadata(BigNumber.from(positionId)),
     {
       // Execute only when positionid is available.
@@ -76,7 +76,7 @@ function ManagePosition() {
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;
 
   const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
-    ['totalLiquidity', tokenAddress],
+    ['totalLiquidity', chain?.chainId, tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
@@ -85,7 +85,7 @@ function ManagePosition() {
   );
 
   const { data: tokenAmount, isError: tokenAmountError } = useQuery(
-    ['tokenAmount', { shares, tokenAddress }],
+    ['tokenAmount', chain?.chainId, { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
       // Execute only when shares & tokenAddress is available.
@@ -94,7 +94,7 @@ function ManagePosition() {
   );
 
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
-    ['tokenTotalCap', tokenAddress],
+    ['tokenTotalCap', chain?.chainId, tokenAddress],
     () => getTokenTotalCap(tokenAddress),
     {
       // Execute only when tokenAddress is available.

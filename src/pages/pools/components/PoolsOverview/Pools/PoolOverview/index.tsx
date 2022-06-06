@@ -34,7 +34,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     useLiquidityFarming(chain);
 
   const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
-    ['totalLiquidity', address],
+    ['totalLiquidity', chain.chainId, address],
     () => getTotalLiquidity(address),
     {
       // Execute only when address is available.
@@ -43,7 +43,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   );
 
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
-    ['tokenTotalCap', address],
+    ['tokenTotalCap', chain.chainId, address],
     () => getTokenTotalCap(address),
     {
       // Execute only when address is available.
@@ -52,7 +52,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   );
 
   const { data: feeAPYData, isError: feeAPYDataError } = useQuery(
-    ['apy', address],
+    ['apy', chain.chainId, address],
     async () => {
       if (!v2GraphEndpoint || !address) return;
 
@@ -78,7 +78,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
   } = useQuery(
-    ['suppliedLiquidityByToken', address],
+    ['suppliedLiquidityByToken', chain.chainId, address],
     () => getSuppliedLiquidityByToken(address),
     {
       // Execute only when address is available.
@@ -87,7 +87,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   );
 
   const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
-    ['tokenPriceInUSD', coinGeckoId],
+    ['tokenPriceInUSD', chain.chainId, coinGeckoId],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
@@ -114,7 +114,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
         const { chainId } = chain;
 
         if (chainId === OPTIMISM_CHAIN_ID) {
-          return getRewardRatePerSecond(address, rewardTokenAddress);
+          return getRewardRatePerSecond(address, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(address);
         }
@@ -143,7 +143,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 
@@ -166,6 +166,19 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     rewardsRatePerSecondError ||
     rewardTokenAddressError ||
     rewardTokenPriceInUSDError;
+
+  if (isError) {
+    console.log({
+      totalLiquidityError,
+      tokenTotalCapError,
+      feeAPYDataError,
+      suppliedLiquidityByTokenError,
+      tokenPriceInUSDError,
+      rewardsRatePerSecondError,
+      rewardTokenAddressError,
+      rewardTokenPriceInUSDError,
+    });
+  }
 
   if (isError) {
     return (

@@ -76,7 +76,7 @@ function AddStakingPosition() {
 
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', token],
+      ['rewardTokenAddress', chain?.chainId, token],
       () => {
         if (!chain || !token) return;
 
@@ -180,7 +180,7 @@ function AddStakingPosition() {
     isLoading: isNFTApprovalAddressLoading,
     refetch: refetchNFTApprovalAddress,
   } = useQuery(
-    ['NFTApprovalAddress', currentPosition],
+    ['NFTApprovalAddress', chain?.chainId, currentPosition],
     () => {
       if (!filteredUserPositions) return;
 

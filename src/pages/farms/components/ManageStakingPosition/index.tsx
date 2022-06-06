@@ -44,7 +44,7 @@ function ManageStakingPosition() {
     isError: positionMetadataError,
     isLoading: isPositionMetadataLoading,
   } = useQuery(
-    ['positionMetadata', positionId],
+    ['positionMetadata', chain?.chainId, positionId],
     () => getPositionMetadata(BigNumber.from(positionId)),
     {
       // Execute only when positionid is available.
@@ -59,7 +59,7 @@ function ManageStakingPosition() {
     isError: positionNFTDataError,
     isLoading: isPositionNFTDataLoading,
   } = useQuery(
-    ['positionNFT', positionId],
+    ['positionNFT', chain?.chainId, positionId],
     () => getTokenURI(BigNumber.from(positionId)),
     {
       // Execute only when positionid is available.
@@ -111,7 +111,7 @@ function ManageStakingPosition() {
     isError: pendingTokenError,
     isLoading: pendingTokenLoading,
   } = useQuery(
-    ['pendingToken', positionId],
+    ['pendingToken', chain?.chainId, positionId],
     () => {
       if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
         return getPendingToken(BigNumber.from(positionId), rewardTokenAddress);

@@ -45,7 +45,7 @@ function LiquidityPositionOverview({
     isError: positionMetadataError,
     isLoading: isPositionMetadataLoading,
     data: positionMetadata,
-  } = useQuery(['positionMetadata', positionId], () =>
+  } = useQuery(['positionMetadata', chain.chainId, positionId], () =>
     getPositionMetadata(positionId),
   );
 
@@ -70,7 +70,7 @@ function LiquidityPositionOverview({
     isLoading: isTotalLiquidityLoading,
     data: totalLiquidity,
   } = useQuery(
-    ['totalLiquidity', tokenAddress],
+    ['totalLiquidity', chain.chainId, tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
@@ -83,7 +83,7 @@ function LiquidityPositionOverview({
     isLoading: isTokenAmountLoading,
     data: tokenAmount,
   } = useQuery(
-    ['tokenAmount', { shares, tokenAddress }],
+    ['tokenAmount', chain.chainId, { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
       // Execute only when shares & tokenAddress is available.
@@ -92,7 +92,7 @@ function LiquidityPositionOverview({
   );
 
   const { isError: feeAPYDataError, data: feeAPYData } = useQuery(
-    ['apy', tokenAddress],
+    ['apy', chain.chainId, tokenAddress],
     async () => {
       if (!v2GraphEndpoint || !tokenAddress) return;
 
@@ -118,7 +118,7 @@ function LiquidityPositionOverview({
     isError: suppliedLiquidityByTokenError,
     data: suppliedLiquidityByToken,
   } = useQuery(
-    ['suppliedLiquidityByToken', tokenAddress],
+    ['suppliedLiquidityByToken', chain.chainId, tokenAddress],
     () => getSuppliedLiquidityByToken(tokenAddress),
     {
       // Execute only when address is available.
@@ -127,7 +127,7 @@ function LiquidityPositionOverview({
   );
 
   const { isError: tokenPriceInUSDError, data: tokenPriceInUSD } = useQuery(
-    ['tokenPriceInUSD', token],
+    ['tokenPriceInUSD', chain.chainId, token],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
@@ -152,7 +152,7 @@ function LiquidityPositionOverview({
       ['rewardsRatePerSecond', chain.chainId, tokenAddress],
       () => {
         if (chainId === OPTIMISM_CHAIN_ID) {
-          return getRewardRatePerSecond(tokenAddress, rewardTokenAddress);
+          return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(tokenAddress);
         }
@@ -181,7 +181,7 @@ function LiquidityPositionOverview({
 
   const { isError: rewardTokenPriceInUSDError, data: rewardTokenPriceInUSD } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

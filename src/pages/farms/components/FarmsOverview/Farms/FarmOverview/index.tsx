@@ -31,7 +31,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
   } = useQuery(
-    ['suppliedLiquidityByToken', address],
+    ['suppliedLiquidityByToken', chain.chainId, address],
     () => getSuppliedLiquidityByToken(address),
     {
       // Execute only when address is available.
@@ -40,7 +40,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   );
 
   const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
-    ['tokenPriceInUSD', coinGeckoId],
+    ['tokenPriceInUSD', chain.chainId, coinGeckoId],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
@@ -62,7 +62,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
 
   const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
     useQuery(
-      ['rewardsRatePerSecond', address],
+      ['rewardsRatePerSecond', chain.chainId, address],
       () => {
         const { chainId } = chain;
 
@@ -96,7 +96,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

@@ -128,7 +128,7 @@ function AddLiquidity() {
 
   // Queries
   const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
-    ['totalLiquidity', selectedTokenAddress],
+    ['totalLiquidity', chain?.chainId, selectedTokenAddress],
     () => getTotalLiquidity(selectedTokenAddress),
     {
       // Execute only when selectedTokenAddress is available.
@@ -137,7 +137,7 @@ function AddLiquidity() {
   );
 
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
-    ['tokenTotalCap', selectedTokenAddress],
+    ['tokenTotalCap', chain?.chainId, selectedTokenAddress],
     () => getTokenTotalCap(selectedTokenAddress),
     {
       // Execute only when selectedTokenAddress is available.
@@ -146,7 +146,7 @@ function AddLiquidity() {
   );
 
   const { data: feeAPYData, isError: feeAPYDataError } = useQuery(
-    ['apy', selectedTokenAddress],
+    ['apy', chain?.chainId, selectedTokenAddress],
     async () => {
       if (!v2GraphEndpoint || !selectedTokenAddress) return;
 
@@ -173,7 +173,7 @@ function AddLiquidity() {
     isError: tokenAllowanceError,
     refetch: refetchTokenAllowance,
   } = useQuery(
-    'tokenAllowance',
+    ['tokenAllowance', chain?.chainId],
     () => {
       if (
         !accounts ||
@@ -252,7 +252,7 @@ function AddLiquidity() {
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
   } = useQuery(
-    ['suppliedLiquidityByToken', selectedTokenAddress],
+    ['suppliedLiquidityByToken', chain?.chainId, selectedTokenAddress],
     () => {
       if (!selectedTokenAddress) return;
 
@@ -265,7 +265,7 @@ function AddLiquidity() {
   );
 
   const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
-    ['tokenPriceInUSD', token],
+    ['tokenPriceInUSD', chain?.chainId, token],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
@@ -298,7 +298,7 @@ function AddLiquidity() {
         if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
           return getRewardRatePerSecond(
             selectedTokenAddress,
-            rewardTokenAddress,
+            rewardTokenAddress[0],
           );
         } else {
           return getRewardRatePerSecond(selectedTokenAddress);
@@ -328,7 +328,7 @@ function AddLiquidity() {
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain?.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

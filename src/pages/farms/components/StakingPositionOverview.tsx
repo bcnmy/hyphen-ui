@@ -48,13 +48,8 @@ function StakingPositionOverview({
     data: positionMetadata,
     isError: positionMetadataError,
     isLoading: isPositionMetadataLoading,
-  } = useQuery(['positionMetadata', positionId], () =>
+  } = useQuery(['positionMetadata', chain.chainId, positionId], () =>
     getPositionMetadata(positionId),
-  );
-
-  const { data: baseDivisor, isError: baseDivisorError } = useQuery(
-    'baseDivisor',
-    () => getBaseDivisor(),
   );
 
   const [tokenAddress, suppliedLiquidity, shares] = positionMetadata || [];
@@ -73,9 +68,14 @@ function StakingPositionOverview({
 
   const tokenDecimals = chain && token ? token[chain.chainId].decimal : null;
 
+  const { data: baseDivisor, isError: baseDivisorError } = useQuery(
+    ['baseDivisor', chain.chainId, token?.symbol],
+    () => getBaseDivisor(),
+  );
+
   const { data: tokenPriceInLPShares, isError: tokenPriceInLPSharesError } =
     useQuery(
-      ['tokenPriceInLPShares', tokenAddress],
+      ['tokenPriceInLPShares', chain.chainId, tokenAddress],
       () => getTokenPriceInLPShares(tokenAddress),
       {
         // Execute only when address is available.
@@ -87,7 +87,7 @@ function StakingPositionOverview({
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
   } = useQuery(
-    ['suppliedLiquidityByToken', tokenAddress],
+    ['suppliedLiquidityByToken', chain.chainId, tokenAddress],
     () => getSuppliedLiquidityByToken(tokenAddress),
     {
       // Execute only when address is available.
@@ -96,7 +96,7 @@ function StakingPositionOverview({
   );
 
   const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
-    ['tokenPriceInUSD', token?.coinGeckoId],
+    ['tokenPriceInUSD', chain.chainId, token?.coinGeckoId],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
@@ -123,7 +123,7 @@ function StakingPositionOverview({
         if (!tokenAddress || !rewardTokenAddress) return;
 
         if (chainId === OPTIMISM_CHAIN_ID) {
-          return getRewardRatePerSecond(tokenAddress, rewardTokenAddress);
+          return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(tokenAddress);
         }
@@ -144,7 +144,7 @@ function StakingPositionOverview({
   );
 
   const { data: pendingToken, isError: pendingTokenError } = useQuery(
-    ['pendingToken', positionId],
+    ['pendingToken', chain.chainId, positionId],
     () => {
       if (chainId === OPTIMISM_CHAIN_ID) {
         return getPendingToken(positionId, rewardTokenAddress);
@@ -178,7 +178,7 @@ function StakingPositionOverview({
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

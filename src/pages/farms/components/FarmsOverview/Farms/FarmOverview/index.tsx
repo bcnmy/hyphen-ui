@@ -78,14 +78,6 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       },
     );
 
-  if (chain.chainId === OPTIMISM_CHAIN_ID) {
-    console.log({
-      tokenSymbol: symbol,
-      tokenAddress: address,
-      rewardTokenAddress,
-    });
-  }
-
   const rewardTokenSymbol =
     rewardTokenAddress && tokens
       ? Object.keys(tokens).find(tokenSymbol => {

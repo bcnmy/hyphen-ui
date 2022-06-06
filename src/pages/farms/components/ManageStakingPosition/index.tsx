@@ -54,18 +54,6 @@ function ManageStakingPosition() {
 
   const [tokenAddress] = positionMetadata || [];
 
-  const tokenSymbol =
-    chainId && tokens && tokenAddress
-      ? Object.keys(tokens).find(tokenSymbol => {
-          const tokenObj = tokens[tokenSymbol];
-          return (
-            tokenObj[Number.parseInt(chainId)]?.address.toLowerCase() ===
-            tokenAddress.toLowerCase()
-          );
-        })
-      : undefined;
-  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
-
   const {
     data: positionNFTData,
     isError: positionNFTDataError,
@@ -91,15 +79,11 @@ function ManageStakingPosition() {
     isError: rewardTokenAddressError,
     isLoading: rewardTokenAddressLoading,
   } = useQuery(
-    'rewardTokenAddress',
-    () => {
-      if (!chain || !token) return;
-
-      return getRewardTokenAddress(token[chain.chainId].address);
-    },
+    ['rewardTokenAddress', chain?.chainId, tokenAddress],
+    () => getRewardTokenAddress(tokenAddress),
     {
-      // Execute only when address is available.
-      enabled: !!(chain && token),
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
     },
   );
 
@@ -108,7 +92,10 @@ function ManageStakingPosition() {
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })

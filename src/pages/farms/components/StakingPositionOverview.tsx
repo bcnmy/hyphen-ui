@@ -108,49 +108,38 @@ function StakingPositionOverview({
 
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', token],
-      () => {
-        if (!chain || !token) return;
-
-        return getRewardTokenAddress(token[chain.chainId].address);
-      },
+      ['rewardTokenAddress', chain.chainId, tokenAddress],
+      () => getRewardTokenAddress(tokenAddress),
       {
-        // Execute only when address is available.
-        enabled: !!(chain && token),
+        // Execute only when tokenAddress is available.
+        enabled: !!tokenAddress,
       },
     );
 
   const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
     useQuery(
-      ['rewardsRatePerSecond', token],
+      ['rewardsRatePerSecond', chain.chainId, tokenAddress],
       () => {
-        if (!token || !rewardTokenAddress) return;
+        if (!tokenAddress || !rewardTokenAddress) return;
 
         if (chainId === OPTIMISM_CHAIN_ID) {
-          return getRewardRatePerSecond(
-            token[chainId].address,
-            rewardTokenAddress,
-          );
+          return getRewardRatePerSecond(tokenAddress, rewardTokenAddress);
         } else {
-          return getRewardRatePerSecond(token[chainId].address);
+          return getRewardRatePerSecond(tokenAddress);
         }
       },
       {
-        // Execute only when address is available.
-        enabled: !!(token && rewardTokenAddress),
+        // Execute only when tokenAddress & rewardTokenAddress are available.
+        enabled: !!(tokenAddress && rewardTokenAddress),
       },
     );
 
   const { data: totalSharesStaked, isError: totalSharesStakedError } = useQuery(
-    ['totalSharesStaked', token],
-    () => {
-      if (!chain || !token) return;
-
-      return getTotalSharesStaked(token[chain.chainId].address);
-    },
+    ['totalSharesStaked', chain.chainId, tokenAddress],
+    () => getTotalSharesStaked(tokenAddress),
     {
-      // Execute only when address is available.
-      enabled: !!(chain && token),
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
     },
   );
 
@@ -173,7 +162,10 @@ function StakingPositionOverview({
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })

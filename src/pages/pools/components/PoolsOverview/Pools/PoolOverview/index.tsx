@@ -168,19 +168,6 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     rewardTokenPriceInUSDError;
 
   if (isError) {
-    console.log({
-      totalLiquidityError,
-      tokenTotalCapError,
-      feeAPYDataError,
-      suppliedLiquidityByTokenError,
-      tokenPriceInUSDError,
-      rewardsRatePerSecondError,
-      rewardTokenAddressError,
-      rewardTokenPriceInUSDError,
-    });
-  }
-
-  if (isError) {
     return (
       <article className="mb-2.5 rounded-10 bg-white p-2.5">
         <section className="flex items-center justify-center px-[1.875rem] pt-16 pb-24">

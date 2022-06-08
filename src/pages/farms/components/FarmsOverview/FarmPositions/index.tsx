@@ -18,9 +18,9 @@ function FarmPositions() {
     isError: stakedUserPositionsError,
     isLoading,
   } = useQuery(
-    ['stakedUserPositions', accounts],
+    ['stakedUserPositions', selectedNetwork?.chainId],
     () => {
-      if (!isLoggedIn || !accounts) return;
+      if (!isLoggedIn || !accounts || !selectedNetwork) return;
 
       return getStakedUserPositions(accounts);
     },

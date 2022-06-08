@@ -24,9 +24,9 @@ function LiquidityPositions() {
     isLoading,
     data: userPositions,
   } = useQuery(
-    ['userPositions', accounts],
+    ['userPositions', selectedNetwork?.chainId],
     () => {
-      if (!isLoggedIn || !accounts) return;
+      if (!isLoggedIn || !accounts || !selectedNetwork) return;
 
       return getUserPositions(accounts);
     },

@@ -88,12 +88,18 @@ function AddStakingPosition() {
       },
     );
 
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
-    rewardTokenAddress && chain && tokens
+    rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })

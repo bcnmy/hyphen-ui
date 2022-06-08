@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { request, gql } from 'graphql-request';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
-import { NATIVE_ADDRESS } from 'config/constants';
+import { NATIVE_ADDRESS, OPTIMISM_CHAIN_ID } from 'config/constants';
 import getTokenAllowance from 'utils/getTokenAllowance';
 import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
@@ -128,7 +128,7 @@ function AddLiquidity() {
 
   // Queries
   const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
-    ['totalLiquidity', selectedTokenAddress],
+    ['totalLiquidity', chain?.chainId, selectedTokenAddress],
     () => getTotalLiquidity(selectedTokenAddress),
     {
       // Execute only when selectedTokenAddress is available.
@@ -137,7 +137,7 @@ function AddLiquidity() {
   );
 
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
-    ['tokenTotalCap', selectedTokenAddress],
+    ['tokenTotalCap', chain?.chainId, selectedTokenAddress],
     () => getTokenTotalCap(selectedTokenAddress),
     {
       // Execute only when selectedTokenAddress is available.
@@ -146,7 +146,7 @@ function AddLiquidity() {
   );
 
   const { data: feeAPYData, isError: feeAPYDataError } = useQuery(
-    ['apy', selectedTokenAddress],
+    ['apy', chain?.chainId, selectedTokenAddress],
     async () => {
       if (!v2GraphEndpoint || !selectedTokenAddress) return;
 
@@ -173,7 +173,7 @@ function AddLiquidity() {
     isError: tokenAllowanceError,
     refetch: refetchTokenAllowance,
   } = useQuery(
-    'tokenAllowance',
+    ['tokenAllowance', chain?.chainId],
     () => {
       if (
         !accounts ||
@@ -252,7 +252,7 @@ function AddLiquidity() {
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
   } = useQuery(
-    ['suppliedLiquidityByToken', selectedTokenAddress],
+    ['suppliedLiquidityByToken', chain?.chainId, selectedTokenAddress],
     () => {
       if (!selectedTokenAddress) return;
 
@@ -265,7 +265,7 @@ function AddLiquidity() {
   );
 
   const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
-    ['tokenPriceInUSD', token],
+    ['tokenPriceInUSD', chain?.chainId, token],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
@@ -275,23 +275,9 @@ function AddLiquidity() {
     },
   );
 
-  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
-    useQuery(
-      ['rewardsRatePerSecond', selectedTokenAddress],
-      () => {
-        if (!selectedTokenAddress) return;
-
-        return getRewardRatePerSecond(selectedTokenAddress);
-      },
-      {
-        // Execute only when selectedTokenAddress is available.
-        enabled: !!selectedTokenAddress,
-      },
-    );
-
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', selectedTokenAddress],
+      ['rewardTokenAddress', chain?.chainId, selectedTokenAddress],
       () => {
         if (!selectedTokenAddress) return;
 
@@ -303,12 +289,41 @@ function AddLiquidity() {
       },
     );
 
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', chain?.chainId, selectedTokenAddress],
+      () => {
+        if (!rewardTokenAddress || !selectedTokenAddress) return;
+
+        // Call getRewardRatePerSecond with reward token address
+        // if chainId is in OPTIMISM_CHAIN_ID.
+        if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(
+            selectedTokenAddress,
+            rewardTokenAddress[0],
+          );
+        } else {
+          return getRewardRatePerSecond(selectedTokenAddress);
+        }
+      },
+      {
+        // Execute only when chain & selectedTokenAddress are available.
+        enabled: !!(rewardTokenAddress && selectedTokenAddress),
+      },
+    );
+
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
@@ -318,7 +333,7 @@ function AddLiquidity() {
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain?.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

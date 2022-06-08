@@ -70,7 +70,7 @@ function IncreaseLiquidity() {
   } = useModal();
 
   const { data: positionMetadata, isError: positionMetadataError } = useQuery(
-    ['positionMetadata', positionId],
+    ['positionMetadata', chain?.chainId, positionId],
     () => getPositionMetadata(BigNumber.from(positionId)),
     {
       // Execute only when positionId is available.
@@ -96,7 +96,7 @@ function IncreaseLiquidity() {
     chainId && token ? token[Number.parseInt(chainId)].decimal : null;
 
   const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
-    ['totalLiquidity', tokenAddress],
+    ['totalLiquidity', chain?.chainId, tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
@@ -105,7 +105,7 @@ function IncreaseLiquidity() {
   );
 
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
-    ['tokenTotalCap', tokenAddress],
+    ['tokenTotalCap', chain?.chainId, tokenAddress],
     () => getTokenTotalCap(tokenAddress),
     {
       // Execute only when tokenAddress is available.
@@ -114,7 +114,7 @@ function IncreaseLiquidity() {
   );
 
   const { isError: totalLiquidityByLPError } = useQuery(
-    ['totalLiquidityByLP', tokenAddress],
+    ['totalLiquidityByLP', chain?.chainId, tokenAddress],
     () => getTotalLiquidityByLp(tokenAddress, accounts),
     {
       // Execute only when tokenAddress is available.
@@ -127,7 +127,7 @@ function IncreaseLiquidity() {
     isError: tokenAllowanceError,
     refetch: refetchTokenAllowance,
   } = useQuery(
-    'tokenAllowance',
+    ['tokenAllowance', chain?.chainId],
     () => {
       if (
         !accounts ||

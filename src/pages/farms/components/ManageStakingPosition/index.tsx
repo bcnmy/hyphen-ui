@@ -14,6 +14,7 @@ import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
 import { useEffect, useState } from 'react';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 function ManageStakingPosition() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ function ManageStakingPosition() {
     isError: positionMetadataError,
     isLoading: isPositionMetadataLoading,
   } = useQuery(
-    ['positionMetadata', positionId],
+    ['positionMetadata', chain?.chainId, positionId],
     () => getPositionMetadata(BigNumber.from(positionId)),
     {
       // Execute only when positionid is available.
@@ -53,24 +54,12 @@ function ManageStakingPosition() {
 
   const [tokenAddress] = positionMetadata || [];
 
-  const tokenSymbol =
-    chainId && tokens && tokenAddress
-      ? Object.keys(tokens).find(tokenSymbol => {
-          const tokenObj = tokens[tokenSymbol];
-          return (
-            tokenObj[Number.parseInt(chainId)]?.address.toLowerCase() ===
-            tokenAddress.toLowerCase()
-          );
-        })
-      : undefined;
-  const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
-
   const {
     data: positionNFTData,
     isError: positionNFTDataError,
     isLoading: isPositionNFTDataLoading,
   } = useQuery(
-    ['positionNFT', positionId],
+    ['positionNFT', chain?.chainId, positionId],
     () => getTokenURI(BigNumber.from(positionId)),
     {
       // Execute only when positionid is available.
@@ -90,24 +79,26 @@ function ManageStakingPosition() {
     isError: rewardTokenAddressError,
     isLoading: rewardTokenAddressLoading,
   } = useQuery(
-    'rewardTokenAddress',
-    () => {
-      if (!chain || !token) return;
-
-      return getRewardTokenAddress(token[chain.chainId].address);
-    },
+    ['rewardTokenAddress', chain?.chainId, tokenAddress],
+    () => getRewardTokenAddress(tokenAddress),
     {
-      // Execute only when address is available.
-      enabled: !!(chain && token),
+      // Execute only when tokenAddress is available.
+      enabled: !!tokenAddress,
     },
   );
 
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
@@ -122,8 +113,20 @@ function ManageStakingPosition() {
     data: pendingToken,
     isError: pendingTokenError,
     isLoading: pendingTokenLoading,
-  } = useQuery(['pendingToken', positionId], () =>
-    getPendingToken(BigNumber.from(positionId)),
+  } = useQuery(
+    ['pendingToken', chain?.chainId, positionId],
+    () => {
+      // Call getPendingToken with reward token address
+      // if chainId is in OPTIMISM_CHAIN_ID.
+      if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+        return getPendingToken(BigNumber.from(positionId), rewardTokenAddress);
+      } else {
+        return getPendingToken(BigNumber.from(positionId));
+      }
+    },
+    {
+      enabled: !!(positionId && rewardTokenAddress),
+    },
   );
 
   const unclaimedRewardToken =

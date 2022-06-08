@@ -24,9 +24,9 @@ function LiquidityPositions() {
     isLoading,
     data: userPositions,
   } = useQuery(
-    ['userPositions', accounts],
+    ['userPositions', selectedNetwork?.chainId],
     () => {
-      if (!isLoggedIn || !accounts) return;
+      if (!isLoggedIn || !accounts || !selectedNetwork) return;
 
       return getUserPositions(accounts);
     },
@@ -102,9 +102,24 @@ function LiquidityPositions() {
               Show Closed Positions
             </button>
           </div>
-        ) : null}
+        ) : (
+          <div className="hidden xl:block">
+            <button
+              className="mr-7 cursor-not-allowed text-xs text-hyphen-gray-400"
+              disabled
+            >
+              Active Positions
+            </button>
+            <button
+              className="mr-7 cursor-not-allowed text-xs text-hyphen-gray-400"
+              disabled
+            >
+              Show Closed Positions
+            </button>
+          </div>
+        )}
 
-        <h2 className="justify-self-start text-sm text-hyphen-purple xl:justify-self-center xl:text-xl">
+        <h2 className="justify-self-start text-sm text-hyphen-purple xl:justify-self-center xl:text-xl ">
           Your Positions
         </h2>
 
@@ -132,7 +147,7 @@ function LiquidityPositions() {
           </section>
         ) : (
           <section className="my-16 flex flex-col items-center justify-start px-[1.875rem]">
-            <div className="flex items-center">
+            <div className="mb-8 flex items-center">
               <img
                 src={emptyPositionsIcon}
                 alt="No positions"
@@ -144,7 +159,7 @@ function LiquidityPositions() {
             </div>
             {!isLoggedIn ? (
               <button
-                className="mb-8 h-15 w-[400px] rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white xl:w-[400px]"
                 onClick={connect}
               >
                 Connect Your Wallet

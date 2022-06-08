@@ -122,6 +122,8 @@ function StakingPositionOverview({
       () => {
         if (!tokenAddress || !rewardTokenAddress) return;
 
+        // Call getRewardRatePerSecond with reward token address
+        // if chainId is in OPTIMISM_CHAIN_ID.
         if (chainId === OPTIMISM_CHAIN_ID) {
           return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
         } else {
@@ -146,6 +148,8 @@ function StakingPositionOverview({
   const { data: pendingToken, isError: pendingTokenError } = useQuery(
     ['pendingToken', chain.chainId, positionId],
     () => {
+      // Call getPendingToken with reward token address
+      // if chainId is in OPTIMISM_CHAIN_ID.
       if (chainId === OPTIMISM_CHAIN_ID) {
         return getPendingToken(positionId, rewardTokenAddress);
       } else {
@@ -157,6 +161,9 @@ function StakingPositionOverview({
     },
   );
 
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {

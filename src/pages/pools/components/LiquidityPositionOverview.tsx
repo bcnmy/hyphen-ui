@@ -151,6 +151,8 @@ function LiquidityPositionOverview({
     useQuery(
       ['rewardsRatePerSecond', chain.chainId, tokenAddress],
       () => {
+        // Call getRewardRatePerSecond with reward token address
+        // if chainId is in OPTIMISM_CHAIN_ID.
         if (chainId === OPTIMISM_CHAIN_ID) {
           return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
         } else {
@@ -163,6 +165,9 @@ function LiquidityPositionOverview({
       },
     );
 
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {

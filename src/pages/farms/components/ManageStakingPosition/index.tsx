@@ -87,6 +87,9 @@ function ManageStakingPosition() {
     },
   );
 
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {
@@ -113,6 +116,8 @@ function ManageStakingPosition() {
   } = useQuery(
     ['pendingToken', chain?.chainId, positionId],
     () => {
+      // Call getPendingToken with reward token address
+      // if chainId is in OPTIMISM_CHAIN_ID.
       if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
         return getPendingToken(BigNumber.from(positionId), rewardTokenAddress);
       } else {

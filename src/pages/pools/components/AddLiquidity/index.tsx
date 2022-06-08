@@ -295,6 +295,8 @@ function AddLiquidity() {
       () => {
         if (!rewardTokenAddress || !selectedTokenAddress) return;
 
+        // Call getRewardRatePerSecond with reward token address
+        // if chainId is in OPTIMISM_CHAIN_ID.
         if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
           return getRewardRatePerSecond(
             selectedTokenAddress,
@@ -310,6 +312,9 @@ function AddLiquidity() {
       },
     );
 
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {

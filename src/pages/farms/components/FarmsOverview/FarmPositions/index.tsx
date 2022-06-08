@@ -69,7 +69,7 @@ function FarmPositions() {
           </section>
         ) : (
           <section className="my-16 flex flex-col items-center justify-start px-[1.875rem]">
-            <div className="flex items-center">
+            <div className="mb-8 flex items-center">
               <img
                 src={emptyPositionsIcon}
                 alt="No positions"
@@ -81,7 +81,7 @@ function FarmPositions() {
             </div>
             {!isLoggedIn ? (
               <button
-                className="mb-8 h-15 w-[400px] rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white xl:w-[400px]"
                 onClick={connect}
               >
                 Connect Your Wallet

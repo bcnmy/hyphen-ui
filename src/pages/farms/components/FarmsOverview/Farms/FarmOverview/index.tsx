@@ -1,13 +1,14 @@
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
+import { useToken } from 'context/Token';
 import { ethers } from 'ethers';
-import { useQuery, useQueryClient } from 'react-query';
-import Skeleton from 'react-loading-skeleton';
-import { HiOutlineXCircle } from 'react-icons/hi';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
-import { makeNumberCompact } from 'utils/makeNumberCompact';
-import { useNavigate } from 'react-router-dom';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import { Network } from 'hooks/useNetworks';
-import { useToken } from 'context/Token';
+import { HiOutlineXCircle } from 'react-icons/hi';
+import Skeleton from 'react-loading-skeleton';
+import { useQuery, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { makeNumberCompact } from 'utils/makeNumberCompact';
 
 interface IFarmOverview {
   chain: Network;
@@ -30,7 +31,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
   } = useQuery(
-    ['suppliedLiquidityByToken', address],
+    ['suppliedLiquidityByToken', chain.chainId, address],
     () => getSuppliedLiquidityByToken(address),
     {
       // Execute only when address is available.
@@ -39,7 +40,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   );
 
   const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
-    ['tokenPriceInUSD', coinGeckoId],
+    ['tokenPriceInUSD', chain.chainId, coinGeckoId],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
@@ -49,19 +50,9 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     },
   );
 
-  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
-    useQuery(
-      ['rewardsRatePerSecond', address],
-      () => getRewardRatePerSecond(address),
-      {
-        // Execute only when address is available.
-        enabled: !!address,
-      },
-    );
-
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', address],
+      ['rewardTokenAddress', chain.chainId, address],
       () => getRewardTokenAddress(address),
       {
         // Execute only when address is available.
@@ -69,12 +60,38 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       },
     );
 
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', chain.chainId, address],
+      () => {
+        const { chainId } = chain;
+
+        // Call getRewardRatePerSecond with reward token address
+        // if chainId is in OPTIMISM_CHAIN_ID.
+        if (chainId === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(address, rewardTokenAddress[0]);
+        } else {
+          return getRewardRatePerSecond(address);
+        }
+      },
+      {
+        // Execute only when address & rewardTokenAddress are available.
+        enabled: !!(address && rewardTokenAddress),
+      },
+    );
+
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
@@ -84,7 +101,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

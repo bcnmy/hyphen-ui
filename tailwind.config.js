@@ -10,6 +10,9 @@ module.exports = {
       mono: ['Roboto Mono', ...defaultTheme.fontFamily.mono],
     },
     extend: {
+      backgroundImage: {
+        bridge: "url('/src/assets/images/hyphen-bg.jpg')",
+      },
       borderRadius: {
         2.5: '0.625rem',
         7.5: '1.875rem',
@@ -45,13 +48,13 @@ module.exports = {
         84: '21rem',
         100: '25rem',
         102: '25.5rem',
-        104.5: '26.125rem'
+        104.5: '26.125rem',
       },
       width: {
-        7.5: '1.875rem'
+        7.5: '1.875rem',
       },
       maxWidth: {
-        170: '42.5rem'
+        170: '42.5rem',
       },
       spacing: {
         7.5: '1.875rem',
@@ -70,7 +73,7 @@ module.exports = {
         });
         isFirefoxRule.append(container.nodes);
         container.append(isFirefoxRule);
-        isFirefoxRule.walkRules((rule) => {
+        isFirefoxRule.walkRules(rule => {
           rule.selector = `.${e(
             `firefox${separator}${rule.selector.slice(1)}`,
           )}`;

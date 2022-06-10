@@ -65,7 +65,7 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
           }}
           label={'token'}
           disabled={disabled}
-          className="rounded-b-none"
+          className="rounded-b-none bg-white"
           style={{
             borderColor: disabled ? '' : selectedToken?.color,
           }}

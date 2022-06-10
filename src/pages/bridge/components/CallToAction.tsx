@@ -1,15 +1,15 @@
+import arrowRight from 'assets/images/arrow-right.svg';
 import PrimaryButtonLight from 'components/Buttons/PrimaryButtonLight';
 import { useBiconomy } from 'context/Biconomy';
 import { useChains } from 'context/Chains';
+import { useToken } from 'context/Token';
 import { useTokenApproval } from 'context/TokenApproval';
-import { useTransaction } from 'context/Transaction';
+import { useTransaction, ValidationErrors } from 'context/Transaction';
 import { useWalletProvider } from 'context/WalletProvider';
 import { Status } from 'hooks/useLoading';
 import * as React from 'react';
 import switchNetwork from 'utils/switchNetwork';
 import CustomTooltip from '../../../components/CustomTooltip';
-import arrowRight from 'assets/images/arrow-right.svg';
-import { useToken } from 'context/Token';
 
 export interface ICallToActionProps {
   onApproveButtonClick: () => void;
@@ -38,6 +38,10 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     transactionAmountValidationErrors,
   } = useTransaction()!;
   const { isBiconomyEnabled } = useBiconomy()!;
+
+  const isBalanceInadequate = transactionAmountValidationErrors.includes(
+    ValidationErrors.INADEQUATE_BALANCE,
+  );
 
   if (!isLoggedIn) {
     return (
@@ -90,24 +94,40 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (
         <>
-          <PrimaryButtonLight disabled>
+          <PrimaryButtonLight
+            disabled
+            className={
+              fetchSelectedTokenApprovalError
+                ? 'disabled:bg-[#FF000040] disabled:text-[#FF0000]'
+                : ''
+            }
+          >
             {fetchSelectedTokenApprovalError &&
             transactionAmountValidationErrors.length === 0
               ? 'Error in checking approval'
               : transferAmountInputValue === ''
               ? 'Enter amount'
-              : 'Check if amount is valid'}
+              : `Approve ${selectedToken?.symbol}`}
           </PrimaryButtonLight>
-          <PrimaryButtonLight disabled>Bridge Tokens</PrimaryButtonLight>
+          <PrimaryButtonLight
+            disabled
+            className={
+              isBalanceInadequate
+                ? 'disabled:bg-[#FF000040] disabled:text-[#FF0000]'
+                : ''
+            }
+          >
+            {isBalanceInadequate ? 'Insufficient balance' : 'Bridge tokens'}
+          </PrimaryButtonLight>
         </>
       ) : (
         <>
           {fetchSelectedTokenApprovalStatus === Status.PENDING && (
             <>
               <PrimaryButtonLight disabled className="mr-8">
-                Loading Approval
+                Loading approval
               </PrimaryButtonLight>
-              <PrimaryButtonLight disabled>Bridge Tokens</PrimaryButtonLight>
+              <PrimaryButtonLight disabled>Bridge tokens</PrimaryButtonLight>
             </>
           )}
 
@@ -125,7 +145,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
                 )}
                 <span data-tip data-for="whyTransferDisabled">
                   <PrimaryButtonLight disabled>
-                    Bridge Tokens
+                    Bridge tokens
                   </PrimaryButtonLight>
                 </span>
                 <CustomTooltip id="whyTransferDisabled">
@@ -141,10 +161,10 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
                   {selectedToken?.symbol} Approved
                 </PrimaryButtonLight>
                 <PrimaryButtonLight onClick={onTransferButtonClick}>
-                  Bridge Tokens
+                  Bridge tokens
                   <img
                     src={arrowRight}
-                    alt="Bridge Tokens"
+                    alt="Bridge tokens"
                     className="ml-2.5"
                   />
                 </PrimaryButtonLight>

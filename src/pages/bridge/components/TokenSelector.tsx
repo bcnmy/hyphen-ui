@@ -1,11 +1,9 @@
 import Select from 'components/Select';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
-import { useTransaction, ValidationErrors } from 'context/Transaction';
 import { Status } from 'hooks/useLoading';
 import React, { useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
-import { twMerge } from 'tailwind-merge';
 import CustomTooltip from '../../../components/CustomTooltip';
 
 interface ITokenSelectorProps {
@@ -23,8 +21,6 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
     selectedToken,
     getSelectedTokenBalanceStatus,
   } = useToken()!;
-
-  const { transactionAmountValidationErrors } = useTransaction()!;
   const { fromChain } = useChains()!;
 
   const tokenOptions = useMemo(() => {
@@ -86,44 +82,15 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
         getSelectedTokenBalanceStatus === Status.SUCCESS &&
         selectedTokenBalance?.displayBalance ? (
           <div className="flex w-full items-center justify-between px-[18px] text-xxs font-bold uppercase text-white">
-            <span
-              className={twMerge(
-                'mr-1',
-                transactionAmountValidationErrors.includes(
-                  ValidationErrors.INADEQUATE_BALANCE,
-                ) && 'text-red-600',
-                'transition-colors',
-              )}
-            >
-              Balance
-            </span>
+            <span className="mr-1">Balance</span>
             <span className="font-mono">
-              <span
-                className={twMerge(
-                  transactionAmountValidationErrors.includes(
-                    ValidationErrors.INADEQUATE_BALANCE,
-                  ) && 'text-red-600',
-                  'transition-colors',
-                )}
-              >
-                {selectedTokenBalance?.displayBalance || ''}
-              </span>
+              <span>{selectedTokenBalance?.displayBalance || ''}</span>
             </span>
           </div>
         ) : getSelectedTokenBalanceStatus &&
           getSelectedTokenBalanceStatus === Status.PENDING ? (
           <div className="flex w-full items-center justify-between px-[18px] text-xxs font-bold uppercase text-white">
-            <span
-              className={twMerge(
-                'mr-1',
-                transactionAmountValidationErrors.includes(
-                  ValidationErrors.INADEQUATE_BALANCE,
-                ) && 'text-red-600',
-                'transition-colors',
-              )}
-            >
-              Balance
-            </span>
+            <span className="mr-1">Balance</span>
             <Skeleton
               baseColor="#ffffff50"
               enableAnimation

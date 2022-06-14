@@ -527,8 +527,10 @@ function AddLiquidity() {
       ? Object.keys(tokens).filter(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[newChainId] && tokenObj[newChainId].isSupported;
-        })
+        })[0]
       : [{}];
+
+    console.log(newTokenSymbol);
 
     if (chainId && newChainId !== Number.parseInt(chainId, 10)) {
       queryClient.removeQueries();

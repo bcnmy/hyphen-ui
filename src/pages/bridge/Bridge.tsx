@@ -1,26 +1,20 @@
+import { useHyphen } from 'context/Hyphen';
+import { useToken } from 'context/Token';
+import { useTokenApproval } from 'context/TokenApproval';
+import { useTransaction } from 'context/Transaction';
+import useModal from 'hooks/useModal';
 import React, { useEffect, useState } from 'react';
-
-import { useWalletProvider } from '../../context/WalletProvider';
 import { useChains } from '../../context/Chains';
-
+import { useWalletProvider } from '../../context/WalletProvider';
+import AmountInput from './components/AmountInput';
+import ApprovalModal from './components/ApprovalModal';
+import CallToAction from './components/CallToAction';
+import ChangeReceiverAddress from './components/ChangeReceiverAddress';
+import ErrorModal from './components/ErrorModal';
 import NetworkSelectors from './components/NetworkSelectors';
 import TokenSelector from './components/TokenSelector';
-import AmountInput from './components/AmountInput';
 import TransactionFee from './components/TransactionFee';
-import ChangeReceiverAddress from './components/ChangeReceiverAddress';
-import CallToAction from './components/CallToAction';
-import { Toggle } from 'components/Toggle';
-import useModal from 'hooks/useModal';
-import ApprovalModal from './components/ApprovalModal';
-import { useTokenApproval } from 'context/TokenApproval';
-import ErrorModal from './components/ErrorModal';
 import TransferModal from './components/TransferModal';
-import { useTransaction } from 'context/Transaction';
-import { useBiconomy } from 'context/Biconomy';
-import CustomTooltip from '../../components/CustomTooltip';
-import { HiInformationCircle } from 'react-icons/hi';
-import { useToken } from 'context/Token';
-import { useHyphen } from 'context/Hyphen';
 
 interface BridgeProps {}
 

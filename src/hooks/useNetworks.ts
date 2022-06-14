@@ -56,7 +56,7 @@ function fetchNetworks(): Promise<Network[]> {
     .then(data =>
       data.message.filter(
         // temporary filtering for Optimism with mainnet chainId of 10.
-        (network: Network) => network.enabled,
+        (network: Network) => network.enabled && network.chainId !== 10,
       ),
     );
 }

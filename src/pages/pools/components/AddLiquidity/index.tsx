@@ -524,7 +524,7 @@ function AddLiquidity() {
       networkObj => networkObj.chainId === selectedChain.id,
     )!;
     const newTokenSymbol = tokens
-      ? Object.keys(tokens).filter(tokenSymbol => {
+      ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[newChainId] && tokenObj[newChainId].isSupported;
         })

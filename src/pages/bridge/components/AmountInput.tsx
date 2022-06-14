@@ -40,7 +40,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
           onChange={e => changeTransferAmountInputValue(e.target.value)}
           className={twMerge(
             'mt-2 inline-block h-15 w-full rounded-t-2.5 border border-hyphen-gray-100 bg-white px-4 py-2 font-mono text-2xl text-hyphen-gray-400 focus:outline-none',
-            disabled && 'cursor-not-allowed bg-hyphen-gray-100',
+            disabled && 'cursor-not-allowed',
           )}
           disabled={disabled}
         />

@@ -1,8 +1,11 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityFarmingABI from 'abis/LiquidityFarming.abi.json';
+// V2 ABI for Liquidity Farming contract.
+import liquidityFarmingABIV2 from 'abis/LiquidityFarmingV2.abi.json';
 import { Network } from 'hooks/useNetworks';
 import { useWalletProvider } from 'context/WalletProvider';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 function useLiquidityFarming(chain: Network | undefined) {
   const { signer } = useWalletProvider()!;
@@ -11,20 +14,42 @@ function useLiquidityFarming(chain: Network | undefined) {
     : undefined;
 
   const liquidityFarmingContract = useMemo(() => {
-    if (!chain || !contractAddress || !chain.rpc) return;
+    if (!chain || !contractAddress) return;
 
-    return new ethers.Contract(
-      contractAddress,
-      liquidityFarmingABI,
-      new ethers.providers.JsonRpcProvider(chain.rpc),
-    );
+    // Check for Optimism ChainID and make
+    // contract instance using V2 ABI.
+    const { chainId } = chain;
+    if (chainId === OPTIMISM_CHAIN_ID) {
+      return new ethers.Contract(
+        contractAddress,
+        liquidityFarmingABIV2,
+        new ethers.providers.JsonRpcProvider(chain.rpc),
+      );
+    } else {
+      return new ethers.Contract(
+        contractAddress,
+        liquidityFarmingABI,
+        new ethers.providers.JsonRpcProvider(chain.rpc),
+      );
+    }
   }, [chain, contractAddress]);
 
   const liquidityFarmingContractSigner = useMemo(() => {
-    if (!contractAddress || !signer) return;
+    if (!chain || !contractAddress || !signer) return;
 
-    return new ethers.Contract(contractAddress, liquidityFarmingABI, signer);
-  }, [contractAddress, signer]);
+    // Check for Optimism ChainID and make
+    // signer instance using V2 ABI.
+    const { chainId } = chain;
+    if (chainId === OPTIMISM_CHAIN_ID) {
+      return new ethers.Contract(
+        contractAddress,
+        liquidityFarmingABIV2,
+        signer,
+      );
+    } else {
+      return new ethers.Contract(contractAddress, liquidityFarmingABI, signer);
+    }
+  }, [chain, contractAddress, signer]);
 
   const claimFee = useCallback(
     (positionId: BigNumber, accounts: string[]) => {
@@ -39,12 +64,24 @@ function useLiquidityFarming(chain: Network | undefined) {
   );
 
   const getPendingToken = useCallback(
-    (positionId: BigNumber) => {
-      if (!liquidityFarmingContract) return;
+    (positionId: BigNumber, rewardTokenAddress = '') => {
+      if (!chain || !liquidityFarmingContract) return;
 
-      return liquidityFarmingContract.pendingToken(positionId);
+      // Check for Optimism ChainID and cakk
+      // pendingToken with reward token address.
+      // TODO: Remove this when farming contracts
+      // are upgraded for all networks.
+      const { chainId } = chain;
+      if (chainId === OPTIMISM_CHAIN_ID) {
+        return liquidityFarmingContract.pendingToken(
+          positionId,
+          rewardTokenAddress,
+        );
+      } else {
+        return liquidityFarmingContract.pendingToken(positionId);
+      }
     },
-    [liquidityFarmingContract],
+    [chain, liquidityFarmingContract],
   );
 
   const getStakedUserPositions = useCallback(
@@ -57,21 +94,43 @@ function useLiquidityFarming(chain: Network | undefined) {
   );
 
   const getRewardRatePerSecond = useCallback(
-    (address: string) => {
-      if (!liquidityFarmingContract) return;
+    (address: string, rewardTokenAddress = '') => {
+      if (!chain || !liquidityFarmingContract) return;
 
-      return liquidityFarmingContract.getRewardRatePerSecond(address);
+      // Check for Optimism ChainID and cakk
+      // getRewardRatePerSecond with reward token address.
+      // TODO: Remove this when farming contracts
+      // are upgraded for all networks.
+      const { chainId } = chain;
+      if (chainId === OPTIMISM_CHAIN_ID) {
+        return liquidityFarmingContract.getRewardRatePerSecond(
+          address,
+          rewardTokenAddress,
+        );
+      } else {
+        return liquidityFarmingContract.getRewardRatePerSecond(address);
+      }
     },
-    [liquidityFarmingContract],
+    [chain, liquidityFarmingContract],
   );
 
   const getRewardTokenAddress = useCallback(
     (address: string) => {
-      if (!liquidityFarmingContract) return;
+      if (!chain || !liquidityFarmingContract) return;
+      // Check for Optimism ChainID and call
+      // function getRewardTokens(address _baseToken) -> address[]
+      // Use the first address for now.
+      // TODO: Handle multiple reward tokens later.
 
-      return liquidityFarmingContract.rewardTokens(address);
+      const { chainId } = chain;
+      // If chain is Optimism testnet or mainnet, use the new function.
+      if (chainId === OPTIMISM_CHAIN_ID) {
+        return liquidityFarmingContract.getRewardTokens(address);
+      } else {
+        return liquidityFarmingContract.rewardTokens(address);
+      }
     },
-    [liquidityFarmingContract],
+    [chain, liquidityFarmingContract],
   );
 
   const getTotalSharesStaked = useCallback(

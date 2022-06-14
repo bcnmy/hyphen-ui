@@ -10,6 +10,7 @@ import CustomTooltip from 'components/CustomTooltip';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface ILiquidityPositionOverview {
   chainId: number;
@@ -44,7 +45,7 @@ function LiquidityPositionOverview({
     isError: positionMetadataError,
     isLoading: isPositionMetadataLoading,
     data: positionMetadata,
-  } = useQuery(['positionMetadata', positionId], () =>
+  } = useQuery(['positionMetadata', chain.chainId, positionId], () =>
     getPositionMetadata(positionId),
   );
 
@@ -69,7 +70,7 @@ function LiquidityPositionOverview({
     isLoading: isTotalLiquidityLoading,
     data: totalLiquidity,
   } = useQuery(
-    ['totalLiquidity', tokenAddress],
+    ['totalLiquidity', chain.chainId, tokenAddress],
     () => getTotalLiquidity(tokenAddress),
     {
       // Execute only when tokenAddress is available.
@@ -82,7 +83,7 @@ function LiquidityPositionOverview({
     isLoading: isTokenAmountLoading,
     data: tokenAmount,
   } = useQuery(
-    ['tokenAmount', { shares, tokenAddress }],
+    ['tokenAmount', chain.chainId, { shares, tokenAddress }],
     () => getTokenAmount(shares, tokenAddress),
     {
       // Execute only when shares & tokenAddress is available.
@@ -91,7 +92,7 @@ function LiquidityPositionOverview({
   );
 
   const { isError: feeAPYDataError, data: feeAPYData } = useQuery(
-    ['apy', tokenAddress],
+    ['apy', chain.chainId, tokenAddress],
     async () => {
       if (!v2GraphEndpoint || !tokenAddress) return;
 
@@ -117,7 +118,7 @@ function LiquidityPositionOverview({
     isError: suppliedLiquidityByTokenError,
     data: suppliedLiquidityByToken,
   } = useQuery(
-    ['suppliedLiquidityByToken', tokenAddress],
+    ['suppliedLiquidityByToken', chain.chainId, tokenAddress],
     () => getSuppliedLiquidityByToken(tokenAddress),
     {
       // Execute only when address is available.
@@ -126,7 +127,7 @@ function LiquidityPositionOverview({
   );
 
   const { isError: tokenPriceInUSDError, data: tokenPriceInUSD } = useQuery(
-    ['tokenPriceInUSD', token],
+    ['tokenPriceInUSD', chain.chainId, token],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
@@ -136,19 +137,9 @@ function LiquidityPositionOverview({
     },
   );
 
-  const { isError: rewardsPerSecondError, data: rewardsRatePerSecond } =
-    useQuery(
-      ['rewardsRatePerSecond', tokenAddress],
-      () => getRewardRatePerSecond(tokenAddress),
-      {
-        // Execute only when address is available.
-        enabled: !!tokenAddress,
-      },
-    );
-
   const { isError: rewardTokenAddressError, data: rewardTokenAddress } =
     useQuery(
-      ['rewardTokenAddress', tokenAddress],
+      ['rewardTokenAddress', chain.chainId, tokenAddress],
       () => getRewardTokenAddress(tokenAddress),
       {
         // Execute only when address is available.
@@ -156,12 +147,36 @@ function LiquidityPositionOverview({
       },
     );
 
+  const { isError: rewardsPerSecondError, data: rewardsRatePerSecond } =
+    useQuery(
+      ['rewardsRatePerSecond', chain.chainId, tokenAddress],
+      () => {
+        // Call getRewardRatePerSecond with reward token address
+        // if chainId is in OPTIMISM_CHAIN_ID.
+        if (chainId === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
+        } else {
+          return getRewardRatePerSecond(tokenAddress);
+        }
+      },
+      {
+        // Execute only when address & rewardTokenAddress are available.
+        enabled: !!(tokenAddress && rewardTokenAddress),
+      },
+    );
+
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
@@ -171,7 +186,7 @@ function LiquidityPositionOverview({
 
   const { isError: rewardTokenPriceInUSDError, data: rewardTokenPriceInUSD } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

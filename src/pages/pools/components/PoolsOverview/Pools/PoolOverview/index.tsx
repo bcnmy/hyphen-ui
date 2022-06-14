@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { Network } from 'hooks/useNetworks';
 import { useToken } from 'context/Token';
+import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface IPoolOverview {
   chain: Network;
@@ -33,7 +34,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     useLiquidityFarming(chain);
 
   const { data: totalLiquidity, isError: totalLiquidityError } = useQuery(
-    ['totalLiquidity', address],
+    ['totalLiquidity', chain.chainId, address],
     () => getTotalLiquidity(address),
     {
       // Execute only when address is available.
@@ -42,7 +43,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   );
 
   const { data: tokenTotalCap, isError: tokenTotalCapError } = useQuery(
-    ['tokenTotalCap', address],
+    ['tokenTotalCap', chain.chainId, address],
     () => getTokenTotalCap(address),
     {
       // Execute only when address is available.
@@ -51,7 +52,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   );
 
   const { data: feeAPYData, isError: feeAPYDataError } = useQuery(
-    ['apy', address],
+    ['apy', chain.chainId, address],
     async () => {
       if (!v2GraphEndpoint || !address) return;
 
@@ -77,7 +78,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     data: suppliedLiquidityByToken,
     isError: suppliedLiquidityByTokenError,
   } = useQuery(
-    ['suppliedLiquidityByToken', address],
+    ['suppliedLiquidityByToken', chain.chainId, address],
     () => getSuppliedLiquidityByToken(address),
     {
       // Execute only when address is available.
@@ -86,7 +87,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   );
 
   const { data: tokenPriceInUSD, isError: tokenPriceInUSDError } = useQuery(
-    ['tokenPriceInUSD', coinGeckoId],
+    ['tokenPriceInUSD', chain.chainId, coinGeckoId],
     () =>
       fetch(
         `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
@@ -96,19 +97,9 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     },
   );
 
-  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
-    useQuery(
-      ['rewardsRatePerSecond', address],
-      () => getRewardRatePerSecond(address),
-      {
-        // Execute only when address is available.
-        enabled: !!address,
-      },
-    );
-
   const { data: rewardTokenAddress, isError: rewardTokenAddressError } =
     useQuery(
-      ['rewardTokenAddress', address],
+      ['rewardTokenAddress', chain.chainId, address],
       () => getRewardTokenAddress(address),
       {
         // Execute only when address is available.
@@ -116,12 +107,38 @@ function PoolOverview({ chain, token }: IPoolOverview) {
       },
     );
 
+  const { data: rewardsRatePerSecond, isError: rewardsRatePerSecondError } =
+    useQuery(
+      ['rewardsRatePerSecond', chain.chainId, address],
+      () => {
+        const { chainId } = chain;
+
+        // Call getRewardRatePerSecond with reward token address
+        // if chainId is in OPTIMISM_CHAIN_ID.
+        if (chainId === OPTIMISM_CHAIN_ID) {
+          return getRewardRatePerSecond(address, rewardTokenAddress[0]);
+        } else {
+          return getRewardRatePerSecond(address);
+        }
+      },
+      {
+        // Execute only when address is available.
+        enabled: !!(address && rewardTokenAddress),
+      },
+    );
+
+  // Get reward token address depending on whether
+  // rewardTokenAddress is an array (V2 Liquidity Farming)
+  // or just a string (V1 Liquidity Farming).
   const rewardTokenSymbol =
     rewardTokenAddress && tokens && chain
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return tokenObj[chain.chainId]
-            ? tokenObj[chain.chainId].address.toLowerCase() ===
+            ? Array.isArray(rewardTokenAddress)
+              ? tokenObj[chain.chainId].address.toLowerCase() ===
+                rewardTokenAddress[0].toLowerCase()
+              : tokenObj[chain.chainId].address.toLowerCase() ===
                 rewardTokenAddress.toLowerCase()
             : false;
         })
@@ -131,7 +148,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
 
   const { data: rewardTokenPriceInUSD, isError: rewardTokenPriceInUSDError } =
     useQuery(
-      ['rewardTokenPriceInUSD', rewardToken?.coinGeckoId],
+      ['rewardTokenPriceInUSD', chain.chainId, rewardToken?.coinGeckoId],
       () => {
         if (!rewardToken) return;
 

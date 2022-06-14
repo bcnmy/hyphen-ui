@@ -42,26 +42,29 @@ function Farms() {
           </div>
 
           {networks && tokens
-            ? networks.map(networkObj => {
-                return Object.keys(tokens).map((tokenSymbol: any) => {
-                  const token = tokens[tokenSymbol];
-                  const tokenObj = token[networkObj.chainId]?.isSupported
-                    ? {
-                        coinGeckoId: token.coinGeckoId,
-                        tokenImage: token.image,
-                        ...token[networkObj.chainId],
-                      }
-                    : null;
+            ? networks
+                // temporary filtering for Optimism with mainnet chainId of 10.
+                .filter(networkObj => networkObj.chainId !== 10)
+                .map(networkObj => {
+                  return Object.keys(tokens).map((tokenSymbol: any) => {
+                    const token = tokens[tokenSymbol];
+                    const tokenObj = token[networkObj.chainId]?.isSupported
+                      ? {
+                          coinGeckoId: token.coinGeckoId,
+                          tokenImage: token.image,
+                          ...token[networkObj.chainId],
+                        }
+                      : null;
 
-                  return tokenObj ? (
-                    <FarmOverview
-                      key={`farm-${networkObj.name}-${tokenSymbol}`}
-                      chain={networkObj}
-                      token={tokenObj}
-                    />
-                  ) : null;
-                });
-              })
+                    return tokenObj ? (
+                      <FarmOverview
+                        key={`farm-${networkObj.name}-${tokenSymbol}`}
+                        chain={networkObj}
+                        token={tokenObj}
+                      />
+                    ) : null;
+                  });
+                })
             : null}
         </section>
       ) : (

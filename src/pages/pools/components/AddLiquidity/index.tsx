@@ -502,6 +502,8 @@ function AddLiquidity() {
       : false;
 
   function reset() {
+    setSelectedToken(undefined);
+    setSelectedChain(undefined);
     setLiquidityAmount('');
     setSelectedTokenAddress(undefined);
     setSliderValue(0);

@@ -151,7 +151,7 @@ function StakingPositionOverview({
       // Call getPendingToken with reward token address
       // if chainId is in OPTIMISM_CHAIN_ID.
       if (chainId === OPTIMISM_CHAIN_ID) {
-        return getPendingToken(positionId, rewardTokenAddress);
+        return getPendingToken(positionId, rewardTokenAddress[0]);
       } else {
         return getPendingToken(positionId);
       }

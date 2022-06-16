@@ -119,7 +119,10 @@ function ManageStakingPosition() {
       // Call getPendingToken with reward token address
       // if chainId is in OPTIMISM_CHAIN_ID.
       if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
-        return getPendingToken(BigNumber.from(positionId), rewardTokenAddress);
+        return getPendingToken(
+          BigNumber.from(positionId),
+          rewardTokenAddress[0],
+        );
       } else {
         return getPendingToken(BigNumber.from(positionId));
       }

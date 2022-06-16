@@ -42,29 +42,26 @@ function Pools() {
           </div>
 
           {networks && tokens
-            ? networks
-                // temporary filtering for Optimism with mainnet chainId of 10.
-                .filter(networkObj => networkObj.chainId !== 10)
-                .map(networkObj => {
-                  return Object.keys(tokens).map((tokenSymbol: any) => {
-                    const token = tokens[tokenSymbol];
-                    const tokenObj = token[networkObj.chainId]?.isSupported
-                      ? {
-                          coinGeckoId: token.coinGeckoId,
-                          tokenImage: token.image,
-                          ...token[networkObj.chainId],
-                        }
-                      : null;
+            ? networks.map(networkObj => {
+                return Object.keys(tokens).map((tokenSymbol: any) => {
+                  const token = tokens[tokenSymbol];
+                  const tokenObj = token[networkObj.chainId]?.isSupported
+                    ? {
+                        coinGeckoId: token.coinGeckoId,
+                        tokenImage: token.image,
+                        ...token[networkObj.chainId],
+                      }
+                    : null;
 
-                    return tokenObj ? (
-                      <PoolOverview
-                        key={`pool-${networkObj.name}-${tokenSymbol}`}
-                        chain={networkObj}
-                        token={tokenObj}
-                      />
-                    ) : null;
-                  });
-                })
+                  return tokenObj ? (
+                    <PoolOverview
+                      key={`pool-${networkObj.name}-${tokenSymbol}`}
+                      chain={networkObj}
+                      token={tokenObj}
+                    />
+                  ) : null;
+                });
+              })
             : null}
         </section>
       ) : (

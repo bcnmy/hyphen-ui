@@ -247,7 +247,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
         />
         <div className="flex flex-col">
           <span className="font-mono text-sm xl:text-2xl">{symbol}</span>
-          <span className="text-xxxs font-bold uppercase text-hyphen-gray-300 xl:text-xxs">
+          <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
             {chain.name}
           </span>
         </div>
@@ -273,7 +273,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
             <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
           </CustomTooltip>
         </div>
-        <span className="text-xxxs font-bold uppercase text-hyphen-gray-300 xl:text-xxs">
+        <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
           Annualized
         </span>
       </div>
@@ -283,7 +283,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
           minProgressWidth={4}
           totalProgress={formattedTokenTotalCap}
         />
-        <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-300">
+        <div className="mt-1 flex justify-between text-xxs font-bold uppercase text-hyphen-gray-400/50">
           <span>Pool cap</span>
           <span className="flex">
             {formattedTotalLiquidity >= 0 && formattedTokenTotalCap >= 0 ? (

@@ -52,22 +52,36 @@ function useLiquidityFarming(chain: Network | undefined) {
   }, [chain, contractAddress, signer]);
 
   const claimFee = useCallback(
-    (positionId: BigNumber, accounts: string[]) => {
-      if (!liquidityFarmingContractSigner || !positionId || !accounts) return;
+    (positionId: BigNumber, accounts: string[], rewardTokenAddress = '') => {
+      if (!chain || !liquidityFarmingContractSigner || !positionId || !accounts)
+        return;
 
-      return liquidityFarmingContractSigner.extractRewards(
-        positionId,
-        accounts[0],
-      );
+      // Check for Optimism ChainID and call
+      // liquidityFarmingContractSigner with reward token address.
+      // TODO: Remove this when farming contracts
+      // are upgraded for all networks.
+      const { chainId } = chain;
+      if (chainId === OPTIMISM_CHAIN_ID) {
+        return liquidityFarmingContractSigner.extractRewards(
+          positionId,
+          rewardTokenAddress,
+          accounts[0],
+        );
+      } else {
+        return liquidityFarmingContractSigner.extractRewards(
+          positionId,
+          accounts[0],
+        );
+      }
     },
-    [liquidityFarmingContractSigner],
+    [chain, liquidityFarmingContractSigner],
   );
 
   const getPendingToken = useCallback(
     (positionId: BigNumber, rewardTokenAddress = '') => {
       if (!chain || !liquidityFarmingContract) return;
 
-      // Check for Optimism ChainID and cakk
+      // Check for Optimism ChainID and call
       // pendingToken with reward token address.
       // TODO: Remove this when farming contracts
       // are upgraded for all networks.
@@ -97,7 +111,7 @@ function useLiquidityFarming(chain: Network | undefined) {
     (address: string, rewardTokenAddress = '') => {
       if (!chain || !liquidityFarmingContract) return;
 
-      // Check for Optimism ChainID and cakk
+      // Check for Optimism ChainID and call
       // getRewardRatePerSecond with reward token address.
       // TODO: Remove this when farming contracts
       // are upgraded for all networks.

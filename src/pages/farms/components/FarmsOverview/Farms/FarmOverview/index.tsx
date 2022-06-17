@@ -194,7 +194,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         />
         <div className="flex flex-col">
           <span className="font-mono text-sm xl:text-2xl">{symbol}</span>
-          <span className="text-xxxs font-bold uppercase text-hyphen-gray-300 xl:text-xxs">
+          <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
             {chain.name}
           </span>
         </div>
@@ -207,7 +207,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
               : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
           </span>
         </div>
-        <span className="text-xxxs font-bold uppercase text-hyphen-gray-300 xl:text-xxs">
+        <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
           Annualized
         </span>
       </div>
@@ -235,7 +235,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
             />
           )}
         </span>
-        <span className="text-xxs font-bold uppercase text-hyphen-gray-300">
+        <span className="text-xxs font-bold uppercase text-hyphen-gray-400/50">
           Per Day
         </span>
       </div>

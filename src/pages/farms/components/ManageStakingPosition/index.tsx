@@ -173,7 +173,12 @@ function ManageStakingPosition() {
       positionId: BigNumber;
       accounts: string[];
     }) => {
-      const claimFeeTx = await claimFee(positionId, accounts);
+      let claimFeeTx;
+      if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+        claimFeeTx = await claimFee(positionId, accounts, rewardTokenAddress);
+      } else {
+        claimFeeTx = await claimFee(positionId, accounts);
+      }
       addTxNotification(
         claimFeeTx,
         'Claim fee',

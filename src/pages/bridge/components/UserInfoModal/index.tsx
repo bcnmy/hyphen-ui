@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import {
   ApolloClient,
   gql,
@@ -6,27 +5,23 @@ import {
   NetworkStatus,
   useQuery,
 } from '@apollo/client';
-import { BigNumber, ethers } from 'ethers';
 import { Dialog } from '@headlessui/react';
-import Skeleton from 'react-loading-skeleton';
-import { useWalletProvider } from 'context/WalletProvider';
-import { IoMdClose } from 'react-icons/io';
-import {
-  HiOutlineClipboardCopy,
-  HiOutlineClipboardCheck,
-  HiOutlineArrowNarrowRight,
-  HiOutlineRefresh,
-} from 'react-icons/hi';
-import Modal from '../../../../components/Modal';
-import { getProviderInfo } from 'web3modal';
 import { useChains } from 'context/Chains';
-import TransactionDetailModal from '../TransactionDetailModal';
-import useModal from 'hooks/useModal';
-import { twMerge } from 'tailwind-merge';
 import { useHyphen } from 'context/Hyphen';
+import { useToken } from 'context/Token';
+import { useWalletProvider } from 'context/WalletProvider';
+import { BigNumber, ethers } from 'ethers';
+import useModal from 'hooks/useModal';
 import { Network } from 'hooks/useNetworks';
 import { Token } from 'hooks/useTokens';
-import { useToken } from 'context/Token';
+import { useEffect, useState } from 'react';
+import { HiOutlineArrowNarrowRight, HiOutlineRefresh } from 'react-icons/hi';
+import { IoMdClose } from 'react-icons/io';
+import Skeleton from 'react-loading-skeleton';
+import { twMerge } from 'tailwind-merge';
+import { getProviderInfo } from 'web3modal';
+import Modal from '../../../../components/Modal';
+import TransactionDetailModal from '../TransactionDetailModal';
 
 export interface IUserInfoModalProps {
   isVisible: boolean;

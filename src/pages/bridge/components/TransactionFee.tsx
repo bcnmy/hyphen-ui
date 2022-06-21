@@ -161,7 +161,7 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
           </div>
 
           {showEthereumDisclaimer ? (
-            <aside className="mt-2 flex h-10 items-center justify-center rounded-full bg-[#FF000040] px-8 text-xxxs font-bold uppercase text-[#FF0000] xl:h-9 xl:text-xxs">
+            <aside className="mt-2 flex h-10 items-center justify-center rounded-full bg-hyphen-warning/25 px-8 text-xxxs font-bold uppercase text-hyphen-warning xl:h-9 xl:text-xxs">
               <HiOutlineInformationCircle className="mr-2 h-2.5 w-auto" />
               <p>
                 The received amount may differ due to gas price fluctuations on

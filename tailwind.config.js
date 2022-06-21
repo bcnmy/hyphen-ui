@@ -34,6 +34,9 @@ module.exports = {
         'hyphen-yellow': {
           100: '#ccba5c',
         },
+        'hyphen-warning': {
+          DEFAULT: '#EF9400',
+        },
       },
       fontSize: {
         xxxs: '0.5rem',

@@ -276,8 +276,11 @@ function PoolOverview({ chain, token }: IPoolOverview) {
               <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
             </CustomTooltip>
           </div>
-          <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
+          <span className="hidden text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:inline-block xl:text-xxs">
             Annualized
+          </span>
+          <span className="inline-block text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:hidden xl:text-xxs">
+            Annualized APY
           </span>
         </div>
         <div className="flex flex-col items-end xl:hidden">

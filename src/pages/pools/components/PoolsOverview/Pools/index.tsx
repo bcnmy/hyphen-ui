@@ -33,7 +33,10 @@ function Pools() {
             <h3 className="text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:text-xxs">
               Asset
             </h3>
-            <h3 className="justify-self-end text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:justify-self-center xl:text-xxs">
+            <h3 className="block justify-self-end text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:hidden xl:justify-self-center xl:text-xxs">
+              Status
+            </h3>
+            <h3 className="hidden justify-self-end text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:block xl:justify-self-center xl:text-xxs">
               APY
             </h3>
             <h3 className="hidden justify-self-end text-xxxs font-semibold uppercase text-hyphen-gray-400 xl:flex xl:text-xxs">

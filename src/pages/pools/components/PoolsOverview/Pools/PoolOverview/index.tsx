@@ -235,15 +235,15 @@ function PoolOverview({ chain, token }: IPoolOverview) {
 
   return (
     <section
-      className="grid h-37.5 w-full cursor-pointer grid-cols-2 items-center px-[2.375rem] text-hyphen-gray-400 xl:grid-cols-3 xl:px-[3.125rem]"
+      className="grid h-37.5 w-full cursor-pointer grid-cols-2 items-center px-[2.375rem] py-8 text-hyphen-gray-400 xl:grid-cols-3 xl:px-[3.125rem]"
       style={{ backgroundColor: chainColor }}
       onClick={handlePoolOverviewClick}
     >
-      <div className="flex items-center">
+      <div className="flex h-full flex-col items-start justify-between xl:flex-row xl:items-center xl:justify-start">
         <img
           src={tokenImage}
           alt={symbol}
-          className="mr-2 h-6 w-6 xl:h-8 xl:w-8"
+          className="mr-2 h-7 w-7 xl:h-8 xl:w-8"
         />
         <div className="flex flex-col">
           <span className="font-mono text-sm xl:text-2xl">{symbol}</span>
@@ -252,30 +252,42 @@ function PoolOverview({ chain, token }: IPoolOverview) {
           </span>
         </div>
       </div>
-      <div className="flex flex-col items-end justify-self-end xl:items-center xl:justify-self-center">
-        <div className="flex items-center justify-center">
-          <span className="font-mono text-sm xl:text-2xl">
-            {APY > 10000 ? '>10,000%' : `${Number.parseFloat(APY.toFixed(3))}%`}
-          </span>
-          <HiInformationCircle
-            className="ml-1 hidden h-5 w-5 cursor-default text-hyphen-gray-400 xl:flex"
-            data-tip
-            data-for={`${chain.name}-${symbol}-apy`}
-            onClick={e => e.stopPropagation()}
-          />
-          <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
-            <p>
-              Reward APY:{' '}
-              {rewardAPY > 10000
+      <div className="flex h-full flex-col items-end justify-between xl:items-center xl:justify-self-center">
+        <div className="flex h-auto flex-col items-end justify-center xl:h-full xl:items-center">
+          <div className="flex items-center justify-center">
+            <span className="font-mono text-sm xl:text-2xl">
+              {APY > 10000
                 ? '>10,000%'
-                : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
-            </p>
-            <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
-          </CustomTooltip>
+                : `${Number.parseFloat(APY.toFixed(3))}%`}
+            </span>
+            <HiInformationCircle
+              className="ml-1 hidden h-5 w-5 cursor-default text-hyphen-gray-400 xl:flex"
+              data-tip
+              data-for={`${chain.name}-${symbol}-apy`}
+              onClick={e => e.stopPropagation()}
+            />
+            <CustomTooltip id={`${chain.name}-${symbol}-apy`}>
+              <p>
+                Reward APY:{' '}
+                {rewardAPY > 10000
+                  ? '>10,000%'
+                  : `${Number.parseFloat(rewardAPY.toFixed(3))}%`}
+              </p>
+              <p>Fee APY: {feeAPY >= 0 ? `${feeAPY}%` : '...'}</p>
+            </CustomTooltip>
+          </div>
+          <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
+            Annualized
+          </span>
         </div>
-        <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
-          Annualized
-        </span>
+        <div className="flex flex-col items-end xl:hidden">
+          <span className="font-mono text-sm xl:text-2xl">
+            {makeNumberCompact(formattedTotalLiquidity)} {symbol}
+          </span>
+          <span className="text-xxxs font-bold uppercase text-hyphen-gray-400/50 xl:text-xxs">
+            Total Pooled
+          </span>
+        </div>
       </div>
       <div className="hidden h-12 w-[250px] flex-col justify-end justify-self-end xl:flex">
         <ProgressBar

@@ -1,4 +1,3 @@
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 import { useToken } from 'context/Token';
 import { ethers } from 'ethers';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
@@ -64,11 +63,9 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     useQuery(
       ['rewardsRatePerSecond', chain.chainId, address],
       () => {
-        const { chainId } = chain;
-
         // Call getRewardRatePerSecond with reward token address
-        // if chainId is in OPTIMISM_CHAIN_ID.
-        if (chainId === OPTIMISM_CHAIN_ID) {
+        // if chain supports new farming contract.
+        if (chain.supportsNewFarmingContract) {
           return getRewardRatePerSecond(address, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(address);

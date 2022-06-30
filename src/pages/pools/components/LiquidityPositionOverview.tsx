@@ -10,7 +10,6 @@ import CustomTooltip from 'components/CustomTooltip';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface ILiquidityPositionOverview {
   chainId: number;
@@ -152,8 +151,8 @@ function LiquidityPositionOverview({
       ['rewardsRatePerSecond', chain.chainId, tokenAddress],
       () => {
         // Call getRewardRatePerSecond with reward token address
-        // if chainId is in OPTIMISM_CHAIN_ID.
-        if (chainId === OPTIMISM_CHAIN_ID) {
+        // if chain supports new farming contract.
+        if (chain.supportsNewFarmingContract) {
           return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(tokenAddress);

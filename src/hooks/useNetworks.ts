@@ -46,6 +46,7 @@ export type Network = {
     gnosisMasterAccount: string;
     whiteListedExternalContracts: [string];
   };
+  supportsNewFarmingContract: boolean;
 };
 
 const networksEndpoint = `${config.hyphen.baseURL}/api/v1/configuration/networks`;

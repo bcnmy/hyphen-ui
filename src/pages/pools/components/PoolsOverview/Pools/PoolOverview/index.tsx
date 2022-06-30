@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { Network } from 'hooks/useNetworks';
 import { useToken } from 'context/Token';
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface IPoolOverview {
   chain: Network;
@@ -111,11 +110,9 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     useQuery(
       ['rewardsRatePerSecond', chain.chainId, address],
       () => {
-        const { chainId } = chain;
-
         // Call getRewardRatePerSecond with reward token address
-        // if chainId is in OPTIMISM_CHAIN_ID.
-        if (chainId === OPTIMISM_CHAIN_ID) {
+        // if chain supports new farming contract.
+        if (chain.supportsNewFarmingContract) {
           return getRewardRatePerSecond(address, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(address);

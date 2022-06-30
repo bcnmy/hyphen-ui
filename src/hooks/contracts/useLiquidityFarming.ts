@@ -5,7 +5,6 @@ import liquidityFarmingABI from 'abis/LiquidityFarming.abi.json';
 import liquidityFarmingABIV2 from 'abis/LiquidityFarmingV2.abi.json';
 import { Network } from 'hooks/useNetworks';
 import { useWalletProvider } from 'context/WalletProvider';
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 function useLiquidityFarming(chain: Network | undefined) {
   const { signer } = useWalletProvider()!;
@@ -16,10 +15,9 @@ function useLiquidityFarming(chain: Network | undefined) {
   const liquidityFarmingContract = useMemo(() => {
     if (!chain || !contractAddress) return;
 
-    // Check for Optimism ChainID and make
+    // Check for new farming contract support and make
     // contract instance using V2 ABI.
-    const { chainId } = chain;
-    if (chainId === OPTIMISM_CHAIN_ID) {
+    if (chain.supportsNewFarmingContract) {
       return new ethers.Contract(
         contractAddress,
         liquidityFarmingABIV2,
@@ -37,10 +35,9 @@ function useLiquidityFarming(chain: Network | undefined) {
   const liquidityFarmingContractSigner = useMemo(() => {
     if (!chain || !contractAddress || !signer) return;
 
-    // Check for Optimism ChainID and make
+    // Check for new farming contract support and make
     // signer instance using V2 ABI.
-    const { chainId } = chain;
-    if (chainId === OPTIMISM_CHAIN_ID) {
+    if (chain.supportsNewFarmingContract) {
       return new ethers.Contract(
         contractAddress,
         liquidityFarmingABIV2,
@@ -56,12 +53,11 @@ function useLiquidityFarming(chain: Network | undefined) {
       if (!chain || !liquidityFarmingContractSigner || !positionId || !accounts)
         return;
 
-      // Check for Optimism ChainID and call
+      // Check for new farming contract support and call
       // liquidityFarmingContractSigner with reward token address.
       // TODO: Remove this when farming contracts
       // are upgraded for all networks.
-      const { chainId } = chain;
-      if (chainId === OPTIMISM_CHAIN_ID) {
+      if (chain.supportsNewFarmingContract) {
         return liquidityFarmingContractSigner.extractRewards(
           positionId,
           rewardTokenAddress,
@@ -81,12 +77,11 @@ function useLiquidityFarming(chain: Network | undefined) {
     (positionId: BigNumber, rewardTokenAddress = '') => {
       if (!chain || !liquidityFarmingContract) return;
 
-      // Check for Optimism ChainID and call
+      // Check for new farming contract support and call
       // pendingToken with reward token address.
       // TODO: Remove this when farming contracts
       // are upgraded for all networks.
-      const { chainId } = chain;
-      if (chainId === OPTIMISM_CHAIN_ID) {
+      if (chain.supportsNewFarmingContract) {
         return liquidityFarmingContract.pendingToken(
           positionId,
           rewardTokenAddress,
@@ -111,12 +106,11 @@ function useLiquidityFarming(chain: Network | undefined) {
     (address: string, rewardTokenAddress = '') => {
       if (!chain || !liquidityFarmingContract) return;
 
-      // Check for Optimism ChainID and call
+      // Check for new farming contract support and call
       // getRewardRatePerSecond with reward token address.
       // TODO: Remove this when farming contracts
       // are upgraded for all networks.
-      const { chainId } = chain;
-      if (chainId === OPTIMISM_CHAIN_ID) {
+      if (chain.supportsNewFarmingContract) {
         return liquidityFarmingContract.getRewardRatePerSecond(
           address,
           rewardTokenAddress,
@@ -131,14 +125,11 @@ function useLiquidityFarming(chain: Network | undefined) {
   const getRewardTokenAddress = useCallback(
     (address: string) => {
       if (!chain || !liquidityFarmingContract) return;
-      // Check for Optimism ChainID and call
+      // Check for new farming contract support and call
       // function getRewardTokens(address _baseToken) -> address[]
       // Use the first address for now.
       // TODO: Handle multiple reward tokens later.
-
-      const { chainId } = chain;
-      // If chain is Optimism testnet or mainnet, use the new function.
-      if (chainId === OPTIMISM_CHAIN_ID) {
+      if (chain.supportsNewFarmingContract) {
         return liquidityFarmingContract.getRewardTokens(address);
       } else {
         return liquidityFarmingContract.rewardTokens(address);

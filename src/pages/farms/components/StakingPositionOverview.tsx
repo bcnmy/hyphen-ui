@@ -253,10 +253,7 @@ function StakingPositionOverview({
       : 0;
 
   const { name: chainName } = chain;
-  const {
-    image: tokenImage,
-    [chain.chainId]: { chainColor },
-  } = token;
+  const { image: tokenImage } = token;
 
   const tvl =
     totalSharesStaked &&
@@ -345,7 +342,7 @@ function StakingPositionOverview({
         isUserOnFarms ? 'cursor-pointer' : ''
       }`}
       onClick={handleStakingPositionClick}
-      style={{ backgroundColor: chainColor }}
+      style={{ backgroundColor: chain.chainColor }}
     >
       <div className="flex flex-col">
         <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs">

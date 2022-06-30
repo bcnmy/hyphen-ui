@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { Network } from 'hooks/useNetworks';
 import { useToken } from 'context/Token';
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface IPoolOverview {
   chain: Network;
@@ -21,8 +20,7 @@ interface IPoolOverview {
 
 function PoolOverview({ chain, token }: IPoolOverview) {
   const navigate = useNavigate();
-  const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
-    token;
+  const { address, coinGeckoId, decimal, symbol, tokenImage } = token;
   const { v2GraphUrl: v2GraphEndpoint } = chain;
 
   const { tokens } = useToken()!;
@@ -111,11 +109,9 @@ function PoolOverview({ chain, token }: IPoolOverview) {
     useQuery(
       ['rewardsRatePerSecond', chain.chainId, address],
       () => {
-        const { chainId } = chain;
-
         // Call getRewardRatePerSecond with reward token address
-        // if chainId is in OPTIMISM_CHAIN_ID.
-        if (chainId === OPTIMISM_CHAIN_ID) {
+        // if chain supports new farming contract.
+        if (chain.supportsNewFarmingContract) {
           return getRewardRatePerSecond(address, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(address);
@@ -236,7 +232,7 @@ function PoolOverview({ chain, token }: IPoolOverview) {
   return (
     <section
       className="grid h-37.5 w-full cursor-pointer grid-cols-2 items-center px-[2.375rem] py-8 text-hyphen-gray-400 xl:grid-cols-3 xl:px-[3.125rem]"
-      style={{ backgroundColor: chainColor }}
+      style={{ backgroundColor: chain.chainColor }}
       onClick={handlePoolOverviewClick}
     >
       <div className="flex h-full flex-col items-start justify-between xl:flex-row xl:items-center xl:justify-start">

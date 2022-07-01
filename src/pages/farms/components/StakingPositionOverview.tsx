@@ -123,7 +123,7 @@ function StakingPositionOverview({
 
         // Call getRewardRatePerSecond with reward token address
         // if chain supports new farming contract.
-        if (chain.supportsNewFarmingContract) {
+        if (chain.contracts.hyphen.liquidityFarmingV2) {
           return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(tokenAddress);
@@ -149,7 +149,7 @@ function StakingPositionOverview({
     () => {
       // Call getPendingToken with reward token address
       // if chain supports new farming contract.
-      if (chain.supportsNewFarmingContract) {
+      if (chain.contracts.hyphen.liquidityFarmingV2) {
         return getPendingToken(positionId, rewardTokenAddress[0]);
       } else {
         return getPendingToken(positionId);

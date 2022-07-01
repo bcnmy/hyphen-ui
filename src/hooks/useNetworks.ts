@@ -55,12 +55,7 @@ const networksEndpoint = `${config.hyphen.baseURL}/api/v1/configuration/networks
 function fetchNetworks(): Promise<Network[]> {
   return fetch(networksEndpoint)
     .then(res => res.json())
-    .then(data =>
-      data.message.filter(
-        // temporary filtering for Arbitrum with mainnet chainId of 42161.
-        (network: Network) => network.enabled && network.chainId !== 42161,
-      ),
-    );
+    .then(data => data.message.filter((network: Network) => network.enabled));
 }
 
 function useNetworks() {

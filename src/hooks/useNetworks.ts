@@ -40,13 +40,14 @@ export type Network = {
       lpToken: string;
       liquidityProviders: string;
       liquidityFarming: string;
+      liquidityFarmingV1: string;
+      liquidityFarmingV2: string;
       whitelistPeriodManager: string;
     };
     biconomyForwarders: [string];
     gnosisMasterAccount: string;
     whiteListedExternalContracts: [string];
   };
-  supportsNewFarmingContract: boolean;
 };
 
 const networksEndpoint = `${config.hyphen.baseURL}/api/v1/configuration/networks`;

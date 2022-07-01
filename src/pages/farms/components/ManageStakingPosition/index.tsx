@@ -117,7 +117,7 @@ function ManageStakingPosition() {
     () => {
       // Call getPendingToken with reward token address
       // if chain supports new farming contract.
-      if (chain?.supportsNewFarmingContract) {
+      if (chain?.contracts.hyphen.liquidityFarmingV2) {
         return getPendingToken(
           BigNumber.from(positionId),
           rewardTokenAddress[0],
@@ -173,7 +173,7 @@ function ManageStakingPosition() {
       accounts: string[];
     }) => {
       let claimFeeTx;
-      if (chain?.supportsNewFarmingContract) {
+      if (chain?.contracts.hyphen.liquidityFarmingV2) {
         claimFeeTx = await claimFee(positionId, accounts, rewardTokenAddress);
       } else {
         claimFeeTx = await claimFee(positionId, accounts);

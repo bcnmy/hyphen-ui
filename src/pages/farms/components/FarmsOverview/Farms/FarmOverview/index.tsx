@@ -64,7 +64,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
       () => {
         // Call getRewardRatePerSecond with reward token address
         // if chain supports new farming contract.
-        if (chain.supportsNewFarmingContract) {
+        if (chain.contracts.hyphen.liquidityFarmingV2) {
           return getRewardRatePerSecond(address, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(address);

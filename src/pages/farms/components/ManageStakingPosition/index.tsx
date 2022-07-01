@@ -14,7 +14,6 @@ import collectFeesIcon from '../../../../assets/images/collect-fees-icon.svg';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
 import { useEffect, useState } from 'react';
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 function ManageStakingPosition() {
   const navigate = useNavigate();
@@ -117,8 +116,8 @@ function ManageStakingPosition() {
     ['pendingToken', chain?.chainId, positionId],
     () => {
       // Call getPendingToken with reward token address
-      // if chainId is in OPTIMISM_CHAIN_ID.
-      if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+      // if chain supports new farming contract.
+      if (chain?.contracts.hyphen.liquidityFarmingV2) {
         return getPendingToken(
           BigNumber.from(positionId),
           rewardTokenAddress[0],
@@ -174,7 +173,7 @@ function ManageStakingPosition() {
       accounts: string[];
     }) => {
       let claimFeeTx;
-      if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+      if (chain?.contracts.hyphen.liquidityFarmingV2) {
         claimFeeTx = await claimFee(positionId, accounts, rewardTokenAddress);
       } else {
         claimFeeTx = await claimFee(positionId, accounts);

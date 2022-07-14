@@ -40,6 +40,8 @@ export type Network = {
       lpToken: string;
       liquidityProviders: string;
       liquidityFarming: string;
+      liquidityFarmingV1: string;
+      liquidityFarmingV2: string;
       whitelistPeriodManager: string;
     };
     biconomyForwarders: [string];

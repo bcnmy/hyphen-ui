@@ -15,7 +15,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { request, gql } from 'graphql-request';
 import useLiquidityProviders from 'hooks/contracts/useLiquidityProviders';
 import useWhitelistPeriodManager from 'hooks/contracts/useWhitelistPeriodManager';
-import { NATIVE_ADDRESS, OPTIMISM_CHAIN_ID } from 'config/constants';
+import { NATIVE_ADDRESS } from 'config/constants';
 import getTokenAllowance from 'utils/getTokenAllowance';
 import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
@@ -296,8 +296,8 @@ function AddLiquidity() {
         if (!rewardTokenAddress || !selectedTokenAddress) return;
 
         // Call getRewardRatePerSecond with reward token address
-        // if chainId is in OPTIMISM_CHAIN_ID.
-        if (Number.parseInt(chainId ?? '', 10) === OPTIMISM_CHAIN_ID) {
+        // if chain supports new farming contract.
+        if (chain?.contracts.hyphen.liquidityFarmingV2) {
           return getRewardRatePerSecond(
             selectedTokenAddress,
             rewardTokenAddress[0],

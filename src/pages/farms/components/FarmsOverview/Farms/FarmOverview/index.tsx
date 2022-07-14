@@ -1,4 +1,3 @@
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 import { useToken } from 'context/Token';
 import { ethers } from 'ethers';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
@@ -18,8 +17,7 @@ interface IFarmOverview {
 function FarmOverview({ chain, token }: IFarmOverview) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { address, chainColor, coinGeckoId, decimal, symbol, tokenImage } =
-    token;
+  const { address, coinGeckoId, decimal, symbol, tokenImage } = token;
 
   const { tokens } = useToken()!;
 
@@ -64,11 +62,9 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     useQuery(
       ['rewardsRatePerSecond', chain.chainId, address],
       () => {
-        const { chainId } = chain;
-
         // Call getRewardRatePerSecond with reward token address
-        // if chainId is in OPTIMISM_CHAIN_ID.
-        if (chainId === OPTIMISM_CHAIN_ID) {
+        // if chain supports new farming contract.
+        if (chain.contracts.hyphen.liquidityFarmingV2) {
           return getRewardRatePerSecond(address, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(address);
@@ -183,7 +179,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
   return (
     <section
       className="grid h-37.5 w-full cursor-pointer grid-cols-2 items-center px-[2.375rem] text-hyphen-gray-400 xl:grid-cols-3 xl:px-[3.125rem]"
-      style={{ backgroundColor: chainColor }}
+      style={{ backgroundColor: chain.chainColor }}
       onClick={handleFarmOverviewClick}
     >
       <div className="flex items-center">

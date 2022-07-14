@@ -10,7 +10,6 @@ import CustomTooltip from 'components/CustomTooltip';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
-import { OPTIMISM_CHAIN_ID } from 'config/constants';
 
 interface ILiquidityPositionOverview {
   chainId: number;
@@ -152,8 +151,8 @@ function LiquidityPositionOverview({
       ['rewardsRatePerSecond', chain.chainId, tokenAddress],
       () => {
         // Call getRewardRatePerSecond with reward token address
-        // if chainId is in OPTIMISM_CHAIN_ID.
-        if (chainId === OPTIMISM_CHAIN_ID) {
+        // if chain supports new farming contract.
+        if (chain.contracts.hyphen.liquidityFarmingV2) {
           return getRewardRatePerSecond(tokenAddress, rewardTokenAddress[0]);
         } else {
           return getRewardRatePerSecond(tokenAddress);
@@ -298,10 +297,7 @@ function LiquidityPositionOverview({
       : tokenAmount;
 
   const { name: chainName } = chain;
-  const {
-    image: tokenImage,
-    [chain.chainId]: { chainColor },
-  } = token;
+  const { image: tokenImage } = token;
   const poolShare =
     suppliedLiquidity && totalLiquidity
       ? Math.round(
@@ -334,7 +330,7 @@ function LiquidityPositionOverview({
           : 'cursor-not-allowed'
       }`}
       onClick={handleLiquidityPositionClick}
-      style={{ backgroundColor: chainColor }}
+      style={{ backgroundColor: chain.chainColor }}
     >
       <div className="flex flex-col">
         <span className="mb-2.5 text-xxxs font-bold uppercase xl:text-xxs">

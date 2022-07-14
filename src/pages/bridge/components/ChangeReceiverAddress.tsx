@@ -27,9 +27,6 @@ function ChangeReceiverAddress() {
               onChange={changeReceiver}
               className="h-15 w-full rounded-lg border border-gray-200 px-4 font-mono text-base focus:border-gray-500 focus-visible:outline-none"
             />
-            <span className="pl-4 text-xxxs uppercase text-red-600 xl:text-xxs">
-              Note: Please do not enter a smart contract address.
-            </span>
           </Disclosure.Panel>
         </div>
       )}

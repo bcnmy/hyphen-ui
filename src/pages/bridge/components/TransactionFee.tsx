@@ -115,7 +115,7 @@ const TransactionFee: React.FunctionComponent<ITransactionFeeProps> = () => {
               <div className="text-right font-mono">
                 {fetchTransactionFeeStatus === Status.SUCCESS &&
                 transactionFee ? (
-                  <>{`${totalFee?.toFixed(3)} ${selectedToken?.symbol}`}</>
+                  <>{`${totalFee?.toFixed(5)} ${selectedToken?.symbol}`}</>
                 ) : (
                   <Skeleton
                     baseColor="#ffffff10"

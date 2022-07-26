@@ -255,7 +255,9 @@ function AddStakingPosition() {
   const isNFTApproved =
     NFTApprovalAddress && chain
       ? NFTApprovalAddress.toLowerCase() ===
-        chain.contracts.hyphen.liquidityFarming.toLowerCase()
+        (chain.contracts.hyphen.liquidityFarmingV2
+          ? chain.contracts.hyphen.liquidityFarmingV2.toLowerCase()
+          : chain.contracts.hyphen.liquidityFarmingV1.toLowerCase())
       : false;
 
   function handlePrevPositionClick() {
@@ -284,7 +286,9 @@ function AddStakingPosition() {
 
     approveNFTMutation(
       {
-        address: chain.contracts.hyphen.liquidityFarming,
+        address: chain.contracts.hyphen.liquidityFarmingV2
+          ? chain.contracts.hyphen.liquidityFarmingV2
+          : chain.contracts.hyphen.liquidityFarmingV1,
         positionId: filteredUserPositions[currentPosition],
       },
       {

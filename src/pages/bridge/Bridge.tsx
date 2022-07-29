@@ -20,7 +20,7 @@ import TransferModal from './components/TransferModal';
 interface BridgeProps {}
 
 const Bridge: React.FC<BridgeProps> = () => {
-  const { sourceChainId, destinationChainId } = useParams();
+  const { sourceChainId, destinationChainId, tokenSymbol } = useParams();
 
   const { areChainsReady, fromChain, toChain, toChainRpcUrlProvider } =
     useChains()!;
@@ -114,6 +114,7 @@ const Bridge: React.FC<BridgeProps> = () => {
                   !poolInfo?.minDepositAmount ||
                   !poolInfo?.maxDepositAmount
                 }
+                tokenSymbol={tokenSymbol}
               />
               <AmountInput
                 disabled={

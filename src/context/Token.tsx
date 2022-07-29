@@ -13,12 +13,12 @@ import { useWalletProvider } from 'context/WalletProvider';
 import { BigNumber, ethers } from 'ethers';
 
 import erc20ABI from 'abis/erc20.abi.json';
-import toFixed from 'utils/toFixed';
-import useAsync, { Status } from 'hooks/useLoading';
-import formatRawEthValue from 'utils/formatRawEthValue';
-import { Network } from 'hooks/useNetworks';
-import useTokens, { Token } from 'hooks/useTokens';
 import { DEFAULT_FIXED_DECIMAL_POINT } from 'config/constants';
+import useAsync, { Status } from 'hooks/useLoading';
+import useTokens, { Token } from 'hooks/useTokens';
+import formatRawEthValue from 'utils/formatRawEthValue';
+import isTokenValidForChains from 'utils/isTokenValidForChains';
+import toFixed from 'utils/toFixed';
 
 interface ITokenBalance {
   formattedBalance: string;
@@ -43,16 +43,6 @@ interface ITokenContext {
 }
 
 const TokenContext = createContext<ITokenContext | null>(null);
-
-function isTokenValidForChains(
-  token: Token,
-  fromChain: Network,
-  toChain: Network,
-) {
-  // return true if token has config available for both from and to chains
-  // else return false
-  return !!(token[fromChain.chainId] && token[toChain.chainId]);
-}
 
 const TokenProvider: React.FC = props => {
   const { accounts } = useWalletProvider()!;
@@ -88,21 +78,6 @@ const TokenProvider: React.FC = props => {
       fromChainRpcUrlProvider,
     );
   }, [selectedToken, fromChainRpcUrlProvider, fromChain]);
-
-  // set the selected token to first compatible token for current chains on startup
-  // or, upon chain change, if the currently selected token is not compatible, then do the same
-  useEffect(() => {
-    if (!fromChain || !toChain || !compatibleTokensForCurrentChains) {
-      setSelectedToken(undefined);
-      return;
-    }
-    if (
-      !selectedToken ||
-      !isTokenValidForChains(selectedToken, fromChain, toChain)
-    ) {
-      setSelectedToken(compatibleTokensForCurrentChains[0]);
-    }
-  }, [fromChain, toChain, selectedToken, compatibleTokensForCurrentChains]);
 
   const changeSelectedToken = useCallback(
     (tokenSymbol: string | undefined) => {

@@ -1920,14 +1920,14 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@biconomy/hyphen@^1.1.3":
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-1.1.3.tgz#a5d7873bcf94e310aebb9b67aeb19b710c3d1560"
-  integrity sha512-QdQxSs5l0wudIfPAUusDFCmXWiEGhexYUf0ZaV8frsKGSWwP6AFCAa9Nfx8sZxFZR1DmUdl75AuVxqh04rfhew==
+"@biconomy/hyphen@^1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-1.1.4.tgz#a20d0858513657b371f81402bda725b32d8d13c9"
+  integrity sha512-5ciW92aCeX+MdfG+LhlxSR0WzZ5bQGnQiJ4DJ2JdcPpKUkzhluM8C2l79E/CvFNpdikjRXjNnc8Ulqe689YrOg==
   dependencies:
     "@biconomy/mexa" "^2.0.24"
+    cross-fetch "^3.1.5"
     ethers "^5.0.24"
-    node-fetch "2.6.7"
     promise "^8.0.3"
     tslint "^6.1.3"
     typescript "^4.1.3"
@@ -5070,7 +5070,7 @@ cross-fetch@^2.1.0:
     node-fetch "2.6.1"
     whatwg-fetch "2.0.4"
 
-cross-fetch@^3.0.6:
+cross-fetch@^3.0.6, cross-fetch@^3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==

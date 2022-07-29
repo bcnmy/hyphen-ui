@@ -18,8 +18,8 @@ interface IChainsContext {
   toChainRpcUrlProvider: undefined | ethers.providers.JsonRpcProvider;
   fromChain: undefined | Network;
   toChain: undefined | Network;
-  changeFromChain: (chain: Network) => void;
-  changeToChain: (chain: Network) => void;
+  setFromChain: (chain: Network | undefined) => void;
+  setToChain: (chain: Network | undefined) => void;
   switchChains: () => void;
   networks: Network[] | undefined;
   isNetworksLoading: boolean;
@@ -55,24 +55,12 @@ const ChainsProvider: React.FC = props => {
     return new ethers.providers.JsonRpcProvider(toChain.rpc);
   }, [toChain]);
 
-  // default from chain to current metamak chain on startup
-  // else if default chain is not supported, then use the first supported chain
+  // Start with the first two chains
+  // as source & destination.
   useEffect(() => {
-    setToChain(undefined);
-    if (!currentChainId) {
-      setFromChain(networks?.[0]);
-      return;
-    }
-    let currentMetamaskChain = networks?.find(
-      network => network.chainId === currentChainId,
-    );
-
-    if (currentMetamaskChain) {
-      setFromChain(currentMetamaskChain);
-    } else {
-      setFromChain(networks?.[0]);
-    }
-  }, [currentChainId, networks]);
+    setFromChain(networks?.[0]);
+    setToChain(networks?.[1]);
+  }, [networks]);
 
   useEffect(() => {
     const network = networks?.find(
@@ -102,20 +90,6 @@ const ChainsProvider: React.FC = props => {
     })();
   });
 
-  const changeFromChain = useCallback((chain: Network) => {
-    setToChain(undefined);
-    setFromChain(chain);
-  }, []);
-
-  const changeToChain = useCallback(
-    (chain: Network) => {
-      if (fromChain) {
-        setToChain(chain);
-      }
-    },
-    [fromChain],
-  );
-
   const switchChains = useCallback(() => {
     if (fromChain && toChain) {
       setFromChain(toChain);
@@ -132,8 +106,8 @@ const ChainsProvider: React.FC = props => {
       value={{
         areChainsReady,
         switchChains,
-        changeFromChain,
-        changeToChain,
+        setFromChain,
+        setToChain,
         fromChainRpcUrlProvider,
         toChainRpcUrlProvider,
         fromChain,

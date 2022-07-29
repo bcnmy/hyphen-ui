@@ -1,37 +1,25 @@
-import Bridge from 'pages/bridge/Bridge';
-import React, { Suspense } from 'react';
+import React from 'react';
 import ReactDOM from 'react-dom';
-import 'react-loading-skeleton/dist/skeleton.css';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import './index.css';
+import 'react-loading-skeleton/dist/skeleton.css';
+
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
 import App from './App';
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AppProviders from './context';
-import './index.css';
-const Farms = React.lazy(() => import('pages/farms'));
-const AddStakingPosition = React.lazy(
-  () => import('pages/farms/components/AddStakingPosition'),
-);
-const FarmsOverview = React.lazy(
-  () => import('pages/farms/components/FarmsOverview'),
-);
-const ManageStakingPosition = React.lazy(
-  () => import('pages/farms/components/ManageStakingPosition'),
-);
-const Pools = React.lazy(() => import('pages/pools'));
-const AddLiquidity = React.lazy(
-  () => import('pages/pools/components/AddLiquidity'),
-);
-const IncreaseLiquidity = React.lazy(
-  () => import('pages/pools/components/IncreaseLiquidity'),
-);
-const ManagePosition = React.lazy(
-  () => import('pages/pools/components/ManageLiquidity'),
-);
-const PoolsOverview = React.lazy(
-  () => import('pages/pools/components/PoolsOverview'),
-);
+import Pools from 'pages/pools';
+import Bridge from 'pages/bridge/Bridge';
+import AddLiquidity from 'pages/pools/components/AddLiquidity';
+import PoolsOverview from 'pages/pools/components/PoolsOverview';
+import ManagePosition from 'pages/pools/components/ManageLiquidity';
+import IncreaseLiquidity from 'pages/pools/components/IncreaseLiquidity';
+import Farms from 'pages/farms';
+import FarmsOverview from 'pages/farms/components/FarmsOverview';
+import AddStakingPosition from 'pages/farms/components/AddStakingPosition';
+import ManageStakingPosition from 'pages/farms/components/ManageStakingPosition';
 
 const queryClientOptions = {
   defaultOptions: {
@@ -54,15 +42,13 @@ ReactDOM.render(
           <Routes>
             <Route path="/" element={<App />}>
               <Route path="/" element={<Navigate replace to="/bridge" />} />
-              <Route path="/bridge" element={<Bridge />} />
-              <Route
-                path="/pools"
-                element={
-                  <Suspense fallback={<>...</>}>
-                    <Pools />
-                  </Suspense>
-                }
-              >
+              <Route path="/bridge" element={<Bridge />}>
+                <Route
+                  path=":sourceChainId/:destinationChainId/:tokenSymbol"
+                  element={<Bridge />}
+                />
+              </Route>
+              <Route path="/pools" element={<Pools />}>
                 <Route path="" element={<PoolsOverview />} />
                 <Route path="add-liquidity" element={<AddLiquidity />} />
                 <Route
@@ -78,14 +64,7 @@ ReactDOM.render(
                   element={<IncreaseLiquidity />}
                 />
               </Route>
-              <Route
-                path="/farms"
-                element={
-                  <Suspense fallback={<>...</>}>
-                    <Farms />
-                  </Suspense>
-                }
-              >
+              <Route path="/farms" element={<Farms />}>
                 <Route path="" element={<FarmsOverview />} />
                 <Route
                   path="add-staking-position/:chainId/:tokenSymbol"

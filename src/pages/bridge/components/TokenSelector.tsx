@@ -2,16 +2,19 @@ import Select from 'components/Select';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
 import { Status } from 'hooks/useLoading';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Skeleton from 'react-loading-skeleton';
+import isTokenValidForChains from 'utils/isTokenValidForChains';
 import CustomTooltip from '../../../components/CustomTooltip';
 
 interface ITokenSelectorProps {
   disabled?: boolean;
+  tokenSymbol?: string;
 }
 
 const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
   disabled,
+  tokenSymbol,
 }) => {
   const {
     tokens,
@@ -21,7 +24,43 @@ const TokenSelector: React.FunctionComponent<ITokenSelectorProps> = ({
     selectedToken,
     getSelectedTokenBalanceStatus,
   } = useToken()!;
-  const { fromChain } = useChains()!;
+  const { fromChain, toChain } = useChains()!;
+
+  useEffect(() => {
+    // Set selected token to undefined.
+    // this ensures that we start from scratch
+    // when source & destination chains change.
+    changeSelectedToken(undefined);
+
+    if (
+      !toChain ||
+      !fromChain ||
+      !(
+        compatibleTokensForCurrentChains &&
+        compatibleTokensForCurrentChains.length > 0
+      )
+    ) {
+      return;
+    }
+
+    // If tokenSymbol is available try setting
+    // selectedToken to that token.
+    const token = tokens && tokenSymbol ? tokens[tokenSymbol] : undefined;
+    if (token) {
+      if (isTokenValidForChains(token, fromChain, toChain)) {
+        changeSelectedToken(tokenSymbol);
+      }
+    } else {
+      changeSelectedToken(compatibleTokensForCurrentChains[0].symbol);
+    }
+  }, [
+    changeSelectedToken,
+    compatibleTokensForCurrentChains,
+    fromChain,
+    toChain,
+    tokenSymbol,
+    tokens,
+  ]);
 
   const tokenOptions = useMemo(() => {
     if (!fromChain || !compatibleTokensForCurrentChains) return [];

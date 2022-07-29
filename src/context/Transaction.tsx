@@ -560,7 +560,7 @@ const TransactionProvider: React.FC = props => {
         fromChainId: fromChain.chainId,
         toChainId: toChain.chainId,
         useBiconomy: isBiconomyEnabled,
-        tag: config.constants.DEPOSIT_TAG,
+        dAppName: config.constants.DEPOSIT_TAG,
       });
 
       addTxNotification(

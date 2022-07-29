@@ -42,7 +42,12 @@ ReactDOM.render(
           <Routes>
             <Route path="/" element={<App />}>
               <Route path="/" element={<Navigate replace to="/bridge" />} />
-              <Route path="/bridge" element={<Bridge />} />
+              <Route path="/bridge" element={<Bridge />}>
+                <Route
+                  path=":sourceChainId/:destinationChainId/:tokenSymbol"
+                  element={<Bridge />}
+                />
+              </Route>
               <Route path="/pools" element={<Pools />}>
                 <Route path="" element={<PoolsOverview />} />
                 <Route path="add-liquidity" element={<AddLiquidity />} />

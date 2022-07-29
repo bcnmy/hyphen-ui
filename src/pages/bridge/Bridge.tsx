@@ -4,6 +4,7 @@ import { useTokenApproval } from 'context/TokenApproval';
 import { useTransaction } from 'context/Transaction';
 import useModal from 'hooks/useModal';
 import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { useChains } from '../../context/Chains';
 import { useWalletProvider } from '../../context/WalletProvider';
 import AmountInput from './components/AmountInput';
@@ -19,6 +20,8 @@ import TransferModal from './components/TransferModal';
 interface BridgeProps {}
 
 const Bridge: React.FC<BridgeProps> = () => {
+  const { sourceChainId, destinationChainId, tokenSymbol } = useParams();
+
   const { areChainsReady, fromChain, toChain, toChainRpcUrlProvider } =
     useChains()!;
   const { selectedToken } = useToken()!;
@@ -99,7 +102,10 @@ const Bridge: React.FC<BridgeProps> = () => {
               transferAmount ? 'rounded-b-none' : ''
             }`}
           >
-            <NetworkSelectors />
+            <NetworkSelectors
+              sourceChainId={sourceChainId}
+              destinationChainId={destinationChainId}
+            />
 
             <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-2 xl:gap-20">
               <TokenSelector
@@ -108,6 +114,7 @@ const Bridge: React.FC<BridgeProps> = () => {
                   !poolInfo?.minDepositAmount ||
                   !poolInfo?.maxDepositAmount
                 }
+                tokenSymbol={tokenSymbol}
               />
               <AmountInput
                 disabled={

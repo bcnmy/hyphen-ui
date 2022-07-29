@@ -43,22 +43,31 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = ({
 
   const fromChainOptions = useMemo(
     () =>
-      networks?.map(network => ({
-        id: network.chainId,
-        name: network.name,
-        image: network.image,
-      })),
+      networks
+        // filter out networks which are disabled for bridge.
+        ?.filter(network => network.bridgeOpen)
+        .map(network => ({
+          id: network.chainId,
+          name: network.name,
+          image: network.image,
+        })),
     [networks],
   );
 
   const toChainOptions = useMemo(() => {
-    return networks
-      ?.filter(network => network.chainId !== fromChain?.chainId)
-      .map(network => ({
-        id: network.chainId,
-        name: network.name,
-        image: network.image,
-      }));
+    return (
+      networks
+        // filter out networks which are disabled for bridge.
+        ?.filter(
+          network =>
+            network.bridgeOpen && network.chainId !== fromChain?.chainId,
+        )
+        .map(network => ({
+          id: network.chainId,
+          name: network.name,
+          image: network.image,
+        }))
+    );
   }, [fromChain?.chainId, networks]);
 
   const selectedFromChain = useMemo(() => {

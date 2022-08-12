@@ -1,23 +1,45 @@
 import Select from 'components/Select';
 import { useChains } from 'context/Chains';
 import { useWalletProvider } from 'context/WalletProvider';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import CustomTooltip from '../../../components/CustomTooltip';
 import transferArrow from 'assets/images/transfer-arrow.svg';
 import GaslessToggle from './GaslessToggle';
 
-interface INetworkSelectorsProps {}
+interface INetworkSelectorsProps {
+  sourceChainId?: string;
+  destinationChainId?: string;
+}
 
-const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
+const NetworkSelectors: React.FC<INetworkSelectorsProps> = ({
+  sourceChainId,
+  destinationChainId,
+}) => {
   const { isLoggedIn } = useWalletProvider()!;
   const {
     networks,
     fromChain,
     toChain,
-    changeFromChain,
-    changeToChain,
+    setFromChain,
+    setToChain,
     switchChains,
   } = useChains()!;
+
+  useEffect(() => {
+    if (sourceChainId && destinationChainId) {
+      const sourceChain = networks?.find(
+        network => network.chainId === Number.parseInt(sourceChainId),
+      );
+      const destinationChain = networks?.find(
+        network => network.chainId === Number.parseInt(destinationChainId),
+      );
+
+      if (sourceChain && destinationChain) {
+        setFromChain(sourceChain);
+        setToChain(destinationChain);
+      }
+    }
+  }, [destinationChainId, networks, setFromChain, setToChain, sourceChainId]);
 
   const fromChainOptions = useMemo(
     () =>
@@ -67,7 +89,7 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
             selected={selectedFromChain}
             setSelected={opt => {
               networks &&
-                changeFromChain(
+                setFromChain(
                   networks.find(network => network.chainId === opt.id)!,
                 );
             }}
@@ -97,7 +119,7 @@ const NetworkSelectors: React.FC<INetworkSelectorsProps> = () => {
             selected={selectedToChain}
             setSelected={opt => {
               networks &&
-                changeToChain(
+                setToChain(
                   networks.find(network => network.chainId === opt.id)!,
                 );
             }}

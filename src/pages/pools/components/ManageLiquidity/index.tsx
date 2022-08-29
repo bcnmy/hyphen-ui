@@ -439,7 +439,11 @@ function ManagePosition() {
               {currentChainId === chain?.chainId ? (
                 <button
                   className="mb-[3.125rem] flex h-15 w-full items-center justify-center rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                  disabled={isDataLoading || unclaimedFees <= 0}
+                  disabled={
+                    isDataLoading ||
+                    unclaimedFees <= 0 ||
+                    (!!chainId && Number.parseInt(chainId) === 43114)
+                  }
                   onClick={handleClaimFeeClick}
                 >
                   {unclaimedFees <= 0 ? (

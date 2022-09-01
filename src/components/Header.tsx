@@ -26,8 +26,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
       ? 'https://hyphen-stats.biconomy.io/'
       : 'https://hyphen-stats-staging.biconomy.io/';
 
-  const superHeaderMsg =
-    "Due to Arbitrum network downtime, activity involving Arbitrum will be paused. Don't worry all your funds are safe";
+  const superHeaderMsg = undefined;
 
   return (
     <header className="sticky top-0 z-20">

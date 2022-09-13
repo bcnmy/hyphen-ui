@@ -35,7 +35,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          role-to-assume: arn:aws:iam::177826984413:role/identity-provider-github-role
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: s3deploysession
           aws-region: ${{ secrets.AWS_DEFAULT_REGION }}
 

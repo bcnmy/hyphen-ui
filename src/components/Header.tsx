@@ -27,7 +27,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
       : 'https://hyphen-stats-staging.biconomy.io/';
 
   const superHeaderMsg =
-    'Ethereum is going through a historic transition 🐼 All Ethereum deposits and exits are paused.';
+    'Ethereum is going through a historic transition 🐼 All Ethereum deposits and exits are paused till The Merge.';
 
   return (
     <header className="sticky top-0 z-20">

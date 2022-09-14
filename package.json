@@ -52,11 +52,11 @@
   "scripts": {
     "start": "REACT_APP_ENV=local craco start",
     "start:prod": "REACT_APP_ENV=production REACT_APP_INFURA_ID=https://mainnet.infura.io/v3/c9c349cef85a436eaad2f5ef6c067f3a REACT_APP_COINGECKO_ID=CG-KxLwB4thJpH5yC6TaEfpPKav craco start",
-    "start:test": "REACT_APP_ENV=test craco start",
+    "start:test": "REACT_APP_ENV=test REACT_APP_COINGECKO_ID=CG-KxLwB4thJpH5yC6TaEfpPKav craco start",
     "start:staging": "REACT_APP_ENV=staging craco start",
     "build": "REACT_APP_ENV=local craco build",
     "build:prod": "REACT_APP_ENV=production REACT_APP_INFURA_ID=https://mainnet.infura.io/v3/c9c349cef85a436eaad2f5ef6c067f3a REACT_APP_COINGECKO_ID=CG-KxLwB4thJpH5yC6TaEfpPKav craco build",
-    "build:test": "REACT_APP_ENV=test craco build",
+    "build:test": "REACT_APP_ENV=test REACT_APP_COINGECKO_ID=CG-KxLwB4thJpH5yC6TaEfpPKav craco build",
     "build:staging": "REACT_APP_ENV=staging craco build",
     "test": "craco test",
     "eject": "react-scripts eject",

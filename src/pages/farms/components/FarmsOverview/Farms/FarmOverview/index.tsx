@@ -41,7 +41,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
     ['tokenPriceInUSD', chain.chainId, coinGeckoId],
     () =>
       fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd`,
+        `https://pro-api.coingecko.com/api/v3/simple/price?ids=${coinGeckoId}&vs_currencies=usd&x_cg_pro_api_key=${process.env.REACT_APP_COINGECKO_ID}`,
       ).then(res => res.json()),
     {
       enabled: !!coinGeckoId,
@@ -102,7 +102,7 @@ function FarmOverview({ chain, token }: IFarmOverview) {
         if (!rewardToken) return;
 
         return fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+          `https://pro-api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd&x_cg_pro_api_key=${process.env.REACT_APP_COINGECKO_ID}`,
         ).then(res => res.json());
       },
       {

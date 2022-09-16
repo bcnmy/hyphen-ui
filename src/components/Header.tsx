@@ -21,6 +21,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
     '/farms/',
   ].includes(location.pathname);
 
+  const rewardsUrl = 'https://rewards.biconomy.io/';
   const statsUrl =
     process.env.REACT_APP_ENV === ENV.production
       ? 'https://hyphen-stats.biconomy.io/'
@@ -116,9 +117,17 @@ function Header({ showUserInfoModal }: IHeaderProps) {
           </NavLink>
           <a
             target="_blank"
-            href={statsUrl}
+            href={rewardsUrl}
             rel="noreferrer"
             className="relative flex items-center text-gray-400 hover:text-white"
+          >
+            Rewards ✨
+          </a>
+          <a
+            target="_blank"
+            href={statsUrl}
+            rel="noreferrer"
+            className="relative -ml-1 flex items-center text-gray-400 hover:text-white"
           >
             Stats
             <HiOutlineArrowSmRight className="absolute top-[2px] right-[-12px] h-3 w-3 -rotate-45" />

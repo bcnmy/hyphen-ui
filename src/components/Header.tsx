@@ -21,6 +21,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
     '/farms/',
   ].includes(location.pathname);
 
+  // Constants for external URLs
   const rewardsUrl = 'https://rewards.biconomy.io/';
   const statsUrl =
     process.env.REACT_APP_ENV === ENV.production

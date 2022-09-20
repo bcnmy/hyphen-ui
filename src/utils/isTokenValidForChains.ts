@@ -8,7 +8,10 @@ function isTokenValidForChains(
 ) {
   // return true if token has config available for both from and to chains
   // else return false
-  return !!(token[fromChain.chainId] && token[toChain.chainId]);
+  return !!(
+    token[fromChain.chainId]?.isSupportedOnBridge &&
+    token[toChain.chainId]?.isSupportedOnBridge
+  );
 }
 
 export default isTokenValidForChains;

@@ -12,7 +12,7 @@ const Bridge: React.FC<BridgeProps> = () => {
 
   useEffect(() => {
     (async () => {
-      await connect().catch(e => {
+      await connect().catch((e: Error) => {
         console.error(e);
       });
     })();

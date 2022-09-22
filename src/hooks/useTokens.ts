@@ -14,6 +14,8 @@ export type Token = {
     symbol: string;
     chainColor: string;
     isSupported?: boolean;
+    isSupportedOnBridge: boolean;
+    isSupportedOnPool: boolean;
     metaTransactionData: {
       supportsEip2612: boolean;
       eip2612Data: {

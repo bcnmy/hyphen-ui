@@ -45,7 +45,7 @@ function Farms() {
             ? networks.map(networkObj => {
                 return Object.keys(tokens).map((tokenSymbol: any) => {
                   const token = tokens[tokenSymbol];
-                  const tokenObj = token[networkObj.chainId]?.isSupported
+                  const tokenObj = token[networkObj.chainId]?.isSupportedOnPool
                     ? {
                         coinGeckoId: token.coinGeckoId,
                         tokenImage: token.image,

@@ -84,8 +84,7 @@ function AddLiquidity() {
             const tokenObj = tokens[tokenSymbol];
             return (
               tokenObj[selectedChain.id] &&
-              (tokenObj[selectedChain.id].isSupported ||
-                tokenObj[selectedChain.id].isSupported === undefined)
+              tokenObj[selectedChain.id]?.isSupportedOnPool
             );
           })
           .map(tokenSymbol => {
@@ -268,7 +267,7 @@ function AddLiquidity() {
     ['tokenPriceInUSD', chain?.chainId, token],
     () =>
       fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd`,
+        `https://pro-api.coingecko.com/api/v3/simple/price?ids=${token?.coinGeckoId}&vs_currencies=usd&x_cg_pro_api_key=${process.env.REACT_APP_COINGECKO_ID}`,
       ).then(res => res.json()),
     {
       enabled: !!token,
@@ -338,7 +337,7 @@ function AddLiquidity() {
         if (!rewardToken) return;
 
         return fetch(
-          `https://api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd`,
+          `https://pro-api.coingecko.com/api/v3/simple/price?ids=${rewardToken.coinGeckoId}&vs_currencies=usd&x_cg_pro_api_key=${process.env.REACT_APP_COINGECKO_ID}`,
         ).then(res => res.json());
       },
       {
@@ -528,7 +527,9 @@ function AddLiquidity() {
     const newTokenSymbol = tokens
       ? Object.keys(tokens).find(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
-          return tokenObj[newChainId] && tokenObj[newChainId].isSupported;
+          return (
+            tokenObj[newChainId] && tokenObj[newChainId]?.isSupportedOnPool
+          );
         })
       : [{}];
 

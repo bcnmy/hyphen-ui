@@ -24,6 +24,7 @@ const Bridge: React.FC<BridgeProps> = () => {
     if (widgetContainer) {
       const widget = HyphenWidget.default.init(widgetContainer, {
         tag: config.constants.DEPOSIT_TAG,
+        env: process.env.REACT_APP_ENV,
         showWidget: true,
         showGasTokenSwap: true,
       });
@@ -36,7 +37,7 @@ const Bridge: React.FC<BridgeProps> = () => {
 
   return (
     <div className="bg-cover bg-top bg-no-repeat py-12.5 xl:bg-bridge">
-      <div className="mx-auto w-full px-6 xl:max-w-170 xl:px-0">
+      <div className="mx-auto w-full px-6 md:max-w-xl md:px-0">
         <div id="hyphen-widget"></div>
       </div>
     </div>

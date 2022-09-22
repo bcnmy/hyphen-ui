@@ -7431,10 +7431,10 @@ husky@^8.0.1:
   resolved "https://registry.yarnpkg.com/husky/-/husky-8.0.1.tgz#511cb3e57de3e3190514ae49ed50f6bc3f50b3e9"
   integrity sha512-xs7/chUH/CKdOCs7Zy0Aev9e/dKOMZf3K1Az1nar3tzlv0jfqnYtu235bstsWTmXOR0EfINrPa97yy4Lz6RiKw==
 
-hyphen-widget-test@^0.0.9:
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/hyphen-widget-test/-/hyphen-widget-test-0.0.9.tgz#caa7fdcb24b6bd7dfaa4e10c6124cada19e8514e"
-  integrity sha512-awyXUp2rVWmjr4nMFnK2qkdbeZ8YMnMKmxPuVJ89Qvh0iLBbggpNbaw5Y70rGR8oRWZg/rcyTxt0VP7Jhdh++Q==
+hyphen-widget-test@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/hyphen-widget-test/-/hyphen-widget-test-1.0.0.tgz#a07b862608df36fc3f631c1de526184afa760477"
+  integrity sha512-rziS88zvJva46PZggDlnFMA9zNjaAUN8q5PWb0o7B/gxeypLuPMJAboNW3PpUaMs7ZMVgROs26Ye6KBZKfM6HQ==
   dependencies:
     "@apollo/client" "^3.5.7"
     "@biconomy/hyphen" "^1.1.6"

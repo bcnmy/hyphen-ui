@@ -33,20 +33,21 @@ function Header({ showUserInfoModal }: IHeaderProps) {
   return (
     <header className="sticky top-0 z-20">
       {superHeaderMsg ? <SuperHeader superHeaderMsg={superHeaderMsg} /> : null}
-      <div className=" grid h-[3.5rem] w-full grid-flow-col items-center bg-[#2e2c62] pl-6 pr-8 text-white xl:grid-cols-3 xl:px-6">
+      <div className="grid h-[3.5rem] w-full grid-cols-[auto_1fr] items-center gap-4 bg-[#2e2c62] px-4 text-white xl:grid-cols-3 xl:px-6">
         <Link to="/bridge">
           <img
             src={`${process.env.PUBLIC_URL}/hyphen-logo.svg`}
-            className="hidden h-8 w-auto xl:flex"
+            className="hidden min-h-[2rem] w-auto xl:flex"
             alt="Hyphen Logo"
           />
           <img
             src={`${process.env.PUBLIC_URL}/hyphen-logo-small.svg`}
-            className="flex h-8 w-auto xl:hidden"
+            className="flex min-h-[2rem] w-auto xl:hidden"
             alt="Hyphen Logo"
           />
         </Link>
-        <nav className="flex items-center gap-7 justify-self-end text-white xl:justify-self-center">
+
+        <nav className="flex h-full w-full items-center gap-4 justify-self-end overflow-x-auto overflow-y-hidden p-3 text-white md:w-auto md:gap-7 md:overflow-x-hidden xl:justify-self-center">
           <NavLink to="/bridge">
             {({ isActive }) => (
               <span
@@ -77,7 +78,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
                 className={
                   isActive
                     ? 'relative'
-                    : 'relative text-gray-400 hover:text-white'
+                    : 'relative whitespace-nowrap text-gray-400 hover:text-white'
                 }
               >
                 Pools
@@ -101,7 +102,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
                 className={
                   isActive
                     ? 'relative'
-                    : 'relative text-gray-400 hover:text-white'
+                    : 'relative whitespace-nowrap text-gray-400 hover:text-white'
                 }
               >
                 Farms
@@ -120,7 +121,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
             target="_blank"
             href={rewardsUrl}
             rel="noreferrer"
-            className="relative flex items-center text-gray-400 hover:text-white"
+            className="relative flex items-center whitespace-nowrap text-gray-400 hover:text-white"
           >
             Rewards ✨
           </a>
@@ -128,12 +129,13 @@ function Header({ showUserInfoModal }: IHeaderProps) {
             target="_blank"
             href={statsUrl}
             rel="noreferrer"
-            className="relative -ml-1 flex items-center text-gray-400 hover:text-white"
+            className="relative -ml-1 flex items-center whitespace-nowrap text-gray-400 hover:text-white"
           >
             Stats
             <HiOutlineArrowSmRight className="absolute top-[2px] right-[-12px] h-3 w-3 -rotate-45" />
           </a>
         </nav>
+
         <div className="hidden items-center justify-self-end xl:flex">
           {showNetworkSelector ? <NetworkSelector /> : null}
           <button

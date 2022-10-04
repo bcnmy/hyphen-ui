@@ -1920,6 +1920,39 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@biconomy/hyphen-widget@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@biconomy/hyphen-widget/-/hyphen-widget-1.0.4.tgz#5e7dcf376f9f860cb0931b219ca2d1072d25db9c"
+  integrity sha512-b3mORjs2Hr8oUIiKjprfkOiprsfx50Jm5elPQamgeLk3AQP2witeOMqPylYEJ6lQximuYl1GSERKu5IU217Deg==
+  dependencies:
+    "@apollo/client" "^3.5.7"
+    "@biconomy/hyphen" "^1.1.6"
+    "@biconomy/mexa" "^2.0.24"
+    "@walletconnect/web3-provider" "^1.6.6"
+    assert "^2.0.0"
+    awesome-debounce-promise "^2.1.0"
+    buffer "^6.0.3"
+    date-fns "^2.28.0"
+    ethers "^5.5.2"
+    graphql "^16.2.0"
+    graphql-request "^4.2.0"
+    https-browserify "^1.0.0"
+    os-browserify "^0.3.0"
+    react-icons "^4.3.1"
+    react-loading-skeleton "^3.0.1"
+    react-notifications-component "^3.1.0"
+    react-query "^3.38.0"
+    react-router-dom "6"
+    react-scripts next
+    react-toastify "^8.1.0"
+    react-tooltip "^4.2.21"
+    react-transition-group "^4.4.2"
+    spinners-react "^1.0.6"
+    stream-browserify "^3.0.0"
+    stream-http "^3.2.0"
+    tailwind-merge "^1.0.0"
+    web3modal "^1.9.4"
+
 "@biconomy/hyphen@^1.1.4":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-1.1.4.tgz#a20d0858513657b371f81402bda725b32d8d13c9"
@@ -7430,39 +7463,6 @@ husky@^8.0.1:
   version "8.0.1"
   resolved "https://registry.yarnpkg.com/husky/-/husky-8.0.1.tgz#511cb3e57de3e3190514ae49ed50f6bc3f50b3e9"
   integrity sha512-xs7/chUH/CKdOCs7Zy0Aev9e/dKOMZf3K1Az1nar3tzlv0jfqnYtu235bstsWTmXOR0EfINrPa97yy4Lz6RiKw==
-
-hyphen-widget-test@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/hyphen-widget-test/-/hyphen-widget-test-1.0.3.tgz#ca27e8454a619b4a8245a85fef7ac116b1330af9"
-  integrity sha512-m6sxuVRnSJSCAg58mR1WBCnLWh/VjRJ0Hf3siFzb4uJN5xIOCcR1twk4lyJBW/r8ZJkoXY/7gsNsTryP28+pMw==
-  dependencies:
-    "@apollo/client" "^3.5.7"
-    "@biconomy/hyphen" "^1.1.6"
-    "@biconomy/mexa" "^2.0.24"
-    "@walletconnect/web3-provider" "^1.6.6"
-    assert "^2.0.0"
-    awesome-debounce-promise "^2.1.0"
-    buffer "^6.0.3"
-    date-fns "^2.28.0"
-    ethers "^5.5.2"
-    graphql "^16.2.0"
-    graphql-request "^4.2.0"
-    https-browserify "^1.0.0"
-    os-browserify "^0.3.0"
-    react-icons "^4.3.1"
-    react-loading-skeleton "^3.0.1"
-    react-notifications-component "^3.1.0"
-    react-query "^3.38.0"
-    react-router-dom "6"
-    react-scripts next
-    react-toastify "^8.1.0"
-    react-tooltip "^4.2.21"
-    react-transition-group "^4.4.2"
-    spinners-react "^1.0.6"
-    stream-browserify "^3.0.0"
-    stream-http "^3.2.0"
-    tailwind-merge "^1.0.0"
-    web3modal "^1.9.4"
 
 iconv-lite@0.4.24:
   version "0.4.24"

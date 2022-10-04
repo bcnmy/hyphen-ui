@@ -1965,18 +1965,6 @@
     tslint "^6.1.3"
     typescript "^4.1.3"
 
-"@biconomy/hyphen@^1.1.6":
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-1.1.6.tgz#f0a18a94605eb615b6b24fc4a4101f5e6442f8b3"
-  integrity sha512-xyDbqu7/j4U1AeTeWOmrR+eH3TArtOiYShPXlHonM+HPTN93T1AmnTA0Q1uOIvUa3sFmkHa6PMRLZYmEpCH9bA==
-  dependencies:
-    "@biconomy/mexa" "^2.0.24"
-    cross-fetch "^3.1.5"
-    ethers "^5.0.24"
-    promise "^8.0.3"
-    tslint "^6.1.3"
-    typescript "^4.1.3"
-
 "@biconomy/mexa@^2.0.24":
   version "2.0.24"
   resolved "https://registry.yarnpkg.com/@biconomy/mexa/-/mexa-2.0.24.tgz#212971ac0a3bb909da95eab1640caa5c3e72d2b3"
@@ -7147,15 +7135,6 @@ graphql-request@^4.0.0:
     extract-files "^9.0.0"
     form-data "^3.0.0"
 
-graphql-request@^4.2.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/graphql-request/-/graphql-request-4.3.0.tgz#b934e08fcae764aa2cdc697d3c821f046cb5dbf2"
-  integrity sha512-2v6hQViJvSsifK606AliqiNiijb1uwWp6Re7o0RTyH+uRTv/u7Uqm2g4Fjq/LgZIzARB38RZEvVBFOQOVdlBow==
-  dependencies:
-    cross-fetch "^3.1.5"
-    extract-files "^9.0.0"
-    form-data "^3.0.0"
-
 graphql-tag@^2.12.3:
   version "2.12.6"
   resolved "https://registry.yarnpkg.com/graphql-tag/-/graphql-tag-2.12.6.tgz#d441a569c1d2537ef10ca3d1633b48725329b5f1"
@@ -10738,15 +10717,6 @@ react-query@^3.34.15:
   version "3.34.15"
   resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.34.15.tgz#9e143b7d0aa39c515102a35120d5518ad91b10f6"
   integrity sha512-dOhGLB5RT3p+wWj0rVdAompSg+R9t6oMRk+JhU8DP0tpJM2UyIv3r4Kk0zUkHSxT+QG34hFdrgdqxVWxgeNq4g==
-  dependencies:
-    "@babel/runtime" "^7.5.5"
-    broadcast-channel "^3.4.1"
-    match-sorter "^6.0.2"
-
-react-query@^3.38.0:
-  version "3.39.2"
-  resolved "https://registry.yarnpkg.com/react-query/-/react-query-3.39.2.tgz#9224140f0296f01e9664b78ed6e4f69a0cc9216f"
-  integrity sha512-F6hYDKyNgDQfQOuR1Rsp3VRzJnWHx6aRnnIZHMNGGgbL3SBgpZTDg8MQwmxOgpCAoqZJA+JSNCydF1xGJqKOCA==
   dependencies:
     "@babel/runtime" "^7.5.5"
     broadcast-channel "^3.4.1"

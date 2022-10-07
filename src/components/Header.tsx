@@ -28,7 +28,8 @@ function Header({ showUserInfoModal }: IHeaderProps) {
       ? 'https://hyphen-stats.biconomy.io/'
       : 'https://hyphen-stats-staging.biconomy.io/';
 
-  const superHeaderMsg = undefined;
+  const superHeaderMsg =
+    "We have paused all pending and new exit transactions on the BNB network following the BNB Network's exploit. Dont worry, your funds are safe.";
 
   return (
     <header className="sticky top-0 z-20">

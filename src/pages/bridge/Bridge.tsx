@@ -3,12 +3,20 @@ import * as HyphenWidget from 'hyphen-widget-test';
 import 'hyphen-widget-test/dist/index.css';
 import config from 'config';
 import { useWalletProvider } from 'context/WalletProvider';
+import { useSocialLoginProvider } from 'context/SocialLogin';
+// import getWallet from './wallet';
 
 interface BridgeProps {}
 
 const Bridge: React.FC<BridgeProps> = () => {
   const [, setHyphenWidget] = useState();
   const { isLoggedIn, connect } = useWalletProvider()!;
+  const {
+    socialLoginSDK,
+    connect: socialLogin,
+    walletProvider,
+  } = useSocialLoginProvider()!;
+  console.log(socialLoginSDK, walletProvider);
 
   useEffect(() => {
     (async () => {
@@ -38,6 +46,18 @@ const Bridge: React.FC<BridgeProps> = () => {
   return (
     <div className="bg-cover bg-top bg-no-repeat py-12.5 xl:bg-bridge">
       <div className="mx-auto w-full px-6 md:max-w-xl md:px-0">
+        <button
+          onClick={async () => {
+            // const wallet = await getWallet();
+            // console.log(wallet);
+            // wallet.showConnectModal();
+            // wallet.showWallet();
+            socialLogin();
+          }}
+        >
+          Biconomy Social Login
+        </button>
+
         <div id="hyphen-widget"></div>
       </div>
     </div>

@@ -127,7 +127,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
       fromChain: Network,
       userDeposits: IUserDeposits[],
     ) {
-      let transformedTransactions = [];
+      let transformedTransactions: any = [];
       for (const userDeposit of userDeposits) {
         const {
           id: depositHash,

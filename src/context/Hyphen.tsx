@@ -32,7 +32,7 @@ interface IHyphenContext {
 
 const HyphenContext = createContext<IHyphenContext | null>(null);
 
-const HyphenProvider: React.FC = props => {
+const HyphenProvider = props => {
   const { rawEthereumProvider, walletProvider } = useWalletProvider()!;
   const { selectedToken } = useToken()!;
   const { isBiconomyEnabled } = useBiconomy()!;

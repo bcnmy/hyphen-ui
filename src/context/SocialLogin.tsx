@@ -12,7 +12,7 @@ interface ISocialLoginProviderContext {
   walletProvider: ethers.providers.Web3Provider | null;
   signer: ethers.Signer | null;
   connect: () => Promise<SocialLogin | null>;
-  // disconnect: null;
+  disconnect: () => Promise<void>;
   socialLoginSDK: SocialLogin | null;
   accounts: string[] | null;
   currentChainId: number | null;
@@ -23,7 +23,7 @@ interface ISocialLoginProviderContext {
 const SocialLoginProviderContext =
   createContext<ISocialLoginProviderContext | null>(null);
 
-const SocialLoginProviderProvider: React.FC = props => {
+const SocialLoginProviderProvider = props => {
   const [walletProvider, setWalletProvider] =
     useState<ethers.providers.Web3Provider | null>(null);
 
@@ -33,10 +33,22 @@ const SocialLoginProviderProvider: React.FC = props => {
   const [accounts, setAccounts] = useState<string[]>([]);
   const [currentChainId, setCurrentChainId] = useState<number>(1);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   const [socialLoginSDK, setSocialLoginSDK] = useState<SocialLogin | null>(
     null,
   );
+
+  useEffect(() => {
+    const initWallet = async () => {
+      setLoading(true);
+      const sdk = new SocialLogin();
+      sdk.init(ethers.utils.hexValue(5));
+      sdk.showConnectModal();
+      setLoading(false);
+    };
+    if (!socialLoginSDK) initWallet();
+  }, [socialLoginSDK]);
 
   useEffect(() => {
     if (
@@ -59,7 +71,11 @@ const SocialLoginProviderProvider: React.FC = props => {
   }, [walletProvider]);
 
   useEffect(() => {
-    if (socialLoginSDK && socialLoginSDK.web3auth) {
+    if (
+      socialLoginSDK &&
+      socialLoginSDK.web3auth &&
+      socialLoginSDK.web3auth.provider
+    ) {
       setWeb3Auth(socialLoginSDK.web3auth);
       setWalletProvider(
         new ethers.providers.Web3Provider(socialLoginSDK.web3auth.provider!),
@@ -85,12 +101,24 @@ const SocialLoginProviderProvider: React.FC = props => {
       socialLoginSDK.showWallet();
       return socialLoginSDK;
     }
+    setLoading(true);
     const sdk = new SocialLogin();
     await sdk.init(ethers.utils.hexValue(5));
     sdk.showConnectModal();
     sdk.showWallet();
     setSocialLoginSDK(sdk);
+    setLoading(false);
     return socialLoginSDK;
+  }, [socialLoginSDK]);
+
+  const disconnect = useCallback(async () => {
+    if (!socialLoginSDK || !socialLoginSDK.web3auth) {
+      console.error('Web3Modal not initialized.');
+      return;
+    }
+    socialLoginSDK.web3auth.logout();
+    setRawEthereumProvider(null);
+    setWalletProvider(null);
   }, [socialLoginSDK]);
 
   return (
@@ -101,7 +129,7 @@ const SocialLoginProviderProvider: React.FC = props => {
         signer,
         connect,
         socialLoginSDK,
-        // disconnect,
+        disconnect,
         accounts,
         currentChainId,
         isLoggedIn,

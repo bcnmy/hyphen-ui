@@ -14,7 +14,7 @@ function constructApolloClients(networks: Network[] | undefined) {
   }, {} as clientInstance);
 }
 
-const GraphQLProvider: React.FC = ({ children, ...props }) => {
+const GraphQLProvider = ({ children, ...props }) => {
   const { fromChain, networks } = useChains()!;
   const apolloClients = constructApolloClients(networks);
 

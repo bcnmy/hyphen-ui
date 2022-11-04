@@ -30,7 +30,7 @@ interface IChainsContext {
 
 const ChainsContext = createContext<IChainsContext | null>(null);
 
-const ChainsProvider: React.FC = props => {
+const ChainsProvider = props => {
   const { currentChainId } = useWalletProvider()!;
   const {
     data: networks,

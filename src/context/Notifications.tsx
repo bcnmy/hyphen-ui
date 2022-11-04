@@ -7,7 +7,7 @@ interface INotificationsContext {
 
 const NotificationsContext = createContext<INotificationsContext | null>(null);
 
-const NotificationsProvider: React.FC = props => {
+const NotificationsProvider = props => {
   // useEffect(() => {
   //   toast(<p className="font-sans">This works somehow</p>, {
   //     position: toast.POSITION.BOTTOM_RIGHT,

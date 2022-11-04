@@ -30,7 +30,7 @@ interface ITokenApprovalContext {
 
 const TokenApprovalContext = createContext<ITokenApprovalContext | null>(null);
 
-const TokenApprovalProvider: React.FC = ({ ...props }) => {
+const TokenApprovalProvider = ({ ...props }) => {
   const { accounts } = useWalletProvider()!;
   const { selectedToken } = useToken()!;
   const { isBiconomyEnabled } = useBiconomy()!;

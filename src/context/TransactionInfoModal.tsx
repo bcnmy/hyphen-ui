@@ -25,7 +25,7 @@ interface ITransactionInfoModalContext {
 const TransactionInfoModalContext =
   createContext<ITransactionInfoModalContext | null>(null);
 
-const TransactionInfoModalProvider: React.FC = ({ children, ...props }) => {
+const TransactionInfoModalProvider = ({ children, ...props }) => {
   const {
     isVisible: isTransactionInfoModalVisible,
     showModal,

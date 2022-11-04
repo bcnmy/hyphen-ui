@@ -44,7 +44,7 @@ interface ITokenContext {
 
 const TokenContext = createContext<ITokenContext | null>(null);
 
-const TokenProvider: React.FC = props => {
+const TokenProvider = props => {
   const { accounts } = useWalletProvider()!;
   const { fromChain, fromChainRpcUrlProvider, toChain } = useChains()!;
   const [selectedToken, setSelectedToken] = useState<Token>();

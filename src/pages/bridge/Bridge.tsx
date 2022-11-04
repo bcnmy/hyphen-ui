@@ -14,8 +14,11 @@ const Bridge: React.FC<BridgeProps> = () => {
   const {
     socialLoginSDK,
     connect: socialLogin,
+    disconnect: socialLogout,
     walletProvider,
+    signer,
   } = useSocialLoginProvider()!;
+
   console.log(socialLoginSDK, walletProvider);
 
   useEffect(() => {
@@ -54,8 +57,31 @@ const Bridge: React.FC<BridgeProps> = () => {
             // wallet.showWallet();
             socialLogin();
           }}
+          style={{
+            backgroundColor: 'aliceblue',
+            marginBottom: 30,
+            padding: 10,
+            marginRight: 20,
+          }}
         >
           Biconomy Social Login
+        </button>
+
+        <button
+          onClick={async () => {
+            // const wallet = await getWallet();
+            // console.log(wallet);
+            // wallet.showConnectModal();
+            // wallet.showWallet();
+            socialLogout();
+          }}
+          style={{
+            backgroundColor: 'aliceblue',
+            marginBottom: 30,
+            padding: 10,
+          }}
+        >
+          Biconomy Social Logout
         </button>
 
         <div id="hyphen-widget"></div>

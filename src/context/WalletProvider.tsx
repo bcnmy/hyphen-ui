@@ -25,7 +25,7 @@ const WalletProviderContext = createContext<IWalletProviderContext | null>(
   null,
 );
 
-const WalletProviderProvider: React.FC = props => {
+const WalletProviderProvider = props => {
   const [walletProvider, setWalletProvider] = useState<
     undefined | ethers.providers.Web3Provider
   >();

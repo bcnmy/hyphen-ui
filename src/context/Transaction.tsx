@@ -92,7 +92,7 @@ const getTokenGasPrice = (
   );
 const getTokenGasPriceDebounced = AwesomeDebouncePromise(getTokenGasPrice, 500);
 
-const TransactionProvider: React.FC = props => {
+const TransactionProvider = props => {
   const { selectedToken, selectedTokenBalance } = useToken()!;
   const { toChainRpcUrlProvider } = useChains()!;
   const { poolInfo, hyphen } = useHyphen()!;

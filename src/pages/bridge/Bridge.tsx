@@ -3,23 +3,22 @@ import * as HyphenWidget from 'hyphen-widget-test';
 import 'hyphen-widget-test/dist/index.css';
 import config from 'config';
 import { useWalletProvider } from 'context/WalletProvider';
-import { useSocialLoginProvider } from 'context/SocialLogin';
 // import getWallet from './wallet';
 
 interface BridgeProps {}
 
 const Bridge: React.FC<BridgeProps> = () => {
   const [, setHyphenWidget] = useState();
-  const { isLoggedIn, connect } = useWalletProvider()!;
-  const {
-    socialLoginSDK,
-    connect: socialLogin,
-    disconnect: socialLogout,
-    walletProvider,
-    signer,
-  } = useSocialLoginProvider()!;
+  const { isLoggedIn, connect, socialConnect, socialDisconnect } = useWalletProvider()!;
+  // const {
+  //   socialLoginSDK,
+  //   connect: socialLogin,
+  //   disconnect: socialLogout,
+  //   walletProvider,
+  //   signer,
+  // } = useSocialLoginProvider()!;
 
-  console.log(socialLoginSDK, walletProvider);
+  // console.log(socialLoginSDK, walletProvider);
 
   useEffect(() => {
     (async () => {
@@ -55,7 +54,8 @@ const Bridge: React.FC<BridgeProps> = () => {
             // console.log(wallet);
             // wallet.showConnectModal();
             // wallet.showWallet();
-            socialLogin();
+            if (!isLoggedIn)
+            socialConnect();
           }}
           style={{
             backgroundColor: 'aliceblue',
@@ -73,7 +73,8 @@ const Bridge: React.FC<BridgeProps> = () => {
             // console.log(wallet);
             // wallet.showConnectModal();
             // wallet.showWallet();
-            socialLogout();
+            if (isLoggedIn)
+            socialDisconnect();
           }}
           style={{
             backgroundColor: 'aliceblue',

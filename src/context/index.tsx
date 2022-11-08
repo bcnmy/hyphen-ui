@@ -9,7 +9,6 @@ import { TokenApprovalProvider } from './TokenApproval';
 import { TransactionProvider } from './Transaction';
 import { TransactionInfoModalProvider } from './TransactionInfoModal';
 import { WalletProviderProvider } from './WalletProvider';
-import { SocialLoginProviderProvider } from './SocialLogin';
 
 export const AppProviders = ({ children }) => {
   return (
@@ -23,9 +22,7 @@ export const AppProviders = ({ children }) => {
                   <TokenApprovalProvider>
                     <TransactionProvider>
                       <TransactionInfoModalProvider>
-                        <SocialLoginProviderProvider>
                           {children}
-                        </SocialLoginProviderProvider>
                       </TransactionInfoModalProvider>
                     </TransactionProvider>
                   </TokenApprovalProvider>

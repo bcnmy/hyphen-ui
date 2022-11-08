@@ -68,7 +68,7 @@ const WalletProviderProvider = props => {
 
   // after social login -> set provider info
   useEffect(() => {
-    if (socialLoginSDK?.provider) {
+    if (socialLoginSDK?.provider && !accounts?.length) {
       const newProvider = new ethers.providers.Web3Provider(
         socialLoginSDK.provider,
       );
@@ -79,7 +79,30 @@ const WalletProviderProvider = props => {
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
     }
-  }, [socialLoginSDK, socialLoginSDK?.provider]);
+  }, [accounts?.length, socialLoginSDK, socialLoginSDK?.provider]);
+
+  // after metamask login -> get provider event
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (accounts?.length) {
+        clearInterval(interval);
+      }
+      if (socialLoginSDK?.provider && !accounts?.length) {
+        const newProvider = new ethers.providers.Web3Provider(
+          socialLoginSDK.provider,
+        );
+        newProvider.listAccounts().then(accounts => {
+          setAccounts(accounts.map(a => a.toLowerCase()));
+        });
+        setRawEthereumProvider(socialLoginSDK.provider);
+        setWalletProvider(newProvider);
+        setSigner(newProvider.getSigner());
+      }
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [accounts?.length, socialLoginSDK]);
 
   // if everything initiated setIsLoggedIn true
   useEffect(() => {

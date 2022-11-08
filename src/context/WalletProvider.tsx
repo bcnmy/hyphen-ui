@@ -68,16 +68,41 @@ const WalletProviderProvider = props => {
 
   // after social login -> set provider info
   useEffect(() => {
-    if (socialLoginSDK?.provider) {
+    if (socialLoginSDK?.provider && !accounts?.length) {
       const newProvider = new ethers.providers.Web3Provider(
         socialLoginSDK.provider,
       );
+      newProvider.listAccounts().then(accounts => {
+        setAccounts(accounts.map(a => a.toLowerCase()));
+      });
       setRawEthereumProvider(socialLoginSDK.provider);
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
-      socialLoginSDK.hideWallet();
     }
-  }, [socialLoginSDK, socialLoginSDK?.provider]);
+  }, [accounts?.length, socialLoginSDK, socialLoginSDK?.provider]);
+
+  // after metamask login -> get provider event
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      if (accounts?.length) {
+        clearInterval(interval);
+      }
+      if (socialLoginSDK?.provider && !accounts?.length) {
+        const newProvider = new ethers.providers.Web3Provider(
+          socialLoginSDK.provider,
+        );
+        newProvider.listAccounts().then(accounts => {
+          setAccounts(accounts.map(a => a.toLowerCase()));
+        });
+        setRawEthereumProvider(socialLoginSDK.provider);
+        setWalletProvider(newProvider);
+        setSigner(newProvider.getSigner());
+      }
+    }, 1000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [accounts?.length, socialLoginSDK]);
 
   // if everything initiated setIsLoggedIn true
   useEffect(() => {
@@ -111,7 +136,6 @@ const WalletProviderProvider = props => {
     (async () => {
       setLoading(true);
       let { chainId } = await walletProvider.getNetwork();
-      let accounts = await walletProvider.listAccounts();
       let wallet = new SmartAccount(walletProvider, {
         signType: SignTypeMethod.PERSONAL_SIGN,
         activeNetworkId: chainId,
@@ -128,7 +152,6 @@ const WalletProviderProvider = props => {
       wallet = await wallet.init();
       console.info('smartAccount', wallet);
       setSmartAccount(wallet);
-      setAccounts(accounts.map(a => a.toLowerCase()));
       setCurrentChainId(chainId);
       setLoading(false);
     })();
@@ -159,6 +182,9 @@ const WalletProviderProvider = props => {
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
       setRawEthereumProvider(socialLoginSDK.web3auth.provider);
+      await newProvider.listAccounts().then(accounts => {
+        setAccounts(accounts.map(a => a.toLowerCase()));
+      });
       return;
     }
     if (socialLoginSDK?.provider) {
@@ -168,6 +194,9 @@ const WalletProviderProvider = props => {
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
       setRawEthereumProvider(socialLoginSDK.provider);
+      await newProvider.listAccounts().then(accounts => {
+        setAccounts(accounts.map(a => a.toLowerCase()));
+      });
       return;
     }
     if (socialLoginSDK) {
@@ -190,10 +219,10 @@ const WalletProviderProvider = props => {
       return;
     }
     await socialLoginSDK.logout();
-    socialLoginSDK.hideWallet();
     setRawEthereumProvider(null);
     setWalletProvider(null);
     setAccounts(null);
+    socialLoginSDK.hideWallet();
   }, [socialLoginSDK]);
 
   return (

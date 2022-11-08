@@ -72,10 +72,12 @@ const WalletProviderProvider = props => {
       const newProvider = new ethers.providers.Web3Provider(
         socialLoginSDK.provider,
       );
+      newProvider.listAccounts().then(accounts => {
+        setAccounts(accounts.map(a => a.toLowerCase()));
+      });
       setRawEthereumProvider(socialLoginSDK.provider);
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
-      socialLoginSDK.hideWallet();
     }
   }, [socialLoginSDK, socialLoginSDK?.provider]);
 
@@ -109,7 +111,6 @@ const WalletProviderProvider = props => {
     (async () => {
       setLoading(true);
       let { chainId } = await walletProvider.getNetwork();
-      let accounts = await walletProvider.listAccounts();
       let wallet = new SmartAccount(walletProvider, {
         signType: SignTypeMethod.PERSONAL_SIGN,
         activeNetworkId: chainId,
@@ -120,7 +121,6 @@ const WalletProviderProvider = props => {
       wallet = await wallet.init();
       console.info('smartAccount', wallet);
       setSmartAccount(wallet);
-      setAccounts(accounts.map(a => a.toLowerCase()));
       setCurrentChainId(chainId);
       setLoading(false);
     })();
@@ -151,6 +151,9 @@ const WalletProviderProvider = props => {
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
       setRawEthereumProvider(socialLoginSDK.web3auth.provider);
+      await newProvider.listAccounts().then(accounts => {
+        setAccounts(accounts.map(a => a.toLowerCase()));
+      });
       return;
     }
     if (socialLoginSDK?.provider) {
@@ -160,6 +163,9 @@ const WalletProviderProvider = props => {
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
       setRawEthereumProvider(socialLoginSDK.provider);
+      await newProvider.listAccounts().then(accounts => {
+        setAccounts(accounts.map(a => a.toLowerCase()));
+      });
       return;
     }
     if (socialLoginSDK) {
@@ -182,10 +188,10 @@ const WalletProviderProvider = props => {
       return;
     }
     await socialLoginSDK.logout();
-    socialLoginSDK.hideWallet();
     setRawEthereumProvider(null);
     setWalletProvider(null);
     setAccounts(null);
+    socialLoginSDK.hideWallet();
   }, [socialLoginSDK]);
 
   return (

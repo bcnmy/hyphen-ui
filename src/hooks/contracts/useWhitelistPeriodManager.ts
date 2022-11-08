@@ -37,7 +37,7 @@ function useWhitelistPeriodManager(chain: Network | undefined) {
   );
 
   const getTotalLiquidityByLp = useCallback(
-    (tokenAddress: string | undefined, accounts: string[] | undefined) => {
+    (tokenAddress: string | undefined, accounts: string[] | null) => {
       if (!whitelistPeriodManagerContract) return;
 
       return whitelistPeriodManagerContract.totalLiquidityByLp(

@@ -33,6 +33,8 @@ function AddLiquidity() {
   const {
     accounts,
     connect,
+    smartAccount,
+    smartAccountAddress,
     currentChainId,
     isLoggedIn,
     signer,
@@ -77,25 +79,7 @@ function AddLiquidity() {
     if (!tokens) {
       return [];
     }
-
-    return selectedChain
-      ? Object.keys(tokens)
-          .filter(tokenSymbol => {
-            const tokenObj = tokens[tokenSymbol];
-            return (
-              tokenObj[selectedChain.id] &&
-              tokenObj[selectedChain.id]?.isSupportedOnPool
-            );
-          })
-          .map(tokenSymbol => {
-            const tokenObj = tokens[tokenSymbol];
-            return {
-              id: tokenObj.symbol,
-              name: tokenObj.symbol,
-              image: tokenObj.image,
-            };
-          })
-      : Object.keys(tokens).map(tokenSymbol => {
+      return Object.keys(tokens).map(tokenSymbol => {
           const tokenObj = tokens[tokenSymbol];
           return {
             id: tokenObj.symbol,
@@ -234,6 +218,10 @@ function AddLiquidity() {
 
       const token = tokens ? tokens[selectedToken.id] : undefined;
 
+      console.log('amount ', amount)
+      console.log('token ', token);
+      
+
       const addLiquidityTx =
         token && token[currentChainId].address === NATIVE_ADDRESS
           ? await addNativeLiquidity(amount)
@@ -347,6 +335,7 @@ function AddLiquidity() {
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
+    
     const chain = chainId
       ? chainOptions?.find(chainObj => chainObj.id === Number.parseInt(chainId))
       : undefined;
@@ -371,9 +360,9 @@ function AddLiquidity() {
       )!;
       const token = tokens ? tokens[tokenSymbol] : undefined;
 
-      if (isLoggedIn && accounts) {
+      if (isLoggedIn && smartAccountAddress) {
         const { displayBalance } =
-          (await getTokenBalance(accounts[0], chain, token)) || {};
+          (await getTokenBalance(smartAccountAddress, chain, token)) || {};
         setWalletBalance(displayBalance);
       }
 
@@ -786,27 +775,6 @@ function AddLiquidity() {
                 {currentChainId === chain?.chainId ? (
                   <>
                     <button
-                      className="mt-12 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                      disabled={
-                        isDataLoading ||
-                        isNativeToken ||
-                        isLiquidityAmountGtWalletBalance ||
-                        isLiquidityAmountGtPoolCap ||
-                        !isLiquidityAmountGtTokenAllowance
-                      }
-                      onClick={showApprovalModal}
-                    >
-                      {liquidityAmount === '' ||
-                      (Number.parseFloat(liquidityAmount) === 0 &&
-                        !isLiquidityAmountGtTokenAllowance)
-                        ? 'Enter amount to see approval'
-                        : approveTokenLoading
-                        ? 'Approving Token'
-                        : isNativeToken || !isLiquidityAmountGtTokenAllowance
-                        ? `${selectedToken?.name} Approved`
-                        : `Approve ${selectedToken?.name}`}
-                    </button>
-                    <button
                       className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
                       onClick={handleConfirmSupplyClick}
                       disabled={
@@ -814,7 +782,6 @@ function AddLiquidity() {
                         liquidityAmount === '' ||
                         Number.parseFloat(liquidityAmount) === 0 ||
                         isLiquidityAmountGtWalletBalance ||
-                        (!isNativeToken && isLiquidityAmountGtTokenAllowance) ||
                         isLiquidityAmountGtPoolCap
                       }
                     >

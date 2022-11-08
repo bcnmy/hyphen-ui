@@ -59,33 +59,37 @@ const WalletProviderProvider = props => {
   const [web3Auth, setWeb3Auth] = useState<any>(null);
 
 
-  useEffect(() => {
-    const initWallet = async () => {
-      setLoading(true);
-      const sdk = new SocialLogin();
-      console.log('sdk ', sdk);
+  // useEffect(() => {
+  //   console.log('initWallet Initiated')
+  //   const initWallet = async () => {
+  //     setLoading(true);
+  //     const sdk = new SocialLogin();
+  //     console.log('sdk ', sdk);
       
-      sdk.init(ethers.utils.hexValue(5));
-      sdk.showConnectModal();
-      setLoading(false);
-    };
-    if (!socialLoginSDK) initWallet();
-  }, [socialLoginSDK]);
+  //     sdk.init(ethers.utils.hexValue(5));
+  //     sdk.showConnectModal();
+  //     setLoading(false);
+  //     console.log('initWallet initiation completed')
+  //   };
+  //   if (!socialLoginSDK) initWallet();
+  // }, [socialLoginSDK]);
 
 
-  useEffect(() => {
-    if (
-      socialLoginSDK &&
-      socialLoginSDK.web3auth &&
-      socialLoginSDK.web3auth.provider
-    ) {
-      setWeb3Auth(socialLoginSDK.web3auth);
-      setWalletProvider(
-        new ethers.providers.Web3Provider(socialLoginSDK.web3auth.provider!),
-      );
-      setRawEthereumProvider(socialLoginSDK.web3auth.provider);
-    }
-  }, [socialLoginSDK, web3Auth]);
+  // useEffect(() => {
+  //   if (
+  //     socialLoginSDK &&
+  //     socialLoginSDK.web3auth &&
+  //     socialLoginSDK.web3auth.provider
+  //   ) {
+  //     console.log('socialLoginSDK Initiated')
+  //     setWeb3Auth(socialLoginSDK.web3auth);
+  //     setWalletProvider(
+  //       new ethers.providers.Web3Provider(socialLoginSDK.web3auth.provider!),
+  //     );
+  //     setRawEthereumProvider(socialLoginSDK.web3auth.provider);
+  //     console.log('socialLoginSDK Initiated done')
+  //   }
+  // }, [socialLoginSDK, web3Auth]);
 
   useEffect(() => {
     if (
@@ -96,15 +100,19 @@ const WalletProviderProvider = props => {
       accounts[0] &&
       accounts[0].length > 0
     ) {
+      console.log('LoggedIn Initiated')
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
+      console.log('LoggedIn Completed')
     }
   }, [rawEthereumProvider, walletProvider, currentChainId, accounts]);
 
   useEffect(() => {
     if (!walletProvider) return;
+    console.log('Change walletProvider Initiated')
     setSigner(walletProvider.getSigner());
+    console.log('Change walletProvider Done')
   }, [walletProvider]);
 
   useEffect(() => {
@@ -138,6 +146,7 @@ const WalletProviderProvider = props => {
   useEffect(() => {
     if (!walletProvider) return;
     (async () => {
+      console.log('wallet Initiated')
       let { chainId } = await walletProvider.getNetwork();
       let accounts = await walletProvider.listAccounts();
       let wallet = new SmartAccount(walletProvider, {
@@ -152,6 +161,7 @@ const WalletProviderProvider = props => {
       setSmartAccount(wallet)
       setAccounts(accounts.map(a => a.toLowerCase()));
       setCurrentChainId(chainId);
+      console.log('wallet Initiated Done')
     })();
   }, []);
 
@@ -160,14 +170,15 @@ const WalletProviderProvider = props => {
     if (!smartAccount || !walletProvider || !accounts)
     return;
     (async () => {
+      console.log('wallet Owner Initiated')
     let { chainId } = await walletProvider.getNetwork();
      // get all smart account versions available and update in state
      const { data } = await smartAccount.getSmartAccountsByOwner({
       chainId: chainId,
       owner: accounts[0],
     });
-    console.info("getSmartAccountsByOwner", data);
     setSmartAccountAddress(data[0]?.smartAccountAddress || '')
+    console.log('wallet Owner Initiated Done')
   })();
   }, [smartAccount, walletProvider]);
 

@@ -32,11 +32,14 @@ function IncreaseLiquidity() {
   const {
     accounts,
     connect,
+    smartAccount,
+    smartAccountAddress,
     currentChainId,
     isLoggedIn,
     signer,
     walletProvider,
   } = useWalletProvider()!;
+
   const { networks } = useChains()!;
   const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
@@ -181,10 +184,13 @@ function IncreaseLiquidity() {
         return;
       }
 
+      console.log('token ', token[chain.chainId].address);
+      
+
       const increaseLiquidityTx =
         token[chain.chainId].address === NATIVE_ADDRESS
           ? await increaseNativeLiquidity(positionId, amount)
-          : await increaseLiquidity(positionId, amount);
+          : await increaseLiquidity(token[chain.chainId].address, positionId, amount);
       addTxNotification(
         increaseLiquidityTx,
         'Increase liquidity',
@@ -197,13 +203,13 @@ function IncreaseLiquidity() {
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
     async function getWalletBalance() {
-      if (!accounts || !chain || !token) return;
+      if (!smartAccountAddress || !chain || !token) return;
       const { displayBalance } =
-        (await getTokenBalance(accounts[0], chain, token)) || {};
+        (await getTokenBalance(smartAccountAddress, chain, token)) || {};
       setWalletBalance(displayBalance);
     }
     getWalletBalance();
-  }, [accounts, chain, token]);
+  }, [smartAccountAddress, chain, token]);
 
   const formattedTotalLiquidity =
     totalLiquidity && tokenDecimals
@@ -558,34 +564,12 @@ function IncreaseLiquidity() {
                 {currentChainId === chain?.chainId ? (
                   <>
                     <button
-                      className="mt-12 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
-                      disabled={
-                        isDataLoading ||
-                        isNativeToken ||
-                        isLiquidityAmountGtWalletBalance ||
-                        isLiquidityAmountGtPoolCap ||
-                        !isLiquidityAmountGtTokenAllowance
-                      }
-                      onClick={showApprovalModal}
-                    >
-                      {liquidityIncreaseAmount === '' ||
-                      (Number.parseFloat(liquidityIncreaseAmount) === 0 &&
-                        !isLiquidityAmountGtTokenAllowance)
-                        ? 'Enter amount to see approval'
-                        : approveTokenLoading
-                        ? 'Approving Token'
-                        : isNativeToken || !isLiquidityAmountGtTokenAllowance
-                        ? `${token?.symbol} Approved`
-                        : `Approve ${token?.symbol}`}
-                    </button>
-                    <button
                       className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
                       disabled={
                         isDataLoading ||
                         liquidityIncreaseAmount === '' ||
                         Number.parseFloat(liquidityIncreaseAmount) === 0 ||
                         isLiquidityAmountGtWalletBalance ||
-                        (!isNativeToken && isLiquidityAmountGtTokenAllowance) ||
                         isLiquidityAmountGtPoolCap
                       }
                       onClick={handleConfirmSupplyClick}

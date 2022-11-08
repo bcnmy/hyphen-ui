@@ -1,14 +1,29 @@
 import { useCallback, useMemo } from 'react';
 import { BigNumber, ethers } from 'ethers';
 import liquidityProvidersABI from 'abis/LiquidityProviders.abi.json';
+import erc20ABI from 'abis/erc20.abi.json'
+
 import { useWalletProvider } from 'context/WalletProvider';
 import { Network } from 'hooks/useNetworks';
 
 function useLiquidityProviders(chain: Network | undefined) {
-  const { signer } = useWalletProvider()!;
+  const {
+    accounts,
+    connect,
+    smartAccount,
+    smartAccountAddress,
+    currentChainId,
+    isLoggedIn,
+    signer,
+    walletProvider,
+  } = useWalletProvider()!;
+
   const contractAddress = chain
     ? chain.contracts.hyphen.liquidityProviders
     : undefined;
+  
+  const erc20ContractInterface = new ethers.utils.Interface(erc20ABI);
+
 
   const liquidityProvidersContract = useMemo(() => {
     if (!chain || !contractAddress || !chain.rpc) return;
@@ -26,14 +41,57 @@ function useLiquidityProviders(chain: Network | undefined) {
     return new ethers.Contract(contractAddress, liquidityProvidersABI, signer);
   }, [contractAddress, signer]);
 
-  const addLiquidity = useCallback(
-    (tokenAddress: string, amount: BigNumber) => {
-      if (!liquidityProvidersContractSigner) return;
+  const makeApproveAndAddLiquidityTrx = async (tokenAddress: string, amount: BigNumber, position: BigNumber, add = true) =>{
+    if (!liquidityProvidersContract)
+    return
 
-      return liquidityProvidersContractSigner.addTokenLiquidity(
+    console.log(' tokenAddress ', tokenAddress);
+    console.log(' amount ', amount);
+    console.log(' position ', position);
+    console.log('contractAddress ', contractAddress);
+    
+    
+
+    const trxs: any = []
+      const approveCallData = erc20ContractInterface.encodeFunctionData('approve', [contractAddress, amount])
+
+      const tx1 = {
+        to: tokenAddress,
+        data: approveCallData,
+      };
+      trxs.push(tx1)
+      let liquidityCallData
+      if (add)
+      liquidityCallData = await liquidityProvidersContract.populateTransaction.addTokenLiquidity(
         tokenAddress,
-        amount,
-      );
+        amount
+      )
+      else
+      liquidityCallData = await liquidityProvidersContract.populateTransaction.increaseTokenLiquidity(
+        position,
+        amount
+      )
+
+      const tx2 = {
+        to: contractAddress,
+        data: liquidityCallData.data
+      }
+      trxs.push(tx2);
+    return trxs
+  }
+
+  const addLiquidity = useCallback(
+    async (tokenAddress: string, amount: BigNumber) => {
+      console.log('Hey going to add Liquidity') 
+     
+      if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount) return;
+
+
+      const txs: any = makeApproveAndAddLiquidityTrx(tokenAddress, amount, BigNumber.from(0))
+
+      const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
+
+      return response
     },
     [liquidityProvidersContractSigner],
   );
@@ -50,10 +108,21 @@ function useLiquidityProviders(chain: Network | undefined) {
   );
 
   const claimFee = useCallback(
-    (positionId: BigNumber) => {
-      if (!liquidityProvidersContractSigner) return;
+    async (positionId: BigNumber) => {
+      if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount || !contractAddress) return;
 
-      return liquidityProvidersContractSigner.claimFee(positionId);
+      const claimFeeCallData: any = liquidityProvidersContract.populateTransaction.claimFee(
+        positionId
+      )
+
+      const trx = {
+        to: contractAddress,
+        data: claimFeeCallData.data
+      }
+
+      const response = await smartAccount.sendGasLessTransaction({ transaction: trx });
+
+      return response
     },
     [liquidityProvidersContractSigner],
   );
@@ -115,13 +184,13 @@ function useLiquidityProviders(chain: Network | undefined) {
   );
 
   const increaseLiquidity = useCallback(
-    (positionId: BigNumber, amount: BigNumber) => {
-      if (!liquidityProvidersContractSigner) return;
+    async (tokenAddress: string, positionId: BigNumber, amount: BigNumber) => {
+      if (!liquidityProvidersContractSigner || !smartAccount) return;
 
-      return liquidityProvidersContractSigner.increaseTokenLiquidity(
-        positionId,
-        amount,
-      );
+      const txs: any = makeApproveAndAddLiquidityTrx(tokenAddress, amount, positionId, false)
+
+      const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
+      return response
     },
     [liquidityProvidersContractSigner],
   );
@@ -141,13 +210,32 @@ function useLiquidityProviders(chain: Network | undefined) {
   );
 
   const removeLiquidity = useCallback(
-    (positionId: BigNumber, amount: BigNumber) => {
-      if (!liquidityProvidersContractSigner) return;
+    async (positionId: BigNumber, amount: BigNumber) => {
+      console.log('Got Remove Liquidity Request');
+      console.log('position id', positionId);
+      console.log('amount', amount);
+      
+      if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount  || !contractAddress) return;
 
-      return liquidityProvidersContractSigner.removeLiquidity(
+      const removeLiquidityCallData: any = await liquidityProvidersContract.populateTransaction.removeLiquidity(
         positionId,
-        amount,
-      );
+        amount
+      )
+
+      console.log('removeLiquidityCallData ', removeLiquidityCallData);
+      
+
+      const trx = {
+        to: contractAddress,
+        data: removeLiquidityCallData.data
+      }
+
+      console.log('trx ', trx);
+      
+      const response = await smartAccount.sendGasLessTransaction({ transaction: trx });
+
+      return response
+
     },
     [liquidityProvidersContractSigner],
   );

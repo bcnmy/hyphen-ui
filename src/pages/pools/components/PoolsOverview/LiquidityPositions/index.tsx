@@ -12,7 +12,7 @@ import { useToken } from 'context/Token';
 
 function LiquidityPositions() {
   const navigate = useNavigate();
-  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
+  const { accounts, connect, isLoggedIn, smartAccountAddress } = useWalletProvider()!;
   const { networks, selectedNetwork } = useChains()!;
   const { tokens } = useToken()!;
 
@@ -26,12 +26,12 @@ function LiquidityPositions() {
   } = useQuery(
     ['userPositions', selectedNetwork?.chainId],
     () => {
-      if (!isLoggedIn || !accounts || !selectedNetwork) return;
+      if (!isLoggedIn || !smartAccountAddress || !selectedNetwork) return;
 
-      return getUserPositions(accounts);
+      return getUserPositions([smartAccountAddress]);
     },
     {
-      enabled: !!(isLoggedIn && accounts && selectedNetwork),
+      enabled: !!(isLoggedIn && smartAccountAddress && selectedNetwork),
       refetchOnWindowFocus: true,
       refetchOnMount: true,
       refetchOnReconnect: true,
@@ -39,6 +39,10 @@ function LiquidityPositions() {
   );
 
   function handleAddLiquidity() {
+    console.log('handleAddLiquidity ********');
+    console.log('tokens ', tokens);
+    
+    debugger
     const isSelectedNetworkSupported = selectedNetwork
       ? networks?.find(
           networkObj => networkObj.chainId === selectedNetwork?.chainId,

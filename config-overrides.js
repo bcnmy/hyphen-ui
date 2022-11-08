@@ -12,7 +12,8 @@ module.exports = function override(config) {
         "https": require.resolve("https-browserify"),
         "url": require.resolve("url"),
         "zlib": require.resolve("browserify-zlib"),
-        "process/browser": require.resolve("process/browser")
+        "process/browser": require.resolve("process/browser"),
+        "path": require.resolve("path-browserify")
     })
     config.resolve.fallback = fallback;
     config.plugins = (config.plugins || []).concat([

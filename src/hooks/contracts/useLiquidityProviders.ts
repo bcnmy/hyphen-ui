@@ -87,7 +87,7 @@ function useLiquidityProviders(chain: Network | undefined) {
       if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount) return;
 
 
-      const txs: any = makeApproveAndAddLiquidityTrx(tokenAddress, amount, BigNumber.from(0))
+      const txs: any = await makeApproveAndAddLiquidityTrx(tokenAddress, amount, BigNumber.from(0))
 
       const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
 
@@ -111,7 +111,7 @@ function useLiquidityProviders(chain: Network | undefined) {
     async (positionId: BigNumber) => {
       if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount || !contractAddress) return;
 
-      const claimFeeCallData: any = liquidityProvidersContract.populateTransaction.claimFee(
+      const claimFeeCallData: any = await liquidityProvidersContract.populateTransaction.claimFee(
         positionId
       )
 
@@ -187,7 +187,7 @@ function useLiquidityProviders(chain: Network | undefined) {
     async (tokenAddress: string, positionId: BigNumber, amount: BigNumber) => {
       if (!liquidityProvidersContractSigner || !smartAccount) return;
 
-      const txs: any = makeApproveAndAddLiquidityTrx(tokenAddress, amount, positionId, false)
+      const txs: any = await makeApproveAndAddLiquidityTrx(tokenAddress, amount, positionId, false)
 
       const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
       return response

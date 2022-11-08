@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.5.7",
-    "@biconomy-sdk/core-types": "file:../biconomy-client-sdk/packages/core-types",
+    "@biconomy-sdk/core-types": "/Users/aman/Desktop/work/bico/biconomy-client-sdk/packages/core-types",
     "@biconomy-sdk/smart-account": "file:../biconomy-client-sdk/packages/smart-account",
     "@biconomy-sdk/web3-auth": "file:../biconomy-client-sdk/packages/web3-auth",
     "@biconomy/hyphen": "^1.1.4",
@@ -32,6 +32,7 @@
     "hyphen-widget-test": "^1.0.3",
     "net": "^1.0.2",
     "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
     "rc-slider": "^9.7.5",
     "react": "^18.2.0",
     "react-animate-height": "^2.0.23",

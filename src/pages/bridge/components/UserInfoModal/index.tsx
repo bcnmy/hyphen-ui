@@ -85,7 +85,8 @@ const FEE_INFO = gql`
 `;
 
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
-  const { accounts, disconnect, rawEthereumProvider } = useWalletProvider()!;
+  const { accounts, disconnect, rawEthereumProvider, smartAccountAddress } =
+    useWalletProvider()!;
   const { fromChain, networks } = useChains()!;
   const { tokens } = useToken()!;
   const { hyphen } = useHyphen()!;
@@ -249,8 +250,8 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
     onClose();
   }
 
-  function handleUserAddressCopy() {
-    navigator.clipboard.writeText(userAddress || '');
+  function handleUserAddressCopy(address: string) {
+    navigator.clipboard.writeText(address || '');
     setAddressCopied(true);
     setTimeout(() => {
       setAddressCopied(false);
@@ -285,16 +286,28 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         </div>
 
         <aside className="px-7.5 xl:px-12.5">
-          <div className="h-[5.625rem] rounded-2.5 border-2 border-[#F6851B] bg-[#F6851B]">
+          <div className="rounded-2.5 border-2 border-[#F6851B] bg-[#F6851B]">
             <p className="relative flex h-15 w-full items-center rounded-t-2.5 bg-white px-5 font-mono text-xl text-hyphen-gray-400">
-              {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
+              EOA - {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
               <button
                 className="absolute top-[1.375rem] right-5 z-[2] flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs uppercase text-white"
-                onClick={handleUserAddressCopy}
+                onClick={() => handleUserAddressCopy(userAddress || '')}
               >
                 {addressCopied ? 'Copied' : 'Copy'}
               </button>
             </p>
+
+            <p className="relative flex h-15 w-full items-center bg-white px-5 font-mono text-xl text-hyphen-gray-400">
+              SCW - {smartAccountAddress?.slice(0, 6)}...
+              {smartAccountAddress?.slice(-6)}
+              <button
+                className="absolute top-[1.375rem] right-5 z-[2] flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs uppercase text-white"
+                onClick={() => handleUserAddressCopy(smartAccountAddress || '')}
+              >
+                {addressCopied ? 'Copied' : 'Copy'}
+              </button>
+            </p>
+
             <p className="flex h-7 items-center justify-between px-5 text-xxs font-bold uppercase text-white">
               Connected with {providerName}
               <button

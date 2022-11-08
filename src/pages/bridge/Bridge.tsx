@@ -2,21 +2,11 @@ import React, { useEffect, useState } from 'react';
 import * as HyphenWidget from 'hyphen-widget-test';
 import 'hyphen-widget-test/dist/index.css';
 import config from 'config';
-import { useWalletProvider } from 'context/WalletProvider';
 
 interface BridgeProps {}
 
 const Bridge: React.FC<BridgeProps> = () => {
   const [, setHyphenWidget] = useState();
-  const { isLoggedIn, connect } = useWalletProvider()!;
-
-  useEffect(() => {
-    (async () => {
-      await connect().catch((e: Error) => {
-        console.error(e);
-      });
-    })();
-  }, [isLoggedIn, connect]);
 
   useEffect(() => {
     const widgetContainer = document.getElementById('hyphen-widget');

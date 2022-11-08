@@ -51,19 +51,9 @@ const WalletProviderProvider = props => {
     null,
   );
   const [loading, setLoading] = useState(false);
-  const [web3Auth, setWeb3Auth] = useState<any>(null);
+  // const [web3Auth, setWeb3Auth] = useState<any>(null);
 
-  console.log('all', {
-    socialLoginSDK,
-    walletProvider,
-    signer,
-    accounts,
-    smartAccount,
-    currentChainId,
-    isLoggedIn,
-    rawEthereumProvider,
-  });
-
+  // create socialLoginSDK and call the init
   useEffect(() => {
     const initWallet = async () => {
       setLoading(true);
@@ -76,19 +66,20 @@ const WalletProviderProvider = props => {
     if (!socialLoginSDK) initWallet();
   }, [socialLoginSDK]);
 
-  // get web3auth after social login
+  // after social login -> set provider info
   useEffect(() => {
-    console.log(socialLoginSDK);
-    if (socialLoginSDK && socialLoginSDK.provider) {
-      setWeb3Auth(socialLoginSDK.web3auth);
-      setWalletProvider(
-        new ethers.providers.Web3Provider(socialLoginSDK.provider),
+    if (socialLoginSDK?.provider) {
+      const newProvider = new ethers.providers.Web3Provider(
+        socialLoginSDK.provider,
       );
       setRawEthereumProvider(socialLoginSDK.provider);
+      setWalletProvider(newProvider);
+      setSigner(newProvider.getSigner());
+      socialLoginSDK.hideWallet();
     }
-  }, [socialLoginSDK]);
-  // get web3auth after social login
+  }, [socialLoginSDK, socialLoginSDK?.provider]);
 
+  // if everything initiated setIsLoggedIn true
   useEffect(() => {
     if (
       rawEthereumProvider &&
@@ -106,13 +97,10 @@ const WalletProviderProvider = props => {
 
   useEffect(() => {
     console.log('hidelwallet');
-    if (socialLoginSDK && accounts?.length) socialLoginSDK.hideWallet();
+    if (socialLoginSDK && accounts?.length) {
+      socialLoginSDK.hideWallet();
+    }
   }, [accounts, socialLoginSDK]);
-
-  useEffect(() => {
-    if (!walletProvider) return;
-    setSigner(walletProvider.getSigner());
-  }, [walletProvider]);
 
   // because provider does not fire events initially, we need to fetch initial values for current chain from walletProvider
   // subsequent changes to these values however do fire events, and we can just use those event handlers
@@ -126,7 +114,7 @@ const WalletProviderProvider = props => {
         signType: SignTypeMethod.PERSONAL_SIGN,
         activeNetworkId: chainId,
         supportedNetworksIds: [chainId],
-        bundlerUrl: 'http://localhost:3002',
+        // bundlerUrl: 'http://localhost:3002',
       });
       console.log('wallet ', wallet);
       wallet = await wallet.init();
@@ -156,6 +144,24 @@ const WalletProviderProvider = props => {
 
   const connect = useCallback(async () => {
     if (accounts) return;
+    if (socialLoginSDK?.web3auth?.provider) {
+      const newProvider = new ethers.providers.Web3Provider(
+        socialLoginSDK.web3auth.provider,
+      );
+      setWalletProvider(newProvider);
+      setSigner(newProvider.getSigner());
+      setRawEthereumProvider(socialLoginSDK.web3auth.provider);
+      return;
+    }
+    if (socialLoginSDK?.provider) {
+      const newProvider = new ethers.providers.Web3Provider(
+        socialLoginSDK.provider,
+      );
+      setWalletProvider(newProvider);
+      setSigner(newProvider.getSigner());
+      setRawEthereumProvider(socialLoginSDK.provider);
+      return;
+    }
     if (socialLoginSDK) {
       socialLoginSDK.showWallet();
       return socialLoginSDK;
@@ -175,78 +181,12 @@ const WalletProviderProvider = props => {
       console.error('Web3Modal not initialized.');
       return;
     }
-    socialLoginSDK.web3auth.logout();
+    await socialLoginSDK.logout();
     socialLoginSDK.hideWallet();
     setRawEthereumProvider(null);
     setWalletProvider(null);
     setAccounts(null);
   }, [socialLoginSDK]);
-
-  const reinit = (changedProvider: any) => {
-    setWalletProvider(new ethers.providers.Web3Provider(changedProvider));
-  };
-  // setup event handlers for web3 provider
-  // this is the provider injected by metamask/fortis/etc
-  useEffect(() => {
-    if (!rawEthereumProvider) return;
-
-    function handleAccountsChanged(accounts: string[]) {
-      console.log('accountsChanged!');
-      setAccounts(accounts.map(a => a.toLowerCase()));
-      reinit(rawEthereumProvider);
-    }
-
-    // Wallet documentation recommends reloading page on chain change.
-    // Ref: https://docs.metamask.io/guide/ethereum-provider.html#events
-    function handleChainChanged(chainId: string | number) {
-      console.log('chainChanged!');
-      if (typeof chainId === 'string') {
-        setCurrentChainId(Number.parseInt(chainId));
-      } else {
-        setCurrentChainId(chainId);
-      }
-      reinit(rawEthereumProvider);
-    }
-
-    function handleConnect(info: { chainId: number }) {
-      console.log('connect!');
-      const { chainId } = info;
-      if (typeof chainId === 'string') {
-        setCurrentChainId(Number.parseInt(chainId));
-      } else {
-        setCurrentChainId(chainId);
-      }
-      reinit(rawEthereumProvider);
-    }
-
-    function handleDisconnect(error: { code: number; message: string }) {
-      console.log('disconnect');
-      console.error(error);
-    }
-
-    // Subscribe to accounts change
-    rawEthereumProvider.on('accountsChanged', handleAccountsChanged);
-
-    // Subscribe to network change
-    rawEthereumProvider.on('chainChanged', handleChainChanged);
-
-    // Subscribe to provider connection
-    rawEthereumProvider.on('connect', handleConnect);
-
-    // Subscribe to provider disconnection
-    rawEthereumProvider.on('disconnect', handleDisconnect);
-
-    // Remove event listeners on unmount!
-    return () => {
-      rawEthereumProvider.removeListener(
-        'accountsChanged',
-        handleAccountsChanged,
-      );
-      rawEthereumProvider.removeListener('chainChanged', handleChainChanged);
-      rawEthereumProvider.removeListener('connect', handleConnect);
-      rawEthereumProvider.removeListener('disconnect', handleDisconnect);
-    };
-  }, [rawEthereumProvider]);
 
   return (
     <WalletProviderContext.Provider

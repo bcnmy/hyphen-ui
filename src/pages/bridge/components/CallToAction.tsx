@@ -28,7 +28,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     fetchSelectedTokenApprovalValue,
   } = useTokenApproval()!;
 
-  const { walletProvider, currentChainId, connect, isLoggedIn } =
+  const { walletProvider, currentChainId, connect, isLoggedIn, loading } =
     useWalletProvider()!;
   const { fromChain } = useChains()!;
   const { selectedToken } = useToken()!;
@@ -47,7 +47,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     return (
       <div className="flex justify-center">
         <PrimaryButtonLight onClick={() => connect()} className="xl:w-full">
-          Connect Wallet
+          {loading ? 'loading...' : 'Connect Wallet'}
         </PrimaryButtonLight>
       </div>
     );

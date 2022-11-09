@@ -11,7 +11,7 @@ interface IFooterProps {
 
 function Footer({ showUserInfoModal }: IFooterProps) {
   const location = useLocation();
-  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
+  const { accounts, connect, isLoggedIn, loading } = useWalletProvider()!;
   const userAddress = accounts?.[0];
 
   const showNetworkSelector = [
@@ -75,8 +75,10 @@ function Footer({ showUserInfoModal }: IFooterProps) {
           onClick={isLoggedIn ? showUserInfoModal : connect}
         >
           {isLoggedIn
-            ? `${userAddress?.slice(0, 6)}...${userAddress?.slice(-6)}`
-            : 'Connect Wallet'}
+              ? `${userAddress?.slice(0, 6)}...${userAddress?.slice(-6)}`
+              : loading
+              ? 'loading...'
+              : 'Connect Wallet'}
         </button>
       </div>
     </footer>

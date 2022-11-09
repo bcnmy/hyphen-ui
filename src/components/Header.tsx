@@ -11,7 +11,7 @@ interface IHeaderProps {
 
 function Header({ showUserInfoModal }: IHeaderProps) {
   const location = useLocation();
-  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
+  const { accounts, connect, isLoggedIn, loading } = useWalletProvider()!;
   const userAddress = accounts?.[0];
 
   const showNetworkSelector = [
@@ -144,6 +144,8 @@ function Header({ showUserInfoModal }: IHeaderProps) {
           >
             {isLoggedIn
               ? `${userAddress?.slice(0, 6)}...${userAddress?.slice(-6)}`
+              : loading
+              ? 'loading...'
               : 'Connect Wallet'}
           </button>
         </div>

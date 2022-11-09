@@ -114,9 +114,11 @@ const WalletProviderProvider = props => {
       accounts[0] &&
       accounts[0].length > 0
     ) {
+      console.log('LoggedIn Initiated')
       setIsLoggedIn(true);
     } else {
       setIsLoggedIn(false);
+      console.log('LoggedIn Completed')
     }
   }, [rawEthereumProvider, walletProvider, currentChainId, accounts]);
 
@@ -138,7 +140,13 @@ const WalletProviderProvider = props => {
         signType: SignTypeMethod.PERSONAL_SIGN,
         activeNetworkId: chainId,
         supportedNetworksIds: [chainId],
-        // bundlerUrl: 'http://localhost:3002',
+        bundlerUrl: 'http://localhost:3000/rpc',
+        networkConfig: [
+          {
+          chainId: chainId,
+          dappAPIKey: 'gUv-7Xh-M.aa270a76-a1aa-4e79-bab5-8d857161c561',
+        }
+      ]
       });
       console.log('wallet ', wallet);
       wallet = await wallet.init();

@@ -115,6 +115,8 @@ function ManagePosition() {
       amount: BigNumber;
     }) => {
       const removeLiquidityTx = await removeLiquidity(positionId, amount);
+      if (!removeLiquidityTx)
+      return
       addTxNotification(
         removeLiquidityTx,
         'Remove liquidity',
@@ -130,6 +132,8 @@ function ManagePosition() {
     mutate: claimFeeMutation,
   } = useMutation(async ({ positionId }: { positionId: BigNumber }) => {
     const claimFeeTx = await claimFee(positionId);
+    if (!claimFeeTx)
+      return
     addTxNotification(
       claimFeeTx,
       'Claim fee',

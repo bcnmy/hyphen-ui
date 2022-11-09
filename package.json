@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.5.7",
-    "@biconomy-sdk/core-types": "/Users/aman/Desktop/work/bico/biconomy-client-sdk/packages/core-types",
-    "@biconomy-sdk/smart-account": "file:../biconomy-client-sdk/packages/smart-account",
-    "@biconomy-sdk/web3-auth": "file:../biconomy-client-sdk/packages/web3-auth",
+    "@biconomy-sdk/core-types": "1.0.21",
+    "@biconomy-sdk/smart-account": "1.0.21",
+    "@biconomy-sdk/web3-auth": "1.0.21",
     "@biconomy/hyphen": "^1.1.4",
     "@biconomy/mexa": "^2.0.24",
     "@craco/craco": "^6.4.3",

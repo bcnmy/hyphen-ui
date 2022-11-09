@@ -5,7 +5,8 @@ import erc20ABI from 'abis/erc20.abi.json'
 
 import { useWalletProvider } from 'context/WalletProvider';
 import { Network } from 'hooks/useNetworks';
-
+import { USDT_ADDRESS } from '../../config/constants'
+import getTokenAllowance from '../../utils/getTokenAllowance'
 function useLiquidityProviders(chain: Network | undefined) {
   const {
     accounts,
@@ -35,6 +36,7 @@ function useLiquidityProviders(chain: Network | undefined) {
     );
   }, [chain, contractAddress]);
 
+
   const liquidityProvidersContractSigner = useMemo(() => {
     if (!contractAddress || !signer) return;
 
@@ -42,17 +44,40 @@ function useLiquidityProviders(chain: Network | undefined) {
   }, [contractAddress, signer]);
 
   const makeApproveAndAddLiquidityTrx = async (tokenAddress: string, amount: BigNumber, position: BigNumber, add = true) =>{
-    if (!liquidityProvidersContract)
+    if (!liquidityProvidersContract || !smartAccountAddress || !contractAddress ||!chain)
     return
+
+    const provider = new ethers.providers.JsonRpcProvider(chain.rpc)
 
     console.log(' tokenAddress ', tokenAddress);
     console.log(' amount ', amount);
     console.log(' position ', position);
     console.log('contractAddress ', contractAddress);
+
+    // In case of USDT if it has alreday approved allowance. 
+    // we need to approve 0 token transaction
+    let amountToApprove = amount
     
+    if (tokenAddress === USDT_ADDRESS){
+      const tokenAllowance = BigNumber.from(await getTokenAllowance(smartAccountAddress, provider, contractAddress, tokenAddress))
+      console.log('Token Allowance ', tokenAllowance);
+      if ( tokenAllowance.gt(BigNumber.from(0)) ){
+        amountToApprove = BigNumber.from(0)
+      }
+    }
+
+
+    console.log('amount to approve ', amount);
     
 
-    const trxs: any = []
+      const trxs: any = []
+      if ( amountToApprove.eq(BigNumber.from(0))){
+        const zeroApproveCallData = erc20ContractInterface.encodeFunctionData('approve', [contractAddress, amountToApprove])
+        trxs.push({
+          to: tokenAddress,
+          data: zeroApproveCallData
+        })
+      }
       const approveCallData = erc20ContractInterface.encodeFunctionData('approve', [contractAddress, amount])
 
       const tx1 = {
@@ -89,6 +114,9 @@ function useLiquidityProviders(chain: Network | undefined) {
 
       const txs: any = await makeApproveAndAddLiquidityTrx(tokenAddress, amount, BigNumber.from(0))
 
+      console.log('------ Add Liquidity Batching Trx ', txs);
+      
+
       const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
 
       return response
@@ -119,6 +147,9 @@ function useLiquidityProviders(chain: Network | undefined) {
         to: contractAddress,
         data: claimFeeCallData.data
       }
+
+      console.log('------ Claim Fee GasLess Trx ', trx);
+
 
       const response = await smartAccount.sendGasLessTransaction({ transaction: trx });
 
@@ -188,6 +219,8 @@ function useLiquidityProviders(chain: Network | undefined) {
       if (!liquidityProvidersContractSigner || !smartAccount) return;
 
       const txs: any = await makeApproveAndAddLiquidityTrx(tokenAddress, amount, positionId, false)
+
+      console.log('------ increase Liquidity Batch Trx ', txs);
 
       const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
       return response

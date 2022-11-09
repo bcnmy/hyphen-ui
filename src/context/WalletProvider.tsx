@@ -141,7 +141,6 @@ const WalletProviderProvider = props => {
         signType: SignTypeMethod.PERSONAL_SIGN,
         activeNetworkId: chainId,
         supportedNetworksIds: [chainId],
-        bundlerUrl: 'http://localhost:3000/rpc',
         networkConfig: [
           {
             chainId: chainId,

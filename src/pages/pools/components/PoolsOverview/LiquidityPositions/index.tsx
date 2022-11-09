@@ -42,7 +42,6 @@ function LiquidityPositions() {
     console.log('handleAddLiquidity ********');
     console.log('tokens ', tokens);
     
-    debugger
     const isSelectedNetworkSupported = selectedNetwork
       ? networks?.find(
           networkObj => networkObj.chainId === selectedNetwork?.chainId,

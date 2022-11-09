@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.5.7",
-    "@biconomy-sdk/core-types": "1.0.21",
-    "@biconomy-sdk/smart-account": "1.0.21",
-    "@biconomy-sdk/web3-auth": "1.0.21",
+    "@biconomy-sdk/core-types": "1.0.23",
+    "@biconomy-sdk/smart-account": "1.0.23",
+    "@biconomy-sdk/web3-auth": "1.0.23",
     "@biconomy/hyphen": "^1.1.4",
     "@biconomy/mexa": "^2.0.24",
     "@headlessui/react": "^1.4.2",
@@ -77,9 +77,11 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "chrome >= 67",
+      "edge >= 79",
+      "firefox >= 68",
+      "opera >= 54",
+      "safari >= 14"
     ],
     "development": [
       "last 1 chrome version",

@@ -6,16 +6,14 @@ import {
   useState,
 } from 'react';
 import { ethers } from 'ethers';
-import Web3Modal from 'web3modal';
 import SmartAccount from '@biconomy-sdk/smart-account';
 import SocialLogin from '@biconomy-sdk/web3-auth';
 
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
   signer: ethers.Signer | undefined;
-  web3Modal: Web3Modal | undefined;
-  connect: Web3Modal['connect'];
-  disconnect: Web3Modal['clearCachedProvider'];
+  connect: () => Promise<SocialLogin | null | undefined>;
+  disconnect: () => Promise<void>;
   socialLoginSDK?: SocialLogin | null;
   accounts: string[] | null;
   smartAccount: SmartAccount | null;
@@ -214,7 +212,7 @@ const WalletProviderProvider = props => {
 
   const disconnect = useCallback(async () => {
     if (!socialLoginSDK || !socialLoginSDK.web3auth) {
-      console.error('Web3Modal not initialized.');
+      console.error('socialLoginSDK not initialized.');
       return;
     }
     await socialLoginSDK.logout();

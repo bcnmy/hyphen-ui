@@ -226,6 +226,9 @@ function AddLiquidity() {
         token && token[currentChainId].address === NATIVE_ADDRESS
           ? await addNativeLiquidity(amount)
           : await addLiquidity(tokenAddress, amount);
+      
+      if (!addLiquidityTx)
+      return
       addTxNotification(
         addLiquidityTx,
         'Add liquidity',

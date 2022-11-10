@@ -230,16 +230,16 @@ function AddLiquidity() {
         token && token[currentChainId].address === NATIVE_ADDRESS
           ? await addNativeLiquidity(amount)
           : await addLiquidity(tokenAddress, amount);
-      
-      if (!addLiquidityTx)
-      return
 
+      if (!addLiquidityTx) return;
+
+      const res: any = await addLiquidityTx.wait(1);
       addTxNotification(
         addLiquidityTx,
         'Add liquidity',
-        `${fromChain?.explorerUrl}/tx/${addLiquidityTx.hash}`,
+        `${fromChain?.explorerUrl}/tx/${res.hash}`,
       );
-      return await addLiquidityTx.wait(1);
+      return res;
     },
   );
 

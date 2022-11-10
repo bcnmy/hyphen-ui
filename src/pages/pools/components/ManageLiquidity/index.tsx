@@ -116,12 +116,13 @@ function ManagePosition() {
     }) => {
       const removeLiquidityTx = await removeLiquidity(positionId, amount);
       if (!removeLiquidityTx) return;
+      const res: any = await removeLiquidityTx.wait(1);
       addTxNotification(
         removeLiquidityTx,
         'Remove liquidity',
-        `${chain?.explorerUrl}/tx/${removeLiquidityTx.hash}`,
+        `${chain?.explorerUrl}/tx/${res.hash}`,
       );
-      return await removeLiquidityTx.wait(1);
+      return res;
     },
   );
 

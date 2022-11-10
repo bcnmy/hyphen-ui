@@ -185,18 +185,22 @@ function IncreaseLiquidity() {
       }
 
       console.log('token ', token[chain.chainId].address);
-      
 
       const increaseLiquidityTx =
         token[chain.chainId].address === NATIVE_ADDRESS
           ? await increaseNativeLiquidity(positionId, amount)
-          : await increaseLiquidity(token[chain.chainId].address, positionId, amount);
+          : await increaseLiquidity(
+              token[chain.chainId].address,
+              positionId,
+              amount,
+            );
+      const res: any = await increaseLiquidityTx.wait(1);
       addTxNotification(
         increaseLiquidityTx,
         'Increase liquidity',
-        `${chain?.explorerUrl}/tx/${increaseLiquidityTx.hash}`,
+        `${chain?.explorerUrl}/tx/${res.hash}`,
       );
-      return await increaseLiquidityTx.wait(1);
+      return res;
     },
   );
 

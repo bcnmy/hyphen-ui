@@ -126,12 +126,29 @@ function useLiquidityProviders(chain: Network | undefined) {
   );
 
   const addNativeLiquidity = useCallback(
-    (amount: BigNumber) => {
-      if (!liquidityProvidersContractSigner) return;
+    async (amount: BigNumber) => {
+      console.log(' addNativeLiquidity ');
+      console.log(' amount ', amount);
+      
+      if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount || !contractAddress) return;
 
-      return liquidityProvidersContractSigner.addNativeLiquidity({
-        value: amount,
-      });
+      const nativeTokenLiquidityCallData: any = await liquidityProvidersContract.populateTransaction.addNativeLiquidity({
+        value: amount
+      })
+
+      const trx = {
+        to: contractAddress,
+        data: nativeTokenLiquidityCallData.data,
+        value: amount
+      }
+
+      console.log('------ Native Token Liquidity GasLess Trx ', trx);
+
+
+      const response = await smartAccount.sendGasLessTransaction({ transaction: trx });
+
+      return response
+
     },
     [liquidityProvidersContractSigner],
   );

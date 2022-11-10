@@ -20,7 +20,7 @@ function ManageStakingPosition() {
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
+  const { accounts, connect, currentChainId, isLoggedIn, walletProvider, loading } =
     useWalletProvider()!;
   const { networks } = useChains()!;
   const { tokens } = useToken()!;
@@ -390,7 +390,7 @@ function ManageStakingPosition() {
                   className="mt-10 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                   onClick={connect}
                 >
-                  Connect Your Wallet
+                  {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}
                 </button>
               ) : null}
             </div>

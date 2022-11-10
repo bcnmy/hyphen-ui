@@ -33,7 +33,7 @@ function AddLiquidity() {
   const {
     accounts,
     connect,
-    smartAccount,
+    loading,
     smartAccountAddress,
     currentChainId,
     isLoggedIn,
@@ -79,14 +79,14 @@ function AddLiquidity() {
     if (!tokens) {
       return [];
     }
-      return Object.keys(tokens).map(tokenSymbol => {
-          const tokenObj = tokens[tokenSymbol];
-          return {
-            id: tokenObj.symbol,
-            name: tokenObj.symbol,
-            image: tokenObj.image,
-          };
-        });
+    return Object.keys(tokens).map(tokenSymbol => {
+      const tokenObj = tokens[tokenSymbol];
+      return {
+        id: tokenObj.symbol,
+        name: tokenObj.symbol,
+        image: tokenObj.image,
+      };
+    });
   }, [selectedChain, tokens]);
   const [selectedToken, setSelectedToken] = useState<Option | undefined>();
 
@@ -218,14 +218,20 @@ function AddLiquidity() {
 
       const token = tokens ? tokens[selectedToken.id] : undefined;
 
-      console.log('amount ', amount)
+      console.log('amount ', amount);
       console.log('token ', token);
-      
 
+      // addTxNotification(
+      //   addLiquidityTx,
+      //   'Add liquidity',
+      //   `${fromChain?.explorerUrl}/tx/${addLiquidityTx.hash}`,
+      // );
       const addLiquidityTx =
         token && token[currentChainId].address === NATIVE_ADDRESS
           ? await addNativeLiquidity(amount)
           : await addLiquidity(tokenAddress, amount);
+      console.log(addLiquidityTx);
+      console.log('imp', fromChain?.explorerUrl, addLiquidityTx.hash);
       addTxNotification(
         addLiquidityTx,
         'Add liquidity',
@@ -335,7 +341,6 @@ function AddLiquidity() {
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   useEffect(() => {
-    
     const chain = chainId
       ? chainOptions?.find(chainObj => chainObj.id === Number.parseInt(chainId))
       : undefined;
@@ -378,6 +383,7 @@ function AddLiquidity() {
     isLoggedIn,
     liquidityProvidersAddress,
     networks,
+    smartAccountAddress,
     tokenSymbol,
     tokens,
   ]);
@@ -814,7 +820,7 @@ function AddLiquidity() {
                 className="mt-[6.75rem] h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                 onClick={connect}
               >
-                Connect Your Wallet
+                {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}
               </button>
             ) : null}
           </div>

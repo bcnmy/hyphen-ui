@@ -7,16 +7,17 @@ import { useWalletProvider } from 'context/WalletProvider';
 import { Network } from 'hooks/useNetworks';
 import { USDT_ADDRESS } from '../../config/constants'
 import getTokenAllowance from '../../utils/getTokenAllowance'
+import { toast } from 'react-toastify';
 function useLiquidityProviders(chain: Network | undefined) {
   const {
-    accounts,
-    connect,
+    // accounts,
+    // connect,
     smartAccount,
     smartAccountAddress,
-    currentChainId,
-    isLoggedIn,
+    // currentChainId,
+    // isLoggedIn,
     signer,
-    walletProvider,
+    // walletProvider,
   } = useWalletProvider()!;
 
   const contractAddress = chain
@@ -108,7 +109,7 @@ function useLiquidityProviders(chain: Network | undefined) {
   const addLiquidity = useCallback(
     async (tokenAddress: string, amount: BigNumber) => {
       console.log('Hey going to add Liquidity') 
-     
+
       if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount) return;
 
 
@@ -116,7 +117,7 @@ function useLiquidityProviders(chain: Network | undefined) {
 
       console.log('------ Add Liquidity Batching Trx ', txs);
       
-
+      toast.info(`Batching and sending add liquidity transaction...`);
       const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
 
       return response
@@ -138,10 +139,12 @@ function useLiquidityProviders(chain: Network | undefined) {
   const claimFee = useCallback(
     async (positionId: BigNumber) => {
       if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount || !contractAddress) return;
-
+      
       const claimFeeCallData: any = await liquidityProvidersContract.populateTransaction.claimFee(
         positionId
       )
+      toast.info(`Batching and sending claim transaction...`);
+      
 
       const trx = {
         to: contractAddress,
@@ -219,9 +222,10 @@ function useLiquidityProviders(chain: Network | undefined) {
       if (!liquidityProvidersContractSigner || !smartAccount) return;
 
       const txs: any = await makeApproveAndAddLiquidityTrx(tokenAddress, amount, positionId, false)
-
+      
       console.log('------ increase Liquidity Batch Trx ', txs);
-
+      
+      toast.info(`Batching and sending increase liquidity transaction...`);
       const response = await smartAccount.sendGaslessTransactionBatch({ transactions: txs });
       return response
     },
@@ -249,11 +253,12 @@ function useLiquidityProviders(chain: Network | undefined) {
       console.log('amount', amount);
       
       if (!liquidityProvidersContractSigner || !liquidityProvidersContract || !smartAccount  || !contractAddress) return;
-
+      
       const removeLiquidityCallData: any = await liquidityProvidersContract.populateTransaction.removeLiquidity(
         positionId,
         amount
       )
+      toast.info(`Batching and sending remove liquidity transaction...`);
 
       console.log('removeLiquidityCallData ', removeLiquidityCallData);
       

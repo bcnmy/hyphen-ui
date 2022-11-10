@@ -12,7 +12,8 @@ import { useToken } from 'context/Token';
 
 function LiquidityPositions() {
   const navigate = useNavigate();
-  const { accounts, connect, isLoggedIn, smartAccountAddress } = useWalletProvider()!;
+  const { loading, connect, isLoggedIn, smartAccountAddress } =
+    useWalletProvider()!;
   const { networks, selectedNetwork } = useChains()!;
   const { tokens } = useToken()!;
 
@@ -41,7 +42,7 @@ function LiquidityPositions() {
   function handleAddLiquidity() {
     console.log('handleAddLiquidity ********');
     console.log('tokens ', tokens);
-    
+
     const isSelectedNetworkSupported = selectedNetwork
       ? networks?.find(
           networkObj => networkObj.chainId === selectedNetwork?.chainId,
@@ -165,7 +166,7 @@ function LiquidityPositions() {
                 className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white xl:w-[400px]"
                 onClick={connect}
               >
-                Connect Your Wallet
+                {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}
               </button>
             ) : null}
           </section>

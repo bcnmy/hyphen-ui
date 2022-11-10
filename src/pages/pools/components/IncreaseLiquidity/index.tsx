@@ -32,7 +32,7 @@ function IncreaseLiquidity() {
   const {
     accounts,
     connect,
-    smartAccount,
+    loading,
     smartAccountAddress,
     currentChainId,
     isLoggedIn,
@@ -602,7 +602,7 @@ function IncreaseLiquidity() {
                 className="mt-[6.75rem] mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                 onClick={connect}
               >
-                Connect Your Wallet
+                {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}
               </button>
             )}
           </div>

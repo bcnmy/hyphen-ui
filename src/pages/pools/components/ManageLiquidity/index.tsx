@@ -23,7 +23,7 @@ function ManagePosition() {
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
 
-  const { connect, currentChainId, isLoggedIn, walletProvider } =
+  const { connect, currentChainId, isLoggedIn, walletProvider, loading } =
     useWalletProvider()!;
   const { networks } = useChains()!;
   const { tokens } = useToken()!;
@@ -115,8 +115,7 @@ function ManagePosition() {
       amount: BigNumber;
     }) => {
       const removeLiquidityTx = await removeLiquidity(positionId, amount);
-      if (!removeLiquidityTx)
-      return
+      if (!removeLiquidityTx) return;
       addTxNotification(
         removeLiquidityTx,
         'Remove liquidity',
@@ -132,8 +131,7 @@ function ManagePosition() {
     mutate: claimFeeMutation,
   } = useMutation(async ({ positionId }: { positionId: BigNumber }) => {
     const claimFeeTx = await claimFee(positionId);
-    if (!claimFeeTx)
-      return
+    if (!claimFeeTx) return;
     addTxNotification(
       claimFeeTx,
       'Claim fee',
@@ -475,7 +473,7 @@ function ManagePosition() {
               className="mt-10 mb-2.5 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-hyphen-gray-300"
               onClick={connect}
             >
-              Connect Your Wallet
+              {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}
             </button>
           )}
 

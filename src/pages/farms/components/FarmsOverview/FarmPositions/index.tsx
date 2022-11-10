@@ -8,7 +8,7 @@ import emptyPositionsIcon from '../../../../../assets/images/empty-positions-ico
 import { HiOutlineXCircle } from 'react-icons/hi';
 
 function FarmPositions() {
-  const { accounts, connect, isLoggedIn } = useWalletProvider()!;
+  const { accounts, connect, isLoggedIn, loading } = useWalletProvider()!;
   const { selectedNetwork } = useChains()!;
 
   const { getStakedUserPositions } = useLiquidityFarming(selectedNetwork);
@@ -84,7 +84,7 @@ function FarmPositions() {
                 className="h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white xl:w-[400px]"
                 onClick={connect}
               >
-                Connect Your Wallet
+                {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}
               </button>
             ) : null}
           </section>

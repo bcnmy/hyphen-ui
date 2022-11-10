@@ -145,7 +145,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
             {isLoggedIn
               ? `${userAddress?.slice(0, 6)}...${userAddress?.slice(-6)}`
               : loading
-              ? 'loading...'
+              ? 'setting up your wallet...'
               : 'Connect Wallet'}
           </button>
         </div>

@@ -27,8 +27,14 @@ function AddStakingPosition() {
   const queryClient = useQueryClient();
   const { chainId, tokenSymbol } = useParams();
 
-  const { accounts, connect, currentChainId, isLoggedIn, walletProvider } =
-    useWalletProvider()!;
+  const {
+    accounts,
+    connect,
+    currentChainId,
+    isLoggedIn,
+    walletProvider,
+    loading,
+  } = useWalletProvider()!;
   const { networks } = useChains()!;
   const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
@@ -351,7 +357,7 @@ function AddStakingPosition() {
               className="mb-8 h-15 w-[400px] rounded-2.5 bg-hyphen-purple font-semibold text-white"
               onClick={connect}
             >
-              Connect Your Wallet
+              {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}
             </button>
           ) : null}
         </section>
@@ -475,7 +481,9 @@ function AddStakingPosition() {
                       className="mt-28 h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                       onClick={connect}
                     >
-                      Connect Your Wallet
+                      {loading
+                        ? 'Setting up you wallet...'
+                        : 'Connect Your Wallet'}
                     </button>
                   ) : null}
                 </div>

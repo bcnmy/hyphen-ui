@@ -20,13 +20,13 @@ const NotificationsProvider = props => {
       {
         pending: `${type} transaction pending`,
         error: `${type} transaction failed`,
-        success: `${type} transaction confirmed`,
+        success: `${type} transaction confirmed. Click to open the explorer.`,
       },
       {
         onClick: () => {
           window.open(explorerUrl, '_blank');
         },
-        position: toast.POSITION.BOTTOM_RIGHT,
+        position: toast.POSITION.TOP_RIGHT,
         className: 'font-sans font-medium',
       },
     );

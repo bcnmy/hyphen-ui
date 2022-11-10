@@ -47,7 +47,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
     return (
       <div className="flex justify-center">
         <PrimaryButtonLight onClick={() => connect()} className="xl:w-full">
-          {loading ? 'loading...' : 'Connect Wallet'}
+          {loading ? 'setting up your wallet...' : 'Connect Wallet'}
         </PrimaryButtonLight>
       </div>
     );

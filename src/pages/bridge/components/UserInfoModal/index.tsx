@@ -93,6 +93,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
 
   const [loading, setLoading] = useState(true);
   const [addressCopied, setAddressCopied] = useState(false);
+  const [scwCopied, setScwCopied] = useState(false);
   const [userTransactions, setUserTransactions] = useState<any>();
   const [transactionDetails, setTransactionDetails] =
     useState<ITransactionDetails>();
@@ -250,11 +251,13 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
     onClose();
   }
 
-  function handleUserAddressCopy(address: string) {
+  function handleUserAddressCopy(address: string, isScw: boolean = false) {
     navigator.clipboard.writeText(address || '');
-    setAddressCopied(true);
+    if (isScw) setScwCopied(true);
+    else setAddressCopied(true);
     setTimeout(() => {
-      setAddressCopied(false);
+      if (isScw) setScwCopied(false);
+      else setAddressCopied(false);
     }, 1500);
   }
 
@@ -302,9 +305,11 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
               {smartAccountAddress?.slice(-6)}
               <button
                 className="absolute top-[1.375rem] right-5 z-[2] flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs uppercase text-white"
-                onClick={() => handleUserAddressCopy(smartAccountAddress || '')}
+                onClick={() =>
+                  handleUserAddressCopy(smartAccountAddress || '', true)
+                }
               >
-                {addressCopied ? 'Copied' : 'Copy'}
+                {scwCopied ? 'Copied' : 'Copy'}
               </button>
             </p>
 

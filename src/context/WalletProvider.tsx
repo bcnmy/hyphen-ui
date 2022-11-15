@@ -57,7 +57,10 @@ const WalletProviderProvider = props => {
   // create socialLoginSDK and call the init
   useEffect(() => {
     const initWallet = async () => {
-      const sdk = await getSocialLoginSDK(ethers.utils.hexValue(5));
+      const sdk = await getSocialLoginSDK(ethers.utils.hexValue(5), {
+        'https://sdk-demo.biconomy.io':
+          'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
+      });
       sdk.showConnectModal();
       setSocialLoginSDK(sdk);
     };

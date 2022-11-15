@@ -1123,9 +1123,9 @@
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
 "@biconomy/account-abstraction@*":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/account-abstraction/-/account-abstraction-0.0.1.tgz#98318b0c3fee12a53f191ad95d4b3460b7180365"
-  integrity sha512-Qt4PEeOKI69dApAYlNEKHCBxoRc0nmv6Os2nvJbucqvyt8rSXhCG67y0b/KnefB8n8fdfaqz5Q078ZFhvZh9JA==
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/account-abstraction/-/account-abstraction-0.0.2.tgz#c8a5330a11f35c5397adf9a35ad216041e9fb34f"
+  integrity sha512-crUklO+lcEWJ4WRkh4JQjXgguTPQjEkDeQekOVJegdS1xFleBRbx4EiBmNmPYwwOnvVRPRP2dS3UUhreclk2gQ==
   dependencies:
     "@account-abstraction/contracts" "^0.2.0"
     "@biconomy/common" "*"
@@ -1141,9 +1141,9 @@
     solidity-coverage "^0.7.22"
 
 "@biconomy/common@*":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/common/-/common-0.0.1.tgz#6a292a4f8c3e8d154ce2460ebef83f39e1be3d30"
-  integrity sha512-WchAbD1X7Ht32zOENJYw1QGI22YnBC9oW6PEKGiBG9HgEypIGP6MzLvr56OSea9K0i65vPoEGJgXHTjTYW1qww==
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/common/-/common-0.0.2.tgz#b27799d501d3065c18250e7bbe4b51230900e868"
+  integrity sha512-ercnMDnezg6guW3aHga9dNlPth84oka+JIFQofv81GeSG++zYBHfCsL0iWRoNvqsJDVLqvJQxHes3+Fp+1+uCA==
   dependencies:
     "@account-abstraction/contracts" "^0.2.0"
     "@biconomy/core-types" "*"
@@ -1153,10 +1153,10 @@
     "@openzeppelin/contracts" "^4.7.3"
     ethers "^5.7.0"
 
-"@biconomy/core-types@*", "@biconomy/core-types@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/core-types/-/core-types-0.0.1.tgz#885b6d26df21968c7b5531e56340c9045cd0cfee"
-  integrity sha512-PRjctBWffTN79pROderhWlH/C+L6TOXeyooX6UKNHK1mfaeo7KbgkSj0Cc9Rx7dhrB0CapcSCw7sk5mQXqiBaA==
+"@biconomy/core-types@*", "@biconomy/core-types@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/core-types/-/core-types-0.0.2.tgz#1cedbe132d02d4e40a09fc306992c4b26d2f609e"
+  integrity sha512-TJ8gKlvguwSN1XeNpE7aZPmrk3LE+9d8nG6HY8EA/WChLC66DY9ZMlO7z4i9it5d1id+A67GAT1f/BuqE4YIcQ==
   dependencies:
     "@ethersproject/bignumber" "^5.6.0"
     "@ethersproject/contracts" "^5.6.0"
@@ -1165,9 +1165,9 @@
     web3-core "^1.7.1"
 
 "@biconomy/ethers-lib@*":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/ethers-lib/-/ethers-lib-0.0.1.tgz#8c82a6a227e593e53e5587e53952b82f09d85974"
-  integrity sha512-NGySQuImpdSZgGCTjKKAiPtAm48CcgPVGI+/hUGS6GjCkWQbUdKrE9Ra5s2WLCHGj55ZQK/8MVm0COjAF2WkcA==
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/ethers-lib/-/ethers-lib-0.0.2.tgz#151241a2ea8cf7d8e4cb0c7ad78672b25fca23a9"
+  integrity sha512-PSXCafiPvb4Wdvx5nFD/O+F75rxCDnIYT4Ugtf5+oHWHvI+uWF5/q9e7CuZlgce3/Ez3qfUp7Wi/oVuNZYPBiw==
   dependencies:
     "@biconomy/core-types" "*"
     "@gnosis.pm/safe-core-sdk-utils" "^1.1.0"
@@ -1203,9 +1203,9 @@
     promise "^8.0.3"
 
 "@biconomy/node-client@*":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/node-client/-/node-client-0.0.1.tgz#60768aefef4bb3de5b7f24e997243a6c2a7ebc4d"
-  integrity sha512-045f/ljl87wkjKfPZKmF8q9HrIhRUhBqOPenUqHyThow2O3O3u2RTN301bNUC7T5NplrCQXkCzxUq75rSVVD4g==
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/node-client/-/node-client-0.0.2.tgz#55dff768cf6fffa076098c64a4d0563ab4016179"
+  integrity sha512-JKdhN7Qjn0V4PXypsJy9e4i2IGfbGfaA85XL5afkJEKTHl4Pn4q2ReEBO0y0gZf2tbfwMUJjvSGcpDDcYoUYPQ==
   dependencies:
     "@biconomy/core-types" "*"
     "@ethersproject/abstract-signer" "^5.6.0"
@@ -1214,9 +1214,9 @@
     node-fetch "^2.6.6"
 
 "@biconomy/relayer@*":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/relayer/-/relayer-0.0.1.tgz#9ff5bd336f36896bf04da00e5bd912e96145f9be"
-  integrity sha512-OW8OWyphp9XonVeeVOcoOYeyxnBwEsXZUIPgEP+1qeNC3V7DffFKkxFy+isTfk6bQIqbVI9l8gQADU5f9gjj4g==
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/relayer/-/relayer-0.0.2.tgz#42cbef5ca6b0d1c1e368cb553f1d7b800f393efb"
+  integrity sha512-YEmwc/yme/4B9FchWWX0NKOT2bTyVdz04UqN9cKGbWmDKSm6hoJ5roow8wusf4CwGkziS0XyzRi7C//p/rcMPQ==
   dependencies:
     "@biconomy/core-types" "*"
     "@ethersproject/providers" "^5.6.8"
@@ -1224,10 +1224,10 @@
     isomorphic-ws "^5.0.0"
     messaging-sdk "^0.0.3"
 
-"@biconomy/smart-account@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/smart-account/-/smart-account-0.0.1.tgz#0f3a85e876ea1dc6ae110dcbe8d0414e8b4027a2"
-  integrity sha512-5ywbxDf/b1St0Y5Jh8GgHWZ0f+jipm1RxaHrWEXcbWnRVHPEHsinFuMqa0hxlI9C1biAKp8L/IfMDisfO7nXQg==
+"@biconomy/smart-account@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/smart-account/-/smart-account-0.0.2.tgz#d4886b2c6c6215a55f2c917ce78e60e257e899e3"
+  integrity sha512-F1iWj1e5r+i9f/agfvMPlfqAXaS5lQKHIl8Vyih0SpVbO4IJX5zSMZ2isVpJhRcCzwniJbL61svX026+X4CpYA==
   dependencies:
     "@0xsequence/network" "^0.41.0"
     "@biconomy/account-abstraction" "*"
@@ -1246,9 +1246,9 @@
     lodash "^4.17.21"
 
 "@biconomy/transactions@*":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/transactions/-/transactions-0.0.1.tgz#43c570b3ae3c01cf83eec760abafd64519c827af"
-  integrity sha512-kObj+amY/I4pGwQLiR33yd48D1nv8vilsXpDTh1IISu7zwSdkMMjloGFGTJqriqnT7sESVH7jJH1viIFrCX4xg==
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/transactions/-/transactions-0.0.2.tgz#69dece5f56aeaaeecb2aba28a71abb667844b3b8"
+  integrity sha512-FOz2n+TXs/Oypiamxjs2EMdLkt6gPl873dGXZiVWHbNm2pEpUXMzCc0BcrroYdy2XQPrrmHDzD/pfsT1PjjlVQ==
   dependencies:
     "@biconomy/core-types" "*"
     "@biconomy/ethers-lib" "*"
@@ -1259,17 +1259,17 @@
     ethereumjs-util "^7.1.5"
     ethers "^5.6.9"
 
-"@biconomy/transak@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/transak/-/transak-0.0.1.tgz#cfc2ffaa23f9175c7bbc46132b85e6eb96bd9332"
-  integrity sha512-cJ6YGwMIEmzQpEf7JZQSgh+ykDIzg3gBEK+KPLtSjPIUS53mJcPwI/UmaM3MOjkzVP4hpZh/weL4cCbhb0omqw==
+"@biconomy/transak@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/transak/-/transak-0.0.2.tgz#3a7d89e279da204eb8b56f279f7a9e6d9ef97c7c"
+  integrity sha512-w/As3FOSJbZXoWvXjibBj+7Zb2fPLThot6NFp7r1WTZ6ekZm5IhRRFpIrwQsgxopPhletUmrL/ZtGnwcLDk+QQ==
   dependencies:
     "@transak/transak-sdk" "^1.2.3"
 
-"@biconomy/web3-auth@0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@biconomy/web3-auth/-/web3-auth-0.0.1.tgz#3f8262cdca89271a796fdbf0b20f055d8ba35353"
-  integrity sha512-nV/xlY3nrf4S/dY/KR3QW+IWSefrfPxFyaeA3sRv6chLxSgBzwQtQj9omx0w6L8mdPdnvXVB1Yr/4H3D+XksGA==
+"@biconomy/web3-auth@0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@biconomy/web3-auth/-/web3-auth-0.0.2.tgz#76fcd3fe7c0bd42e1247ab3baeb5208200ed828a"
+  integrity sha512-3Ot4C/87f0yD8bXYw6shwt726koB6klNT6HQf7XOwCUfE5rOD78baG/sZj3BVXpnb7GgLkztI1eJLh6UUgiHhg==
   dependencies:
     "@biconomy/node-client" "*"
     "@walletconnect/qrcode-modal" "^1.8.0"
@@ -1916,10 +1916,17 @@
   dependencies:
     semver "^7.3.7"
 
-"@gnosis.pm/safe-deployments@1.16.0", "@gnosis.pm/safe-deployments@^1.12.0", "@gnosis.pm/safe-deployments@^1.16.0":
+"@gnosis.pm/safe-deployments@1.16.0":
   version "1.16.0"
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-deployments/-/safe-deployments-1.16.0.tgz#78b1fb400934ff117f7d9c8e66398503bd772eeb"
   integrity sha512-5Wakso6SiulstuZfz3gH6yME8Q50BT5dVxIfgWz4vzOmyyqmAVstMd0VIwyw6IDee0gU4mHKZjhD3UXPKEvRCw==
+  dependencies:
+    semver "^7.3.7"
+
+"@gnosis.pm/safe-deployments@^1.12.0", "@gnosis.pm/safe-deployments@^1.16.0":
+  version "1.17.0"
+  resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-deployments/-/safe-deployments-1.17.0.tgz#52a7b0e75c08b4a829f491b594e2babbdd6606c5"
+  integrity sha512-vfl13IuSMqJZxTPraRcKZqJcaSCDWTt/JXH6VURa8LHMYATOqd96IGbqqOKRPAgSzAyXpA2thOD4YUQ0X8XKyQ==
   dependencies:
     semver "^7.3.7"
 
@@ -10214,9 +10221,9 @@ jest-mock@^27.5.1:
     "@types/node" "*"
 
 jest-pnp-resolver@^1.2.2:
-  version "1.2.2"
-  resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.2.tgz#b704ac0ae028a89108a4d040b3f919dfddc8e33c"
-  integrity sha512-olV41bKSMm8BdnuMsewT4jqlZ8+3TCARAXjZGT9jcoSnrfUnRCqnMoF9XEeoWjbzObpqF9dRhHQj0Xb9QdF6/w==
+  version "1.2.3"
+  resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.3.tgz#930b1546164d4ad5937d5540e711d4d38d4cad2e"
+  integrity sha512-+3NpwQEnRoIBtx4fyhblQDPgJI0H1IEIkX7ShLUjPGA7TtUTvI1oiKi3SR4oBR0hQhQR80l4WAe5RrXBwWMA8w==
 
 jest-regex-util@^27.5.1:
   version "27.5.1"

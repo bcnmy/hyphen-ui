@@ -220,7 +220,7 @@ const WalletProviderProvider = props => {
     setLoading(true);
     const sdk = await getSocialLoginSDK(ethers.utils.hexValue(5), {
       'https://sdk-demo.biconomy.io':
-        'MEQCICDC8Q08H9DoxMn_VycciDNoiwz5dS2PMWg81RENJRn6AiAlp0fVTkDyxZvdQMB8Mix43EcjGTWiQZGZdnc-G7EsKQ',
+        'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
     });
     sdk.showConnectModal();
     sdk.showConnectModal();

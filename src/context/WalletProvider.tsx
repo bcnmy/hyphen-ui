@@ -6,8 +6,8 @@ import {
   useState,
 } from 'react';
 import { ethers } from 'ethers';
-import SmartAccount from '@biconomy-sdk/smart-account';
-import SocialLogin from '@biconomy-sdk/web3-auth';
+import SmartAccount from '@biconomy/smart-account';
+import SocialLogin, { getSocialLoginSDK } from '@biconomy/web3-auth';
 
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
@@ -22,6 +22,7 @@ interface IWalletProviderContext {
   isLoggedIn: boolean;
   loading: boolean;
   rawEthereumProvider: undefined | any;
+  userInfo: any;
 }
 
 export enum SignTypeMethod {
@@ -40,6 +41,7 @@ const WalletProviderProvider = props => {
   const [rawEthereumProvider, setRawEthereumProvider] = useState<any>();
 
   const [accounts, setAccounts] = useState<string[] | null>(null);
+  const [userInfo, setUserInfo] = useState(null);
   const [currentChainId, setCurrentChainId] = useState<number>();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [smartAccount, setSmartAccount] = useState<SmartAccount | null>(null);
@@ -55,8 +57,7 @@ const WalletProviderProvider = props => {
   // create socialLoginSDK and call the init
   useEffect(() => {
     const initWallet = async () => {
-      const sdk = new SocialLogin();
-      await sdk.init(ethers.utils.hexValue(5));
+      const sdk = await getSocialLoginSDK(ethers.utils.hexValue(5));
       sdk.showConnectModal();
       setSocialLoginSDK(sdk);
     };
@@ -76,6 +77,10 @@ const WalletProviderProvider = props => {
       setRawEthereumProvider(socialLoginSDK.provider);
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
+      socialLoginSDK.getUserInfo().then((user: any) => {
+        console.log('user', user);
+        setUserInfo(user);
+      });
     }
   }, [accounts?.length, socialLoginSDK, socialLoginSDK?.provider]);
 
@@ -96,6 +101,10 @@ const WalletProviderProvider = props => {
         setRawEthereumProvider(socialLoginSDK.provider);
         setWalletProvider(newProvider);
         setSigner(newProvider.getSigner());
+        await socialLoginSDK.getUserInfo().then((user: any) => {
+          console.log('user', user);
+          setUserInfo(user);
+        });
       }
     }, 1000);
     return () => {
@@ -177,6 +186,10 @@ const WalletProviderProvider = props => {
       );
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
+      await socialLoginSDK.getUserInfo().then((user: any) => {
+        console.log('user', user);
+        setUserInfo(user);
+      });
       setRawEthereumProvider(socialLoginSDK.web3auth.provider);
       await newProvider.listAccounts().then(accounts => {
         setAccounts(accounts.map(a => a.toLowerCase()));
@@ -190,6 +203,10 @@ const WalletProviderProvider = props => {
       );
       setWalletProvider(newProvider);
       setSigner(newProvider.getSigner());
+      await socialLoginSDK.getUserInfo().then((user: any) => {
+        console.log('user', user);
+        setUserInfo(user);
+      });
       setRawEthereumProvider(socialLoginSDK.provider);
       await newProvider.listAccounts().then(accounts => {
         setAccounts(accounts.map(a => a.toLowerCase()));
@@ -201,8 +218,11 @@ const WalletProviderProvider = props => {
       return socialLoginSDK;
     }
     setLoading(true);
-    const sdk = new SocialLogin();
-    await sdk.init(ethers.utils.hexValue(5));
+    const sdk = await getSocialLoginSDK(ethers.utils.hexValue(5), {
+      'https://sdk-demo.biconomy.io':
+        'MEQCICDC8Q08H9DoxMn_VycciDNoiwz5dS2PMWg81RENJRn6AiAlp0fVTkDyxZvdQMB8Mix43EcjGTWiQZGZdnc-G7EsKQ',
+    });
+    sdk.showConnectModal();
     sdk.showConnectModal();
     sdk.showWallet();
     setSocialLoginSDK(sdk);
@@ -236,6 +256,7 @@ const WalletProviderProvider = props => {
         currentChainId,
         isLoggedIn,
         loading,
+        userInfo,
       }}
       {...props}
     />

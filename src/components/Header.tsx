@@ -11,8 +11,8 @@ interface IHeaderProps {
 
 function Header({ showUserInfoModal }: IHeaderProps) {
   const location = useLocation();
-  const { accounts, connect, isLoggedIn, loading } = useWalletProvider()!;
-  const userAddress = accounts?.[0];
+  const { smartAccountAddress, connect, isLoggedIn, loading } =
+    useWalletProvider()!;
 
   const showNetworkSelector = [
     '/pools',
@@ -143,7 +143,10 @@ function Header({ showUserInfoModal }: IHeaderProps) {
             onClick={isLoggedIn ? showUserInfoModal : connect}
           >
             {isLoggedIn
-              ? `${userAddress?.slice(0, 6)}...${userAddress?.slice(-6)}`
+              ? `${smartAccountAddress?.slice(
+                  0,
+                  6,
+                )}...${smartAccountAddress?.slice(-6)}`
               : loading
               ? 'setting up your wallet...'
               : 'Connect Wallet'}

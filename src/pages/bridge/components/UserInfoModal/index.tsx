@@ -22,6 +22,7 @@ import { twMerge } from 'tailwind-merge';
 import { getProviderInfo } from 'web3modal';
 import Modal from '../../../../components/Modal';
 import TransactionDetailModal from '../TransactionDetailModal';
+import Transak from '@biconomy/transak';
 
 export interface IUserInfoModalProps {
   isVisible: boolean;
@@ -85,8 +86,13 @@ const FEE_INFO = gql`
 `;
 
 function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
-  const { accounts, disconnect, rawEthereumProvider, smartAccountAddress } =
-    useWalletProvider()!;
+  const {
+    accounts,
+    disconnect,
+    rawEthereumProvider,
+    smartAccountAddress,
+    userInfo,
+  } = useWalletProvider()!;
   const { fromChain, networks } = useChains()!;
   const { tokens } = useToken()!;
   const { hyphen } = useHyphen()!;
@@ -289,8 +295,8 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
         </div>
 
         <aside className="px-7.5 xl:px-12.5">
-          <div className="rounded-2.5 border-2 border-[#F6851B] bg-[#F6851B]">
-            <p className="relative flex h-15 w-full items-center rounded-t-2.5 bg-white px-5 font-mono text-xl text-hyphen-gray-400">
+          <div className="rounded-2.5 border-2 border-[#E5E7EB] bg-[#E5E7EB]">
+            {/* <p className="relative flex h-15 w-full items-center rounded-t-2.5 bg-white px-5 font-mono text-xl text-hyphen-gray-400">
               EOA - {userAddress?.slice(0, 6)}...{userAddress?.slice(-6)}
               <button
                 className="absolute top-[1.375rem] right-5 z-[2] flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs uppercase text-white"
@@ -298,10 +304,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
               >
                 {addressCopied ? 'Copied' : 'Copy'}
               </button>
-            </p>
+            </p> */}
 
             <p className="relative flex h-15 w-full items-center bg-white px-5 font-mono text-xl text-hyphen-gray-400">
-              SCW - {smartAccountAddress?.slice(0, 6)}...
+              <b>SCW</b> {':'} {smartAccountAddress?.slice(0, 6)}...
               {smartAccountAddress?.slice(-6)}
               <button
                 className="absolute top-[1.375rem] right-5 z-[2] flex h-4 items-center rounded-full bg-hyphen-purple px-1.5 text-xxs uppercase text-white"
@@ -313,10 +319,10 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
               </button>
             </p>
 
-            <p className="flex h-7 items-center justify-between px-5 text-xxs font-bold uppercase text-white">
+            <p className="flex h-9 items-center justify-between px-5 text-xxs font-bold uppercase text-[#333333]">
               Connected with {providerName}
               <button
-                className="rounded-full bg-[#FF000080] px-2 text-xxs font-bold uppercase text-white"
+                className="px-2 text-xxs font-bold uppercase text-[#CC0000]"
                 onClick={handleWalletDisconnect}
               >
                 Disconnect
@@ -324,10 +330,38 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
             </p>
           </div>
         </aside>
+        <div className="m-auto mt-4 justify-end rounded-2.5 px-7.5 xl:px-12.5">
+          <button
+            className="h-9 w-28 justify-self-end rounded-xl bg-hyphen-purple text-xs text-white"
+            onClick={() => {
+              // console.log("userInfo", userInfo);
+              const transak = new Transak('STAGING', {
+                defaultCryptoCurrency: 'ETH',
+                // fiatCurrency: 'INR',
+                network: 'polygon',
+                walletAddress: smartAccountAddress,
+                email: '',
+                defaultFiatAmount: 20,
+                userData: {
+                  firstName: userInfo?.name || '',
+                  email: userInfo?.email || '',
+                },
+              });
+              console.log('#transak', transak);
+              transak.init();
+            }}
+          >
+            Buy Tokens
+          </button>
+        </div>
 
-        <aside className="mt-7.5 bg-[#F1F0FF] p-7.5 xl:mt-12.5 xl:p-12.5">
+        <aside className="mt-7.5 bg-[#F1F0FF] p-7.5 xl:mt-12.5 xl:px-12.5 xl:py-5">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-lg text-gray-700">Recent Transactions</h2>
+            <h2 className="text-lg text-gray-700">
+              {!loading && userTransactions && userTransactions.length === 0
+                ? 'No Recent Transactions found'
+                : 'Recent Transactions'}
+            </h2>
             <button
               onClick={handleTransactionsRefetch}
               className="flex items-center rounded-md p-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -349,9 +383,9 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
             />
           ) : null}
 
-          {!loading && userTransactions && userTransactions.length === 0 ? (
+          {/* {!loading && userTransactions && userTransactions.length === 0 ? (
             <span>No transactions found 😐</span>
-          ) : null}
+          ) : null} */}
 
           {!loading && userTransactions && userTransactions.length > 0 ? (
             <ul>

@@ -242,6 +242,63 @@ const WalletProviderProvider = props => {
     socialLoginSDK.hideWallet();
   }, [socialLoginSDK]);
 
+  const reinit = (changedProvider: any) => {
+    setWalletProvider(new ethers.providers.Web3Provider(changedProvider));
+  };
+  // setup event handlers for web3 provider given by web3-modal
+  // this is the provider injected by metamask/fortis/etc
+  useEffect(() => {
+    if (!rawEthereumProvider) return;
+    function handleAccountsChanged(accounts: string[]) {
+      console.log('accountsChanged!');
+      setAccounts(accounts.map(a => a.toLowerCase()));
+      reinit(rawEthereumProvider);
+    }
+    // Wallet documentation recommends reloading page on chain change.
+    // Ref: https://docs.metamask.io/guide/ethereum-provider.html#events
+    function handleChainChanged(chainId: string | number) {
+      console.log('chainChanged!');
+      if (typeof chainId === 'string') {
+        setCurrentChainId(Number.parseInt(chainId));
+      } else {
+        setCurrentChainId(chainId);
+      }
+      reinit(rawEthereumProvider);
+    }
+    function handleConnect(info: { chainId: number }) {
+      console.log('connect!');
+      const { chainId } = info;
+      if (typeof chainId === 'string') {
+        setCurrentChainId(Number.parseInt(chainId));
+      } else {
+        setCurrentChainId(chainId);
+      }
+      reinit(rawEthereumProvider);
+    }
+    function handleDisconnect(error: { code: number; message: string }) {
+      console.log('disconnect');
+      console.error(error);
+    }
+    // Subscribe to accounts change
+    rawEthereumProvider.on('accountsChanged', handleAccountsChanged);
+    // Subscribe to network change
+    rawEthereumProvider.on('chainChanged', handleChainChanged);
+    // Subscribe to provider connection
+    rawEthereumProvider.on('connect', handleConnect);
+    // Subscribe to provider disconnection
+    rawEthereumProvider.on('disconnect', handleDisconnect);
+    // Remove event listeners on unmount!
+    return () => {
+      rawEthereumProvider.removeListener(
+        'accountsChanged',
+        handleAccountsChanged,
+      );
+      rawEthereumProvider.removeListener('chainChanged', handleChainChanged);
+      rawEthereumProvider.removeListener('connect', handleConnect);
+      rawEthereumProvider.removeListener('disconnect', handleDisconnect);
+    };
+  }, [rawEthereumProvider]);
+
   return (
     <WalletProviderContext.Provider
       value={{

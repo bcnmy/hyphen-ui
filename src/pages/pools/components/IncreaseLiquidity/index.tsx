@@ -23,7 +23,7 @@ import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
-import GaslessToggle from 'components/GaslessToggle';
+// import GaslessToggle from 'components/GaslessToggle';
 import { useBiconomy } from 'context/Biconomy';
 
 function IncreaseLiquidity() {
@@ -490,10 +490,10 @@ function IncreaseLiquidity() {
               Clear All
             </button>
           </div>
-          <div></div>
+          {/* <div></div>
           <div className="m-auto mt-3 w-full">
             <GaslessToggle />
-          </div>
+          </div> */}
         </header>
 
         {chainId ? (

@@ -17,7 +17,7 @@ import { useWalletProvider } from 'context/WalletProvider';
 import switchNetwork from 'utils/switchNetwork';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
-import GaslessToggle from 'components/GaslessToggle';
+// import GaslessToggle from 'components/GaslessToggle';
 import { useBiconomy } from 'context/Biconomy';
 
 function ManagePosition() {
@@ -323,10 +323,10 @@ function ManagePosition() {
             Clear All
           </button>
         </div>
-        <div></div>
+        {/* <div></div>
         <div className="m-auto mt-3 w-full">
           <GaslessToggle />
-        </div>
+        </div> */}
       </header>
 
       {chainId ? (

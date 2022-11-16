@@ -24,7 +24,7 @@ import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useToken } from 'context/Token';
-import GaslessToggle from 'components/GaslessToggle';
+// import GaslessToggle from 'components/GaslessToggle';
 import { useBiconomy } from 'context/Biconomy';
 
 function AddLiquidity() {
@@ -395,11 +395,11 @@ function AddLiquidity() {
       console.log(err);
       setIsFeeLoading(false);
     }
-  }, [selectedTokenAddress]);
+  }, [selectedTokenAddress, isBiconomyToggledOn]);
 
   useEffect(() => {
     getFee();
-  }, [getFee, smartAccount]);
+  }, [getFee, smartAccount, isBiconomyToggledOn]);
 
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   // Refactor tokenApproval using useQuery (see IncreaseLiquidity component.)
@@ -422,7 +422,7 @@ function AddLiquidity() {
       }
 
       if (token) {
-        setSelectedTokenAddress(token[chain.chainId].address);
+        setSelectedTokenAddress(token[chain.chainId]?.address);
       }
     }
 
@@ -757,10 +757,10 @@ function AddLiquidity() {
               Clear All
             </button>
           </div>
-          <div></div>
+          {/* <div></div>
           <div className="m-auto mt-3 w-full">
             <GaslessToggle />
-          </div>
+          </div> */}
         </header>
 
         <section className="grid grid-cols-1 px-10 xl:grid-cols-2 xl:px-0">
@@ -876,7 +876,7 @@ function AddLiquidity() {
                   </>
                 ) : (
                   <button
-                    className="mt-[6.75rem] h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                    className="mt-[1.75rem] h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                     onClick={handleNetworkChange}
                   >
                     Switch to {chain?.name}
@@ -886,7 +886,7 @@ function AddLiquidity() {
             ) : null}
             {!isLoggedIn ? (
               <button
-                className="mt-[6.75rem] h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
+                className="mt-[1.75rem] h-15 w-full rounded-2.5 bg-hyphen-purple font-semibold text-white"
                 onClick={connect}
               >
                 {loading ? 'Setting up you wallet...' : 'Connect Your Wallet'}

@@ -176,7 +176,7 @@ const WalletProviderProvider = props => {
         toast.success(`Transaction confirmed. Click to open the explorer.`, {
           onClick: () => {
             window.open(
-              `https://mumbai.polygonscan.com/tx/${response.hash}`,
+              `https://polygonscan.com/tx/${response.hash}`,
               '_blank',
             );
           },
@@ -190,7 +190,7 @@ const WalletProviderProvider = props => {
         toast.success(`Transaction confirmed. Click to open the explorer.`, {
           onClick: () => {
             window.open(
-              `https://mumbai.polygonscan.com/tx/${response.hash}`,
+              `https://polygonscan.com/tx/${response.hash}`,
               '_blank',
             );
           },

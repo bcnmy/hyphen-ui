@@ -34,6 +34,8 @@ const WalletProviderContext = createContext<IWalletProviderContext | null>(
   null,
 );
 
+const Web3AuthChainId = 80001;
+
 const WalletProviderProvider = props => {
   const [walletProvider, setWalletProvider] =
     useState<ethers.providers.Web3Provider | null>(null);
@@ -57,7 +59,7 @@ const WalletProviderProvider = props => {
   // create socialLoginSDK and call the init
   useEffect(() => {
     const initWallet = async () => {
-      const sdk = await getSocialLoginSDK(ethers.utils.hexValue(5), {
+      const sdk = await getSocialLoginSDK(ethers.utils.hexValue(Web3AuthChainId), {
         'https://sdk-demo.biconomy.io':
           'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
       });
@@ -221,7 +223,7 @@ const WalletProviderProvider = props => {
       return socialLoginSDK;
     }
     setLoading(true);
-    const sdk = await getSocialLoginSDK(ethers.utils.hexValue(5), {
+    const sdk = await getSocialLoginSDK(ethers.utils.hexValue(Web3AuthChainId), {
       'https://sdk-demo.biconomy.io':
         'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
     });

@@ -27,7 +27,7 @@ jobs:
       - name: Generate build
         run: |
           yarn install
-          yarn run build:test
+          yarn run build:prod
         env:
           CI: false
           NODE_OPTIONS: --max_old_space_size=4096

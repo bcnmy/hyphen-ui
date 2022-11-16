@@ -142,7 +142,7 @@ function Header({ showUserInfoModal }: IHeaderProps) {
             className="font-base ml-2.5 cursor-pointer rounded-xl bg-hyphen-purple bg-opacity-50 px-4 py-1 font-mono text-white"
             onClick={isLoggedIn ? showUserInfoModal : connect}
           >
-            {isLoggedIn
+            {isLoggedIn && smartAccountAddress
               ? `${smartAccountAddress?.slice(
                   0,
                   6,

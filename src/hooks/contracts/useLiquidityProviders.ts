@@ -8,6 +8,8 @@ import { Network } from 'hooks/useNetworks';
 import { USDT_ADDRESS } from '../../config/constants';
 import getTokenAllowance from '../../utils/getTokenAllowance';
 import { toast } from 'react-toastify';
+// import { GasLimit } from "@biconomy-sdk/core-types";
+
 function useLiquidityProviders(chain: Network | undefined) {
   const {
     // accounts,
@@ -42,96 +44,104 @@ function useLiquidityProviders(chain: Network | undefined) {
     return new ethers.Contract(contractAddress, liquidityProvidersABI, signer);
   }, [contractAddress, signer]);
 
-  const makeApproveAndAddLiquidityTrx = async (
-    tokenAddress: string,
-    amount: BigNumber,
-    position: BigNumber,
-    add = true,
-  ) => {
-    if (
-      !liquidityProvidersContract ||
-      !smartAccountAddress ||
-      !contractAddress ||
-      !chain
-    )
-      return;
+  const makeApproveAndAddLiquidityTrx = useCallback(
+    async (
+      tokenAddress: string,
+      amount: BigNumber,
+      position: BigNumber,
+      add = true,
+    ) => {
+      if (
+        !liquidityProvidersContract ||
+        !smartAccountAddress ||
+        !contractAddress ||
+        !chain
+      )
+        return;
 
-    const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
+      const provider = new ethers.providers.JsonRpcProvider(chain.rpc);
 
-    console.log(' tokenAddress ', tokenAddress);
-    console.log(' amount ', amount);
-    console.log(' position ', position);
-    console.log('contractAddress ', contractAddress);
+      console.log(' tokenAddress ', tokenAddress);
+      console.log(' amount ', amount);
+      console.log(' position ', position);
+      console.log('contractAddress ', contractAddress);
 
-    // In case of USDT if it has alreday approved allowance.
-    // we need to approve 0 token transaction
-    let amountToApprove = amount;
+      // In case of USDT if it has alreday approved allowance.
+      // we need to approve 0 token transaction
+      let amountToApprove = amount;
 
-    if (tokenAddress === USDT_ADDRESS) {
-      const tokenAllowance = BigNumber.from(
-        await getTokenAllowance(
-          smartAccountAddress,
-          provider,
-          contractAddress,
-          tokenAddress,
-        ),
-      );
-      console.log('Token Allowance ', tokenAllowance);
-      if (tokenAllowance.gt(BigNumber.from(0))) {
-        amountToApprove = BigNumber.from(0);
+      if (tokenAddress === USDT_ADDRESS) {
+        const tokenAllowance = BigNumber.from(
+          await getTokenAllowance(
+            smartAccountAddress,
+            provider,
+            contractAddress,
+            tokenAddress,
+          ),
+        );
+        console.log('Token Allowance ', tokenAllowance);
+        if (tokenAllowance.gt(BigNumber.from(0))) {
+          amountToApprove = BigNumber.from(0);
+        }
       }
-    }
 
-    console.log('amount to approve ', amount);
+      console.log('amount to approve ', amount);
 
-    const trxs: any = [];
-    if (amountToApprove.eq(BigNumber.from(0))) {
-      const zeroApproveCallData = erc20ContractInterface.encodeFunctionData(
+      const trxs: any = [];
+      if (amountToApprove.eq(BigNumber.from(0))) {
+        const zeroApproveCallData = erc20ContractInterface.encodeFunctionData(
+          'approve',
+          [contractAddress, amountToApprove],
+        );
+        trxs.push({
+          to: tokenAddress,
+          data: zeroApproveCallData,
+        });
+      }
+      const approveCallData = erc20ContractInterface.encodeFunctionData(
         'approve',
-        [contractAddress, amountToApprove],
+        [contractAddress, amount],
       );
-      trxs.push({
+
+      const tx1 = {
         to: tokenAddress,
-        data: zeroApproveCallData,
-      });
-    }
-    const approveCallData = erc20ContractInterface.encodeFunctionData(
-      'approve',
-      [contractAddress, amount],
-    );
+        data: approveCallData,
+      };
+      trxs.push(tx1);
+      let liquidityCallData;
+      if (add)
+        liquidityCallData =
+          await liquidityProvidersContract.populateTransaction.addTokenLiquidity(
+            tokenAddress,
+            amount,
+          );
+      else
+        liquidityCallData =
+          await liquidityProvidersContract.populateTransaction.increaseTokenLiquidity(
+            position,
+            amount,
+          );
 
-    const tx1 = {
-      to: tokenAddress,
-      data: approveCallData,
-    };
-    trxs.push(tx1);
-    let liquidityCallData;
-    if (add)
-      liquidityCallData =
-        await liquidityProvidersContract.populateTransaction.addTokenLiquidity(
-          tokenAddress,
-          amount,
-        );
-    else
-      liquidityCallData =
-        await liquidityProvidersContract.populateTransaction.increaseTokenLiquidity(
-          position,
-          amount,
-        );
-
-    const tx2 = {
-      to: contractAddress,
-      data: liquidityCallData.data,
-    };
-    trxs.push(tx2);
-    return trxs;
-  };
+      const tx2 = {
+        to: contractAddress,
+        data: liquidityCallData.data,
+      };
+      trxs.push(tx2);
+      return trxs;
+    },
+    [
+      chain,
+      contractAddress,
+      erc20ContractInterface,
+      liquidityProvidersContract,
+      smartAccountAddress,
+    ],
+  );
 
   const addLiquidity = useCallback(
     async (tokenAddress: string, amount: BigNumber) => {
       console.log('Hey going to add Liquidity');
       toast.info(`Making add liquidity transaction...`);
-
       if (
         !liquidityProvidersContractSigner ||
         !liquidityProvidersContract ||
@@ -144,16 +154,50 @@ function useLiquidityProviders(chain: Network | undefined) {
         amount,
         BigNumber.from(0),
       );
-
       console.log('------ Add Liquidity Batching Trx ', txs);
 
-      const response = await smartAccount.sendGaslessTransactionBatch({
+      // prepare refund txn batch before so that we have accurate token gas price
+      const feeQuotes = await smartAccount.prepareRefundTransactionBatch({
         transactions: txs,
       });
-      toast.info(`Waiting for transaction confirmation...`);
-      return response;
+      console.log('prepareRefundTransactionBatch', feeQuotes);
+
+      // set fee to selected token
+      let fee = feeQuotes[1];
+      for (let i = 0; i < feeQuotes.length; ++i) {
+        if (feeQuotes[i].address === tokenAddress) {
+          fee = feeQuotes[i];
+        }
+      }
+
+      toast.info(`Sign transaction to confirm...`);
+      // making transaction with version, set feeQuotes[1].tokenGasPrice = 6
+      const transaction = await smartAccount.createRefundTransactionBatch({
+        transactions: txs,
+        feeQuote: fee,
+      });
+      console.log('transaction', transaction);
+
+      let gasLimit = {
+        hex: '0x1E8480',
+        type: 'hex',
+      };
+
+      // send transaction internally calls signTransaction and sends it to connected relayer
+      const txId = await smartAccount.sendTransaction({
+        tx: transaction,
+        gasLimit,
+      });
+      console.log(txId);
+      toast.info(`Transaction sent to relayers...`);
+      // return response;
     },
-    [liquidityProvidersContractSigner],
+    [
+      liquidityProvidersContract,
+      liquidityProvidersContractSigner,
+      makeApproveAndAddLiquidityTrx,
+      smartAccount,
+    ],
   );
 
   const addNativeLiquidity = useCallback(
@@ -295,10 +339,41 @@ function useLiquidityProviders(chain: Network | undefined) {
       console.log('------ increase Liquidity Trx ', txs);
 
       toast.info(`Increasing liquidity transaction...`);
-      const response = await smartAccount.sendGaslessTransactionBatch({
+      // prepare refund txn batch before so that we have accurate token gas price
+      const feeQuotes = await smartAccount.prepareRefundTransactionBatch({
         transactions: txs,
       });
-      return response;
+      console.log('prepareRefundTransactionBatch', feeQuotes);
+
+      // set fee to selected token
+      let fee = feeQuotes[1];
+      for (let i = 0; i < feeQuotes.length; ++i) {
+        if (feeQuotes[i].address === tokenAddress) {
+          fee = feeQuotes[i];
+        }
+      }
+
+      toast.info(`Sign transaction to confirm...`);
+      // making transaction with version, set feeQuotes[1].tokenGasPrice = 6
+      const transaction = await smartAccount.createRefundTransactionBatch({
+        transactions: txs,
+        feeQuote: fee,
+      });
+      console.log('transaction', transaction);
+
+      let gasLimit = {
+        hex: '0x1E8480',
+        type: 'hex',
+      };
+
+      // send transaction internally calls signTransaction and sends it to connected relayer
+      const txId = await smartAccount.sendTransaction({
+        tx: transaction,
+        gasLimit,
+      });
+      console.log(txId);
+      toast.info(`Transaction sent to relayers...`);
+      // return response;
     },
     [liquidityProvidersContractSigner],
   );
@@ -344,20 +419,41 @@ function useLiquidityProviders(chain: Network | undefined) {
         to: contractAddress,
         data: removeLiquidityCallData.data,
       };
-
       console.log('trx ', trx);
 
-      const response = await smartAccount.sendGasLessTransaction({
+      // prepare refund txn batch before so that we have accurate token gas price
+      const feeQuotes = await smartAccount.prepareRefundTransaction({
         transaction: trx,
       });
+      console.log('prepareRefundTransactionBatch', feeQuotes);
 
-      return response;
+      toast.info(`Sign transaction to confirm...`);
+      // making transaction with version, set feeQuotes[1].tokenGasPrice = 6
+      const transaction = await smartAccount.createRefundTransaction({
+        transaction: trx,
+        feeQuote: feeQuotes[1],
+      });
+      console.log('transaction', transaction);
+
+      let gasLimit = {
+        hex: '0x1E8480',
+        type: 'hex',
+      };
+
+      // send transaction internally calls signTransaction and sends it to connected relayer
+      const txHash = await smartAccount.sendTransaction({
+        tx: transaction,
+        gasLimit,
+      });
+      console.log(txHash);
+      toast.info(`Transaction sent to relayers...`);
     },
     [liquidityProvidersContractSigner],
   );
 
   return {
     addLiquidity,
+    makeApproveAndAddLiquidityTrx,
     addNativeLiquidity,
     claimFee,
     getBaseDivisor,

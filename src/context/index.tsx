@@ -12,27 +12,27 @@ import { WalletProviderProvider } from './WalletProvider';
 
 export const AppProviders = ({ children }) => {
   return (
-    <WalletProviderProvider>
-      <ChainsProvider>
-        <GraphQLProvider>
-          <NotificationsProvider>
+    <NotificationsProvider>
+      <WalletProviderProvider>
+        <ChainsProvider>
+          <GraphQLProvider>
             <TokenProvider>
               <BiconomyProvider>
                 <HyphenProvider>
                   <TokenApprovalProvider>
                     <TransactionProvider>
                       <TransactionInfoModalProvider>
-                          {children}
+                        {children}
                       </TransactionInfoModalProvider>
                     </TransactionProvider>
                   </TokenApprovalProvider>
                 </HyphenProvider>
               </BiconomyProvider>
             </TokenProvider>
-          </NotificationsProvider>
-        </GraphQLProvider>
-      </ChainsProvider>
-    </WalletProviderProvider>
+          </GraphQLProvider>
+        </ChainsProvider>
+      </WalletProviderProvider>
+    </NotificationsProvider>
   );
 };
 

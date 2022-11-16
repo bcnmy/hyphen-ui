@@ -194,13 +194,13 @@ function IncreaseLiquidity() {
               positionId,
               amount,
             );
-      const res: any = await increaseLiquidityTx.wait(1);
-      addTxNotification(
-        increaseLiquidityTx,
-        'Increase liquidity',
-        `${chain?.explorerUrl}/tx/${res.hash}`,
-      );
-      return res;
+      // const res: any = await increaseLiquidityTx.wait(1);
+      // addTxNotification(
+      //   increaseLiquidityTx,
+      //   'Increase liquidity',
+      //   `${chain?.explorerUrl}/tx/${res.hash}`,
+      // );
+      return increaseLiquidityTx;
     },
   );
 

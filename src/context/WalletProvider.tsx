@@ -8,7 +8,8 @@ import {
 import { ethers } from 'ethers';
 import SmartAccount from '@biconomy/smart-account';
 import SocialLogin, { getSocialLoginSDK } from '@biconomy/web3-auth';
-
+import { toast } from 'react-toastify';
+import { useNotifications } from 'context/Notifications';
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
   signer: ethers.Signer | undefined;
@@ -37,6 +38,7 @@ const WalletProviderContext = createContext<IWalletProviderContext | null>(
 const Web3AuthChainId = 80001;
 
 const WalletProviderProvider = props => {
+  const { addTxNotification } = useNotifications()!;
   const [walletProvider, setWalletProvider] =
     useState<ethers.providers.Web3Provider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer>();
@@ -59,10 +61,13 @@ const WalletProviderProvider = props => {
   // create socialLoginSDK and call the init
   useEffect(() => {
     const initWallet = async () => {
-      const sdk = await getSocialLoginSDK(ethers.utils.hexValue(Web3AuthChainId), {
-        'https://sdk-demo.biconomy.io':
-          'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
-      });
+      const sdk = await getSocialLoginSDK(
+        ethers.utils.hexValue(Web3AuthChainId),
+        {
+          'https://sdk-demo.biconomy.io':
+            'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
+        },
+      );
       sdk.showConnectModal();
       setSocialLoginSDK(sdk);
     };
@@ -163,6 +168,43 @@ const WalletProviderProvider = props => {
       console.log('wallet ', wallet);
       wallet = await wallet.init();
       console.info('smartAccount', wallet);
+
+      wallet.on('txHashChanged', (response: any) => {
+        console.log(
+          'txHashChanged event received in addLiq via emitter',
+          response,
+        );
+        toast.info(`Transaction updated with hash: ${response.hash}`);
+        toast.success(`Transaction confirmed. Click to open the explorer.`, {
+          onClick: () => {
+            window.open(
+              `https://mumbai.polygonscan.com/tx/${response.hash}`,
+              '_blank',
+            );
+          },
+          position: toast.POSITION.TOP_RIGHT,
+          className: 'font-sans font-medium',
+        });
+      });
+
+      wallet.on('txMined', (response: any) => {
+        console.log('txMined event received in addLiq via emitter', response);
+        toast.success(`Transaction confirmed. Click to open the explorer.`, {
+          onClick: () => {
+            window.open(
+              `https://mumbai.polygonscan.com/tx/${response.hash}`,
+              '_blank',
+            );
+          },
+          position: toast.POSITION.TOP_RIGHT,
+          className: 'font-sans font-medium',
+        });
+      });
+
+      wallet.on('error', (response: any) => {
+        console.log('error event received in addLiq via emitter', response);
+        toast.info(`Transaction error: ${response.hash}`);
+      });
       setSmartAccount(wallet);
       setCurrentChainId(chainId);
     })();
@@ -223,10 +265,13 @@ const WalletProviderProvider = props => {
       return socialLoginSDK;
     }
     setLoading(true);
-    const sdk = await getSocialLoginSDK(ethers.utils.hexValue(Web3AuthChainId), {
-      'https://sdk-demo.biconomy.io':
-        'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
-    });
+    const sdk = await getSocialLoginSDK(
+      ethers.utils.hexValue(Web3AuthChainId),
+      {
+        'https://sdk-demo.biconomy.io':
+          'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
+      },
+    );
     sdk.showConnectModal();
     sdk.showConnectModal();
     sdk.showWallet();

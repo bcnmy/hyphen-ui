@@ -115,14 +115,14 @@ function ManagePosition() {
       amount: BigNumber;
     }) => {
       const removeLiquidityTx = await removeLiquidity(positionId, amount);
-      if (!removeLiquidityTx) return;
-      const res: any = await removeLiquidityTx.wait(1);
-      addTxNotification(
-        removeLiquidityTx,
-        'Remove liquidity',
-        `${chain?.explorerUrl}/tx/${res.hash}`,
-      );
-      return res;
+      // if (!removeLiquidityTx) return;
+      // const res: any = await removeLiquidityTx.wait(1);
+      // addTxNotification(
+      //   removeLiquidityTx,
+      //   'Remove liquidity',
+      //   `${chain?.explorerUrl}/tx/${res.hash}`,
+      // );
+      return removeLiquidityTx;
     },
   );
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { HiArrowSmLeft, HiOutlineEmojiSad, HiX } from 'react-icons/hi';
 import { useChains } from 'context/Chains';
@@ -39,6 +39,7 @@ function AddLiquidity() {
     isLoggedIn,
     signer,
     walletProvider,
+    smartAccount,
   } = useWalletProvider()!;
   const { fromChain, networks } = useChains()!;
   const { tokens } = useToken()!;
@@ -66,6 +67,7 @@ function AddLiquidity() {
     ? chain.contracts.hyphen.liquidityProviders
     : undefined;
   const {
+    makeApproveAndAddLiquidityTrx,
     addLiquidity,
     addNativeLiquidity,
     getSuppliedLiquidityByToken,
@@ -354,6 +356,60 @@ function AddLiquidity() {
     setSelectedToken(token);
   }, [chainId, chainOptions, tokenOptions, tokenSymbol]);
 
+  const [isFeeLoading, setIsFeeLoading] = useState(false);
+  const [fee, setFee] = useState<
+    | {
+        symbol: string;
+        value: string;
+      }
+    | undefined
+  >();
+
+  const getFee = useCallback(async () => {
+    if (!selectedTokenAddress || !smartAccount) return;
+    try {
+      setIsFeeLoading(true);
+      const txs: any = await makeApproveAndAddLiquidityTrx(
+        selectedTokenAddress,
+        ethers.utils.parseUnits('50', 18),
+        BigNumber.from(0),
+      );
+      // prepare refund txn batch before so that we have accurate token gas price
+      const feeQuotes = await smartAccount.prepareRefundTransactionBatch({
+        transactions: txs,
+      });
+      console.log('prepareRefundTransactionBatch', feeQuotes);
+
+      let pmtSelected: any;
+      for (let i = 0; i < feeQuotes.length; ++i) {
+        if (
+          feeQuotes[i].address === selectedTokenAddress &&
+          feeQuotes[i].address !== '0x0000000000000000000000000000000000000000'
+        ) {
+          pmtSelected = feeQuotes[i];
+        }
+      }
+      if (!pmtSelected) {
+        pmtSelected = feeQuotes[1];
+      }
+      const pmtAmount = parseFloat(
+        (pmtSelected.payment / Math.pow(10, pmtSelected.decimal)).toString(),
+      ).toFixed(8);
+      setFee({
+        symbol: pmtSelected.symbol,
+        value: pmtAmount,
+      });
+      setIsFeeLoading(false);
+    } catch (err) {
+      console.log(err);
+      setIsFeeLoading(false);
+    }
+  }, [selectedTokenAddress]);
+
+  useEffect(() => {
+    getFee();
+  }, [getFee, smartAccount]);
+
   // TODO: Clean up hooks so that React doesn't throw state updates on unmount warning.
   // Refactor tokenApproval using useQuery (see IncreaseLiquidity component.)
   useEffect(() => {
@@ -371,6 +427,7 @@ function AddLiquidity() {
         const { displayBalance } =
           (await getTokenBalance(smartAccountAddress, chain, token)) || {};
         setWalletBalance(displayBalance);
+        getFee();
       }
 
       if (token) {
@@ -382,6 +439,7 @@ function AddLiquidity() {
   }, [
     accounts,
     chainId,
+    getFee,
     isLoggedIn,
     liquidityProvidersAddress,
     networks,
@@ -477,7 +535,8 @@ function AddLiquidity() {
     }
   }, [isError]);
 
-  const isDataLoading = approveTokenLoading || addLiquidityLoading;
+  const isDataLoading =
+    approveTokenLoading || addLiquidityLoading || isFeeLoading;
 
   const isNativeToken = selectedTokenAddress === NATIVE_ADDRESS;
 
@@ -502,6 +561,7 @@ function AddLiquidity() {
     setSelectedChain(undefined);
     setLiquidityAmount('');
     setSelectedTokenAddress(undefined);
+    setFee(undefined);
     setSliderValue(0);
     setWalletBalance(undefined);
     updatePoolShare('0');
@@ -778,6 +838,16 @@ function AddLiquidity() {
               step={25}
               value={sliderValue}
             />
+            <div className="my-5 flex justify-end space-x-2 text-sm text-hyphen-gray-300">
+              {fee && (
+                <>
+                  <div className="mr-1">Fee: </div>
+                  <div>
+                    {fee.symbol} {fee.value}
+                  </div>
+                </>
+              )}
+            </div>
             {isLoggedIn ? (
               <>
                 {currentChainId === chain?.chainId ? (
@@ -795,6 +865,8 @@ function AddLiquidity() {
                     >
                       {!walletBalance
                         ? 'Getting your balance'
+                        : isFeeLoading
+                        ? 'Getting Fee Quote'
                         : liquidityAmount === '' ||
                           Number.parseFloat(liquidityAmount) === 0
                         ? 'Enter Amount'

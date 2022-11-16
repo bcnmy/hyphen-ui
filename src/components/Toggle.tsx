@@ -2,6 +2,7 @@ import { Switch } from '@headlessui/react';
 interface IToggleProps {
   bgColor: string;
   enabled: boolean;
+  disabled?: boolean;
   label: string;
   onToggle: (enabled: boolean) => void;
   variant?: string;
@@ -10,6 +11,7 @@ interface IToggleProps {
 export const Toggle: React.FC<IToggleProps> = ({
   bgColor,
   enabled,
+  disabled,
   label,
   onToggle,
   variant = 'small',
@@ -17,33 +19,38 @@ export const Toggle: React.FC<IToggleProps> = ({
   return (
     <Switch
       checked={enabled}
+      disabled={disabled}
       onChange={onToggle}
       className={`
-        relative inline-flex flex-shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75
+        tw-hw-relative tw-hw-inline-flex tw-hw-flex-shrink-0 tw-hw-cursor-pointer tw-hw-items-center tw-hw-rounded-full tw-hw-transition-colors tw-hw-duration-200 tw-hw-ease-in-out focus:tw-hw-outline-none focus-visible:tw-hw-ring-2  focus-visible:tw-hw-ring-white focus-visible:tw-hw-ring-opacity-75
         ${enabled ? bgColor : `${bgColor}/60`}
-        ${variant === 'small' ? 'h-[10px] w-[20px]' : 'h-[20px] w-[40px]'}
+        ${
+          variant === 'small'
+            ? 'tw-hw-h-[10px] tw-hw-w-[20px]'
+            : 'tw-hw-h-[20px] tw-hw-w-[40px]'
+        }
       `}
       style={{
         backgroundColor: enabled ? bgColor : `${bgColor}60`,
       }}
     >
-      <span className="sr-only">{label}</span>
+      <span className="tw-hw-sr-only">{label}</span>
       <span
         aria-hidden="true"
         className={`
-          pointer-events-none inline-block transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out
+          tw-hw-pointer-events-none tw-hw-inline-block tw-hw-transform tw-hw-rounded-full tw-hw-bg-white tw-hw-shadow-lg tw-hw-ring-0 tw-hw-transition tw-hw-duration-200 tw-hw-ease-in-out
           ${
             variant === 'small'
               ? enabled
-                ? 'h-[7px] w-[7px] translate-x-[11.5px]'
-                : 'h-[7px] w-[7px] translate-x-[1.25px]'
+                ? 'tw-hw-h-[7px] tw-hw-w-[7px] tw-hw-translate-x-[11.5px]'
+                : 'tw-hw-h-[7px] tw-hw-w-[7px] tw-hw-translate-x-[1.25px]'
               : ''
           }
           ${
             variant === 'large'
               ? enabled
-                ? 'h-[14px] w-[14px] translate-x-[23px]'
-                : 'h-[14px] w-[14px] translate-x-[3px]'
+                ? 'tw-hw-h-[14px] tw-hw-w-[14px] tw-hw-translate-x-[23px]'
+                : 'tw-hw-h-[14px] tw-hw-w-[14px] tw-hw-translate-x-[3px]'
               : ''
           }
         `}

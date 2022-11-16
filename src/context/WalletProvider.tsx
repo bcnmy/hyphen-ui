@@ -9,7 +9,6 @@ import { ethers } from 'ethers';
 import SmartAccount from '@biconomy/smart-account';
 import SocialLogin, { getSocialLoginSDK } from '@biconomy/web3-auth';
 import { toast } from 'react-toastify';
-import { useNotifications } from 'context/Notifications';
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
   signer: ethers.Signer | undefined;
@@ -35,10 +34,9 @@ const WalletProviderContext = createContext<IWalletProviderContext | null>(
   null,
 );
 
-const Web3AuthChainId = 80001;
+const Web3AuthChainId = 137;
 
 const WalletProviderProvider = props => {
-  const { addTxNotification } = useNotifications()!;
   const [walletProvider, setWalletProvider] =
     useState<ethers.providers.Web3Provider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer>();

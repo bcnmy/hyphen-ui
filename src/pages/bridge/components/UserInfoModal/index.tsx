@@ -335,7 +335,7 @@ function UserInfoModal({ isVisible, onClose }: IUserInfoModalProps) {
             className="h-9 w-28 justify-self-end rounded-xl bg-hyphen-purple text-xs text-white"
             onClick={() => {
               // console.log("userInfo", userInfo);
-              const transak = new Transak('STAGING', {
+              const transak = new Transak('PRODUCTION', {
                 defaultCryptoCurrency: 'ETH',
                 // fiatCurrency: 'INR',
                 network: 'polygon',

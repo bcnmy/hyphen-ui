@@ -24,11 +24,14 @@ import { useNotifications } from 'context/Notifications';
 import { makeNumberCompact } from 'utils/makeNumberCompact';
 import useLiquidityFarming from 'hooks/contracts/useLiquidityFarming';
 import { useToken } from 'context/Token';
+import GaslessToggle from 'components/GaslessToggle';
+import { useBiconomy } from 'context/Biconomy';
 
 function AddLiquidity() {
   const navigate = useNavigate();
   const { chainId, tokenSymbol } = useParams();
   const queryClient = useQueryClient();
+  const { isBiconomyToggledOn } = useBiconomy()!;
 
   const {
     accounts,
@@ -41,7 +44,7 @@ function AddLiquidity() {
     walletProvider,
     smartAccount,
   } = useWalletProvider()!;
-  const { fromChain, networks } = useChains()!;
+  const { networks } = useChains()!;
   const { tokens } = useToken()!;
   const { addTxNotification } = useNotifications()!;
 
@@ -69,6 +72,7 @@ function AddLiquidity() {
   const {
     makeApproveAndAddLiquidityTrx,
     addLiquidity,
+    addLiquidityGasless,
     addNativeLiquidity,
     getSuppliedLiquidityByToken,
     getTotalLiquidity,
@@ -217,31 +221,18 @@ function AddLiquidity() {
       if (!selectedToken || !currentChainId) {
         return;
       }
-
       const token = tokens ? tokens[selectedToken.id] : undefined;
-
       console.log('amount ', amount);
       console.log('token ', token);
 
-      // addTxNotification(
-      //   addLiquidityTx,
-      //   'Add liquidity',
-      //   `${fromChain?.explorerUrl}/tx/${addLiquidityTx.hash}`,
-      // );
-      const addLiquidityTx =
-        token && token[currentChainId].address === NATIVE_ADDRESS
-          ? await addNativeLiquidity(amount)
-          : await addLiquidity(tokenAddress, amount);
-
-      if (!addLiquidityTx) return;
-
-      const res: any = await addLiquidityTx.wait(1);
-      addTxNotification(
-        addLiquidityTx,
-        'Add liquidity',
-        `${fromChain?.explorerUrl}/tx/${res.hash}`,
-      );
-      return res;
+      if (token && token[currentChainId].address === NATIVE_ADDRESS) {
+        await addNativeLiquidity(amount);
+      } else if (isBiconomyToggledOn) {
+        await addLiquidityGasless(tokenAddress, amount);
+      } else {
+        await addLiquidity(tokenAddress, amount);
+      }
+      // return res;
     },
   );
 
@@ -366,7 +357,7 @@ function AddLiquidity() {
   >();
 
   const getFee = useCallback(async () => {
-    if (!selectedTokenAddress || !smartAccount) return;
+    if (!selectedTokenAddress || !smartAccount || isBiconomyToggledOn) return;
     try {
       setIsFeeLoading(true);
       const txs: any = await makeApproveAndAddLiquidityTrx(
@@ -740,7 +731,7 @@ function AddLiquidity() {
         />
       ) : null}
       <article className="my-12.5 rounded-10 bg-white p-0 py-2 xl:p-12.5 xl:pt-2.5">
-        <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr_4rem] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
+        <header className="mt-6 mb-5 grid grid-cols-[2.5rem_1fr_4rem] items-center border-b px-10 pb-4 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
           <div>
             <button
               className="flex items-center rounded text-hyphen-gray-400"
@@ -765,6 +756,10 @@ function AddLiquidity() {
             >
               Clear All
             </button>
+          </div>
+          <div></div>
+          <div className="m-auto mt-3 w-full">
+            <GaslessToggle />
           </div>
         </header>
 
@@ -839,7 +834,7 @@ function AddLiquidity() {
               value={sliderValue}
             />
             <div className="my-5 flex justify-end space-x-2 text-sm text-hyphen-gray-300">
-              {fee && (
+              {fee && !isBiconomyToggledOn && (
                 <>
                   <div className="mr-1">Fee: </div>
                   <div>

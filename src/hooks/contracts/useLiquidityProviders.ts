@@ -200,6 +200,34 @@ function useLiquidityProviders(chain: Network | undefined) {
     ],
   );
 
+  const addLiquidityGasless = useCallback(
+    async (tokenAddress: string, amount: BigNumber) => {
+      console.log('Hey going to add Liquidity');
+      toast.info(`Making add liquidity transaction...`);
+
+      if (
+        !liquidityProvidersContractSigner ||
+        !liquidityProvidersContract ||
+        !smartAccount
+      )
+        return;
+
+      const txs: any = await makeApproveAndAddLiquidityTrx(
+        tokenAddress,
+        amount,
+        BigNumber.from(0),
+      );
+
+      console.log('------ Add Liquidity Batching Trx ', txs);
+
+      await smartAccount.sendGaslessTransactionBatch({
+        transactions: txs,
+      });
+      toast.info(`Transaction hash generated...`);
+    },
+    [liquidityProvidersContractSigner],
+  );
+
   const addNativeLiquidity = useCallback(
     async (amount: BigNumber) => {
       console.log(' addNativeLiquidity ');
@@ -378,6 +406,28 @@ function useLiquidityProviders(chain: Network | undefined) {
     [liquidityProvidersContractSigner],
   );
 
+  const increaseLiquidityGasless = useCallback(
+    async (tokenAddress: string, positionId: BigNumber, amount: BigNumber) => {
+      if (!liquidityProvidersContractSigner || !smartAccount) return;
+
+      const txs: any = await makeApproveAndAddLiquidityTrx(
+        tokenAddress,
+        amount,
+        positionId,
+        false,
+      );
+
+      console.log('------ increase Liquidity Trx ', txs);
+
+      toast.info(`Increasing liquidity transaction...`);
+      await smartAccount.sendGaslessTransactionBatch({
+        transactions: txs,
+      });
+      toast.info(`Transaction hash generated...`);
+    },
+    [liquidityProvidersContractSigner],
+  );
+
   const increaseNativeLiquidity = useCallback(
     (positionId: BigNumber, amount: BigNumber) => {
       if (!liquidityProvidersContractSigner) return;
@@ -451,8 +501,47 @@ function useLiquidityProviders(chain: Network | undefined) {
     [liquidityProvidersContractSigner],
   );
 
+  const removeLiquidityGasless = useCallback(
+    async (positionId: BigNumber, amount: BigNumber) => {
+      console.log('Got Remove Liquidity Request');
+      console.log('position id', positionId);
+      console.log('amount', amount);
+
+      if (
+        !liquidityProvidersContractSigner ||
+        !liquidityProvidersContract ||
+        !smartAccount ||
+        !contractAddress
+      )
+        return;
+
+      const removeLiquidityCallData: any =
+        await liquidityProvidersContract.populateTransaction.removeLiquidity(
+          positionId,
+          amount,
+        );
+      toast.info(`Removing liquidity...`);
+
+      console.log('removeLiquidityCallData ', removeLiquidityCallData);
+
+      const trx = {
+        to: contractAddress,
+        data: removeLiquidityCallData.data,
+      };
+
+      console.log('trx ', trx);
+
+      await smartAccount.sendGasLessTransaction({
+        transaction: trx,
+      });
+      toast.info(`Transaction hash generated...`);
+    },
+    [liquidityProvidersContractSigner],
+  );
+
   return {
     addLiquidity,
+    addLiquidityGasless,
     makeApproveAndAddLiquidityTrx,
     addNativeLiquidity,
     claimFee,
@@ -463,8 +552,10 @@ function useLiquidityProviders(chain: Network | undefined) {
     getTotalLiquidity,
     getTotalSharesMinted,
     increaseLiquidity,
+    increaseLiquidityGasless,
     increaseNativeLiquidity,
     removeLiquidity,
+    removeLiquidityGasless,
   };
 }
 

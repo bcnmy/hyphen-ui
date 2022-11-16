@@ -23,11 +23,14 @@ import ApprovalModal from 'pages/bridge/components/ApprovalModal';
 import useModal from 'hooks/useModal';
 import { useChains } from 'context/Chains';
 import { useToken } from 'context/Token';
+import GaslessToggle from 'components/GaslessToggle';
+import { useBiconomy } from 'context/Biconomy';
 
 function IncreaseLiquidity() {
   const navigate = useNavigate();
   const { chainId, positionId } = useParams();
   const queryClient = useQueryClient();
+  const { isBiconomyToggledOn } = useBiconomy()!;
 
   const {
     accounts,
@@ -54,8 +57,12 @@ function IncreaseLiquidity() {
     ? chain.contracts.hyphen.liquidityProviders
     : undefined;
   const { getPositionMetadata } = useLPToken(chain);
-  const { getTotalLiquidity, increaseLiquidity, increaseNativeLiquidity } =
-    useLiquidityProviders(chain);
+  const {
+    getTotalLiquidity,
+    increaseLiquidity,
+    increaseLiquidityGasless,
+    increaseNativeLiquidity,
+  } = useLiquidityProviders(chain);
   const { getTokenTotalCap, getTotalLiquidityByLp } =
     useWhitelistPeriodManager(chain);
 
@@ -69,7 +76,6 @@ function IncreaseLiquidity() {
   const {
     isVisible: isApprovalModalVisible,
     hideModal: hideApprovalModal,
-    showModal: showApprovalModal,
   } = useModal();
 
   const { data: positionMetadata, isError: positionMetadataError } = useQuery(
@@ -183,24 +189,25 @@ function IncreaseLiquidity() {
       if (!token || !chain) {
         return;
       }
-
       console.log('token ', token[chain.chainId].address);
 
-      const increaseLiquidityTx =
-        token[chain.chainId].address === NATIVE_ADDRESS
-          ? await increaseNativeLiquidity(positionId, amount)
-          : await increaseLiquidity(
-              token[chain.chainId].address,
-              positionId,
-              amount,
-            );
-      // const res: any = await increaseLiquidityTx.wait(1);
-      // addTxNotification(
-      //   increaseLiquidityTx,
-      //   'Increase liquidity',
-      //   `${chain?.explorerUrl}/tx/${res.hash}`,
-      // );
-      return increaseLiquidityTx;
+      if (token[chain.chainId].address === NATIVE_ADDRESS) {
+        await increaseNativeLiquidity(positionId, amount);
+      } else if (isBiconomyToggledOn) {
+        await increaseLiquidityGasless(
+          token[chain.chainId].address,
+          positionId,
+          amount,
+        );
+      } else {
+        await increaseLiquidity(
+          token[chain.chainId].address,
+          positionId,
+          amount,
+        );
+      }
+
+      // return increaseLiquidityTx;
     },
   );
 
@@ -462,7 +469,7 @@ function IncreaseLiquidity() {
         />
       ) : null}
       <article className="my-12 rounded-10 bg-white p-0 py-2 xl:my-24 xl:p-12.5 xl:pt-2.5">
-        <header className="mt-6 mb-8 grid grid-cols-[2.5rem_1fr_4rem] items-center border-b px-10 pb-6 xl:mb-12 xl:grid-cols-3 xl:p-0 xl:pb-6">
+        <header className="mt-6 mb-2 grid grid-cols-[2.5rem_1fr_4rem] items-center border-b px-10 pb-4 xl:mb-8 xl:grid-cols-3 xl:p-0 xl:pb-4">
           <div>
             <button
               className="flex items-center rounded text-hyphen-gray-400"
@@ -482,6 +489,10 @@ function IncreaseLiquidity() {
             <button className="text-xs text-hyphen-purple" onClick={reset}>
               Clear All
             </button>
+          </div>
+          <div></div>
+          <div className="m-auto mt-3 w-full">
+            <GaslessToggle />
           </div>
         </header>
 

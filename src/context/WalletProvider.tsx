@@ -9,7 +9,6 @@ import { ethers } from 'ethers';
 import SmartAccount from '@biconomy/smart-account';
 import SocialLogin, { getSocialLoginSDK } from '@biconomy/web3-auth';
 import { toast } from 'react-toastify';
-import { useNotifications } from 'context/Notifications';
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
   signer: ethers.Signer | undefined;
@@ -38,7 +37,6 @@ const WalletProviderContext = createContext<IWalletProviderContext | null>(
 const Web3AuthChainId = 80001;
 
 const WalletProviderProvider = props => {
-  const { addTxNotification } = useNotifications()!;
   const [walletProvider, setWalletProvider] =
     useState<ethers.providers.Web3Provider | null>(null);
   const [signer, setSigner] = useState<ethers.Signer>();
@@ -66,6 +64,8 @@ const WalletProviderProvider = props => {
         {
           'https://sdk-demo.biconomy.io':
             'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
+          'http://sdk-demo.biconomy.io':
+            'MEQCIQDGPqqi-_WZPYZDkhqghK_eSouVc2JpjOiKJIM4y8qcYwIfTOZGjydWz11RG_XSNu2ZLnxdv4bQkGOym4m2NdPGWQ',
         },
       );
       sdk.showConnectModal();
@@ -270,6 +270,8 @@ const WalletProviderProvider = props => {
       {
         'https://sdk-demo.biconomy.io':
           'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
+        'http://sdk-demo.biconomy.io':
+          'MEQCIQDGPqqi-_WZPYZDkhqghK_eSouVc2JpjOiKJIM4y8qcYwIfTOZGjydWz11RG_XSNu2ZLnxdv4bQkGOym4m2NdPGWQ',
       },
     );
     sdk.showConnectModal();

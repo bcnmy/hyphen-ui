@@ -64,6 +64,8 @@ const WalletProviderProvider = props => {
         {
           'https://sdk-demo.biconomy.io':
             'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
+          'http://sdk-demo.biconomy.io':
+            'MEQCIQDGPqqi-_WZPYZDkhqghK_eSouVc2JpjOiKJIM4y8qcYwIfTOZGjydWz11RG_XSNu2ZLnxdv4bQkGOym4m2NdPGWQ',
         },
       );
       sdk.showConnectModal();
@@ -268,6 +270,8 @@ const WalletProviderProvider = props => {
       {
         'https://sdk-demo.biconomy.io':
           'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
+        'http://sdk-demo.biconomy.io':
+          'MEQCIQDGPqqi-_WZPYZDkhqghK_eSouVc2JpjOiKJIM4y8qcYwIfTOZGjydWz11RG_XSNu2ZLnxdv4bQkGOym4m2NdPGWQ',
       },
     );
     sdk.showConnectModal();

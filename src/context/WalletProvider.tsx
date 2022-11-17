@@ -66,6 +66,8 @@ const WalletProviderProvider = props => {
             'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
           'http://sdk-demo.biconomy.io':
             'MEQCIQDGPqqi-_WZPYZDkhqghK_eSouVc2JpjOiKJIM4y8qcYwIfTOZGjydWz11RG_XSNu2ZLnxdv4bQkGOym4m2NdPGWQ',
+          'https://sdk-demo-beta.biconomy.io':
+            'MEUCIQCnh9FOszeGOkm0mR5V7_lCPZ5QaVksTRVXfCQ0RgJEcwIgd829-XShpmwUdzYhV0bqsxL2T3EY0g8foQkBwGEpox0',
         },
       );
       sdk.showConnectModal();
@@ -272,6 +274,8 @@ const WalletProviderProvider = props => {
           'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
         'http://sdk-demo.biconomy.io':
           'MEQCIQDGPqqi-_WZPYZDkhqghK_eSouVc2JpjOiKJIM4y8qcYwIfTOZGjydWz11RG_XSNu2ZLnxdv4bQkGOym4m2NdPGWQ',
+        'https://sdk-demo-beta.biconomy.io':
+          'MEUCIQCnh9FOszeGOkm0mR5V7_lCPZ5QaVksTRVXfCQ0RgJEcwIgd829-XShpmwUdzYhV0bqsxL2T3EY0g8foQkBwGEpox0',
       },
     );
     sdk.showConnectModal();

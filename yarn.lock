@@ -1913,10 +1913,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@biconomy/hyphen@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-0.0.19.tgz#cf24814aadc3c31a508f6f354ccb094e0e9195ec"
-  integrity sha512-nihPT45NE8v1RvSq67e0fii/FGDbBc0SiZsgH81j2W+Pun9UmKk07FVdoTHvpsRFt9DJx1BiR8kqYbmA1sDBFQ==
+"@biconomy/hyphen@^0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-0.0.20.tgz#b856a25a9d812add14cf81a3e4f212fa120d1820"
+  integrity sha512-WFsP52sOzyX6MtlZf8aIk9pfiZWcfhrHvRF92ye2bTPHCZ+NqpCxNmqfXWm89aun5ZQc6ea2UfZDJ/Q4WFlU0A==
   dependencies:
     "@biconomy/mexa" "^2.0.24"
     ethers "^5.0.24"
@@ -10348,10 +10348,10 @@ react-error-overlay@7.0.0-next.67+6a3315b7:
   resolved "https://registry.yarnpkg.com/react-error-overlay/-/react-error-overlay-7.0.0-next.67.tgz#70ad61fdcfedbe0e59555f5634ab06e94bd65bbc"
   integrity sha512-IwKidUz/gCOLY010cjlfM/neLqk8VSKU/1Mz285KsX2ONewQkuFdY9omtc8udIYHe0QQxM6b3BWiG1/pKfE5fg==
 
-react-icons@^4.3.1:
-  version "4.3.1"
-  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.3.1.tgz#2fa92aebbbc71f43d2db2ed1aed07361124e91ca"
-  integrity sha512-cB10MXLTs3gVuXimblAdI71jrJx8njrJZmNMEMC+sQu5B/BIOmlsAjskdqpn81y8UBVEGuHODd7/ci5DvoSzTQ==
+react-icons@^4.7.1:
+  version "4.7.1"
+  resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.7.1.tgz#0f4b25a5694e6972677cb189d2a72eabea7a8345"
+  integrity sha512-yHd3oKGMgm7zxo3EA7H2n7vxSoiGmHk5t6Ou4bXsfcgWyhfDKMpyKfhHR6Bjnn63c+YXBLBPUql9H4wPJM6sXw==
 
 react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"

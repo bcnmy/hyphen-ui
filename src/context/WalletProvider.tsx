@@ -59,9 +59,10 @@ const WalletProviderProvider = props => {
   // create socialLoginSDK and call the init
   useEffect(() => {
     const initWallet = async () => {
-      const sdk = await getSocialLoginSDK(
-        ethers.utils.hexValue(Web3AuthChainId),
-        {
+      const sdk = new SocialLogin();
+      await sdk.init({
+        chainId: ethers.utils.hexValue(Web3AuthChainId),
+        whitelistUrls: {
           'https://sdk-demo.biconomy.io':
             'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
           'http://sdk-demo.biconomy.io':
@@ -69,8 +70,7 @@ const WalletProviderProvider = props => {
           'https://sdk-demo-beta.biconomy.io':
             'MEUCIQCnh9FOszeGOkm0mR5V7_lCPZ5QaVksTRVXfCQ0RgJEcwIgd829-XShpmwUdzYhV0bqsxL2T3EY0g8foQkBwGEpox0',
         },
-      );
-      sdk.showConnectModal();
+      });
       setSocialLoginSDK(sdk);
     };
     if (!socialLoginSDK) initWallet();
@@ -267,9 +267,10 @@ const WalletProviderProvider = props => {
       return socialLoginSDK;
     }
     setLoading(true);
-    const sdk = await getSocialLoginSDK(
-      ethers.utils.hexValue(Web3AuthChainId),
-      {
+    const sdk = new SocialLogin();
+    await sdk.init({
+      chainId: ethers.utils.hexValue(Web3AuthChainId),
+      whitelistUrls: {
         'https://sdk-demo.biconomy.io':
           'MEUCIQDLg0nfQqUyMqInsUmnRNv1GOtcbeoqafYDb2ShWaZo5AIgRKOLfw87rX3a2uVZpMAkoGwjrLgNwlfdvk33XGHcOMs',
         'http://sdk-demo.biconomy.io':
@@ -277,9 +278,7 @@ const WalletProviderProvider = props => {
         'https://sdk-demo-beta.biconomy.io':
           'MEUCIQCnh9FOszeGOkm0mR5V7_lCPZ5QaVksTRVXfCQ0RgJEcwIgd829-XShpmwUdzYhV0bqsxL2T3EY0g8foQkBwGEpox0',
       },
-    );
-    sdk.showConnectModal();
-    sdk.showConnectModal();
+    });
     sdk.showWallet();
     setSocialLoginSDK(sdk);
     setLoading(false);

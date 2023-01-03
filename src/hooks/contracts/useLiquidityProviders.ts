@@ -256,7 +256,7 @@ function useLiquidityProviders(chain: Network | undefined) {
 
       console.log('------ Native Token Liquidity GasLess Trx ', trx);
 
-      const response = await smartAccount.sendGasLessTransaction({
+      const response = await smartAccount.sendGaslessTransaction({
         transaction: trx,
       });
 
@@ -288,7 +288,7 @@ function useLiquidityProviders(chain: Network | undefined) {
 
       console.log('------ Claim Fee GasLess Trx ', trx);
 
-      const response = await smartAccount.sendGasLessTransaction({
+      const response = await smartAccount.sendGaslessTransaction({
         transaction: trx,
       });
 
@@ -531,7 +531,7 @@ function useLiquidityProviders(chain: Network | undefined) {
 
       console.log('trx ', trx);
 
-      await smartAccount.sendGasLessTransaction({
+      await smartAccount.sendGaslessTransaction({
         transaction: trx,
       });
       toast.info(`Transaction hash generated...`);

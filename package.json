@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/client": "^3.5.7",
+    "@apollo/client": "^3.7.4",
     "@biconomy/hyphen": "^0.0.20",
     "@biconomy/mexa": "^2.0.24",
     "@craco/craco": "^6.4.3",

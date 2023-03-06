@@ -1913,10 +1913,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@biconomy/hyphen@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-0.0.19.tgz#cf24814aadc3c31a508f6f354ccb094e0e9195ec"
-  integrity sha512-nihPT45NE8v1RvSq67e0fii/FGDbBc0SiZsgH81j2W+Pun9UmKk07FVdoTHvpsRFt9DJx1BiR8kqYbmA1sDBFQ==
+"@biconomy/hyphen@^0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@biconomy/hyphen/-/hyphen-0.0.20.tgz#b856a25a9d812add14cf81a3e4f212fa120d1820"
+  integrity sha512-WFsP52sOzyX6MtlZf8aIk9pfiZWcfhrHvRF92ye2bTPHCZ+NqpCxNmqfXWm89aun5ZQc6ea2UfZDJ/Q4WFlU0A==
   dependencies:
     "@biconomy/mexa" "^2.0.24"
     ethers "^5.0.24"
@@ -10363,10 +10363,10 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.1.tgz#5b3531bd76a645a4c9fb6e693ed36419e3301339"
   integrity sha512-NAnt2iGDXohE5LI7uBnLnqvLQMtzhkiAOLXTmv+qnF9Ky7xAPcX8Up/xWIhxvLVGJvuLiNc4xQLtuqDRzb4fSA==
 
-react-loading-skeleton@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/react-loading-skeleton/-/react-loading-skeleton-3.0.1.tgz#b1ccd07d18ade80ce5d5b1563f4232331efedf46"
-  integrity sha512-YL9tSV7w53HLd5aAPPjUGp9iqUJ5+yj8ZI//E1ES1OHrWy2mSCHTRPSc37u77Di+jWph6evGVNKBr3rpAnKwDQ==
+react-loading-skeleton@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/react-loading-skeleton/-/react-loading-skeleton-3.2.0.tgz#c79f1390195bcd8625c30e68454a1b95508a9c74"
+  integrity sha512-kN12x4Ud69jbksr2EdhYywAFeW4bPdvFQ9p3ID1OM/QeFjgwFSmSUY2a6P6uOb5ACzWp3ozY8C+7+04KR6+PHA==
 
 react-notifications-component@^3.1.0:
   version "3.1.0"

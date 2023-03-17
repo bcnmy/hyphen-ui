@@ -9,7 +9,18 @@ import { ethers, Signer } from "ethers";
 import { useWeb3Modal } from "@web3modal/react";
 import Web3Modal from "web3modal";
 import WalletConnectProvider from "@walletconnect/web3-provider";
-import { useAccount, useDisconnect, useNetwork, useProvider, useSigner } from "wagmi";
+import { goerli, mainnet, polygon, polygonMumbai } from "wagmi/chains";
+import { Hyphen, SIGNATURE_TYPES } from "@biconomy/hyphen";
+import {
+  useAccount,
+  useDisconnect,
+  useNetwork,
+  useProvider,
+  useSigner,
+} from "wagmi";
+import { ENV } from "types/environment";
+import { useChains } from "./Chains";
+import { chains, pubProv } from "config/wagmi";
 
 interface IWalletProviderContext {
   walletProvider: ethers.providers.Web3Provider | undefined;
@@ -43,32 +54,48 @@ const WalletProviderProvider: React.FC = (props) => {
   // const [rawEthereumProvider, setRawEthereumProvider] = useState<any>();
   const rawEthereumProvider = useProvider();
 
+  console.log("🚀 ~ file: WalletProvider.tsx:61 ~ pubProv:", pubProv(polygonMumbai).provider());
+  const hyphen: any = new Hyphen(pubProv(polygonMumbai).provider(), {
+    infiniteApproval: true,
+    environment: {
+      [ENV.production]: "prod",
+      [ENV.test]: "test",
+      [ENV.staging]: "staging",
+      local: "",
+    }[process.env.REACT_APP_ENV],
+    biconomy: {
+      enable: true,
+      apiKey: "r8N3i0Ukw.bb5dd97d-af25-47cb-9281-2069f1b95ade",
+    },
+    signatureType: SIGNATURE_TYPES.EIP712,
+    walletProvider: rawEthereumProvider,
+  });
+  console.log("🚀 ~ file: WalletProvider.tsx:76 ~ hyphen:", hyphen);
+
   // const [accounts, setAccounts] = useState<string[]>();
-  const { address, isConnecting, isConnected } = useAccount(
-    {
-      onConnect() {
-        console.log('Connected')
-      },
-      onDisconnect() {
-        console.log('Disconnected')
-      },
-    }
-    );
-    
+  const { address, isConnected: isLoggedIn } = useAccount({
+    onConnect() {
+      console.log("Connected");
+    },
+    onDisconnect() {
+      console.log("Disconnected");
+    },
+  });
+
   const accounts = address ? [address] : undefined;
   const { chain } = useNetwork();
   const currentChainId = chain?.id;
 
   // const [currentChainId, setCurrentChainId] = useState<number>();
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  // const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
 
-  useEffect(() => {
-    if (rawEthereumProvider && walletProvider && currentChainId && address) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-    }
-  }, [rawEthereumProvider, walletProvider, currentChainId, address]);
+  // useEffect(() => {
+  //   if (rawEthereumProvider && walletProvider && currentChainId && address) {
+  // setIsLoggedIn(true);
+  //   } else {
+  // setIsLoggedIn(false);
+  //   }
+  // }, [rawEthereumProvider, walletProvider, currentChainId, address]);
 
   // useEffect(() => {
   //   if (!walletProvider) return;
@@ -104,9 +131,9 @@ const WalletProviderProvider: React.FC = (props) => {
   //   })();
   // }, [walletProvider]);
 
-  const reinit = (changedProvider: any) => {
-    setWalletProvider(new ethers.providers.Web3Provider(changedProvider));
-  };
+  // const reinit = (changedProvider: any) => {
+  //   setWalletProvider(new ethers.providers.Web3Provider(changedProvider));
+  // };
 
   // setup event handlers for web3 provider given by web3-modal
   // this is the provider injected by metamask/fortis/etc
@@ -116,7 +143,7 @@ const WalletProviderProvider: React.FC = (props) => {
     function handleAccountsChanged(accounts: string[]) {
       console.log("accountsChanged!");
       // setAccounts(accounts.map((a) => a.toLowerCase()));
-      reinit(rawEthereumProvider);
+      // reinit(rawEthereumProvider);
     }
 
     // Wallet documentation recommends reloading page on chain change.
@@ -128,7 +155,7 @@ const WalletProviderProvider: React.FC = (props) => {
       // } else {
       //   setCurrentChainId(chainId);
       // }
-      reinit(rawEthereumProvider);
+      // reinit(rawEthereumProvider);
     }
 
     // function handleConnect(info: { chainId: number }) {
@@ -182,6 +209,18 @@ const WalletProviderProvider: React.FC = (props) => {
   //     await onOpen();
   //   }
   // };
+
+  // console.log(
+  //   rawEthereumProvider,
+  //   walletProvider,
+  //   signer,
+  //   // web3Modal,
+  //   connect,
+  //   disconnect,
+  //   accounts,
+  //   currentChainId,
+  //   isLoggedIn
+  // );
 
   return (
     <WalletProviderContext.Provider

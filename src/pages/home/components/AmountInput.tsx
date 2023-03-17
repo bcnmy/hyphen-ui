@@ -64,7 +64,8 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
         >
           Min:
           <span className="min-w-[40px] ml-1 text-left">
-            {getPoolInfoStatus === Status.SUCCESS &&
+            100
+            {/* {getPoolInfoStatus === Status.SUCCESS &&
             poolInfo?.minDepositAmount ? (
               <>{poolInfo.minDepositAmount}</>
             ) : (
@@ -75,7 +76,7 @@ const AmountInput: React.FunctionComponent<IAmountInputProps> = ({
                   highlightColor="#615ccd05"
                 />
               </>
-            )}
+            )} */}
           </span>
         </button>
         <button

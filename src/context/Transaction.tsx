@@ -357,9 +357,6 @@ const TransactionProvider: React.FC = (props) => {
   }, [errors, fetchTransactionFee]);
 
   const preDepositCheck = useCallback(async () => {
-    if (!transferAmount || errors.length > 0) {
-      throw new Error("Invalid transfer amount");
-    }
     if (!fromChain || !toChain || !selectedToken) {
       throw new Error("Prerequisites missing");
     }

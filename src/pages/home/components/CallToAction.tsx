@@ -83,7 +83,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
 
   return (
     <div className="flex justify-center gap-8 mt-4">
-      {fetchSelectedTokenApprovalStatus === Status.IDLE ||
+      {/* {fetchSelectedTokenApprovalStatus === Status.IDLE ||
       transactionAmountValidationErrors.length > 0 ||
       fetchSelectedTokenApprovalError ? (
         <>
@@ -157,7 +157,10 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
               </PrimaryButtonLight>
             )}
         </>
-      )}
+      )} */}
+      <PrimaryButtonLight onClick={onTransferButtonClick}>
+        Transfer
+      </PrimaryButtonLight>
     </div>
   );
 };

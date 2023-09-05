@@ -6,11 +6,7 @@ function Pools() {
   const { isLoggedIn, connect } = useWalletProvider()!;
 
   useEffect(() => {
-    (async () => {
-      await connect().catch(e => {
-        console.error(e);
-      });
-    })();
+    connect && connect();
   }, [isLoggedIn, connect]);
 
   return (

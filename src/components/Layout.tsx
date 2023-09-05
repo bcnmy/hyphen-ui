@@ -15,7 +15,7 @@ function Layout({ children }: LayoutProps) {
   } = useModal();
 
   return (
-    <div className="grid min-h-screen w-full grid-rows-[auto_1fr_auto] xl:grid-rows-[auto_1fr_3rem]">
+    <div className="grid min-h-screen w-screen grid-rows-[auto_1fr_auto] xl:grid-rows-[auto_1fr_3rem]">
       <Header showUserInfoModal={showUserInfoModal} />
       <UserInfoModal
         isVisible={isUserInfoModalVisible}

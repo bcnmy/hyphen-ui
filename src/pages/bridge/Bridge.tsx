@@ -11,11 +11,7 @@ const Bridge: React.FC<BridgeProps> = () => {
   const { isLoggedIn, connect } = useWalletProvider()!;
 
   useEffect(() => {
-    (async () => {
-      await connect().catch((e: Error) => {
-        console.error(e);
-      });
-    })();
+    connect && connect();
   }, [isLoggedIn, connect]);
 
   useEffect(() => {

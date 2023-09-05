@@ -1,20 +1,21 @@
-import { useWalletProvider } from "context/WalletProvider";
 import { useChains } from "context/Chains";
 import { useToken } from "context/Token";
 import { Status } from "hooks/useLoading";
 import { useBiconomy } from "context/Biconomy";
 import { useHyphen } from "context/Hyphen";
 import { BigNumber } from "ethers";
+import { useAccount } from "wagmi";
 
-export {};
-function useTokenApproval(): {
+export { };
+
+export function useTokenApproval(): {
   checkSelectedTokenApproval: ((amount: number) => Promise<boolean>) | null;
   approveToken: (
     isInfiniteApproval: boolean,
     tokenAmount: number
   ) => Promise<void>;
 } {
-  const { accounts } = useWalletProvider()!;
+  const { address: account } = useAccount();
   const { selectedToken } = useToken()!;
   const { isBiconomyEnabled } = useBiconomy()!;
   const { hyphen, poolInfo, getPoolInfoStatus } = useHyphen()!;
@@ -34,7 +35,7 @@ function useTokenApproval(): {
       !poolInfo?.fromLPManagerAddress ||
       !fromChain ||
       !selectedToken?.[fromChain?.chainId].address ||
-      !accounts?.[0]
+      !account
     ) {
       // console.error({ poolInfo, selectedToken, accounts });
       return null;
@@ -45,7 +46,7 @@ function useTokenApproval(): {
 
       let tokenAllowance = await hyphen.getERC20Allowance(
         selectedToken[fromChain.chainId].address,
-        accounts[0],
+        account,
         poolInfo.fromLPManagerAddress
       );
 
@@ -84,9 +85,9 @@ function useTokenApproval(): {
       !fromChain ||
       !selectedToken[fromChain.chainId] ||
       !poolInfo?.fromLPManagerAddress ||
-      !accounts?.[0]
+      !account
     ) {
-      console.log({ selectedToken, fromChain, poolInfo, accounts });
+      console.log({ selectedToken, fromChain, poolInfo, account });
       throw new Error(
         "Unable to proceed with approval. Some information is missing. Check console for more info"
       );
@@ -104,7 +105,7 @@ function useTokenApproval(): {
         selectedToken[fromChain.chainId].address,
         poolInfo.fromLPManagerAddress,
         rawAmountHexString,
-        accounts[0],
+        account,
         isInfiniteApproval,
         isBiconomyEnabled
       );

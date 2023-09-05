@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import { useState } from "react";
 
 export default function useModal() {
   const [isVisible, setIsVisible] = useState(false);

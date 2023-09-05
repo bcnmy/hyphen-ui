@@ -4,7 +4,6 @@ import {
     useContext,
     useEffect,
     useMemo,
-    useState,
 } from "react";
 
 // @ts-ignore
@@ -15,7 +14,6 @@ import { useToken } from "./Token";
 import useAsync, { Status } from "hooks/useLoading";
 import { useBiconomy } from "./Biconomy";
 import { ENV } from "types/environment";
-import { useAccount } from "wagmi";
 import { useWalletProvider } from "./WalletProvider";
 
 type PoolInfo = {

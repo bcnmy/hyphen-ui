@@ -7,7 +7,9 @@ function Farms() {
 
   useEffect(() => {
     (async () => {
-      connect && connect();
+      await connect().catch(e => {
+        console.error(e);
+      });
     })();
   }, [isLoggedIn, connect]);
 

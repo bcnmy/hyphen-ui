@@ -46,7 +46,7 @@ export const CallToAction: React.FC<ICallToActionProps> = ({
   if (!isLoggedIn) {
     return (
       <div className="flex justify-center">
-        <PrimaryButtonLight onClick={connect} className="xl:w-full">
+        <PrimaryButtonLight onClick={() => connect()} className="xl:w-full">
           Connect Wallet
         </PrimaryButtonLight>
       </div>

@@ -55,6 +55,7 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
+    "build:prod": "REACT_APP_ENV=production REACT_APP_INFURA_ID=https://mainnet.infura.io/v3/c9c349cef85a436eaad2f5ef6c067f3a craco build",
     "test": "react-app-rewired test",
     "eject": "react-app-rewired eject",
     "lint-staged": "lint-staged --config lint-staged.js",
